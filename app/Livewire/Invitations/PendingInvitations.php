@@ -65,6 +65,7 @@ class PendingInvitations extends Component
 
         $this->dispatch('toast', type:'success', message:'Invitation acceptée ✅');
         $this->loadInvites();
+
     }
 
     public function decline(int $invitationId): void
