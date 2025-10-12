@@ -46,10 +46,5 @@
             
         </div>
     </div>
-    <button
-        class="fixed bottom-8 right-8 bg-primary text-white rounded-full p-4 shadow-xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-background-dark transition-transform duration-300 hover:scale-110">
-        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-        </svg>
-    </button>
+
 </div>
