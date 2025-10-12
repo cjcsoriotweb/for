@@ -7,7 +7,7 @@
     </div>
     @if(Auth::user()->hasTeamRole(Auth::user()->currentTeam, 'admin'))
       <div>
-        <a href="{{ route('admin.index') }}" class="text-blue-600 hover:underline">Admin</a>
+        <a href="{{ route('team.admin.index', ['team' => Auth::user()->current_team_id]) }}" class="text-blue-600 hover:underline">Admin</a>
       </div>
     @endif
     <div>© {{ now()->year }}</div>

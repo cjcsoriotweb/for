@@ -1,33 +1,40 @@
 <?php
 
-use App\Http\Controllers\FormationsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FormationsController;
+use App\Http\Controllers\Team\DashboardController; // adapte si besoin
 
+// Accueil public
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+// Espace perso générique (hors team)
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-              Route::get('/formations', fn () => view('admin.formations.index'))->name('formations.index');
-
-    Route::get('/teams/{team}/formations/{formation}/start', [FormationsController::class, 'startFormation'])->name('teams.startFormation');
-
-
-    Route::middleware(['web','auth','verified','can:access-admin'])
-        ->prefix('admin')->as('admin.')
-        ->group(function () {
-            Route::get('/', fn () => view('admin.index'))->name('index');
-  
-            
-        });
-
-
 });
 
+// Espace "app d'équipe"
+Route::middleware(['auth','verified'])
+    ->prefix('application/{team}')   // {team} doit exister ici
+    ->as('team.')
+    ->scopeBindings()
+    ->group(function () {
+
+        // Accès membres
+        Route::middleware('can:access-team,team')->group(function () {
+
+            Route::get('/dashboard', [DashboardController::class, 'index'])
+                ->name('dashboard');
+
+            Route::resource('formations', FormationsController::class)
+                ->only(['index','show']);
+
+            // Accès admin (owner/admin) — IMPORTANT: ,team
+            Route::middleware('can:access-admin,team')->group(function () {
+                Route::get('/admin', fn () => view('team.admin.index'))->name('admin.index');
+            });
+        });
+    });
