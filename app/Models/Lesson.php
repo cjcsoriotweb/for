@@ -13,4 +13,11 @@ class Lesson extends Model
     {
         return $this->belongsTo(Chapter::class);
     }
+    public function learners()
+    {
+        return $this->belongsToMany(User::class, 'lesson_user')
+            ->withPivot(['status','watched_seconds','best_score','max_score','attempts','read_percent','started_at','last_activity_at','completed_at'])
+            ->withTimestamps();
+    }
+
 }

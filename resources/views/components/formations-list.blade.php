@@ -35,7 +35,7 @@
                         </div>
                         <div class="mt-6 flex justify-end">
                             <a class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors"
-                                href="#">
+                                href="{{ route('teams.startFormation', ['team' => Auth::user()->current_team_id, 'formation' => $formation->id]) }}">
                                 Continuer la formation
                                 <span class="material-symbols-outlined ml-1">arrow_forward</span>
                             </a>
