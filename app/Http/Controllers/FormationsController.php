@@ -17,12 +17,7 @@ class FormationsController extends Controller
         $formations = $team->formations; // Récupère les formations associées à l'équipe
         return view('formations.index', compact('team', 'formations'));
     }
-    public function show(Team $team, Formation $formation)
-    {
-        $this->assertFormationInCurrentTeam($formation);
 
-        return view('formations.show', compact('team', 'formation'));
-    }
 
     /**
      * Vérifie que l'utilisateur est bien dans la team courante
