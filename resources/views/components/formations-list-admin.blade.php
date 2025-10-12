@@ -1,8 +1,9 @@
 <div class="relative min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-10">Formation disponible pour {{ Auth::user()->currentTeam->name ?? '' }}</h1>
-        <div class="space-y-8">sdq
-            @foreach($formations as $formation)
+        <div class="space-y-8">
+
+
             <div
                 class="bg-white dark:bg-gray-800/50 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col lg:flex-row transform hover:-translate-y-1">
                 <div class="w-full lg:w-1/3 h-56 lg:h-auto bg-cover bg-center"
@@ -38,7 +39,8 @@
                     </div>
                 </div>
             </div>
-            @endforeach
+
+            
         </div>
     </div>
     <button

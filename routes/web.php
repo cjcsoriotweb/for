@@ -2,39 +2,69 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormationsController;
-use App\Http\Controllers\Team\DashboardController; // adapte si besoin
+use App\Http\Controllers\Team\DashboardController; // si tu l'utilises
 
-// Accueil public
-Route::get('/', function () {
-    return view('welcome');
-});
+/*
+|--------------------------------------------------------------------------
+| Public
+|--------------------------------------------------------------------------
+*/
+Route::view('/', 'welcome')->name('home');
 
-// Espace perso générique (hors team)
+
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+                Route::view('/dashboard', 'account-dashboard')->name('dashboard');
 });
 
-// Espace "app d'équipe"
-Route::middleware(['auth','verified'])
-    ->prefix('application/{team}')   // {team} doit exister ici
+
+/*
+|--------------------------------------------------------------------------
+| Espace d'équipe / application
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])
+    ->prefix('application/{team:slug}')   // ← utilise le slug; repasse en {team} si binding par ID
     ->as('team.')
     ->scopeBindings()
     ->group(function () {
 
-        // Accès membres
+        // Accès membres de l’équipe
         Route::middleware('can:access-team,team')->group(function () {
 
-            Route::get('/dashboard', [DashboardController::class, 'index'])
-                ->name('dashboard');
+          
 
+            // Dashboard d'équipe (optionnel si tu as un controller)
+            Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
+
+            // Formations visibles par les membres
             Route::resource('formations', FormationsController::class)
-                ->only(['index','show']);
+                ->only(['index', 'show'])
+                ->names([
+                    'index' => 'formations.index',
+                    'show'  => 'formations.show',
+                ]);
 
-            // Accès admin (owner/admin) — IMPORTANT: ,team
-            Route::middleware('can:access-admin,team')->group(function () {
-                Route::get('/admin', fn () => view('team.admin.index'))->name('admin.index');
-            });
+            // Accès admin (owner/admin)
+            Route::prefix('admin')
+                ->as('admin.')
+                ->middleware('can:access-admin,team')
+                ->group(function () {
+                    Route::view('/', 'team.admin.index')->name('index');
+
+                    // Liste/gestion des formations côté admin (vue simple)
+                    Route::view('/formations', 'team.admin.formations.index')->name('formations.index');
+
+                    // Si tu passes en controller plus tard :
+                    // Route::resource('formations', \App\Http\Controllers\Team\Admin\FormationsController::class)->except('show');
+                });
         });
     });
+
+/*
+|--------------------------------------------------------------------------
+| Fallback (évite des erreurs brutes si un modèle n'est pas trouvé)
+|--------------------------------------------------------------------------
+*/
+Route::missing(function () {
+    abort(404);
+});

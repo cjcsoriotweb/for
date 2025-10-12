@@ -8,7 +8,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
-class FormationsList extends Component
+class FormationsListAdmin extends Component
 {
     /**
      * Filtrage (props optionnels que tu peux passer depuis la vue)

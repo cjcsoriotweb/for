@@ -11,7 +11,14 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-         
+
+                    <x-nav-link :href="route('team.admin.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.index')">
+                        Admin
+                    </x-nav-link>
+                    <x-nav-link :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.formations.index')">
+                        Formations
+                    </x-nav-link>
+
                 </div>
             </div>
 
@@ -27,10 +34,5 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div x-data="{ open: false }" :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="px-2 pt-2 pb-3 space-y-1 bg-blue-700">
-    
-        </div>
-    </div>
+
 </nav>
