@@ -9,7 +9,37 @@
                 <div class="hidden lg:flex items-center space-x-1">
 
 
-                    <x-nav-link :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])"
+                    <x-nav-link :href="route('team.admin.index', ['team' => Auth::user()->current_team_id])"
+                        :active="request()->routeIs('team.admin.index')" class="group">
+                        <span
+                            class="flex items-center px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 hover:bg-gray-50/50 rounded-lg">
+                            <svg class="w-5 h-5 mr-2 text-gray-500 group-hover:text-green-500" fill="currentColor"
+                                viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Paramètre
+                        </span>
+                    </x-nav-link>
+
+                                        <x-nav-link :href="route('team.admin.members.index', ['team' => $team->id])"
+                        :active="request()->routeIs('team.admin.members.index')" class="group">
+                        <span
+                            class="flex items-center px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 hover:bg-gray-50/50 rounded-lg">
+                            <svg class="w-5 h-5 mr-2 text-gray-500 group-hover:text-green-500" fill="currentColor"
+                                viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {{ __('Utilisateurs') }}
+                        </span>
+                    </x-nav-link>
+
+                    
+
+                                        <x-nav-link :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])"
                         :active="request()->routeIs('team.admin.formations.index')" class="group">
                         <span
                             class="flex items-center px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 hover:bg-gray-50/50 rounded-lg">
@@ -49,43 +79,6 @@
             </div>
         </div>
 
-        <!-- Mobile Navigation Menu -->
-        <div class="lg:hidden" :class="{'block': open, 'hidden': !open}">
-            <div class="px-2 pt-2 pb-3 space-y-1 bg-white/80 backdrop-blur-sm rounded-b-lg border-t border-gray-200/20">
-                <x-nav-link :href="route('team.dashboard', ['team' => Auth::user()->current_team_id])"
-                    :active="request()->routeIs('team.admin.index')" class="block">
-                    <span
-                        class="flex items-center px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 rounded-md font-medium">
-                        <svg class="w-5 h-5 mr-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                        </svg>
-                        Voir application
-                    </span>
-                </x-nav-link>
-                <x-nav-link :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])"
-                    :active="request()->routeIs('team.admin.formations.index')" class="block">
-                    <span
-                        class="flex items-center px-3 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors duration-200 rounded-md font-medium">
-                        <svg class="w-5 h-5 mr-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        Formations
-                    </span>
-                </x-nav-link>
 
-                <!-- Mobile Money Counter -->
-                <div
-                    class="flex items-center justify-center px-3 py-2 bg-green-50 text-green-700 rounded-md font-semibold border border-green-200">
-                    <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                            d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
-                    </svg>
-                    {{ $team->money }}€
-                </div>
-            </div>
-        </div>
     </div>
 </nav>

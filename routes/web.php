@@ -58,7 +58,7 @@ Route::prefix('application/{team:id}')
             ->group(function () {
                 Route::get('/', [TeamAdminController::class, 'index'])->name('index');
                 Route::get('/formations', [TeamAdminController::class, 'formationsIndex'])->name('formations.index');
-                Route::get('/users', [TeamAdminController::class, 'usersIndex'])->name('users.index');
+                Route::get('/users', [TeamAdminController::class, 'usersIndex'])->name('members.index');
             });
     });
 
