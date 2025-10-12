@@ -31,11 +31,11 @@
 
             {{-- Code 404 stylé --}}
             <h1 class="text-7xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600 select-none">
-                404
+                403
             </h1>
 
             <p class="mt-4 text-xl font-semibold">
-                Oups, cette page est introuvable.
+                Vous ne disposez pas des autorisations nécessaires pour accéder à cette page.
             </p>
 
             @php

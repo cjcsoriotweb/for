@@ -61,6 +61,47 @@ class Formation extends Model
         });
     }
 
+    public function scopeAvailableInTeam($query, $team): \Illuminate\Database\Eloquent\Builder
+{
+    $teamId = $team instanceof \App\Models\Team ? $team->id : (int) $team;
+    $now = now();
+
+    if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'team_id')) {
+        // Ownership : "dans la team" = appartient à cette team
+        return $query->where('team_id', $teamId);
+    }
+
+    // Pivot : disponible et visible pour cette team
+    return $query->whereHas('teams', function ($q) use ($teamId, $now) {
+        $q->where('team_id', $teamId)
+          ->where('visible', true)
+          ->whereNotNull('approved_at')
+          ->where(function ($w) use ($now) {
+              $w->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+          })
+          ->where(function ($w) use ($now) {
+              $w->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+          });
+    });
+}
+
+
+    // Formation dans team
+    public function scopeInTeam($query, $team): \Illuminate\Database\Eloquent\Builder
+    {
+        $teamId = $team instanceof \App\Models\Team ? $team->id : (int) $team;
+
+        // Cas 1 : ownership direct (colonne team_id)
+        if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'team_id')) {
+            return $query->where('team_id', $teamId);
+        }
+
+        // Cas 2 : via pivot formation_team (disponible pour la team)
+        return $query->whereHas('teams', function ($q) use ($teamId) {
+            $q->where('team_id', $teamId);
+        });
+    }
+
     public function learners() // utilisateurs inscrits
     {
         return $this->belongsToMany(User::class, 'formation_user')

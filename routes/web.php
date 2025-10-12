@@ -17,8 +17,7 @@ Route::middleware([
     })->name('dashboard');
               Route::get('/formations', fn () => view('admin.formations.index'))->name('formations.index');
 
-    Route::get('/formations/{team}/{formation}/start',
-                [FormationsController::class, 'startFormation'])->name('teams.startFormation');
+    Route::get('/teams/{team}/formations/{formation}/start', [FormationsController::class, 'startFormation'])->name('teams.startFormation');
 
 
     Route::middleware(['web','auth','verified','can:access-admin'])
