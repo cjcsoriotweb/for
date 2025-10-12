@@ -33,7 +33,6 @@ class FormationsList extends Component
     public function render(): View|Closure|string
     {
         $q = Formation::query()
-            ->when($this->teamId, fn($qq) => $qq->where('team_id', $this->teamId))
             ->when(($s = trim((string) $this->search)) !== '', function ($qq) use ($s) {
                 $qq->where(function ($w) use ($s) {
                     $w->where('title', 'like', "%{$s}%")

@@ -1,2 +1,3 @@
 <livewire:invitations.pending-invitations />
-{{ Auth::user()->currentTeam }}
+<x-formations-list team-id="{{ Auth::user()->currentTeam->id }}" />
+
