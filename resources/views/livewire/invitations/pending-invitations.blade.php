@@ -98,9 +98,6 @@
 
     @if (!$hasInvites && !$hasTeam)
         <section class="p-6 lg:p-8 bg-white border border-gray-200 rounded-xl shadow-sm">
-            @if (class_exists(\Illuminate\View\AnonymousComponent::class))
-                <x-application-logo class="block h-12 w-auto" />
-            @endif
 
             <h1 class="mt-6 text-xl font-semibold text-gray-900">
                 {{ __("Vous n'avez aucune invitation") }}
