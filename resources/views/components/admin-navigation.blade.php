@@ -10,13 +10,16 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" >
 
-                    <x-nav-link :href="route('team.admin.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.index')">
-                        Admin
+                    <x-nav-link  style="color:white" :href="route('team.dashboard', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.index')">
+                        Voir application
                     </x-nav-link>
-                    <x-nav-link :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.formations.index')">
+                    <x-nav-link  style="color:white" :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.formations.index')">
                         Formations
+                    </x-nav-link>
+                   <x-nav-link  style="color:white" :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.formations.index')">
+                        {{$team->money}}€
                     </x-nav-link>
 
                 </div>

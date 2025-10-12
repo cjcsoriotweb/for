@@ -1,7 +1,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-            <x-admin-navigation />
+            <x-admin-navigation :team="$team"  />
     </x-slot>
 
     <div class="py-12">
