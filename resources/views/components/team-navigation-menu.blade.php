@@ -42,16 +42,12 @@
                             <div class="w-60">
                                 <!-- Team Management -->
                                 <div class="block px-4 py-2 text-xs text-gray-400">
-                                    {{ __('Admin') }}
+                                    {{ __('Manage Team') }}
                                 </div>
 
                                 <!-- Team Settings -->
                                 <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
-                                    {{ __('Paramètres de l\'application') }}
-                                </x-dropdown-link>
-
-                                <x-dropdown-link href="{{ route('team.admin.index', Auth::user()->currentTeam->id) }}">
-                                    {{ __('Administration') }}
+                                    {{ __('Team Settings') }}
                                 </x-dropdown-link>
 
                                 <!--

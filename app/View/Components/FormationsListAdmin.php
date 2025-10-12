@@ -45,7 +45,7 @@ class FormationsListAdmin extends Component
 
         $formations = $q->limit($this->limit)->get();
 
-        return view('components.formations-list-admin', [
+        return view('components.formations-list', [
             'formations' => $formations,
         ]);
     }

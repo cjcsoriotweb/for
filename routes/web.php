@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormationsController;
 use App\Http\Controllers\Team\DashboardController;
-use App\Http\Controllers\TeamAdminController;
 use App\Http\Controllers\TeamSwitchController;
 
 /*
@@ -49,18 +48,13 @@ Route::prefix('application/{team:id}')
                 'show'  => 'formations.show',
             ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Administration (scopé par id)
-        |--------------------------------------------------------------------------
-        */
+        // Zone admin d’équipe
         Route::prefix('admin')
             ->as('admin.')
             ->middleware('can:access-admin,team')
             ->group(function () {
-                Route::get('/', [TeamAdminController::class, 'index'])->name('index');
-                Route::get('/formations', [TeamAdminController::class, 'formationsIndex'])->name('formations.index');
-                Route::get('/users', [TeamAdminController::class, 'usersIndex'])->name('users.index');
+                Route::view('/', 'team.admin.index')->name('index');
+                Route::view('/formations', 'team.admin.formations.index')->name('formations.index');
             });
     });
 
