@@ -14,5 +14,14 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::middleware(['web','auth','verified','can:access-admin'])
+        ->prefix('admin')->as('admin.')
+        ->group(function () {
+            Route::get('/', fn () => view('admin.index'))->name('index');
+            Route::get('/formations', fn () => view('admin.formations.index'))->name('formations.index');
+        });
+
+
 });
 

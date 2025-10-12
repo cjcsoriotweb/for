@@ -53,6 +53,8 @@
                                         </x-dropdown-link>
                                     @endcan
 
+                              
+
                                     <!-- Team Switcher -->
                                     @if (Auth::user()->allTeams()->count() > 1)
                                         <div class="border-t border-gray-200"></div>
