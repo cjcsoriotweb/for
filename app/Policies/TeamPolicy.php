@@ -34,13 +34,8 @@ class TeamPolicy
         return true;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Team $team): bool
-    {
-        return $user->ownsTeam($team);
-    }
+
+
 
     /**
      * Determine whether the user can add team members.
@@ -73,4 +68,14 @@ class TeamPolicy
     {
         return $user->ownsTeam($team);
     }
+
+    /**
+    * Determine whether the user can update the model.
+    */
+
+    public function update(User $user, Team $team): bool
+    {
+        return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
+    }
+
 }
