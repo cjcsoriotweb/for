@@ -22,6 +22,7 @@ Route::view('/', 'welcome')->name('home');
 */
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/dashboard', 'account-dashboard')->name('dashboard');
+    Route::view('/welcome-back', 'welcome-back')->name('welcome-back');
 
     // Switch d’équipe (sécurisé: l’utilisateur doit appartenir à l’équipe)
     Route::post('/teams/{team}/switch', [TeamSwitchController::class, 'store'])
