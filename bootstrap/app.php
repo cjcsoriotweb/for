@@ -3,6 +3,7 @@
 use App\Http\Middleware\SetTeamContext;
 use App\Models\Team;
 use App\Models\User;
+use App\Policies\TeamPolicy;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
-            // Gates "team" — tolérantes : acceptent Team|int|string depuis la route (ex: {team} = "3")
+             Gate::policy(Team::class, TeamPolicy::class);
+
             Gate::define('access-team', function (User $user, $team) {
                 $team = $team instanceof Team ? $team : Team::query()->findOrFail($team);
                 return $user->belongsToTeam($team);
@@ -26,10 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
             });
 
-            // (Optionnel) Super-admin de secours pendant le dev
-            // Gate::before(function (User $user, string $ability, ?array $args = null) {
-            //     return $user->email === 'you@example.com' ? true : null;
-            // });
+    
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {

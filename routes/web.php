@@ -10,7 +10,9 @@ use App\Http\Controllers\TeamSwitchController;
 | Public
 |--------------------------------------------------------------------------
 */
+
 Route::view('/', 'welcome')->name('home');
+
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -27,6 +29,7 @@ Route::middleware(['auth','verified'])
 | Espace d'équipe / application
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'verified'])
     ->prefix('team/{team:slug}')   // ← utilise le slug; repasse en {team} si binding par ID
     ->as('team.')
@@ -34,7 +37,6 @@ Route::middleware(['auth', 'verified'])
     ->group(function () {
         Route::middleware('can:access-team,team')->group(function () {
             Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
-
 
             Route::resource('formations', FormationsController::class)
                 ->only(['index', 'show'])
