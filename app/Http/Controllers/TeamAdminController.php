@@ -20,12 +20,6 @@ class TeamAdminController extends Controller
      */
     public function index(Team $team)
     {
-        // Authorization check
-        if (Gate::denies('access-admin', $team)) {
-            abort(403);
-        }
-
-        // Fetch users associated with the team
         $users = $team->users;
 
         return view('team.admin.index', [
@@ -38,9 +32,6 @@ class TeamAdminController extends Controller
 
     public function formationsIndex(Team $team)
     {
-        // Authorization check
-
-
         return view('team.admin.formations.index', [
             'team' => $team,
         ]);
@@ -50,10 +41,6 @@ class TeamAdminController extends Controller
 
     public function usersIndex(Team $team)
     {
-        // Authorization check
-
-
-
         return view('team.admin.users.index', [
             'team' => $team,
         ]);

@@ -56,7 +56,7 @@ Route::prefix('application/{team:id}')
         // Zone admin d’équipe
         Route::prefix('admin')
             ->as('admin.')
-            ->middleware('can:access-admin,team')
+            ->middleware('can:admin,team')
             ->group(function () {
                 Route::get('/', [TeamAdminController::class, 'index'])->name('index');
                 Route::get('/formations', [TeamAdminController::class, 'formationsIndex'])->name('formations.index');

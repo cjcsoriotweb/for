@@ -10,7 +10,10 @@
 
             @livewire('teams.update-team-name-form', ['team' => $team])
 
-            <!-- Money Counter -->
+            @include('teams.partials.update-team-photo-form', ['team' => $team])
+
+
+
 
 
         </div>
