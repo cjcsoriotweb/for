@@ -28,6 +28,11 @@ class TeamAdminController extends Controller
         // Fetch users associated with the team
         $users = $team->users;
 
+        return view('team.admin.index', [
+            'team' => $team,
+            'users' => $users,
+        ]);
+
   
     }
 
@@ -38,6 +43,11 @@ class TeamAdminController extends Controller
             abort(403);
         }
 
+
+        return view('team.admin.formations.index', [
+            'team' => $team,
+        ]);
+        
 
     }
 
