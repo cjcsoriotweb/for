@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.formations.index')">
                         Formations
                     </x-nav-link>
+                    <x-nav-link :href="route('team.admin.users.index', ['team' => Auth::user()->current_team_id])" :active="request()->routeIs('team.admin.users.index')">
+                        Utilisateurs
+                    </x-nav-link>
 
                 </div>
             </div>
