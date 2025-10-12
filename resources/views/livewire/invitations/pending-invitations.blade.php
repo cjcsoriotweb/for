@@ -95,8 +95,7 @@
         </section>
     @endif
 
-    {{-- EMPTY STATE : afficher seulement si pas d’invitations
-         et (optionnel) pas d’équipe --}}
+
     @if (!$hasInvites && !$hasTeam)
         <section class="p-6 lg:p-8 bg-white border border-gray-200 rounded-xl shadow-sm">
             @if (class_exists(\Illuminate\View\AnonymousComponent::class))
