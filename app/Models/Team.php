@@ -46,6 +46,14 @@ class Team extends JetstreamTeam
         ];
     }
 
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        return $this->profile_photo_path
+            ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_photo_path)
+            : 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=0D8ABC&color=fff';
+    }
+
+
     public function formations()
     {
         return $this->belongsToMany(\App\Models\Formation::class, 'formation_team')
