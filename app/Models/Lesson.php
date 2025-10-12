@@ -9,4 +9,8 @@ class Lesson extends Model
 {
     /** @use HasFactory<\Database\Factories\LessonFactory> */
     use HasFactory;
+    public function chapter()
+    {
+        return $this->belongsTo(Chapter::class);
+    }
 }

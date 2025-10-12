@@ -3,9 +3,7 @@
     <div>
       {{-- Priorité : nom d’équipe courante, sinon fallback --}}
       <strong>{{  config('app.name') }}</strong>
-      @if(!empty($currentTeam))
-        <span class="text-gray-500">—  {{ $currentTeam->name }}</span>
-      @endif
+        <span class="text-gray-500">—  {{ Auth::user()->currentTeam->name ?? '' }}</span>
     </div>
     <div>© {{ now()->year }}</div>
   </div>
