@@ -45,4 +45,12 @@ class Team extends JetstreamTeam
             'personal_team' => 'boolean',
         ];
     }
+
+    public function formations()
+    {
+        return $this->belongsToMany(\App\Models\Formation::class, 'formation_team')
+            ->withPivot(['visible','approved_at','approved_by','starts_at','ends_at'])
+            ->withTimestamps();
+    }
+
 }

@@ -41,7 +41,9 @@ class FormationsList extends Component
             })
             ->when($this->onlyPublished, fn($qq) => $qq->where('published', true))
             ->withCount('lessons')
+            ->visibleForTeam($this->teamId)
             ->latest('id');
+
 
         $formations = $q->limit($this->limit)->get();
 
