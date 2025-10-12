@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormationsController;
 use App\Http\Controllers\Team\DashboardController;
+use App\Http\Controllers\Team\TeamPhotoController;
 use App\Http\Controllers\TeamAdminController;
 use App\Http\Controllers\TeamSwitchController;
 
@@ -11,6 +12,7 @@ use App\Http\Controllers\TeamSwitchController;
 | Public
 |--------------------------------------------------------------------------
 */
+
 Route::view('/', 'welcome')->name('home');
 
 /*
@@ -18,7 +20,7 @@ Route::view('/', 'welcome')->name('home');
 | Espace perso (auth générique)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth','verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/dashboard', 'account-dashboard')->name('dashboard');
 
     // Switch d’équipe (sécurisé: l’utilisateur doit appartenir à l’équipe)
@@ -34,7 +36,7 @@ Route::middleware(['auth','verified'])->group(function () {
 */
 Route::prefix('application/{team:id}')
     ->as('team.')
-    ->middleware(['auth','verified','can:access-team,team'])
+    ->middleware(['auth', 'verified', 'can:access-team,team'])
     ->scopeBindings()
     ->group(function () {
 
@@ -43,7 +45,7 @@ Route::prefix('application/{team:id}')
 
         // Catalogue / Détails des formations (lecture seule ici)
         Route::resource('formations', FormationsController::class)
-            ->only(['index','show'])
+            ->only(['index', 'show'])
             ->names([
                 'index' => 'formations.index',
                 'show'  => 'formations.show',
@@ -60,6 +62,15 @@ Route::prefix('application/{team:id}')
             });
     });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::put('/teams/{team}/photo', [TeamPhotoController::class, 'update'])
+        ->name('teams.photo.update')
+        ->can('update', 'team');
+
+    Route::delete('/teams/{team}/photo', [TeamPhotoController::class, 'destroy'])
+        ->name('teams.photo.destroy')
+        ->can('update', 'team');
+});
 /*
 |--------------------------------------------------------------------------
 | Fallback

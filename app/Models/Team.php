@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Jetstream\Events\TeamCreated;
 use Laravel\Jetstream\Events\TeamDeleted;
 use Laravel\Jetstream\Events\TeamUpdated;
+use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\Team as JetstreamTeam;
 
 class Team extends JetstreamTeam
 {
     /** @use HasFactory<\Database\Factories\TeamFactory> */
-    use HasFactory;
+    use HasFactory, HasProfilePhoto;
 
     /**
      * The attributes that are mass assignable.
@@ -46,13 +47,11 @@ class Team extends JetstreamTeam
         ];
     }
 
-    public function getProfilePhotoUrlAttribute(): string
+    // Disque utilisé par le trait (public conseillé avec storage:link)
+    protected function profilePhotoDisk(): string
     {
-        return $this->profile_photo_path
-            ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_photo_path)
-            : 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=0D8ABC&color=fff';
+        return 'public';
     }
-
 
     public function formations()
     {

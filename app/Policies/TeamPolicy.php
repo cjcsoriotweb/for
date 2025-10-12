@@ -78,4 +78,6 @@ class TeamPolicy
         return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
     }
 
+    
+
 }

@@ -5,17 +5,24 @@
             <div class="flex">
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('team.dashboard', ['team' => $team->id]) }}">
-                        <x-application-mark class="block h-9 w-auto" />
+                        @if(!$team->profile_photo_path)
+                            <x-application-mark class="block h-9 w-auto" />
+                        @else
+                            <img src="{{ $team->profile_photo_url }}" alt="Logo" class="block h-9 w-auto" />
+                        @endif
                     </a>
                 </div>
 
                 
                 <!-- Navigation Links -->
+                        @if(!$team->profile_photo_path)
+
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('team.dashboard', ['team' => $team->id]) }}" :active="request()->routeIs('dashboard')">
                         {{ $team->name }}</b>
                     </x-nav-link>
                 </div>
+                @endif
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
