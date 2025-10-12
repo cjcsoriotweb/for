@@ -19,7 +19,7 @@
                         </p>
                     </div>
                     <a class="bg-primary text-white font-bold py-2 px-6 rounded-full hover:bg-primary/80 transition-colors duration-300 flex items-center space-x-2"
-                        href="{{ route('team.dashboard', ['team' => $team->]) }}">
+                        href="{{ route('team.dashboard', ['team' => $team->id ]) }}">
                         <span>Aller</span>
                         <span class="material-symbols-outlined text-xl">arrow_forward</span>
                     </a>
