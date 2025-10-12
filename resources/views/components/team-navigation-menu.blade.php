@@ -4,7 +4,7 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('team.dashboard', ['team' => $team->id]) }}">
                         <x-application-mark class="block h-9 w-auto" />
                     </a>
                 </div>
@@ -12,7 +12,7 @@
                 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                    <x-nav-link href="{{ route('team.dashboard', ['team' => $team->id]) }}" :active="request()->routeIs('dashboard')">
                         {{ $team->name }}</b>
                     </x-nav-link>
                 </div>

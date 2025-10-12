@@ -1,5 +1,5 @@
 
-<x-app-layout>
+<x-team-layout :team="$team">
     <x-slot name="header">
             <x-admin-navigation :team="$team"  />
     </x-slot>
@@ -11,4 +11,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-team-layout>
