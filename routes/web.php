@@ -6,6 +6,7 @@ use App\Http\Controllers\Team\DashboardController;
 use App\Http\Controllers\Team\TeamPhotoController;
 use App\Http\Controllers\TeamAdminController;
 use App\Http\Controllers\TeamSwitchController;
+use App\Http\Controllers\WelcomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,7 @@ use App\Http\Controllers\TeamSwitchController;
 |--------------------------------------------------------------------------
 */
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', [WelcomeController::class, 'home'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +23,7 @@ Route::view('/', 'welcome')->name('home');
 */
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/dashboard', 'account-dashboard')->name('dashboard');
-    Route::view('/welcome-back', 'welcome-back')->name('welcome-back');
+    Route::view('/welcome-back', 'welcome-back')->name('welcome-back','dashboard');
 
     // Switch d’équipe (sécurisé: l’utilisateur doit appartenir à l’équipe)
     Route::post('/teams/{team}/switch', [TeamSwitchController::class, 'store'])
