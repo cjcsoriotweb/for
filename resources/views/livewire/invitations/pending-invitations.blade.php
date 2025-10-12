@@ -107,15 +107,7 @@
                 {{ __("Lorsque vous recevrez une invitation à rejoindre une équipe, elle apparaîtra ici.") }}
             </p>
 
-            <div class="mt-6">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit"
-                            class="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500">
-                        {{ __('Se déconnecter') }}
-                    </button>
-                </form>
-            </div>
+ 
         </section>
     @endif
 </div>

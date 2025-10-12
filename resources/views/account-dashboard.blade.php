@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                @if (Auth::user()->allTeams()->count() > 1)
+                @if (Auth::user()->allTeams()->count() > 0)
                 <div class="border-t border-gray-200"></div>
 
                 <div class="block px-4 py-2 text-xs text-gray-400">
@@ -23,11 +23,24 @@
                     </button>
                 </form>
                 @endforeach
+
+
                 @endif
 
+
+            </div>
+        </div>
+    </div>
+
+        <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+       
                 <livewire:invitations.pending-invitations />
 
             </div>
         </div>
     </div>
+
+
 </x-app-layout>
