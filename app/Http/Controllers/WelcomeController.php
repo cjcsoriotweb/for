@@ -8,7 +8,7 @@ class WelcomeController extends Controller
 {
     public function home(){
         if(auth()->check()){
-            return redirect()->route('welcome-back');
+            return redirect()->route('yoursApplications');
         }
         return view('welcome');
     }
