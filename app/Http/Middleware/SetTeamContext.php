@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Team;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,75 +15,73 @@ class SetTeamContext
         $fallbackName = config('app.name');
         $user = Auth::user();
 
-        // 1) Team prioritaire : paramètre de route {team} si présent (Jetstream route-model binding)
-        $team = $request->route('team') ?? null;
+        // Normalise {team} (Model ou id)
+        $teamParam = $request->route('team') ?? null;
+        $team = null;
 
-        // 2) Sinon team courante de l'utilisateur
-        if (! $team && $user) {
-            $team = $user->currentTeam; // nullable
+        if ($teamParam instanceof Team) {
+            $team = $teamParam;
+        } elseif (!is_null($teamParam)) {
+            $team = Team::query()->whereKey($teamParam)->first();
         }
 
-        // 3) Construire le contexte
+        // Sinon: team courante
+        if (!$team && $user) {
+            $team = $user->currentTeam;
+        }
+
+        // Contexte partagé
         $ctx = [
-            'hasUser'        => (bool) $user,
-            'hasTeam'        => (bool) $team,
-            'siteName'       => $team?->name ?? $fallbackName,
+            'hasUser'       => (bool) $user,
+            'hasTeam'       => (bool) $team,
+            'siteName'      => $team?->name ?: $fallbackName,
 
             'team' => $team ? [
-                'id'        => $team->id,
-                'uuid'      => $team->uuid ?? null, // Jetstream a souvent uuid
-                'name'      => $team->name,
-                'owner_id'  => $team->user_id,
+                'id'       => $team->id,
+                'uuid'     => null,
+                'name'     => $team->name,
+                'owner_id' => $team->user_id,
             ] : null,
 
-            'role'           => null,
-            'isOwner'        => false,
-            'permissions'    => [],
-            'currentTeamId'  => $user?->current_team_id,
-            'allTeams'       => [],
+            'role'          => null, // 'owner' | 'admin' | 'eleve' | null
+            'isOwner'       => false,
+            'permissions'   => [],
+            'currentTeamId' => $user?->current_team_id,
+            'allTeams'      => [],
         ];
 
         if ($user && $team) {
-            // Rôle : 'owner' si propriétaire, sinon rôle du pivot (ex: 'admin','eleve',...)
             $isOwner = (int) $team->user_id === (int) $user->id;
-            $role = null;
+            $role = $isOwner ? 'owner' : optional(
+                $user->teams()->where('team_id', $team->id)->first()
+            )->pivot?->role;
 
-            if ($isOwner) {
-                $role = 'owner';
-            } else {
-                // Cherche l'entrée de membership pour récupérer le pivot->role
-                $membership = $user->teams()
-                    ->where('team_id', $team->id)
-                    ->first(); // Team model avec pivot
-                $role = $membership?->pivot?->role; // ex. 'admin', 'eleve', ...
-            }
+            $permissions = method_exists($user, 'teamPermissions')
+                ? (array) $user->teamPermissions($team)
+                : [];
 
-            // Permissions (Jetstream::permissions()) pour cette team
-            // -> renvoie un array de permissions ex. ['read','create','update','delete']
-            $permissions = $user->teamPermissions($team);
-
-            // Liste *légère* des teams de l'utilisateur (pour switcher en UI si besoin)
-            $allTeams = $user->allTeams()->map(function ($t) {
+            $allTeams = $user->allTeams()->map(function ($t) use ($user) {
                 return [
-                    'id'   => $t->id,
-                    'uuid' => $t->uuid ?? null,
-                    'name' => $t->name,
-                    'is_owner' => (int) $t->user_id === (int) auth()->id(),
+                    'id'       => $t->id,
+                    'uuid'     => null,
+                    'name'     => $t->name,
+                    'is_owner' => (int) $t->user_id === (int) $user->id,
                 ];
             })->values()->all();
 
             $ctx['isOwner']     = $isOwner;
-            $ctx['role']        = $role;                 // 'owner' | 'admin' | 'eleve' | null
-            $ctx['permissions'] = array_values($permissions ?? []);
+            $ctx['role']        = $role;
+            $ctx['permissions'] = array_values($permissions);
             $ctx['allTeams']    = $allTeams;
         }
 
-        // 4) Partage global (vues) + config app.name mise au nom d’équipe pour la requête
+        // Partage global + config app.name
+        config(['app.name' => $ctx['siteName']]);
         View::share('teamCtx', $ctx);
-        View::share('siteName', $ctx['siteName']);   // rétro-compat
-        View::share('currentTeam', $team);           // rétro-compat
+        View::share('siteName', $ctx['siteName']);
+        View::share('currentTeam', $team);
 
-        // 5) Accessible aussi côté contrôleur via $request->attributes
+        // Accessible côté contrôleurs/Livewire
         $request->attributes->set('teamCtx', $ctx);
 
         return $next($request);

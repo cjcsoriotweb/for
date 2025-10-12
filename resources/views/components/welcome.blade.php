@@ -1,4 +1,2 @@
-
-
-    <livewire:invitations.pending-invitations />
+<livewire:invitations.pending-invitations />
 
