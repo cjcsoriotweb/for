@@ -45,10 +45,17 @@
                                     {{ __('Manage Team') }}
                                 </div>
 
+
+                                <x-dropdown-link href="{{ route('team.admin.index', Auth::user()->currentTeam->id) }}">
+                                    {{ __('Administration') }}
+                                </x-dropdown-link>
+
                                 <!-- Team Settings -->
                                 <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
-                                    {{ __('Team Settings') }}
+                                    {{ __('Paramètres d\'application') }}
                                 </x-dropdown-link>
+
+         
 
                                 <!--
                                     @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
