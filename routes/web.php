@@ -15,6 +15,7 @@ use App\Http\Controllers\WelcomeController;
 */
 
 Route::get('/', [WelcomeController::class, 'home'])->name('home');
+Route::view('/legale', [WelcomeController::class, 'policy'])->name('privacy');
 
 /*
 |--------------------------------------------------------------------------
