@@ -7,12 +7,16 @@
 
     <x-block-div>
         <x-slot name="block">
-            Configuration de votre application
+            Changez le nom de votre application
         </x-slot>
         @livewire('teams.update-team-name-form', ['team' => $team])
     </x-block-div>
 
-    <x-block-div>
-        @include('application.admin.blocks.block-include', ['team' => $team])
-    </x-block-div>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+
+
+
+    </section>
+
 </x-application-layout>

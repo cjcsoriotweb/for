@@ -12,7 +12,5 @@
         @livewire('teams.team-member-manager', ['team' => $team])
     </x-block-div>
 
-    <x-block-div>
-            @include('application.admin.blocks.block-include', ['team' => $team])
-    </x-block-div>
+
 </x-application-layout>

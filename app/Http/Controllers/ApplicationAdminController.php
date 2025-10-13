@@ -14,9 +14,14 @@ class ApplicationAdminController extends Controller
         return view('application.admin.index', compact('team'));
     }
 
-    public function config(Team $team)
+    public function configurationIndex(Team $team)
     {
-        return view('application.admin.config', compact('team'));
+        return view('application.admin.configuration.index', compact('team'));
+    }
+
+    public function configurationName(Team $team)
+    {
+        return view('application.admin.configuration.name', compact('team'));
     }
 
     public function invitation(Team $team)

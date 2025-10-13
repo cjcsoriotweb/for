@@ -12,16 +12,15 @@
         
 
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                <x-button-block 
+                    titre="Configurez l'application"
+                    description="...."
+                    url="{{ route('application.admin.configuration.index', ['team'=>$team]) }}"
+                    />
 
-                <x-admin-block 
-                    titre="Changer nom application"
-                    description="Gérez les paramètres de votre application, y compris les préférences utilisateur, les options de sécurité et les intégrations tierces."
-                />
+ 
 
-                <x-admin-block 
-                    titre="Changer logo"
-                    description="Gérez les paramètres de votre application, y compris les préférences utilisateur, les options de sécurité et les intégrations tierces."
-                />
+                
         </section>
 
 

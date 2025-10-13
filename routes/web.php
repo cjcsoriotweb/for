@@ -46,9 +46,18 @@ Route::middleware(['auth', 'verified'])
                     ->name('index')
                     ->middleware('can:access-admin,team');
 
-                Route::get('/config', [ApplicationAdminController::class, 'config'])
-                    ->name('config')
-                    ->middleware('can:access-admin,team');
+                route::prefix('configuration')
+                    ->as('configuration.')
+                    ->group(function () {
+                        Route::get('/', [ApplicationAdminController::class, 'configurationIndex'])
+                            ->name('index')
+                            ->middleware('can:access-admin,team');
+
+                        Route::get('/name', [ApplicationAdminController::class, 'configurationName'])
+                            ->name('name')
+                            ->middleware('can:access-admin,team');        
+                });
+
      
                 Route::get('/users', [ApplicationAdminController::class, 'users'])
                     ->name('users')
