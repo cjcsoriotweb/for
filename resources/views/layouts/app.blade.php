@@ -16,7 +16,9 @@
         <!-- Main Content -->
         <main class="content">
             <div class="content-container">
-                {{ $slot }}
+                <div class="full width">
+                    {{ $slot }}
+                </div>
             </div>
         </main>
 

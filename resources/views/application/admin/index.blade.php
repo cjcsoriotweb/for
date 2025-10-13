@@ -5,13 +5,27 @@
         </h2>
     </x-slot>
 
-    @include('application.admin.navbar', ['team' => $team])
+    <x-block-div>
+        <x-slot name="block">
+            Configuration de votre application
+        </x-slot>
+        
 
-   
-    <x-slot name="block">
-        Bienvenue sur le panneau d'administration de votre équipe. Ici, vous pouvez gérer les membres, les projets, les paramètres et bien plus encore.
-    </x-slot>
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+
+                <x-admin-block 
+                    titre="Changer nom application"
+                    description="Gérez les paramètres de votre application, y compris les préférences utilisateur, les options de sécurité et les intégrations tierces."
+                />
+
+                <x-admin-block 
+                    titre="Changer logo"
+                    description="Gérez les paramètres de votre application, y compris les préférences utilisateur, les options de sécurité et les intégrations tierces."
+                />
+        </section>
+
+
+    </x-block-div>
+
 
 </x-application-layout>
-
-

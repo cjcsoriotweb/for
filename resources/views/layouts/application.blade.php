@@ -11,45 +11,33 @@
 
 <body class="font-sans antialiased">
     <x-banner />
-
-
     <div class="min-h-screen bg-gray-100">
-        
         <x-team-navigation-menu :team="$team" />
 
-            @if(isset($header))
-            {{  $header }}
-            @endif
-
-
-
-
-
         <x-error-display />
-
         <main>
-            
-  
-        @if(isset($block))
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <p class="text-gray-700">
-                        {{ $block}}
-                        </p>
+            @if(isset($block))
+            <div class="py-12">
+                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6 bg-white border-b border-gray-200">
+                            <p class="text-gray-700">
+                            @if(isset($header))
+                                <h1 class="text-center">{{ $header }}</h1>
+                            @endif
+                            {{ $block}}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        @endif
-        
-            {{ $slot }}
+            @endif
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {{ $slot }}
+            </div>
         </main>
     </div>
-
     @stack('modals')
-
     @livewireScripts
 </body>
 

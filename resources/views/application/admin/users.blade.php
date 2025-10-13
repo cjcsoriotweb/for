@@ -1,23 +1,18 @@
 <x-application-layout :team="$team">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Accueil') }}
+            {{ __('Gestion Utilisateurs') }}
         </h2>
     </x-slot>
 
+    <x-block-div>
+        <x-slot name="block">
+            Gestion des utilisateurs de votre application
+        </x-slot>
+        @livewire('teams.team-member-manager', ['team' => $team])
+    </x-block-div>
 
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-            <x-slot name="block">
-                Gestion des utilisateurs de votre application
-            </x-slot>
-
-            @livewire('teams.team-member-manager', ['team' => $team])
-
-
-
-        </div>
-    </div>
+    <x-block-div>
+            @include('application.admin.blocks.block-include', ['team' => $team])
+    </x-block-div>
 </x-application-layout>
