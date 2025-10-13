@@ -28,10 +28,10 @@
                     <div class="mb-2">
                         @if($formation->formation_user)
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progression</span>
-                            <span class="text-sm font-medium text-primary">{{ $formation->formation_user->progress_percent }}%</span>
+                            <span class="text-sm font-medium text-secondary dark:text-gray-300">Progression</span>
+                            <span class="text-sm font-medium text-secondary">{{ $formation->formation_user->progress_percent }}%</span>
                         </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div class="w-full bg-gray-200 dark:bg-secondary rounded-full h-2.5">
                             <div class="bg-primary h-2.5 rounded-full" style="width: {{ $formation->formation_user->progress_percent }}%"></div>
                         </div>
                         @endif
@@ -39,7 +39,7 @@
                     </div>
                     @if( $formation->formation_user )
                     <div class="mt-6 flex justify-end">
-                        <a class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
+                        <a class="text-secondary hover:text-primary/80 font-semibold flex items-center transition-colors">
                             Continuer la formation
                             <span class="material-symbols-outlined ml-1">arrow_forward</span>
                         </a>
