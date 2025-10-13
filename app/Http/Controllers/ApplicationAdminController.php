@@ -24,9 +24,15 @@ class ApplicationAdminController extends Controller
         return view('application.admin.configuration.index', compact('team'));
     }
 
+    /* Utilisateurs */
     public function usersIndex(Team $team)
     {
         return view('application.admin.users.index', compact('team'));
+    }
+
+    public function usersManager(Team $team)
+    {
+        return view('application.admin.users.manager', compact('team'));
     }
 
     /* */

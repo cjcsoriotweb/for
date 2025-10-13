@@ -6,12 +6,27 @@
     </x-slot>
 
     <x-block-div>
-        @livewire('teams.team-member-manager', ['team' => $team])
 
     </x-block-div>
 
     <x-block-div>
-        <x-block-navigation :navigation="[]" :team="$team" backTitle="Retour à Administration"
-            back="{{ route('application.admin.index', $team) }}" />
+        <x-block-navigation 
+        :navigation="[
+            [
+                'title' => 'Inviter des utilisateurs',
+                'description' => 'Voir les invitations et permissions', 
+                'route' => 'application.admin.users.manager'
+            ],
+            [
+                'title' => 'Liste de vos utilisateurs *',
+                'description' => '..', 
+                'route' => 'application.admin.configuration.index'
+            ],
+     
+            
+        ]" 
+        :team="$team" 
+        backTitle="Retour à l'Administration"
+        back="{{ route('application.admin.users.index', $team) }}" />
     </x-block-div>
 </x-application-layout>

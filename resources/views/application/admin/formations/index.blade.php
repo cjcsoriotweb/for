@@ -10,7 +10,23 @@
     </x-block-div>
 
     <x-block-div>
-        <x-block-navigation :navigation="[]" :team="$team" backTitle="Retour à Administration"
-            back="{{ route('application.admin.index', $team) }}" />
+        <x-block-navigation 
+        :navigation="[
+            [
+                'title' => 'Activer une formation',
+                'description' => '..', 
+                'route' => 'application.admin.configuration.index'
+            ],
+            [
+                'title' => 'Gerer vos formation',
+                'description' => '..', 
+                'route' => 'application.admin.configuration.index'
+            ],
+     
+            
+        ]" 
+        :team="$team" 
+        backTitle="Retour à l'Administration"
+        back="{{ route('application.admin.index', $team) }}" />
     </x-block-div>
 </x-application-layout>
