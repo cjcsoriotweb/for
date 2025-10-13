@@ -5,7 +5,7 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class TeamLayout extends Component
+class ApplicationLayout extends Component
 {
     /**
      * Get the view / contents that represents the component.
@@ -17,7 +17,7 @@ class TeamLayout extends Component
     }
     public function render(): View
     {
-        return view('layouts.team', [
+        return view('layouts.application', [
             'team' => $this->team,
         ]);
     }

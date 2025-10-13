@@ -1,4 +1,4 @@
-<x-app-layout :team="$team">
+<x-application-layout :team="$team">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Accueil') }}
@@ -14,4 +14,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-application-layout>

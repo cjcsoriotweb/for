@@ -4,7 +4,7 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('application.dashboard', ['team' => $team->id]) }}">
+                    <a href="{{ route('application.index', ['team' => $team->id]) }}">
                         @if(!$team->profile_photo_path)
                         <x-application-mark class="block h-9 w-auto" />
                         @else
@@ -18,7 +18,7 @@
                 @if(!$team->profile_photo_path)
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('team.dashboard', ['team' => $team->id]) }}"
+                    <x-nav-link href="{{ route('application.index', ['team' => $team->id]) }}"
                         :active="request()->routeIs('dashboard')">
                         {{ $team->name }}</b>
                     </x-nav-link>
@@ -114,7 +114,7 @@
                                 </div>
 
 
-                                <x-dropdown-link href="{{ route('application.admin.index', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('application.admin', Auth::user()->currentTeam->id) }}">
                                     {{ __('Administration') }}
                                 </x-dropdown-link>
 
@@ -164,7 +164,7 @@
                                 </div>
 
 
-                                <x-dropdown-link href="{{ route('application.admin.index', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('application.admin', Auth::user()->currentTeam->id) }}">
                                     {{ __('Administration') }}
                                 </x-dropdown-link>
 
@@ -265,7 +265,7 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+            <x-responsive-nav-link href="{{ route('vous.index') }}" :active="request()->routeIs('vous.index')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
         </div>

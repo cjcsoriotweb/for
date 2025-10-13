@@ -9,8 +9,8 @@
                 <div class="hidden lg:flex items-center space-x-1">
 
 
-                    <x-nav-link :href="route('team.admin.index', ['team' => Auth::user()->current_team_id])"
-                        :active="request()->routeIs('team.admin.index')" class="group">
+                    <x-nav-link :href="route('application.admin', ['team' => Auth::user()->current_team_id])"
+                        :active="request()->routeIs('application.admin')" class="group">
                         <span
                             class="flex items-center px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 hover:bg-gray-50/50 rounded-lg">
                             <svg class="w-5 h-5 mr-2 text-gray-500 group-hover:text-green-500" fill="currentColor"
@@ -23,8 +23,8 @@
                         </span>
                     </x-nav-link>
 
-                                        <x-nav-link :href="route('team.admin.members.index', ['team' => $team->id])"
-                        :active="request()->routeIs('team.admin.members.index')" class="group">
+                    <x-nav-link :href="route('application.admin', ['team' => $team->id])"
+                        :active="request()->routeIs('application.admin')" class="group">
                         <span
                             class="flex items-center px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 hover:bg-gray-50/50 rounded-lg">
                             <svg class="w-5 h-5 mr-2 text-gray-500 group-hover:text-green-500" fill="currentColor"
@@ -37,10 +37,10 @@
                         </span>
                     </x-nav-link>
 
-                    
 
-                                        <x-nav-link :href="route('team.admin.formations.index', ['team' => Auth::user()->current_team_id])"
-                        :active="request()->routeIs('team.admin.formations.index')" class="group">
+
+                    <x-nav-link :href="route('application.admin', ['team' => Auth::user()->current_team_id])"
+                        :active="request()->routeIs('application.admin')" class="group">
                         <span
                             class="flex items-center px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 hover:bg-gray-50/50 rounded-lg">
                             <svg class="w-5 h-5 mr-2 text-gray-500 group-hover:text-green-500" fill="currentColor"
@@ -52,8 +52,6 @@
                             Formations
                         </span>
                     </x-nav-link>
-
- 
                 </div>
             </div>
 

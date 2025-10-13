@@ -11,7 +11,6 @@
 
 <body>
     <div class="main-layout">
-        <x-layout.header :team="$team" />
 
         <!-- Main Content -->
         <main class="content">
