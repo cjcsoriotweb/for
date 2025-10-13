@@ -1,14 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
 use App\Models\Team;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Inertia\Inertia;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 
 
 class TeamAdminController extends Controller
@@ -18,6 +12,13 @@ class TeamAdminController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware(['auth','verified']);
+        $this->middleware('can:access-admin,team')->except(['index','show']);
+    }
+
+
     public function index(Team $team)
     {
         $users = $team->users;
@@ -56,6 +57,8 @@ class TeamAdminController extends Controller
 
     public function formationsEnable(Team $team)
     {
+
+
         return redirect()->back()->with('success', 'Formation activée.');
     }
 
