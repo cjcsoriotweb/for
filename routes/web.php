@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::prefix('users')->name('users.')->group(function () {
                         Route::get('/', [ApplicationAdminController::class, 'usersIndex'])->name('index');
                         Route::get('/manager', [ApplicationAdminController::class, 'usersManager'])->name('manager');
+                        Route::get('/list', [ApplicationAdminController::class, 'usersList'])->name('list');
                     });
                 });
 

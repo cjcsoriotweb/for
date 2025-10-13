@@ -34,6 +34,10 @@ class ApplicationAdminController extends Controller
     {
         return view('application.admin.users.manager', compact('team'));
     }
+    public function usersList(Team $team)
+    {
+        return view('application.admin.users.list', compact('team'));
+    }
 
     /* */
 

@@ -19,8 +19,8 @@
             ],
             [
                 'title' => 'Liste de vos utilisateurs *',
-                'description' => '..', 
-                'route' => 'application.admin.configuration.index'
+                'description' => 'Voir la liste complète de vos utilisateurs', 
+                'route' => 'application.admin.users.list'
             ],
      
             
