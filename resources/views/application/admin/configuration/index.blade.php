@@ -12,15 +12,6 @@
     </x-block-div>
 
 
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            <x-button-block 
-                    titre="Changez le nom de votre application"
-                    description="...."
-                    url="{{ route('application.admin.configuration.name', ['team'=>$team]) }}"
-                    />
-
-
-
-    </section>
+    <x-block-navigation :team="$team" back="1"/>
 
 </x-application-layout>

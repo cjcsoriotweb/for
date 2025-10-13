@@ -6,78 +6,75 @@ use App\Http\Controllers\ApplicationAdminController;
 use App\Http\Controllers\ApplicationController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+/*
+|--------------------------------------------------------------------------
+| Public
+|--------------------------------------------------------------------------
+*/
+Route::view('/', 'welcome')->name('home');
 
-Route::middleware(['auth', 'verified'])
-    ->prefix('vous')
-    ->as('vous.')
-    ->scopeBindings()
-    ->group(function () {
-        Route::get('/', [AccountRouting::class, 'index'])
-            ->name('index');
+/*
+|--------------------------------------------------------------------------
+| Authenticated area
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Espace perso
+    Route::prefix('vous')->name('vous.')->group(function () {
+        Route::get('/', [AccountRouting::class, 'index'])->name('index');
     });
 
-Route::middleware(['auth', 'verified'])
-    ->prefix('application/{team:id}')
-    ->as('application.')
-    ->scopeBindings()
-    ->group(function () {
-        Route::get('/', [ApplicationController::class, 'index'])
-            ->name('index')
-            ->middleware('can:access-team,team');
+    // Espace application scoping par team (binding implicite sur id)
+    Route::prefix('application/{team}')
+        ->name('application.')
+        ->scopeBindings()
+        ->group(function () {
 
-        Route::get('/show', [ApplicationController::class, 'show'])
-            ->name('show')
-            ->middleware('can:access-team,team');
+            /*
+            |------------------------------
+            | Accès membre d'équipe
+            |------------------------------
+            */
+            Route::middleware('can:access-team,team')->group(function () {
+                Route::get('/', [ApplicationController::class, 'index'])->name('index');
+                Route::get('/show', [ApplicationController::class, 'show'])->name('show');
 
-        /* Switch Team */
-        Route::post('/switch/application', [ApplicationController::class, 'switch'])
-            ->name('switch')
-            ->middleware('can:access-team,team');
-
-        /* Admin Routes */
-        Route::prefix('admin')
-            ->as('admin.')
-            ->middleware('can:access-admin,team')
-            ->group(function () {
-                Route::get('/', [ApplicationAdminController::class, 'index'])
-                    ->name('index')
-                    ->middleware('can:access-admin,team');
-
-                route::prefix('configuration')
-                    ->as('configuration.')
-                    ->group(function () {
-                        Route::get('/', [ApplicationAdminController::class, 'configurationIndex'])
-                            ->name('index')
-                            ->middleware('can:access-admin,team');
-
-                        Route::get('/name', [ApplicationAdminController::class, 'configurationName'])
-                            ->name('name')
-                            ->middleware('can:access-admin,team');        
-                });
-
-     
-                Route::get('/users', [ApplicationAdminController::class, 'users'])
-                    ->name('users')
-                    ->middleware('can:access-admin,team');
+                // Switch d'application / d'équipe
+                Route::post('/switch', [ApplicationController::class, 'switch'])->name('switch');
             });
 
+            /*
+            |------------------------------
+            | Admin d'équipe
+            |------------------------------
+            */
+            Route::prefix('admin')
+                ->name('admin.')
+                ->middleware('can:access-admin,team')
+                ->group(function () {
+                    Route::get('/', [ApplicationAdminController::class, 'index'])->name('index');
 
-    });
+                    // Configuration
+                    Route::prefix('configuration')->name('configuration.')->group(function () {
+                        Route::get('/', [ApplicationAdminController::class, 'configurationIndex'])->name('index');
+                        Route::get('/name', [ApplicationAdminController::class, 'configurationName'])->name('name');
+                    });
 
+                    // Utilisateurs
+                    Route::prefix('users')->name('users.')->group(function () {
+                        Route::get('/', [ApplicationAdminController::class, 'users'])->name('index');
+                    });
+                });
 
-Route::middleware(['auth','verified'])
-    ->prefix('application/{team}')        // ou {team:slug} si tu as un slug
-    ->as('teams.')
-    ->scopeBindings()
-    ->group(function () {
-        Route::put('/photo', [TeamPhotoController::class, 'update'])
-            ->name('photo.update')
-            ->middleware('can:access-admin,team');
-
-        Route::delete('/photo', [TeamPhotoController::class, 'destroy'])
-            ->name('photo.destroy')
-            ->middleware('can:access-admin,team');
-    });
+            /*
+            |------------------------------
+            | Photo d'équipe (admin)
+            |------------------------------
+            */
+            Route::middleware('can:access-admin,team')->group(function () {
+                Route::put('/photo', [TeamPhotoController::class, 'update'])->name('photo.update');
+                Route::delete('/photo', [TeamPhotoController::class, 'destroy'])->name('photo.destroy');
+            });
+        });
+});
