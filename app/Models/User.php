@@ -17,6 +17,7 @@ class User extends Authenticatable
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+
     use HasProfilePhoto;
     use HasTeams;
     use Notifiable;
@@ -66,17 +67,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function formations()
     {
         return $this->belongsToMany(Formation::class, 'formation_user')
-            ->withPivot(['status','progress_percent','current_lesson_id','enrolled_at','last_seen_at','completed_at','score_total','max_score_total'])
+            ->withPivot(['status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
             ->withTimestamps();
     }
 
     public function lessons()
     {
         return $this->belongsToMany(Lesson::class, 'lesson_user')
-            ->withPivot(['status','watched_seconds','best_score','max_score','attempts','read_percent','started_at','last_activity_at','completed_at'])
+            ->withPivot(['status', 'watched_seconds', 'best_score', 'max_score', 'attempts', 'read_percent', 'started_at', 'last_activity_at', 'completed_at'])
             ->withTimestamps();
     }
 

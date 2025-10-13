@@ -6,7 +6,7 @@
     </x-slot>
 
     <x-block-div>
-        liste users
+        <livewire:power-grid.user-table-in-team :team="$team" />
     </x-block-div>
 
     <x-block-div>

@@ -13,7 +13,6 @@
                     </a>
                 </div>
 
-
                 <!-- Navigation Links -->
                 @if(!$team->profile_photo_path)
 

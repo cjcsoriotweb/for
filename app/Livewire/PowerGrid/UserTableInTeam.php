@@ -3,36 +3,47 @@
 namespace App\Livewire\PowerGrid;
 
 use App\Models\User;
+use App\Models\Team;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 
-final class UserTable extends PowerGridComponent
+final class UserTableInTeam extends PowerGridComponent
 {
+    use AuthorizesRequests;
+
     public string $tableName = 'user-table-qfkn8u-table';
+
+    /** Livewire va hydrater cette propriété depuis :team="$team" */
+    public Team $team;
+
+    public function booted(): void
+    {
+        // sécurité (Gate/Policy): l'utilisateur doit appartenir à l'équipe
+        $this->authorize('access-team', $this->team);
+    }
 
     public function setUp(): array
     {
         $this->showCheckBox();
 
         return [
-            PowerGrid::header()
-                ->showSearchInput(),
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
+            PowerGrid::header()->showSearchInput(),
+            PowerGrid::footer()->showPerPage()->showRecordCount(),
         ];
     }
 
-    public function datasource(): Builder
-    {
-        return User::query();
-    }
+public function datasource(): \Illuminate\Database\Eloquent\Builder
+{
+    // Filtre par l’équipe courante via whereHas — retourne bien un Eloquent\Builder
+    return User::query()
+        ->whereHas('teams', fn ($q) => $q->whereKey($this->team->getKey()));
+}
 
     public function relationSearch(): array
     {
@@ -45,35 +56,18 @@ final class UserTable extends PowerGridComponent
             ->add('id')
             ->add('name')
             ->add('email')
-            ->add('created_at');
+            ->add('created_at')
+            ->add('created_at_formatted', fn (User $u) => Carbon::parse($u->created_at)->format('d/m/Y H:i'));
     }
 
     public function columns(): array
     {
         return [
             Column::make('Id', 'id'),
-            Column::make('Name', 'name')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Email', 'email')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Created at', 'created_at_formatted', 'created_at')
-                ->sortable(),
-
-            Column::make('Created at', 'created_at')
-                ->sortable()
-                ->searchable(),
-
-            Column::action('Action')
-        ];
-    }
-
-    public function filters(): array
-    {
-        return [
+            Column::make('Name', 'name')->sortable()->searchable(),
+            Column::make('Email', 'email')->sortable()->searchable(),
+            Column::make('Created at', 'created_at_formatted', 'created_at')->sortable(),
+            Column::action('Action'),
         ];
     }
 
@@ -90,19 +84,7 @@ final class UserTable extends PowerGridComponent
                 ->slot('Edit: '.$row->id)
                 ->id()
                 ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('edit', ['rowId' => $row->id])
+                ->dispatch('edit', ['rowId' => $row->id]),
         ];
     }
-
-    /*
-    public function actionRules($row): array
-    {
-       return [
-            // Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
-                ->hide(),
-        ];
-    }
-    */
 }

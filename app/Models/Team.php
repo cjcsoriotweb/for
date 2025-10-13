@@ -60,4 +60,5 @@ class Team extends JetstreamTeam
             ->withTimestamps();
     }
 
+
 }
