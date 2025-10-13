@@ -20,7 +20,7 @@ class ApplicationController extends Controller
         // Logic to switch application context can be added here
 
         return redirect()->route('application.index', ['team' => $team->id])
-                         ->with('success', __('Vous rentez dans l\'Application.'));
+                         ->with('success', __("Vous êtes dans l'application : <b>$team->name</b>."));
     }
 
     public function dashboard(Team $team)

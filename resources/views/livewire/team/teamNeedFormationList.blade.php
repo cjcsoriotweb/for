@@ -85,5 +85,4 @@
         @endforelse
     </div>
     <x-big-button>Trouver d'autre formation</x-big-button>
-    <x-debug>livewire:teamNeedFormationList | {{ $team->name }}</x-debug>
 </div>

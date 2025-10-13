@@ -11,7 +11,7 @@
 
 <body>
     <div class="main-layout">
-        <x-app-navigation-menu />
+        <x-out-app-navigation-menu />
 
         <!-- Main Content -->
         <main class="content">
