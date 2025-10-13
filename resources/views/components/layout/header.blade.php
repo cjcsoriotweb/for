@@ -6,7 +6,6 @@
     <div class="buttons">
         @if(Auth::check())
 
-        <x-admin-navigation :team="$team" />
         <div class="hidden sm:flex sm:items-center sm:ms-6">
             <!-- Settings Dropdown -->
             <div class="ms-3 relative">

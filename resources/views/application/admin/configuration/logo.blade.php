@@ -6,6 +6,7 @@
     </x-slot>
 
     <x-block-div>
+ 
         @livewire('teams.update-team-name-form', ['team' => $team])
     </x-block-div>
 

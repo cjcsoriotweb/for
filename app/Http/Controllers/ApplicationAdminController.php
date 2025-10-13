@@ -24,6 +24,11 @@ class ApplicationAdminController extends Controller
         return view('application.admin.configuration.name', compact('team'));
     }
 
+    public function configurationLogo(Team $team)
+    {
+        return view('application.admin.configuration.logo', compact('team'));
+    }
+
     public function invitation(Team $team)
     {
         return view('application.admin.invitation', compact('team'));

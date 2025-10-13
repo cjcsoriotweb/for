@@ -5,12 +5,7 @@
         </h2>
     </x-slot>
 
-    <x-block-div>
-        <x-slot name="block">
-            Gestion des utilisateurs de votre application
-        </x-slot>
-        @livewire('teams.team-member-manager', ['team' => $team])
-    </x-block-div>
+
 
 
 </x-application-layout>

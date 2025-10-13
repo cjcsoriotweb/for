@@ -57,8 +57,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
                     // Configuration
                     Route::prefix('configuration')->name('configuration.')->group(function () {
+                        
                         Route::get('/', [ApplicationAdminController::class, 'configurationIndex'])->name('index');
                         Route::get('/name', [ApplicationAdminController::class, 'configurationName'])->name('name');
+                        Route::get('/logo', [ApplicationAdminController::class, 'configurationLogo'])->name('logo');
+                    
                     });
 
                     // Utilisateurs

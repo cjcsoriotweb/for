@@ -6,22 +6,11 @@
     </x-slot>
 
     <x-block-div>
-        <x-slot name="block">
-            Configuration de votre application
-        </x-slot>
         
+        <x-block-navigation :navigation="[
+            ['title' => 'Configuration', 'description' => '..', 'route' => 'application.admin.configuration.index']
+        ]" :team="$team" back="0"/>
 
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                <x-button-block 
-                    titre="Configurez l'application"
-                    description="...."
-                    url="{{ route('application.admin.configuration.index', ['team'=>$team]) }}"
-                    />
-
- 
-
-                
-        </section>
 
 
     </x-block-div>

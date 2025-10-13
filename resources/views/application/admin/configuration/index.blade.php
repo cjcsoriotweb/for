@@ -6,12 +6,14 @@
     </x-slot>
 
     <x-block-div>
-        <x-slot name="block">
-            Configuration de votre application
-        </x-slot>
+
+        <x-block-navigation :navigation="[
+        ['title' => 'Changer nom', 'description' => '...', 'route' => 'application.admin.configuration.name'],
+        ['title' => 'Changer logo', 'description' => '...', 'route' => 'application.admin.configuration.logo']
+    ]" :team="$team" back="1" />
+    
     </x-block-div>
 
 
-    <x-block-navigation :team="$team" back="1"/>
 
 </x-application-layout>

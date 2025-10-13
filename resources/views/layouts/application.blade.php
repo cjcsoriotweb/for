@@ -14,6 +14,7 @@
     <div class="min-h-screen bg-gray-100">
         <x-team-navigation-menu :team="$team" />
 
+        
         <x-error-display />
         <main>
             @if(isset($block))

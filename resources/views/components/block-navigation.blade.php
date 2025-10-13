@@ -4,8 +4,8 @@
     <x-button-block titre="Retour" description="{{ url()->previous() }}" button="<---" url="{{ url()->previous() }}" />
     @endif
 
-    <x-button-block titre="Changez le nom de votre application" description="...."
-        url="{{ route('application.admin.configuration.name', ['team'=>$team]) }}" />
-    <x-button-block titre="Changez le logo de votre application" description="...."
-        url="{{ route('application.admin.configuration.name', ['team'=>$team]) }}" />
+    @foreach($navigation as $nav)
+    <x-button-block titre="{{ $nav['title'] }}" description="{{ $nav['description'] }}"
+        url="{{ route($nav['route'], ['team'=>$team]) }}" />
+    @endforeach
 </section>
