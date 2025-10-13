@@ -109,4 +109,9 @@ class Formation extends Model
             ->withTimestamps();
     }
 
+    public function eleveStartThisFormation($eleveId, $teamId = null)
+    {
+        return $this->learners()->where('user_id', $eleveId)->where('team_id', $teamId)->exists();
+    }
+
 }

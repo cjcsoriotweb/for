@@ -9,6 +9,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('formation_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('team_id')->constrained()->cascadeOnDelete();
 
             // Etat global
             $table->enum('status', ['enrolled','in_progress','completed','paused'])->default('enrolled');
@@ -26,7 +27,7 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->unique(['formation_id','user_id']);
+            $table->unique(['formation_id','user_id','team_id']);
         });
     }
 

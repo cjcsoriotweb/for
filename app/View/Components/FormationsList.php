@@ -3,6 +3,7 @@
 namespace App\View\Components;
 
 use App\Models\Formation;
+use App\Models\Team;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -13,18 +14,21 @@ class FormationsList extends Component
     /**
      * Filtrage (props optionnels que tu peux passer depuis la vue)
      */
-    public ?int $teamId;
+    public Team $team;
     public ?string $search;
     public bool $onlyPublished;
     public int $limit;
 
     public function __construct(
-        ?int $teamId = null,
+        Team $team,
         ?string $search = null,
         bool $onlyPublished = false,
         int $limit = 20
     ) {
-        $this->teamId = $teamId ?? (Auth::user()?->current_team_id);
+        $this->team = $team;
+        if (!$team) {
+            throw new \InvalidArgumentException("Le composant FormationsList as besoin de la team pour fonctionner.");
+        }
         $this->search = $search;
         $this->onlyPublished = $onlyPublished;
         $this->limit = max(1, min($limit, 100)); // borne 1..100
@@ -36,12 +40,12 @@ class FormationsList extends Component
             ->when(($s = trim((string) $this->search)) !== '', function ($qq) use ($s) {
                 $qq->where(function ($w) use ($s) {
                     $w->where('title', 'like', "%{$s}%")
-                      ->orWhere('summary', 'like', "%{$s}%");
+                        ->orWhere('summary', 'like', "%{$s}%");
                 });
             })
             ->when($this->onlyPublished, fn($qq) => $qq->where('published', true))
             ->withCount('lessons')
-            ->visibleForTeam($this->teamId)
+            ->visibleForTeam($this->team->id)
             ->latest('id');
 
 
