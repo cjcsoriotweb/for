@@ -114,7 +114,7 @@
                                 </div>
 
 
-                                <x-dropdown-link href="{{ route('application.admin', $team->id) }}">
+                                <x-dropdown-link href="{{ route('application.admin.index', $team->id) }}">
                                     {{ __('Administration') }}
                                 </x-dropdown-link>
 

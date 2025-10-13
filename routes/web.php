@@ -38,13 +38,19 @@ Route::middleware(['auth', 'verified'])
             ->middleware('can:access-team,team');
 
         /* Admin Routes */
-        Route::get('/admin', [ApplicationController::class, 'admin'])
-            ->name('admin')
-            ->middleware('can:access-admin,team');
+        Route::prefix('admin')
+            ->as('admin.')
+            ->middleware('can:access-admin,team')
+            ->group(function () {
+                Route::get('/', [ApplicationController::class, 'index'])
+                    ->name('index')
+                    ->middleware('can:access-admin,team');
 
-        Route::get('/admin', [ApplicationAdminController::class, 'admin'])
-            ->name('admin')
-            ->middleware('can:access-admin,team');
+                Route::get('/users', [ApplicationAdminController::class, 'users'])
+                    ->name('users')
+                    ->middleware('can:access-admin,team');
+            });
+
 
     });
 
