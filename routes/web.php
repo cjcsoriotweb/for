@@ -32,6 +32,10 @@ Route::middleware(['auth','verified'])
             ->name('index')
             ->middleware('can:access-team,team');
 
+        Route::post('/switch/application', [ApplicationController::class, 'switch'])
+            ->name('switch')
+            ->middleware('can:access-team,team');
+
    
         Route::get('/admin', [ApplicationController::class, 'admin'])
             ->name('admin')

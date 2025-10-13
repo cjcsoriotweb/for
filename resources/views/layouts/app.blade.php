@@ -11,6 +11,7 @@
 
 <body>
     <div class="main-layout">
+        @include('navigation-menu')
 
         <!-- Main Content -->
         <main class="content">
