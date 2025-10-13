@@ -12,11 +12,14 @@
                     <div class="flex items-center justify-between mb-2">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $formation->formation->title }}
                         </h2>
+                        @if( $formation->formation_user )
                         <span
                             class="bg-blue-100 text-primary text-xs font-semibold px-3 py-1 rounded-full flex items-center">
                             <span class="material-symbols-outlined text-sm mr-1">timelapse</span>
                             En cours
                         </span>
+
+                        @endif
                     </div>
                     
                             <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">{{ $formation->formation->description }}</p>
@@ -26,20 +29,30 @@
                         @if($formation->formation_user)
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progression</span>
-                            <span class="text-sm font-medium text-primary">{{ $formation->formation_user->progress }}%</span>
+                            <span class="text-sm font-medium text-primary">{{ $formation->formation_user->progress_percent }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                            <div class="bg-primary h-2.5 rounded-full" style="width: {{ $formation->formation_user->progress }}%"></div>
+                            <div class="bg-primary h-2.5 rounded-full" style="width: {{ $formation->formation_user->progress_percent }}%"></div>
                         </div>
                         @endif
 
                     </div>
+                    @if( $formation->formation_user )
                     <div class="mt-6 flex justify-end">
                         <a class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
                             Continuer la formation
                             <span class="material-symbols-outlined ml-1">arrow_forward</span>
                         </a>
                     </div>
+                    @else
+                    <div class="mt-6 flex justify-end">
+                        <a class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
+                            Commencer la formation
+                            <span class="material-symbols-outlined ml-1">arrow_forward</span>
+                        </a>
+                    </div>
+
+                    @endif
                 </div>
             </div>
         </div>

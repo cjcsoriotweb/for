@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Models\Formation;
 use App\Models\FormationTeam;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Livewire\Component;
 
 class FormationByTeam extends Component
@@ -11,13 +11,27 @@ class FormationByTeam extends Component
     public $formations = [];
     public $team;
 
-    public function searchLikeEleve(){
-        $this->formations = FormationTeam::where('team_id', $this->team->id)->with('formation')->with('formation_user')->get();
+
+
+
+    // Récupère les formations associées à l'équipe de l'élève connecté
+    public function formationToEleveTeam(){
+
+
+        $this->formations = FormationTeam::where(['team_id' => $this->team->id])
+        ->visible($this->team)
+        ->with('formation')
+        ->with('formation_user')
+        ->get();
+
+
     }
+
+
 
     public function render()
     {
-        $this->searchLikeEleve();
+        $this->formationToEleveTeam();
         return view('livewire.formation-by-team');
     }
 }

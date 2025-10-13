@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class FormationTeam extends Model
@@ -24,6 +25,11 @@ class FormationTeam extends Model
     public function formation_user()
     {
         return $this->hasOne(FormationUser::class, 'formation_id', 'formation_id');
+    }
+
+    public function scopeVisible(Builder $query): Builder
+    {
+        return $query->where('visible', '=', true);
     }
 
 }

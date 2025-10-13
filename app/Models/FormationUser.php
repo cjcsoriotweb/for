@@ -16,6 +16,8 @@ class FormationUser extends Model
         'starts_at',
         'ends_at',
     ];
+
+
     public function formation()
     {
         return $this->belongsTo(Formation::class);
