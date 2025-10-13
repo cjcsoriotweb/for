@@ -6,6 +6,8 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
+use function Laravel\Prompts\error;
+
 class TeamPolicy
 {
     use HandlesAuthorization;
@@ -83,9 +85,13 @@ class TeamPolicy
     * Determine whether the user can update the model.
     */
 
-    public function admin(User $user, Team $team): bool
+    public function accessAdmin(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'superadmin');
+        if($user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'superadmin')){
+            return true;
+        } else {
+            return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');
+        }
     }
 
     

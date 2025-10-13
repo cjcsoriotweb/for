@@ -7,10 +7,15 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+            @livewire('teams.update-team-name-form', ['team' => $team])
+
+            @include('teams.partials.update-team-photo-form', ['team' => $team])
 
 
-            </div>
+            @livewire('teams.team-member-manager', ['team' => $team])
+
+
+
         </div>
     </div>
 </x-application-layout>

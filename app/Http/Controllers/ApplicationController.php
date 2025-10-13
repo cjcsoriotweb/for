@@ -28,11 +28,6 @@ class ApplicationController extends Controller
         return view('application.app.dashboard', compact('team'));
     }
 
-    public function admin(Team $team)
-    {
-        return view('application.admin.index', compact('team'));
-    }
-
     public function show(Team $team)
     {
         return view('application.app.show', compact('team'));

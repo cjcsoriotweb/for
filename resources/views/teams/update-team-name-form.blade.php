@@ -1,10 +1,10 @@
 <x-form-section submit="updateTeamName">
     <x-slot name="title">
-        {{ __('Team Name') }}
+        {{ __('Nom de votre application') }}
     </x-slot>
 
     <x-slot name="description">
-        {{ __('The team\'s name and owner information.') }}
+        {{ __('Informations sur le nom et le propriétaire de l\'équipe.') }}
     </x-slot>
 
     <x-slot name="form">

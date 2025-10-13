@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\AccountRouting;
-use App\Http\Controllers\OfflineRoutingController;
+use App\Http\Controllers\Application\Admin\TeamPhotoController;
+use App\Http\Controllers\ApplicationAdminController;
 use App\Http\Controllers\ApplicationController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,9 +10,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-
-
-Route::middleware(['auth','verified'])
+Route::middleware(['auth', 'verified'])
     ->prefix('vous')
     ->as('vous.')
     ->scopeBindings()
@@ -20,10 +19,7 @@ Route::middleware(['auth','verified'])
             ->name('index');
     });
 
-
-
-
-Route::middleware(['auth','verified'])
+Route::middleware(['auth', 'verified'])
     ->prefix('application/{team:id}')
     ->as('application.')
     ->scopeBindings()
@@ -32,25 +28,37 @@ Route::middleware(['auth','verified'])
             ->name('index')
             ->middleware('can:access-team,team');
 
+        Route::get('/show', [ApplicationController::class, 'show'])
+            ->name('show')
+            ->middleware('can:access-team,team');
+
+        /* Switch Team */
         Route::post('/switch/application', [ApplicationController::class, 'switch'])
             ->name('switch')
             ->middleware('can:access-team,team');
 
-   
+        /* Admin Routes */
         Route::get('/admin', [ApplicationController::class, 'admin'])
             ->name('admin')
             ->middleware('can:access-admin,team');
 
-        Route::get('/show', [ApplicationController::class, 'show'])
-            ->name('show')
-            ->middleware('can:access-team,team');
+        Route::get('/admin', [ApplicationAdminController::class, 'admin'])
+            ->name('admin')
+            ->middleware('can:access-admin,team');
+
     });
 
-/*
-include_once __DIR__.'/offline.php';
-include __DIR__.'/auth.php';
-include __DIR__.'/application/application.php';
 
-*/
+Route::middleware(['auth','verified'])
+    ->prefix('application/{team}')        // ou {team:slug} si tu as un slug
+    ->as('teams.')
+    ->scopeBindings()
+    ->group(function () {
+        Route::put('/photo', [TeamPhotoController::class, 'update'])
+            ->name('photo.update')
+            ->middleware('can:access-admin,team');
 
-
+        Route::delete('/photo', [TeamPhotoController::class, 'destroy'])
+            ->name('photo.destroy')
+            ->middleware('can:access-admin,team');
+    });
