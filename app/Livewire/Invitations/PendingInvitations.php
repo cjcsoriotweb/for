@@ -80,6 +80,9 @@ class PendingInvitations extends Component
 
         $this->dispatch('toast', type: 'success', message: 'Invitation acceptée ✅');
         $this->loadInvites(); // met à jour la liste immédiatement
+
+        // Redirige vers la page de l’équipe
+        $this->redirect(route('team.dashboard', $team));
     }
 
     public function decline(int $invitationId): void
