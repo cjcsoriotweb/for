@@ -114,12 +114,12 @@
                                 </div>
 
 
-                                <x-dropdown-link href="{{ route('application.admin', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('application.admin', $team->id) }}">
                                     {{ __('Administration') }}
                                 </x-dropdown-link>
 
                                 <!-- Team Settings -->
-                                <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('teams.show', $team->id) }}">
                                     {{ __('Paramètres d\'application') }}
                                 </x-dropdown-link>
 

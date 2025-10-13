@@ -8,8 +8,7 @@
                 <!-- Navigation Links -->
                 <div class="hidden lg:flex items-center space-x-1">
 
-
-                    <x-nav-link :href="route('application.admin', ['team' => Auth::user()->current_team_id])"
+                    <x-nav-link :href="route('application.admin', ['team' => $team->id])"
                         :active="request()->routeIs('application.admin')" class="group">
                         <span
                             class="flex items-center px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 hover:bg-gray-50/50 rounded-lg">
