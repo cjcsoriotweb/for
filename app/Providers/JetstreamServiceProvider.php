@@ -9,6 +9,7 @@ use App\Actions\Jetstream\DeleteUser;
 use App\Actions\Jetstream\InviteTeamMember;
 use App\Actions\Jetstream\RemoveTeamMember;
 use App\Actions\Jetstream\UpdateTeamName;
+use Illuminate\Console\Application;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
 
@@ -45,15 +46,20 @@ class JetstreamServiceProvider extends ServiceProvider
     {
         Jetstream::defaultApiTokenPermissions(['read']);
 
-        Jetstream::role('superadmin', 'Super-Administrateur', [
-            'read', 'create', 'update', 'delete', 'admin', 'sadmin',
-        ])->description('Accès complet à l’équipe.');
 
         Jetstream::role('admin', 'Admin', [
+            'team:invite_apprentis',
+
+            'read', 'create', 'update',  'admin'
+        ])->description('Accès complet à l’équipe.');
+
+
+        Jetstream::role('souschef', 'Sous-Chef', [
             'read', 'create', 'update', 'admin'
         ])->description('Accès complet à l’équipe.');
 
-        Jetstream::role('eleve', 'Élève', [
+
+        Jetstream::role('apprentis', 'Apprentis', [
             'read',
         ])->description('Peut consulter les contenus de l’équipe.');
     }

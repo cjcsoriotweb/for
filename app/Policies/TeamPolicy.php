@@ -6,8 +6,6 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-use function Laravel\Prompts\error;
-
 class TeamPolicy
 {
     use HandlesAuthorization;
@@ -36,33 +34,27 @@ class TeamPolicy
         return true;
     }
 
-
-
-
     /**
      * Determine whether the user can add team members.
      */
     public function addTeamMember(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team);
+        // autoriser le propriétaire OU un membre avec la permission explicite
+        return $user->ownsTeam($team)
+            || $user->hasTeamPermission($team, 'team:invite');
     }
 
-    /**
-     * Determine whether the user can update team member permissions.
-     */
     public function updateTeamMember(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team);
+        return $user->ownsTeam($team)
+            || $user->hasTeamPermission($team, 'team:manage-roles');
     }
 
-    /**
-     * Determine whether the user can remove team members.
-     */
     public function removeTeamMember(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team);
+        return $user->ownsTeam($team)
+            || $user->hasTeamPermission($team, 'team:remove');
     }
-
     /**
      * Determine whether the user can delete the model.
      */
@@ -72,30 +64,23 @@ class TeamPolicy
     }
 
     /**
-    * Determine whether the user can update the model.
-    */
-
+     * Determine whether the user can update the model.
+     */
     public function update(User $user, Team $team): bool
     {
         return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
     }
 
-
-        /**
-    * Determine whether the user can update the model.
-    */
-
+    /**
+     * Determine whether the user can update the model.
+     */
     public function accessAdmin(User $user, Team $team): bool
     {
-        if($user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'superadmin')){
+        if ($user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'superadmin')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');
         }
     }
-
     
-
-    
-
 }
