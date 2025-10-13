@@ -93,7 +93,6 @@
     @stack('modals')
 
     @livewireScripts
-    <x-footer />
 </body>
 
 </html>

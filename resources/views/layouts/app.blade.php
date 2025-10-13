@@ -237,7 +237,6 @@
             </div>
         </main>
 
-        <x-footer />
     </div>
 </body>
 </html>

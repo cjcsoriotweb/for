@@ -4,7 +4,7 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('team.dashboard', ['team' => $team->id]) }}">
+                    <a href="{{ route('application.dashboard', ['team' => $team->id]) }}">
                         @if(!$team->profile_photo_path)
                         <x-application-mark class="block h-9 w-auto" />
                         @else
@@ -114,7 +114,7 @@
                                 </div>
 
 
-                                <x-dropdown-link href="{{ route('team.admin.index', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('application.admin.index', Auth::user()->currentTeam->id) }}">
                                     {{ __('Administration') }}
                                 </x-dropdown-link>
 
@@ -164,7 +164,7 @@
                                 </div>
 
 
-                                <x-dropdown-link href="{{ route('team.admin.index', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('application.admin.index', Auth::user()->currentTeam->id) }}">
                                     {{ __('Administration') }}
                                 </x-dropdown-link>
 
