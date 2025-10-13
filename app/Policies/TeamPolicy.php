@@ -71,12 +71,17 @@ class TeamPolicy
         return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
     }
 
+    public function canAddApprentis(User $user, Team $team): bool
+    {
+        return $user->hasTeamPermission($team, 'admin');
+    }
+
     /**
      * Determine whether the user can update the model.
      */
     public function accessAdmin(User $user, Team $team): bool
     {
-        if ($user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'superadmin')) {
+        if ($user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'manager')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');
