@@ -7,10 +7,23 @@
 
     <x-block-div>
 
-        <x-block-navigation :navigation="[
-            ['title' => 'Changer nom', 'description' => '...', 'route' => 'application.admin.configuration.name'],
-            ['title' => 'Changer logo', 'description' => '', 'route' => 'application.admin.configuration.logo', 'image'=>$team->profile_photo_path ? asset('storage/'.$team->profile_photo_path) : null],
-        ]" :team="$team" back="1" />
+        <x-block-navigation 
+            :navigation="[
+                [
+                    'title' => 'Changer nom',
+                    'description' => 'Remplacer le nom ' . e($team->name) . '',
+                    'route' => 'application.admin.configuration.name',
+                ],
+                [
+                    'title' => 'Changer logo',
+                    'description' => '',
+                    'route' => 'application.admin.configuration.logo',
+                    'image' => $team->profile_photo_path ? asset('storage/'.$team->profile_photo_path) : null,
+                ],
+            ]"
+            :team="$team"
+            back="{{ route('application.index', $team) }}"
+        />
         
     </x-block-div>
 
