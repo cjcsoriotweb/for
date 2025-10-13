@@ -12,8 +12,9 @@ class ApplicationController extends Controller
 {
     public function index(Team $team)
     {
-        return view('application.app.index', compact('team'));
+        return view('application.index', compact('team'));
     }
+    
 
     public function switch(Team $team)
     {
