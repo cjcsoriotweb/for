@@ -8,7 +8,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <x-admin-money-team :team="$team" />
 
-                <x-formations-list-admin team-id="{{ Auth::user()->currentTeam->id }}" />
+            @livewire('formation-by-team', ['team' => $team, 'display'=>'admin'])
+            
         </div>
         
     </div>

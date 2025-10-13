@@ -154,9 +154,7 @@
                 <a href="{{ route('home') }}">{{ config('app.name') }}</a>
             </div>
 
-            <nav class="nav">
-             
-            </nav>
+
 
             <div class="buttons">
                 @if(Auth::check())

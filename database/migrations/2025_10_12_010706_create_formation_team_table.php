@@ -16,9 +16,6 @@ return new class extends Migration {
             $table->timestamp('approved_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
 
-            // (optionnel) fenêtre de publication
-            $table->timestamp('starts_at')->nullable();
-            $table->timestamp('ends_at')->nullable();
 
             $table->timestamps();
 

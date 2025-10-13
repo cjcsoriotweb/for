@@ -2,6 +2,7 @@
     <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-10">Mes Formations</h1>
     <div class="space-y-8">
         @forelse($formations as $formation)
+
         <div
             class="bg-white dark:bg-gray-800/50 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col lg:flex-row transform hover:-translate-y-1">
             <div class="w-full lg:w-1/3 h-56 lg:h-auto bg-cover bg-center"
@@ -10,7 +11,7 @@
             <div class="p-6 lg:p-8 flex-1 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $formation->formation->title }}
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $formation->title }}
                         </h2>
                         @if( $formation->formation_user )
                         <span
@@ -22,7 +23,7 @@
                         @endif
                     </div>
                     
-                            <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">{{ $formation->formation->description }}</p>
+                            <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">{{ $formation->description }}</p>
                 </div>
                 <div>
                     <div class="mb-2">
@@ -37,6 +38,28 @@
                         @endif
 
                     </div>
+                    @if($display === 'admin')
+                    <div class="mt-4">
+                        <span
+                            class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center">
+                            <span class="material-symbols-outlined text-sm mr-1">admin_panel_settings</span>
+                            Admin
+                        </span>
+                        @if($formation->pivot_active)
+                        <form method="POST" action="{{ route('team.admin.formation.disable', [$team,$formation]) }}">
+                            @csrf
+                            <button type="submit" class="text-sm font-medium text-primary hover:underline">Désactiver cette formation</button>
+                        </form>
+                        @else
+                        <form method="POST" action="{{ route('team.admin.formation.enable', [$team,$formation]) }}">
+                            @csrf
+                            <button type="submit" class="text-sm font-medium text-primary hover:underline">Activer cette formation</button>
+                        </form>
+                        @endif
+                    </div>
+                    @endif
+
+                    @if($display === 'eleve')
                     @if( $formation->formation_user )
                     <div class="mt-6 flex justify-end">
                         <a class="text-secondary hover:text-primary/80 font-semibold flex items-center transition-colors">
@@ -52,6 +75,7 @@
                         </a>
                     </div>
 
+                    @endif
                     @endif
                 </div>
             </div>

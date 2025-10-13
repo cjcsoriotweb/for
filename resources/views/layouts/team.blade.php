@@ -63,9 +63,11 @@
 <body class="font-sans antialiased">
     <x-banner />
 
+
+
     <div class="min-h-screen bg-gray-100">
         <x-team-navigation-menu :team="$team" />
-        
+
 
         <!-- Page Heading -->
         @if (isset($header))
@@ -74,6 +76,12 @@
                 {{ $header }}
             </div>
         </header>
+        @endif
+
+        @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+            {{ session('success') }}
+        </div>
         @endif
 
         <!-- Page Content -->

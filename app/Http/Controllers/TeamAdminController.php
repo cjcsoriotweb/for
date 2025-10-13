@@ -29,6 +29,14 @@ class TeamAdminController extends Controller
 
   
     }
+    
+    public function usersIndex(Team $team)
+    {
+        return view('team.admin.users.index', [
+            'team' => $team,
+        ]);
+    }
+
 
     public function formationsIndex(Team $team)
     {
@@ -39,11 +47,18 @@ class TeamAdminController extends Controller
 
     }
 
-    public function usersIndex(Team $team)
+    /* Edit formations linked to the team */
+
+    public function formationsDisable(Team $team)
     {
-        return view('team.admin.users.index', [
-            'team' => $team,
-        ]);
+        return redirect()->back()->with('success', 'Formation désactivée.');
     }
+
+    public function formationsEnable(Team $team)
+    {
+        return redirect()->back()->with('success', 'Formation activée.');
+    }
+
+
 
 }

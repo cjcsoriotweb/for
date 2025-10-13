@@ -27,9 +27,6 @@ class FormationTeam extends Model
         return $this->hasOne(FormationUser::class, 'formation_id', 'formation_id');
     }
 
-    public function scopeVisible(Builder $query): Builder
-    {
-        return $query->where('visible', '=', true);
-    }
+
 
 }
