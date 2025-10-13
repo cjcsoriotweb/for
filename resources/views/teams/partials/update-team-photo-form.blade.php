@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <form method="POST" action="{{ route('teams.photo.update', $team) }}" enctype="multipart/form-data"
+                    <form method="POST" action="{{ route('application.photo.update', $team) }}" enctype="multipart/form-data"
                         class="flex-1">
                         @csrf
                         @method('PUT')
@@ -66,7 +66,7 @@
                     </form>
 
                     @if($team->profile_photo_path)
-                    <form method="POST" action="{{ route('teams.photo.destroy', $team) }}" class="flex-shrink-0">
+                    <form method="POST" action="{{ route('application.photo.destroy', $team) }}" class="flex-shrink-0">
                         @csrf
                         @method('DELETE')
                         <x-danger-button>

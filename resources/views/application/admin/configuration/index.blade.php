@@ -8,10 +8,10 @@
     <x-block-div>
 
         <x-block-navigation :navigation="[
-        ['title' => 'Changer nom', 'description' => '...', 'route' => 'application.admin.configuration.name'],
-        ['title' => 'Changer logo', 'description' => '...', 'route' => 'application.admin.configuration.logo']
-    ]" :team="$team" back="1" />
-    
+            ['title' => 'Changer nom', 'description' => '...', 'route' => 'application.admin.configuration.name'],
+            ['title' => 'Changer logo', 'description' => '', 'route' => 'application.admin.configuration.logo', 'image'=>$team->profile_photo_path ? asset('storage/'.$team->profile_photo_path) : null],
+        ]" :team="$team" back="1" />
+        
     </x-block-div>
 
 

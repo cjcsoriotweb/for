@@ -5,14 +5,17 @@
     <p class="text-gray-600 mb-6">
         {{ $description }}
     </p>
+    <br>
     @endif
 
-    @if(isset($image))
+    @if(isset($image) && $image)
         <img src="{{ $image }}" alt="{{ $titre }}" class="w-full h-auto rounded-lg">
+        <br>
     @endif
+
 
     <a href="{{ $url }}"
         class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 inline-block">
-        {{ $button ?? 'Accéder' }}
+        {!! $button ?? 'Accéder' !!}
     </a>
 </div>

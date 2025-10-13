@@ -10,10 +10,11 @@
     </x-block-div>
 
 
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+    <x-block-div>
+        
+        <x-block-navigation :navigation="[]" :team="$team" back="1" />
 
+    </x-block-div>
 
-
-    </section>
 
 </x-application-layout>
