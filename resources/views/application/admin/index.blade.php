@@ -13,6 +13,16 @@
                 'title' => 'Configuration',
                 'description' => 'Gérer les paramètres de votre application', 
                 'route' => 'application.admin.configuration.index'
+            ],
+            [
+                'title' => 'Utilisateurs',
+                'description' => 'Gérer les utilisateurs de votre application', 
+                'route' => 'application.admin.users.index'
+            ],
+            [
+                'title' => 'Formations',
+                'description' => 'Gérer les formations de votre application', 
+                'route' => 'application.admin.formations.index'
             ]
         ]" 
         :team="$team" 

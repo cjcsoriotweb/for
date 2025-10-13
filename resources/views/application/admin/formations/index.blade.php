@@ -6,7 +6,6 @@
     </x-slot>
 
     <x-block-div>
-        @livewire('teams.team-member-manager', ['team' => $team])
 
     </x-block-div>
 

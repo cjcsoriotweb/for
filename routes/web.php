@@ -55,6 +55,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->group(function () {
                     Route::get('/', [ApplicationAdminController::class, 'index'])->name('index');
 
+                    // Formations
+                    Route::prefix('formations')->name('formations.')->group(function () {
+                        Route::get('/', [ApplicationAdminController::class, 'formationsIndex'])->name('index');
+                    });
                     // Configuration
                     Route::prefix('configuration')->name('configuration.')->group(function () {
                         
@@ -66,7 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
                     // Utilisateurs
                     Route::prefix('users')->name('users.')->group(function () {
-                        Route::get('/', [ApplicationAdminController::class, 'users'])->name('index');
+                        Route::get('/', [ApplicationAdminController::class, 'usersIndex'])->name('index');
                     });
                 });
 
