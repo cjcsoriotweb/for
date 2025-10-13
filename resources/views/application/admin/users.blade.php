@@ -5,7 +5,6 @@
         </h2>
     </x-slot>
 
-    @include('application.admin.navbar', ['team' => $team])
 
 
     <div class="py-12">

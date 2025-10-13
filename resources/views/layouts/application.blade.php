@@ -17,9 +17,9 @@
         
         <x-team-navigation-menu :team="$team" />
 
-    @if(isset($header))
-    {{  $header }}
-    @endif
+            @if(isset($header))
+            {{  $header }}
+            @endif
 
 
 
