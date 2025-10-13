@@ -8,7 +8,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <x-admin-money-team :team="$team" />
 
-            @livewire('formation-by-team', ['team' => $team, 'display'=>'admin'])
+            @livewire('teamNeedFormationList', ['team' => $team, 'display'=>'admin'])
             
         </div>
         

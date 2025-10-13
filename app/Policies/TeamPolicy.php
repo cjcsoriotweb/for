@@ -85,7 +85,7 @@ class TeamPolicy
 
     public function admin(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team) || $user->hasTeamRole($team, 'superadmin');
+        return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'superadmin');
     }
 
     
