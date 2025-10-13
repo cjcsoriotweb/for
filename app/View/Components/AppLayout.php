@@ -7,6 +7,12 @@ use Illuminate\View\View;
 
 class AppLayout extends Component
 {
+    public $team;
+
+    public function __construct($team)
+    {
+        $this->team = $team;
+    }
     /**
      * Get the view / contents that represents the component.
      */
