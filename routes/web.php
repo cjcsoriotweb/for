@@ -42,10 +42,14 @@ Route::middleware(['auth', 'verified'])
             ->as('admin.')
             ->middleware('can:access-admin,team')
             ->group(function () {
-                Route::get('/', [ApplicationController::class, 'index'])
+                Route::get('/', [ApplicationAdminController::class, 'index'])
                     ->name('index')
                     ->middleware('can:access-admin,team');
 
+                Route::get('/config', [ApplicationAdminController::class, 'config'])
+                    ->name('config')
+                    ->middleware('can:access-admin,team');
+     
                 Route::get('/users', [ApplicationAdminController::class, 'users'])
                     ->name('users')
                     ->middleware('can:access-admin,team');

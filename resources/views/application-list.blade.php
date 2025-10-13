@@ -14,9 +14,9 @@
         <button type="submit"
             class="text-left focus:outline-none focus:ring-4 focus:ring-slate-500 focus:ring-offset-4 focus:ring-offset-white rounded-xl overflow-hidden transform transition-all duration-500 hover:shadow-3xl hover:shadow-slate-500/50 hover:ring-2 hover:ring-slate-300/50">
             <div
-                class="relative rounded-xl overflow-hidden shadow-2xl w-24 h-24 sm:w-36 sm:h-36 md:w-48 md:h-48 lg:w-60 lg:h-60">
+                class="p-5 relative rounded-xl overflow-hidden shadow-2xl w-24 h-24 sm:w-36 sm:h-36 md:w-48 md:h-48 lg:w-60 lg:h-60">
                 @if($item->profile_photo_path)
-                <img src="{{ $item->profile_photo_url }}" alt="{{ $item->name }}"
+                <img style="object-fit: scale-down;" src="{{ $item->profile_photo_url }}" alt="{{ $item->name }}"
                     class="w-full h-full object-cover animate__animated animate__fadeIn transition-opacity duration-300">
                 @else
                 <div class="w-full h-full bg-slate-800 flex items-center justify-center">
