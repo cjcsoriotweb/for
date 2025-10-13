@@ -10,7 +10,7 @@
             <div class="p-6 lg:p-8 flex-1 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Programmation Python Avancée
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $formation->formation->title }}
                         </h2>
                         <span
                             class="bg-blue-100 text-primary text-xs font-semibold px-3 py-1 rounded-full flex items-center">
@@ -18,18 +18,21 @@
                             En cours
                         </span>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">Apprenez les concepts et techniques
-                        avancés de Python pour construire des applications robustes.</p>
+                    
+                            <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">{{ $formation->formation->description }}</p>
                 </div>
                 <div>
                     <div class="mb-2">
+                        @if($formation->formation_user)
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progression</span>
-                            <span class="text-sm font-medium text-primary">65%</span>
+                            <span class="text-sm font-medium text-primary">{{ $formation->formation_user->progress }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                            <div class="bg-primary h-2.5 rounded-full" style="width: 65%"></div>
+                            <div class="bg-primary h-2.5 rounded-full" style="width: {{ $formation->formation_user->progress }}%"></div>
                         </div>
+                        @endif
+
                     </div>
                     <div class="mt-6 flex justify-end">
                         <a class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">

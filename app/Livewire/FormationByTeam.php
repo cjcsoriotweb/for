@@ -12,7 +12,7 @@ class FormationByTeam extends Component
     public $team;
 
     public function searchLikeEleve(){
-        $this->formations = FormationTeam::get();
+        $this->formations = FormationTeam::where('team_id', $this->team->id)->with('formation')->with('formation_user')->get();
     }
 
     public function render()

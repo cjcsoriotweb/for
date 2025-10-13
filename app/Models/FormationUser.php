@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FormationTeam extends Model
+class FormationUser extends Model
 {
-    //
-    protected $table = 'formation_teams';
+    protected $table = 'formation_user';
     protected $fillable = [
         'formation_id',
-        'team_id',
+        'user_id',
         'visible',
         'approved_at',
         'approved_by',
@@ -21,9 +20,4 @@ class FormationTeam extends Model
     {
         return $this->belongsTo(Formation::class);
     }
-    public function formation_user()
-    {
-        return $this->hasOne(FormationUser::class, 'formation_id', 'formation_id');
-    }
-
 }
