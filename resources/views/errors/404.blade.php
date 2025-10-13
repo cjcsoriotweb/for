@@ -61,7 +61,7 @@
                     ← Revenir en arrière
                 </button>
 
-                <a href="{{ auth()->check() ? route('dashboard') : url('/') }}"
+                <a href="{{ auth()->check() ? route('vous.index') : url('/') }}"
                    class="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60">
                     Aller à l’accueil
                 </a>
