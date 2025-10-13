@@ -2,16 +2,15 @@
 
 namespace App\Livewire\PowerGrid;
 
-use App\Models\User;
 use App\Models\Team;
-use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Carbon;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\PowerGridFields;
 
 final class UserTableInTeam extends PowerGridComponent
 {
@@ -38,12 +37,12 @@ final class UserTableInTeam extends PowerGridComponent
         ];
     }
 
-public function datasource(): \Illuminate\Database\Eloquent\Builder
-{
-    // Filtre par l’équipe courante via whereHas — retourne bien un Eloquent\Builder
-    return User::query()
-        ->whereHas('teams', fn ($q) => $q->whereKey($this->team->getKey()));
-}
+    public function datasource(): \Illuminate\Database\Eloquent\Builder
+    {
+        // Filtre par l’équipe courante via whereHas — retourne bien un Eloquent\Builder
+        return User::query()
+            ->whereHas('teams', fn ($q) => $q->whereKey($this->team->getKey()));
+    }
 
     public function relationSearch(): array
     {
@@ -74,12 +73,22 @@ public function datasource(): \Illuminate\Database\Eloquent\Builder
     #[\Livewire\Attributes\On('edit')]
     public function edit($rowId): void
     {
-        $this->js('alert('.$rowId.')');
+        $user = User::find($rowId);
+        if ($user) {
+            // Retirer l'utilisateur de l'équipe courante
+            $this->team->users()->detach($user);
+        }
     }
 
     public function actions(User $row): array
     {
         return [
+            Button::add('edit')
+                ->slot('Retirer: '.$row->id)
+                ->id()
+                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
+                ->dispatch('edit', ['rowId' => $row->id]),
+
             Button::add('edit')
                 ->slot('Edit: '.$row->id)
                 ->id()
