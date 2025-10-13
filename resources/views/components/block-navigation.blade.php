@@ -1,16 +1,13 @@
-<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
 
     @if($back)
-    <x-button-block titre="{{ $backTitle ?? 'Retour' }}" description="Retourner à la page precedente" button='
-        <svg class="w-6 h-6  text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10"> <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"></path> </svg>
-    ' url="{{ $back }}" />
-
+    <p class="mb-5">
+        <a href="{{ $back }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{ $backTitle ?? 'Retour' }}</a>
+    </p>
     @endif
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
 
     @foreach($navigation as $nav)
-
-
-    <x-button-block titre="{{ $nav['title'] }}" description="{{ $nav['description'] }}"
-        url="{{ route($nav['route'], ['team'=>$team]) }}" image="{{ $nav['image'] ?? null }}" />
+        <x-button-block titre="{{ $nav['title'] }}" description="{{ $nav['description'] }}"
+            url="{{ route($nav['route'], ['team'=>$team]) }}" image="{{ $nav['image'] ?? null }}" />
     @endforeach
 </section>

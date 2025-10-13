@@ -15,18 +15,7 @@
 
     <x-block-div>
         
-        <x-block-navigation :navigation="[
-            [
-                'title' => 'Changer nom',
-                'description' => '...',
-                'route' => 'application.admin.configuration.name'
-            ],
-            [
-                'title' => 'Changer logo',
-                'description' => '...',
-                'route' => 'application.admin.configuration.logo'
-            ]
-        ]" 
+        <x-block-navigation :navigation="[]" 
         :team="$team" 
         backTitle="Retour à la configuration"
         back="{{ route('application.admin.configuration.index', $team) }}" />

@@ -11,7 +11,7 @@
         :navigation="[
             [
                 'title' => 'Configuration',
-                'description' => '..', 
+                'description' => 'Gérer les paramètres de votre application', 
                 'route' => 'application.admin.configuration.index'
             ]
         ]" 

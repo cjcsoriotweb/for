@@ -1,5 +1,5 @@
-<div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition duration-300">
-    <h3 class="text-2xl font-bold text-blue-600 mb-4">{!! $titre !!}</h3>
+<div class="bg-white p-8 rounded-xl shadow-lg   transition duration-300">
+    <h3 class="font-bold text-blue-600 mb-4">{!! $titre !!}</h3>
 
     @if(isset($description))
     <p class="text-gray-600 mb-6">
