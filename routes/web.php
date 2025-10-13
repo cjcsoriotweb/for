@@ -1,13 +1,22 @@
 <?php
 
+use App\Http\Controllers\Team\ApplicationController;
+use App\Http\Controllers\Team\FormationController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FormationsController;
-use App\Http\Controllers\Team\DashboardController;
-use App\Http\Controllers\Team\TeamPhotoController;
-use App\Http\Controllers\TeamAdminController;
-use App\Http\Controllers\TeamSwitchController;
-use App\Http\Controllers\WelcomeController;
 
+Route::resource('formations', ApplicationController::class)
+            ->only(['index','show'])
+            ->names('formations')
+            ->scoped()                            // {formation:slug} si getRouteKeyName()
+            ->middleware('can:access-team,team');
+
+
+
+Route::resource('formations', FormationController::class)
+            ->only(['index','show'])
+            ->names('formations')
+            ->scoped()                            // {formation:slug} si getRouteKeyName()
+            ->middleware('can:access-team,team');
 
 
 include_once __DIR__.'/offline.php';

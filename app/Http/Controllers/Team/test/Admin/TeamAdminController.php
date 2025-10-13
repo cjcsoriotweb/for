@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Team\admin;
 use App\Models\Team;
 use App\Http\Controllers\Controller;
 
@@ -15,7 +15,7 @@ class TeamAdminController extends Controller
     public function __construct()
     {
         $this->middleware(['auth','verified']);
-        $this->middleware('can:access-admin,team')->except(['index','show']);
+        $this->middleware('can:access-admin,team');
     }
 
 
@@ -48,19 +48,6 @@ class TeamAdminController extends Controller
 
     }
 
-    /* Edit formations linked to the team */
-
-    public function formationsDisable(Team $team)
-    {
-        return redirect()->back()->with('success', 'Formation désactivée.');
-    }
-
-    public function formationsEnable(Team $team)
-    {
-
-
-        return redirect()->back()->with('success', 'Formation activée.');
-    }
 
 
 
