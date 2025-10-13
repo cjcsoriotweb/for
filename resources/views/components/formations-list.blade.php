@@ -1,8 +1,7 @@
-<div class="relative min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-10">Mes Formations</h1>
         <div class="space-y-8">
-            @foreach($formations as $formation)
+            @forelse($formations as $formation)
 
             <div
                 class="bg-white dark:bg-gray-800/50 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col lg:flex-row transform hover:-translate-y-1">
@@ -42,9 +41,11 @@
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <p class="text-gray-600 dark:text-gray-400">Aucune formation en cours pour le moment.</p>
+            @endforelse
         </div>
-    </div>
     <x-big-button>Trouver d'autre formation</x-big-button>
+
+    </div>
     
-</div>
