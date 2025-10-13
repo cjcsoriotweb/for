@@ -6,10 +6,19 @@
     </x-slot>
 
     <x-block-div>
-        
-        <x-block-navigation :navigation="[
-            ['title' => 'Configuration', 'description' => '..', 'route' => 'application.admin.configuration.index']
-        ]" :team="$team" back="0"/>
+
+        <x-block-navigation 
+        :navigation="[
+            [
+                'title' => 'Configuration',
+                'description' => '..', 
+                'route' => 'application.admin.configuration.index'
+            ]
+        ]" 
+        :team="$team" 
+        backTitle="Retour à l'application"
+        back="{{ route('application.index', $team) }}" />
+
 
 
 

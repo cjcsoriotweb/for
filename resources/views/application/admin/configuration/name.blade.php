@@ -12,7 +12,12 @@
 
     <x-block-div>
         
-        <x-block-navigation :navigation="[]" :team="$team" back="1" />
+        <x-block-navigation 
+        :navigation="[]" 
+        :team="$team" 
+        backTitle="Retour à la configuration"
+        back="{{ route('application.admin.configuration.index', $team) }}"
+         />
 
     </x-block-div>
 

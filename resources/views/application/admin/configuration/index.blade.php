@@ -22,7 +22,8 @@
                 ],
             ]"
             :team="$team"
-            back="{{ route('application.index', $team) }}"
+            backTitle="Retour à Administration"
+            back="{{ route('application.admin.index', $team) }}"
         />
         
     </x-block-div>
