@@ -71,10 +71,7 @@ class TeamPolicy
         return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
     }
 
-    public function canAddApprentis(User $user, Team $team): bool
-    {
-        return $user->hasTeamPermission($team, 'admin');
-    }
+
 
     /**
      * Determine whether the user can update the model.
