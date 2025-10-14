@@ -19,13 +19,6 @@
         @endif
     @endif
 
-    @if(config('app.debug'))
-        @if(isset($nav['hasTeamRole']))
-        {{ $nav['hasTeamRole'] }}
-        @else
-        X
-        @endif
-    @endif
 
     @if($visible)
     <x-button-block titre="{{ $nav['title'] }}" description="{{ $nav['description'] }}"
