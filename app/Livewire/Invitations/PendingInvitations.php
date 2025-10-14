@@ -82,7 +82,7 @@ class PendingInvitations extends Component
         $this->loadInvites(); // met à jour la liste immédiatement
 
         // Redirige vers la page de l’équipe
-        $this->redirect(route('team.dashboard', $team));
+        $this->redirect(route('application.index', $team));
     }
 
     public function decline(int $invitationId): void

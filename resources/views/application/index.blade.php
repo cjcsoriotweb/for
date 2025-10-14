@@ -3,15 +3,16 @@
 
 
     <x-slot name="block">
-       <p>Page d'accueil de la formation.</p>   
+        <p>Page d'accueil d'accueil.</p>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
+    <x-block-div>
 
-            </div>
-        </div>
-    </div>
+        <x-block-navigation :navigation="[
+            ['hasTeamRole' => 'admin', 'title' => 'Administration', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
+
+        ]" :team="$team" back="0" />
+
+    </x-block-div>
 </x-application-layout>
