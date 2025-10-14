@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\Application\Admin\TeamPhotoController;
 
 Route::prefix('application/{team:id}')
     ->name('application.')
@@ -21,5 +22,11 @@ Route::prefix('application/{team:id}')
             Route::post('/switch', [ApplicationController::class, 'switch'])->name('switch');
         });
 
+        /*
+        |------------------------------
+        | Photo d'équipe (admin)
+        |------------------------------
+        | On garde ici (sans /admin dans l'URL), mais protégé par la policy admin.
+        */
 
     });
