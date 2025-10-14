@@ -17,7 +17,7 @@
 
         $allowed   = (bool) ($inspect['allowed'] ?? false);
         $hasGuards = collect($inspect['details'] ?? [])->whereIn('type', ['can','permission','role'])->isNotEmpty();
-        $label     = $hasGuards ? implode(' • ', $inspect['labels'] ?? []) : null;
+        $label     = $hasGuards ? implode(' <br> ', $inspect['labels'] ?? []) : null;
 
         $debug        = (bool) config('app.debug');
         $shouldRender = $allowed || ($debug && !$allowed);
