@@ -30,7 +30,8 @@ class UpdateTeamName implements UpdatesTeamNames
         ])->save();
 
         $admins = $team->allUsers() // inclut le owner
-            ->filter(fn (User $u) => $u->hasTeamPermission($team, 'admin') || $u->id === $team->owner_id); // évite d’auto-notifier l’invitant
+            ->filter(fn (User $u) => $u->hasTeamPermission($team, 'admin') || $u->id === $team->owner_id)
+            ->reject(fn (User $u) => $u->id === auth()->id()); // évite d’auto-notifier l’invitant
         Notification::send(
             $admins,
             new \App\Notifications\TeamAdminAvert(
