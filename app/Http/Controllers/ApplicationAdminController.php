@@ -12,6 +12,13 @@ class ApplicationAdminController extends Controller
 
     public function index(Team $team)
     {
+        auth()->user()->notify(new \App\Notifications\UserMentioned(
+            mentionerId: auth()->id(),
+            mentionerName: auth()->user()->name,
+            context: 'Message dans #général',
+            url: route('vous.index')
+        ));
+
         return view('application.admin.index', compact('team'));
     }
     public function formationsIndex(Team $team)
