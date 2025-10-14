@@ -21,7 +21,7 @@ class teamNeedFormationList extends Component
 
         // Si mode admin → exige le droit, sinon 403
         if ($this->display === 'admin') {
-            abort_unless(auth()->user()?->can('access-admin', $team), 403);
+            abort_unless(auth()->user()?->can('admin', $team), 403);
         }
 
         // Si tu veux précharger/initialiser, OK, mais évite les requêtes lourdes ici

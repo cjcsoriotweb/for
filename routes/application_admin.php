@@ -6,7 +6,7 @@ use App\Http\Controllers\ApplicationAdminController;
 Route::prefix('application/{team:id}/admin')
     ->name('application.admin.')
     ->scopeBindings()
-    ->middleware('can:access-admin,team')
+    ->middleware('can:admin,team')
     ->group(function () {
 
         Route::get('/', [ApplicationAdminController::class, 'index'])->name('index');

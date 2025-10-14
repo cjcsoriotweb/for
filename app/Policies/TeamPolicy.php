@@ -68,7 +68,7 @@ class TeamPolicy
      */
     public function update(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
+        return $user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin');
     }
 
 
@@ -76,9 +76,9 @@ class TeamPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function accessAdmin(User $user, Team $team): bool
+    public function admin(User $user, Team $team): bool
     {
-        if ($user->ownsTeam($team) || $user->hasTeamRole($team, 'admin') || $user->hasTeamRole($team, 'manager')) {
+        if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');

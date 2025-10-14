@@ -32,10 +32,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $user->belongsToTeam($team);
             });
 
-            Gate::define('access-admin', function (User $user, $team) {
-                $team = $team instanceof Team ? $team : Team::query()->findOrFail($team);
-                return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
-            });
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {

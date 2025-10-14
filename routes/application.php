@@ -28,7 +28,7 @@ Route::prefix('application/{team:id}')
         |------------------------------
         | On garde ici (sans /admin dans l'URL), mais protégé par la policy admin.
         */
-        Route::middleware('can:access-admin,team')->group(function () {
+        Route::middleware('can:admin,team')->group(function () {
             Route::put('/photo', [TeamPhotoController::class, 'update'])->name('photo.update');
             Route::delete('/photo', [TeamPhotoController::class, 'destroy'])->name('photo.destroy');
         });
