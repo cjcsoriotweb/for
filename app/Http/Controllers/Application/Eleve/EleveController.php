@@ -14,5 +14,10 @@ class EleveController extends Controller
         return view('application.eleve.index', compact('team'));
     }
 
+    public function formationIndex(Team $team)
+    {
+        return view('application.eleve.formationsList', compact('team'));
+    }
+
 
 }

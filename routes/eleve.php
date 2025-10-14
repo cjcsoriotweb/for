@@ -10,6 +10,7 @@ Route::prefix('application/{team:id}/apprentisage')
     ->group(function () {
 
         Route::get('/', [EleveController::class, 'index'])->name('index');
+        Route::get('/vos-formations', [EleveController::class, 'formationIndex'])->name('formation.index');
 
 
     });
