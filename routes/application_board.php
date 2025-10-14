@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('application/{team:id}/tableau-de-bord')
     ->name('application.admin.')
     ->scopeBindings()
-    ->middleware('can:access-team,team')
+    ->middleware('can:board,team')
     ->group(function () {
 
         Route::get('/', [ApplicationAdminController::class, 'index'])->name('index');
