@@ -10,7 +10,7 @@
 
     <div class="py-12">
       
-                @include('application-list')
+                @include('auth.vous.application-list')
           
 
         
