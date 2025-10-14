@@ -162,6 +162,9 @@ class TeamPolicy
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour inviter des membres dans cette équipe.');
         }
     }
+    /**
+     * Determine whether the user is admin of the team.
+     */
 
     public function admin(User $user, Team $team): bool
     {
@@ -169,6 +172,21 @@ class TeamPolicy
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');
+        }
+    }
+
+    /**
+     * Determine whether the user can read the team.
+     */
+
+
+
+    public function eleve(User $user, Team $team): bool
+    {
+        if ($user->belongsToTeam($team)) {
+            return true;
+        } else {
+            return abort(403, 'Accès refusé. Vous n\'êtes pas membre de cette équipe.');
         }
     }
     
