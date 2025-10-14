@@ -2,26 +2,92 @@
 
 namespace App\Livewire;
 
+use Illuminate\Support\Carbon;
 use Livewire\Component;
 
 class NotificationsBell extends Component
 {
-    public int $limit = 10;
+    public int $pageSize = 15;
 
-    protected $listeners = ['notification-read' => '$refresh']; // si tu veux rafraîchir manuellement
+    // état UI
+    public bool $open = false;
 
-    public function markAllRead()
-    {
-        auth()->user()->unreadNotifications->markAsRead();
+    public function open(){
+        dd('ok');
     }
+    // liste matérialisée côté serveur
+    public array $items = [];
+    public ?string $next_before = null; // ISO8601 du dernier item chargé
 
     public function render()
     {
         $user = auth()->user();
+        $unreadCount = $user->unreadNotifications()->count();
 
-        return view('livewire.notifications-bell', [
-            'unreadCount' => $user->unreadNotifications()->count(),
-            'latest' => $user->notifications()->latest()->limit($this->limit)->get(),
-        ]);
+        return view('livewire.notifications-bell', compact('unreadCount'));
+    }
+
+    /** Ouverture du menu : on charge la première page si vide */
+    public function updatedOpen($isOpen): void
+    {
+        if ($isOpen && empty($this->items)) {
+            $this->refreshList();
+        }
+    }
+
+    public function refreshList(): void
+    {
+        $this->items = [];
+        $this->next_before = null;
+        $this->load(); // première page
+    }
+
+    public function loadMore(): void
+    {
+        if ($this->next_before) {
+            $this->load($this->next_before);
+        }
+    }
+
+    private function load(?string $before = null): void
+    {
+        $user = auth()->user();
+
+        $q = $user->notifications()
+            ->select(['id','data','read_at','created_at'])   // ← évite type, updated_at…
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
+
+        if ($before) {
+            $q->where('created_at', '<', \Illuminate\Support\Carbon::parse($before));
+        }
+
+        $rows = $q->limit($this->pageSize + 1)->get();
+
+        $hasMore = $rows->count() > $this->pageSize;
+        $slice   = $rows->take($this->pageSize)->values();
+
+        foreach ($slice as $n) {
+            $this->items[] = [
+                'id' => (string) $n->id,
+                'read_at' => $n->read_at?->toIso8601String(),
+                'data' => is_array($n->data) ? $n->data : (array) $n->data, // safe
+                'created_at' => $n->created_at->toIso8601String(),
+                // ⚠️ plus de diffForHumans côté PHP (coûteux). On formate côté client.
+                'human_created_at' => null,
+            ];
+        }
+
+        $this->next_before = $hasMore
+            ? optional($slice->last()?->created_at)->toIso8601String()
+            : null;
+    }
+
+
+    public function markAllRead(): void
+    {
+        auth()->user()->unreadNotifications->markAsRead();
+        // on garde la liste visible, mais tu peux aussi faire $this->refreshList();
+        // pour refléter l'état lu/non-lu immédiatement
     }
 }
