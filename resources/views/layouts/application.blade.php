@@ -22,6 +22,11 @@
         </x-slot>
     @endisset
 
+    @isset($slot)
+        {{ $slot }}
+    @endisset
+    
+
     {{-- Zone d’erreurs / alertes personnalisées si tu en as une --}}
     <x-error-display />
 

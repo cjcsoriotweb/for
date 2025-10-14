@@ -5,9 +5,7 @@
         </h2>
     </x-slot>
 
-    <x-block-div>
 
-    </x-block-div>
 
     <x-block-div>
         <x-block-navigation 
