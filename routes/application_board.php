@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Application\Admin\TeamPhotoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApplicationAdminController;
 
@@ -31,4 +32,8 @@ Route::prefix('application/{team:id}/tableau-de-bord')
         });
 
 
+            Route::middleware('can:admin,team')->group(function () {
+                Route::put('/photo', [TeamPhotoController::class, 'update'])->name('photo.update');
+                Route::delete('/photo', [TeamPhotoController::class, 'destroy'])->name('photo.destroy');
+            });
     });
