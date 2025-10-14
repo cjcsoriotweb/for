@@ -16,7 +16,7 @@
 
         
         <x-error-display />
-        <livewire:notifications-bell />
+        
 
         <main>
             @if(isset($block))

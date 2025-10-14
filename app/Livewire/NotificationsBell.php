@@ -12,9 +12,7 @@ class NotificationsBell extends Component
     // état UI
     public bool $open = false;
 
-    public function open(){
-        dd('ok');
-    }
+
     // liste matérialisée côté serveur
     public array $items = [];
     public ?string $next_before = null; // ISO8601 du dernier item chargé
@@ -30,6 +28,7 @@ class NotificationsBell extends Component
     /** Ouverture du menu : on charge la première page si vide */
     public function updatedOpen($isOpen): void
     {
+
         if ($isOpen && empty($this->items)) {
             $this->refreshList();
         }
@@ -37,6 +36,7 @@ class NotificationsBell extends Component
 
     public function refreshList(): void
     {
+        
         $this->items = [];
         $this->next_before = null;
         $this->load(); // première page
@@ -53,7 +53,8 @@ class NotificationsBell extends Component
     {
         $user = auth()->user();
 
-        $q = $user->notifications()
+        $q = $user->unreadNotifications()
+            
             ->select(['id','data','read_at','created_at'])   // ← évite type, updated_at…
             ->orderByDesc('created_at')
             ->orderByDesc('id');

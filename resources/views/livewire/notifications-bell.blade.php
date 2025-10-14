@@ -7,7 +7,7 @@
     <button type="button"
             class="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             @click="open = !open"
-            :onclick="open( ? $wire.markAllRead() : null)"
+            wire:click="refreshList"
             :aria-expanded="open.toString()"
             aria-haspopup="menu">
         <span class="text-lg">🔔</span>

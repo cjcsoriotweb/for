@@ -28,6 +28,10 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <!-- Teams Dropdown -->
 
+                <div>
+                    <livewire:notifications-bell />
+                </div>
+
                 <div class="hidden sm:flex sm:items-center sm:ms-6">
                     <!-- Settings Dropdown -->
                     <div class="ms-3 relative">
@@ -85,8 +89,7 @@
                         </x-dropdown>
                     </div>
                 </div>
-   
-
+    
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures() && Auth::user()->hasTeamPermission($team, 'admin'))
                 <div class="ms-3 relative">
                     <x-dropdown align="right" width="60">
