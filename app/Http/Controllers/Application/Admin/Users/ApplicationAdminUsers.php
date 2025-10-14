@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Team;
 
 
-class ApplicationAdminFormation extends Controller
+class ApplicationAdminUsers extends Controller
 {
     public function usersIndex(Team $team)
     {

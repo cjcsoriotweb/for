@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Application\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Team;
@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\File;
 
-class TeamPhotoController extends Controller
+
+class ApplicationAdminPhotoConfiguration extends Controller
 {
     public function update(Request $request, Team $team)
     {
@@ -41,4 +42,5 @@ class TeamPhotoController extends Controller
         }
         return back()->with('ok', 'Photo supprimée.');
     }
+
 }

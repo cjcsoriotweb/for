@@ -10,7 +10,6 @@ class ApplicationAdminFormation extends Controller
 {
 
 
-
     public function formationsIndex(Team $team)
     {
         return view('application.admin.formations.index', compact('team'));
@@ -20,8 +19,6 @@ class ApplicationAdminFormation extends Controller
     {
         return view('application.admin.formations.list', compact('team'));
     }
-
-
 
 
 }
