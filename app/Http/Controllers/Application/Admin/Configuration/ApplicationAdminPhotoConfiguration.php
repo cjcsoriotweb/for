@@ -35,9 +35,9 @@ class ApplicationAdminPhotoConfiguration extends Controller
 
     public function destroy(Team $team)
     {
-        if ($team->photo_path) {
-            Storage::disk('public')->delete($team->photo_path);
-            $team->photo_path = null;
+        if ($team->profile_photo_path) {
+            Storage::disk('public')->delete($team->profile_photo_path);
+            $team->profile_photo_path = null;
             $team->save();
         }
         return back()->with('ok', 'Photo supprimée.');
