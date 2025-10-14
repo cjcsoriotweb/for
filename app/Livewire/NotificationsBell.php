@@ -88,6 +88,7 @@ class NotificationsBell extends Component
     public function markAllRead(): void
     {
         auth()->user()->unreadNotifications->markAsRead();
+        $this->refreshList();
         // on garde la liste visible, mais tu peux aussi faire $this->refreshList();
         // pour refléter l'état lu/non-lu immédiatement
     }
