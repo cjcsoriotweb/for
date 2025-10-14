@@ -19,7 +19,7 @@
         @endif
     @endif
 
-    @if(true)
+    @if(config('app.debug'))
         @if(isset($nav['hasTeamRole']))
         {{ $nav['hasTeamRole'] }}
         @else
