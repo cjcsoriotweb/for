@@ -16,7 +16,6 @@ Route::prefix('application/{team:id}')
         */
         Route::middleware('can:access-team,team')->group(function () {
             Route::get('/', [ApplicationController::class, 'index'])->name('index');
-            Route::get('/show', [ApplicationController::class, 'show'])->name('show');
 
             // Switch d'application / d'équipe
             Route::post('/switch', [ApplicationController::class, 'switch'])->name('switch');
