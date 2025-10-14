@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Application\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\File;
 
@@ -34,11 +35,14 @@ class TeamPhotoController extends Controller
 
     public function destroy(Team $team)
     {
-        if ($team->photo_path) {
-            Storage::disk('public')->delete($team->photo_path);
-            $team->photo_path = null;
+        if ($team->profile_photo_path) {
+            Storage::disk('public')->delete($team->profile_photo_path);
+            $team->profile_photo_path = null;
             $team->save();
         }
-        return back()->with('ok', 'Photo supprimée.');
+
+        Auth::user()->notify(new \App\Notifications\TeamPhotoDeleted($team));
+
+        return back()->with('success', 'Photo supprimée.');
     }
 }

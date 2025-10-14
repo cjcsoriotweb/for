@@ -162,5 +162,14 @@ class TeamPolicy
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour inviter des membres dans cette équipe.');
         }
     }
+
+    public function admin(User $user, Team $team): bool
+    {
+        if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin')) {
+            return true;
+        } else {
+            return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');
+        }
+    }
     
 }
