@@ -65,13 +65,16 @@ class JetstreamServiceProvider extends ServiceProvider
             'read', 'create', 'update',  'admin', 'team:invite', 'invite:apprentis', 'admin', 
 
             
-            'team:removeTeamMember',
 
             'team:manage_formation',
-            'team:manage_users',
 
-            'team:list_users',
+            'team:users',
+            'team:manage_users',
             'team:invite_users',
+            'team:list_users',
+
+
+
             'team:configuration',
         ])->description('Accès complet à l’équipe.');
 

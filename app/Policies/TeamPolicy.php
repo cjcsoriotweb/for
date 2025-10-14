@@ -53,7 +53,7 @@ class TeamPolicy
     public function removeTeamMember(User $user, Team $team): bool
     {
         return $user->ownsTeam($team)
-            || $user->hasTeamPermission($team, 'team:removeTeamMember');
+            || $user->hasTeamPermission($team, 'team:action:users_invite');
     }
     /**
      * Determine whether the user can delete the model.

@@ -101,7 +101,7 @@
                                 <div class="text-gray-600">{{ $invitation->email }}</div>
 
                                 <div class="flex items-center">
-                                    @if (Auth::user()->hasTeamPermission( $team,'team:removeTeamMember'))
+                                    @if (Auth::user()->hasTeamPermission( $team,'team:action:users_invite'))
                                         <!-- Cancel Team Invitation -->
                                         <button class="cursor-pointer ms-6 text-sm text-red-500 focus:outline-none"
                                                             wire:click="cancelTeamInvitation({{ $invitation->id }})">
