@@ -1,4 +1,3 @@
-
 @if($back)
 <p class="mb-5">
     <a href="{{ $back }}"
@@ -9,20 +8,28 @@
 <section style="position:relative;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
 
     @foreach($navigation as $nav)
-        @php
-        $visible = true;
-        @endphp
+    @php
+    $visible = true;
+    @endphp
 
 
     @if(isset($nav['hasTeamRole']))
         @if(!Auth::user()->hasTeamRole($team, $nav['hasTeamRole']))
-            {{ $visible = false }}
+        {{ $visible = false }}
+        @endif
+    @endif
+
+    @if(true)
+        @if(isset($nav['hasTeamRole']))
+        {{ $nav['hasTeamRole'] }}
+        @else
+        X
         @endif
     @endif
 
     @if($visible)
-        <x-button-block titre="{{ $nav['title'] }}" description="{{ $nav['description'] }}"
-            url="{{ route($nav['route'], ['team'=>$team]) }}" image="{{ $nav['image'] ?? null }}" />
+    <x-button-block titre="{{ $nav['title'] }}" description="{{ $nav['description'] }}"
+        url="{{ route($nav['route'], ['team'=>$team]) }}" image="{{ $nav['image'] ?? null }}" />
     @endif
 
     @endforeach
