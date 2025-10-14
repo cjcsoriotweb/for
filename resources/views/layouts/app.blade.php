@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Layout</title>
     <x-header />
-
+    @livewireStyles
 </head>
 
 <body>
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </main>
-
+        @livewireScripts
     </div>
 </body>
 

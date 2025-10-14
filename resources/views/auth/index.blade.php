@@ -6,16 +6,7 @@
         <x-deconnexion />
     </x-slot>
 
-
-
     <div class="py-12">
-      
-                @include('auth.vous.application-list')
-          
-
-        
-
-        </div>
-
-
+        @include('auth.vous.application-list')
+    </div>
 </x-app-layout>
