@@ -9,7 +9,7 @@
 
 @php use App\Support\RouteAccess; @endphp
 
-<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 ">
 @foreach($navigation as $nav)
     @php
         $params    = array_merge(['team' => $team], $nav['params'] ?? []);

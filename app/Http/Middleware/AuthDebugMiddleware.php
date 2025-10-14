@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\View;
 class AuthDebugMiddleware
 {
     public function handle($request, Closure $next)
-    {
+    {   
+
         if (! config('app.debug')) {
             return $next($request);
         }

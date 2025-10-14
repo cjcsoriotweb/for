@@ -19,6 +19,5 @@ class ApplicationController extends Controller
     {
         return view('application.cgu', compact('team'));
     }
-    
 
 }
