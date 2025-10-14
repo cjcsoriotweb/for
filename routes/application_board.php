@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\ApplicationAdminConfiguration;
-use App\Http\Controllers\ApplicationAdminController;
-use App\Http\Controllers\ApplicationAdminFormation;
-use App\Http\Controllers\ApplicationAdminPhotoConfiguration;
-use App\Http\Controllers\ApplicationAdminUsers;
+use App\Http\Controllers\Application\Admin\ApplicationAdminController;
+use App\Http\Controllers\Application\Admin\Configuration\ApplicationAdminConfiguration;
+use App\Http\Controllers\Application\Admin\Configuration\ApplicationAdminPhotoConfiguration;
+use App\Http\Controllers\Application\Admin\Formation\ApplicationAdminFormation;
+use App\Http\Controllers\Application\Admin\Users\ApplicationAdminUsers;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('application/{team:id}/tableau-de-bord')
     ->name('application.admin.')
     ->scopeBindings()
-    ->middleware('can:board,team')
+    ->middleware('can:access-team,team')
     ->group(function () {
 
         Route::get('/', [ApplicationAdminController::class, 'index'])->name('index');
@@ -34,7 +34,7 @@ Route::prefix('application/{team:id}/tableau-de-bord')
             Route::get('/list', [ApplicationAdminUsers::class, 'usersList'])->middleware('can:list_users,team')->name('list');
         });
 
-        Route::middleware('can:admin,team')->group(function () {
+        Route::middleware('can:access-team,team')->group(function () {
             Route::put('/photo', [ApplicationAdminPhotoConfiguration::class, 'update'])->name('photo.update');
             Route::delete('/photo', [ApplicationAdminPhotoConfiguration::class, 'destroy'])->name('photo.destroy');
         });
