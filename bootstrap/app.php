@@ -3,10 +3,12 @@
 use App\Models\Team;
 use App\Models\User;
 use App\Policies\TeamPolicy;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -37,9 +39,24 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // ex: $middleware->appendToGroup('web', \App\Http\Middleware\SetTeamContext::class);
+       $middleware->appendToGroup('web', \App\Http\Middleware\AuthDebugMiddleware::class);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions) {
+        // Policies / Gate::authorize() -> AuthorizationException (403)
+        $exceptions->render(function (AuthorizationException $e, $request) {
+            return response()->view('errors.403', [
+                'message' => $e->getMessage(),
+            ], 403);
+        });
+
+        // Autres 403 (middleware can:, AccessDeniedHttpException, etc.)
+        $exceptions->render(function (HttpExceptionInterface $e, $request) {
+            if ($e->getStatusCode() === 403) {
+                return response()->view('errors.403', [
+                    'message' => method_exists($e, 'getMessage') ? $e->getMessage() : null,
+                ], 403);
+            }
+            return null;
+        });
     })
     ->create();

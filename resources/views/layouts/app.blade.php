@@ -44,6 +44,7 @@
                 </div>
             </header>
         @endisset
+        
 
         {{-- 👉 Slot BLOCK optionnel (carte centrale au-dessus du contenu) --}}
         @isset($block)
@@ -80,8 +81,12 @@
         </footer>
     </div>
 
+    {{-- Panneau de debug Auth (Gate/Policy) --}}
+
     @stack('modals')
     @livewireScripts
     @stack('scripts')
+    <x-auth-debug-panel />
+
 </body>
 </html>
