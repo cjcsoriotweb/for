@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\Contracts\InvitesTeamMembers;
@@ -40,6 +41,19 @@ class InviteTeamMember implements InvitesTeamMembers
             'email' => $email,
             'role' => $role,
         ]);
+
+        $admins = $team->allUsers() // inclut le owner
+            ->filter(fn (User $u) => $u->hasTeamPermission($team, 'admin') || $u->id === $team->owner_id)
+            ->reject(fn (User $u) => $u->id === auth()->id()); // évite d’auto-notifier l’invitant
+        Notification::send(
+            $admins,
+            new \App\Notifications\TeamAdminAvert(
+                mentionerId: auth()->id(),
+                mentionerName: auth()->user()->name,
+                context: "Invitation de {$email} en tant que {$role}",
+                url: route('application.admin.users.manager', $team)
+            )
+        );
 
         Mail::to($email)->send(new TeamInvitation($invitation));
     }

@@ -13,6 +13,7 @@ class ApplicationAdminController extends Controller
     public function index(Team $team)
     {
 
+
         return view('application.admin.index', compact('team'));
     }
     public function formationsIndex(Team $team)
