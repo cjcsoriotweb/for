@@ -24,9 +24,11 @@ Route::prefix('application/{team:id}/admin')
         });
 
         // Utilisateurs
-        Route::prefix('users')->name('users.')->group(function () {
+        Route::middleware('can:manage_roles,team')->prefix('users')->name('users.')->group(function () {
             Route::get('/', [ApplicationAdminController::class, 'usersIndex'])->name('index');
             Route::get('/manager', [ApplicationAdminController::class, 'usersManager'])->name('manager');
             Route::get('/list', [ApplicationAdminController::class, 'usersList'])->name('list');
         });
+
+
     });

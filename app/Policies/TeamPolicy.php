@@ -84,5 +84,29 @@ class TeamPolicy
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');
         }
     }
+
+    /**
+     * Determine whether the user can manage users.
+     */
+    public function manage_roles(User $user, Team $team): bool
+    {
+        if ($user->hasTeamPermission($team, 'team:manage_roles')) {
+            return true;
+        } else {
+            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour gérer les utilisateurs de cette équipe.');
+        }
+    }
+    /**
+     * Determine whether the user can invite users.
+     */
+    
+    public function invite(User $user, Team $team): bool
+    {
+        if ($user->hasTeamPermission($team, 'invite')) {
+            return true;
+        } else {
+            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour inviter des membres dans cette équipe.');
+        }
+    }
     
 }

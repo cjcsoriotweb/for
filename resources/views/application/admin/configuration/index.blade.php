@@ -13,14 +13,12 @@
                     'title' => 'Changer nom',
                     'description' => 'Remplacer le nom ' . e($team->name) . '',
                     'route' => 'application.admin.configuration.name',
-                    'hasTeamRole' => 'admin',
                 ],
                 [
                     'title' => 'Changer logo',
                     'description' => '',
                     'route' => 'application.admin.configuration.logo',
                     'image' => $team->profile_photo_path ? asset('storage/'.$team->profile_photo_path) : null,
-                    'hasTeamRole' => 'admin',
                 ],
             ]"
             :team="$team"

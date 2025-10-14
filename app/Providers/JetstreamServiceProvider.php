@@ -48,18 +48,13 @@ class JetstreamServiceProvider extends ServiceProvider
 
 
         Jetstream::role('admin', 'Admin', [
-            'read', 'create', 'update',  'admin'
+            'read', 'create', 'update',  'admin', 'invite'
         ])->description('Accès complet à l’équipe.');
 
         Jetstream::role('manager', 'Manager', [
             'read', 'create', 'update',  'admin', 'team:invite', 'invite:apprentis'
         ])->description('Accès complet à l’équipe.');
 
-
-
-        Jetstream::role('souschef', 'Sous-Chef', [
-            'read', 'create', 'update', 'admin'
-        ])->description('Accès complet à l’équipe.');
 
 
         Jetstream::role('apprentis', 'Apprentis', [
