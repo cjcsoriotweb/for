@@ -20,7 +20,6 @@ class UpdateTeamName implements UpdatesTeamNames
     {
         Gate::forUser($user)->authorize('update', $team);
 
-        
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
         ])->validateWithBag('updateTeamName');
@@ -32,6 +31,7 @@ class UpdateTeamName implements UpdatesTeamNames
         $admins = $team->allUsers() // inclut le owner
             ->filter(fn (User $u) => $u->hasTeamPermission($team, 'admin') || $u->id === $team->owner_id)
             ->reject(fn (User $u) => $u->id === auth()->id()); // évite d’auto-notifier l’invitant
+            
         Notification::send(
             $admins,
             new \App\Notifications\TeamAdminAvert(

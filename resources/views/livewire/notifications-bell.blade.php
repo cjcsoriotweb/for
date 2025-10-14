@@ -41,10 +41,12 @@
                         wire:click="refreshList">
                     Rafraîchir
                 </button>
+                @if($unreadCount > 0)
                 <button class="text-sm text-blue-600 hover:underline"
                         wire:click="markAllRead">
                     Tout marquer lu
                 </button>
+                @endif
             </div>
         </div>
 
