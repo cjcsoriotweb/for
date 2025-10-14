@@ -29,6 +29,7 @@ class RouteAccess
         ?Authenticatable $user = null,
         bool $includeAuthLabel = false
     ): array {
+
         $user  = $user ?: auth()->user();
         $route = Route::getRoutes()->getByName($name);
 

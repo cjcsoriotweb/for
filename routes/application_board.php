@@ -7,7 +7,7 @@ use App\Http\Controllers\ApplicationAdminPhotoConfiguration;
 use App\Http\Controllers\ApplicationAdminUsers;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('application/{team:id}/tableau-de-bord')
+Route::prefix('application/{team}/tableau-de-bord')
     ->name('application.admin.')
     ->scopeBindings()
     ->middleware('can:board,team')
