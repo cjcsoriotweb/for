@@ -1,23 +1,30 @@
 <?php
 
-use App\Http\Middleware\SetTeamContext;
 use App\Models\Team;
 use App\Models\User;
 use App\Policies\TeamPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Gate;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__ . '/../routes/web.php',
+        // On peut passer un ARRAY de fichiers pour "web"
+        web: [
+            __DIR__ . '/../routes/web.php',
+            __DIR__ . '/../routes/account.php',
+            __DIR__ . '/../routes/application.php',
+            __DIR__ . '/../routes/application_admin.php',
+        ],
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
-             Gate::policy(Team::class, TeamPolicy::class);
+            // Policies
+            Gate::policy(Team::class, TeamPolicy::class);
 
+            // Gates
             Gate::define('access-team', function (User $user, $team) {
                 $team = $team instanceof Team ? $team : Team::query()->findOrFail($team);
                 return $user->belongsToTeam($team);
@@ -27,13 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 $team = $team instanceof Team ? $team : Team::query()->findOrFail($team);
                 return $user->ownsTeam($team) || $user->hasTeamRole($team, 'admin');
             });
-
-    
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Si tu utilises un contexte d’équipe partagé aux vues :
-        // $middleware->appendToGroup('web', SetTeamContext::class);
+        // ex: $middleware->appendToGroup('web', \App\Http\Middleware\SetTeamContext::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
