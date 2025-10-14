@@ -32,10 +32,7 @@
 
     {{-- CONTENU PRINCIPAL DE LA PAGE --}}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {{-- Mets ici le contenu “{{ $slot }}” de ton ancienne page --}}
-        {{-- Exemple: --}}
         @yield('content') {{-- si tu utilises des sections --}}
-        {{-- ou bien ton contenu Blade direct --}}
     </div>
 
 </x-app-layout>
