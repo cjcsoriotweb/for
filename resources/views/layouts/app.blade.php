@@ -1,25 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full antialiased">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>@hasSection('title')@yield('title') — @endif{{ config('app.name', 'Application') }}</title>
-
-    {{-- Favicons (optionnel) --}}
     <link rel="icon" href="{{ asset('favicon.ico') }}">
-
-    {{-- Vite (Laravel 12) : CSS & JS app --}}
     @vite(['resources/css/app.css','resources/js/app.js'])
-
-    {{-- Livewire --}}
     @livewireStyles
-
-    {{-- En-tête personnalisée (styles/links additionnels) --}}
     <x-header />
-
-    {{-- Pile extensible pour des <meta> ou <link> additionnels --}}
     @stack('head')
 </head>
 

@@ -11,7 +11,7 @@
     <x-block-div>
 
         <x-block-navigation :navigation="[
-            ['title' => 'Vos formations', 'button' => 'ok', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.eleve.formation.index', 'icon' => 'cog'],
+            ['title' => 'Vos formations', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.eleve.formation.index', 'icon' => 'cog'],
             ['title' => 'Trouver une formation', 'description' => 'Cherchez une formation', 'route' => 'application.admin.index', 'icon' => 'cog'],
             ['title' => 'Vos documents', 'description' => 'Gérer les documents de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
 

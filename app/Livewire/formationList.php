@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\Models\Formation;
 use Livewire\Component;
 
-class teamNeedFormationList extends Component
+class formationList extends Component
 {
     public $formations = [];
     public $team;
@@ -55,6 +55,6 @@ class teamNeedFormationList extends Component
     public function render()
     {
         
-        return view('livewire.team.teamNeedFormationList');
+        return view('livewire.team.formationList');
     }
 }
