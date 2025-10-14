@@ -74,7 +74,7 @@ class TeamPolicy
 
     public function configuration(User $user, Team $team): bool
     {
-        if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin')) {
+        if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'configuration')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour modifier la configuration de cette équipe.');
@@ -83,12 +83,12 @@ class TeamPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function admin(User $user, Team $team): bool
+    public function board(User $user, Team $team): bool
     {
-        if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin')) {
+        if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'board')) {
             return true;
         } else {
-            return abort(403, 'Accès refusé. Vous n\'avez pas les droits administrateur pour cette équipe.');
+            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour le tableau de bord de cette équipe.');
         }
     }
     /**

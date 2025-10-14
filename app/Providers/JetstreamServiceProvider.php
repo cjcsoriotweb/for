@@ -48,24 +48,12 @@ class JetstreamServiceProvider extends ServiceProvider
 
 
         Jetstream::role('admin', 'Admin', [
-            'read', 'create', 'update',  'admin', 'invite', 
-            'invite:apprentis',
-            'team:invite', 
-            'team:invite_remove', 
-            'team:manage-roles', 
-            'team:manage_formation', 
-            'team:manage_users', 
-            'team:list_users', 
-            'team:invite_users', 
-            'team:configuration', 
-            'team:manage_users'
-        ])->description('Accès complet à l’équipe.');
-
-        Jetstream::role('manager', 'Manager', [
-            'read', 'create', 'update',  'admin', 'team:invite', 'invite:apprentis', 'admin', 
-
+            'read', 'create', 'update',  
             
-
+            'board', 
+            'team:invite', 
+            'invite:apprentis',
+            
             'team:manage_formation',
 
             'team:users',
@@ -73,9 +61,30 @@ class JetstreamServiceProvider extends ServiceProvider
             'team:invite_users',
             'team:list_users',
 
-
-
             'team:configuration',
+        ])->description('Accès complet à l’équipe.');
+
+        Jetstream::role('manager', 'Gestionnaire Formation', [
+            'board', 
+            'team:invite', 
+            'invite:apprentis',
+            
+            'team:manage_formation',
+        ])->description('Accès complet à l’équipe.');
+
+        Jetstream::role('gestion_users', 'Gestionnaire Utilisateur', [
+            'board', 
+            'team:invite', 
+            'invite:apprentis',
+            
+            // 'team:manage_formation',
+
+            'team:users',
+            'team:manage_users',
+            'team:invite_users',
+            'team:list_users',
+
+            // 'team:configuration',
         ])->description('Accès complet à l’équipe.');
 
 
