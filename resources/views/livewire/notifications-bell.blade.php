@@ -37,10 +37,6 @@
         <div class="flex items-center justify-between px-3 py-2 border-b">
             <span class="font-semibold">Notifications</span>
             <div class="flex items-center gap-3">
-                <button class="text-sm text-gray-600 hover:underline"
-                        wire:click="refreshList">
-                    Rafraîchir
-                </button>
                 @if($items)
                 <button class="text-sm text-blue-600 hover:underline"
                         wire:click="markAllRead">
