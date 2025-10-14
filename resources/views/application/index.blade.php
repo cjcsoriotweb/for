@@ -10,7 +10,7 @@
     <x-block-div>
 
         <x-block-navigation :navigation="[
-            ['title' => 'Administration', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
+            ['title' => 'Application', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
 
         ]" :team="$team" back="0" />
 

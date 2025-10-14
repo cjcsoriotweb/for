@@ -41,19 +41,19 @@ class TeamPolicy
     {
         // autoriser le propriétaire OU un membre avec la permission explicite
         return $user->ownsTeam($team)
-            || $user->hasTeamPermission($team, 'team:invite');
+            || $user->hasTeamPermission($team, 'invite');
     }
 
     public function updateTeamMember(User $user, Team $team): bool
     {
         return $user->ownsTeam($team)
-            || $user->hasTeamPermission($team, 'team:manage-roles');
+            || $user->hasTeamPermission($team, 'manage-roles');
     }
 
     public function removeTeamMember(User $user, Team $team): bool
     {
         return $user->ownsTeam($team)
-            || $user->hasTeamPermission($team, 'team:action:users_invite');
+            || $user->hasTeamPermission($team, 'action:users_invite');
     }
     /**
      * Determine whether the user can delete the model.
@@ -97,7 +97,7 @@ class TeamPolicy
 
     public function manage_formation(User $user, Team $team): bool
     {
-        if ($user->hasTeamPermission($team, 'team:manage_formation')) {
+        if ($user->hasTeamPermission($team, 'manage_formation')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour gérer les formations de cette équipe.');
@@ -109,7 +109,7 @@ class TeamPolicy
      */
     public function manage_roles(User $user, Team $team): bool
     {
-        if ($user->hasTeamPermission($team, 'team:manage_roles')) {
+        if ($user->hasTeamPermission($team, 'manage_roles')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour gérer les utilisateurs de cette équipe.');
@@ -120,7 +120,7 @@ class TeamPolicy
      */
     public function list_users(User $user, Team $team): bool
     {
-        if ($user->hasTeamPermission($team, 'team:list_users')) {
+        if ($user->hasTeamPermission($team, 'list_users')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'êtes pas membre de cette équipe.');
@@ -132,7 +132,7 @@ class TeamPolicy
 
     public function invite_users(User $user, Team $team): bool
     {
-        if ($user->hasTeamPermission($team, 'team:invite_users')) {
+        if ($user->hasTeamPermission($team, 'invite_users')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour inviter des membres dans cette équipe.');
@@ -144,7 +144,7 @@ class TeamPolicy
 
     public function manage_users(User $user, Team $team): bool
     {
-        if ($user->hasTeamPermission($team, 'team:manage_users')) {
+        if ($user->hasTeamPermission($team, 'manage_users')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour gérer les utilisateurs de cette équipe.');
@@ -156,7 +156,7 @@ class TeamPolicy
     
     public function invite(User $user, Team $team): bool
     {
-        if ($user->hasTeamPermission($team, 'team:invite_users')) {
+        if ($user->hasTeamPermission($team, 'invite_users')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour inviter des membres dans cette équipe.');
