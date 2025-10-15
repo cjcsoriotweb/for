@@ -21,7 +21,7 @@ Route::prefix('application/{team:id}/tableau-de-bord')
             Route::get('/formations-list', [ApplicationAdminFormation::class, 'formationsList'])->name('list');
 
             Route::post('/formation/enable', [ApplicationAdminFormation::class, 'formationEnable'])->name('enable');
-            Route::post('/formation/disable', [ApplicationAdminFormation::class, 'formationEnable'])->name('disable');
+            Route::post('/formation/disable', [ApplicationAdminFormation::class, 'formationDisable'])->name('disable');
 
 
         });

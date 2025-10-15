@@ -40,22 +40,23 @@
                     </div>
                     @if($display === 'admin')
                     <div class="mt-4">
-                        <span
-                            class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center">
-                            <span class="material-symbols-outlined text-sm mr-1">admin_panel_settings</span>
-                            Admin
-                        </span>
+                        
                         @if($formation->pivot_active)
+
                         <form method="POST" action="{{ route('application.admin.formations.disable', [$team,$formation]) }}">
                             @csrf
                             <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit" class="text-sm font-medium text-primary hover:underline">Désactiver cette formation</button>
+                            <button type="submit" class=" hover:underline bg-red-500 button ">
+                                <span class="material-symbols-outlined text-sm mr-1">south</span> Désactiver cette formation</button>
                         </form>
                         @else
+                
                         <form method="POST" action="{{ route('application.admin.formations.enable', [$team,$formation]) }}">
                             @csrf
                             <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit" class="text-sm font-medium text-primary hover:underline">Activer cette formation</button>
+                            <button type="submit" class="text-sm font-medium text-primary hover:underline">
+                                <span class="material-symbols-outlined text-sm mr-1">adjust</span>
+                                Activer cette formation</button>
                         </form>
                         @endif
                     </div>

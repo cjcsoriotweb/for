@@ -26,10 +26,25 @@ class ApplicationAdminFormation extends Controller
   
 
         $formationId = request()->input('formation_id');
-        $x = $team->formations()->updateExistingPivot($formationId, ['visible' => true,'team_id'=>$team->id,'formation_id'=>$formationId]);
+        $team->formations()->syncWithoutDetaching([
+            $formationId => ['visible' => true],
+        ]);
 
 
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation enabled successfully!'));
+    }
+
+    public function formationDisable(Team $team)
+    {
+  
+
+        $formationId = request()->input('formation_id');
+        $team->formations()->syncWithoutDetaching([
+            $formationId => ['visible' => false],
+        ]);
+
+
+        return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation disabled successfully!'));
     }
     
 
