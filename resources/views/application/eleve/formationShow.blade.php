@@ -1,4 +1,17 @@
 <x-application-layout :team="$team">
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ $formation->title }}
+        </h2>
+        <x-slot name="subtitle">Détails de la formation professionnelle</x-slot>
+        <x-slot name="headerIcon">school</x-slot>
+        <x-slot name="headerActions">
+            <a href="{{ route('application.eleve.formations.preview', [$team, $formation]) }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg text-sm font-medium transition-colors duration-200">
+                <span class="material-symbols-outlined mr-2 text-sm">rocket_launch</span>
+                Commencer la formation
+            </a>
+        </x-slot>
+    </x-slot>
 
     <div class="py-8">
         <!-- Card principale d'information -->
