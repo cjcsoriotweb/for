@@ -27,17 +27,5 @@ class FormationService
         ]);
     }
 
-    public function teamEnableFormation($formation_id, $team){
-        $formation = Formation::find($formation_id);
 
-        $formationVisibilityService = new FormationVisibilityService();
-        $formationVisibilityService->makeFormationVisibleForTeam($formation, $team);
-    }
-
-    public function teamDisableFormation($formation_id, $team){
-        $formation = Formation::find($formation_id);
-
-        $formationVisibilityService = new FormationVisibilityService();
-        $formationVisibilityService->makeFormationInvisibleForTeam($formation, $team);
-    }
 }
