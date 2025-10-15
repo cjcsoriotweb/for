@@ -95,5 +95,4 @@
         <p class="text-gray-600 dark:text-gray-400">Aucune formation en cours pour le moment.</p>
         @endforelse
     </div>
-    <x-big-button style="background:red">Trouver d'autre formation</x-big-button>
 </div>
