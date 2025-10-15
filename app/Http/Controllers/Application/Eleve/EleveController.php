@@ -20,9 +20,19 @@ class EleveController extends Controller
         return view('application.eleve.formationsList', compact('team'));
     }
 
-    public function formationShow(Team $team, Formation $formation)
+    public function formationPreview(Team $team, Formation $formation)
     {
-        return view('application.eleve.formationShowStart', compact('team', 'formation'));
+        return view('application.eleve.formationPreview', compact('team', 'formation'));
+    }
+
+    public function formationContinue(Team $team, Formation $formation)
+    {
+        return view('application.eleve.formationContinue', compact('team', 'formation'));
+    }
+
+    public function formationEnable(Team $team, Formation $formation)
+    {
+        return redirect()->route('application.eleve.formation.continue', [$team,$formation])->with('success', "La formation '{$formation->title}' a été activée pour votre équipe '{$team->name}'.");
     }
 
 }

@@ -10,7 +10,10 @@ Route::prefix('application/{team:id}/apprentisage')
 
         Route::get('/', [EleveController::class, 'index'])->name('index');
         Route::get('/vos-formations', [EleveController::class, 'formationIndex'])->name('formation.index');
-        Route::get('/formation/{formation}', [EleveController::class, 'formationShow'])->name('formation.show');
+        
+        Route::get('/formation-preview/{formation}', [EleveController::class, 'formationPreview'])->name('formation.preview');
+        Route::get('/formation-continue/{formation}', [EleveController::class, 'formationContinue'])->name('formation.continue');
+        Route::get('/formation-enable/{formation}', [EleveController::class, 'formationEnable'])->name('formation.enable');
 
 
     });

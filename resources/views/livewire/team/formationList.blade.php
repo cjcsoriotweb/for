@@ -1,5 +1,5 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-10">Mes Formations</h1>
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-10">Formations</h1>
     <div class="space-y-8">
         @forelse($formations as $formation)
 
@@ -80,7 +80,7 @@
                     </div>
                     @else
                     <div class="mt-6 flex justify-end">
-                        <a href="{{ route('application.eleve.formation.show', [$team, $formation]) }}" class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
+                        <a href="{{ route('application.eleve.formation.preview', [$team, $formation]) }}" class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
                             Commencer la formation
                             <span class="material-symbols-outlined ml-1">arrow_forward</span>
                         </a>
