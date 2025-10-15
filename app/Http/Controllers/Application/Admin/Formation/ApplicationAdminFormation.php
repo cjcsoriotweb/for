@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Application\Admin\Formation;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EnableFormationRequest;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Services\FormationVisibilityService;
@@ -29,11 +30,9 @@ class ApplicationAdminFormation extends Controller
     }
 
     /* POST */
-    public function formationEnable(Request $request, Team $team)
+    public function formationEnable(EnableFormationRequest $request, Team $team)
     {
-        $validated = $request->validate([
-            'formation_id' => 'required|exists:formations,id',
-        ]);
+        $validated = $request->validated();
 
         $formation = Formation::find($validated['formation_id']);
         $this->visibilityService->makeFormationVisibleForTeam($formation, $team);

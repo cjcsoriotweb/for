@@ -56,6 +56,9 @@
         </x-slot>
     @endisset
 
+
+    <x-error-display />
+
     {{-- BLOCK ÉLÉGANT --}}
     @isset($block)
         <x-slot name="block">
@@ -81,7 +84,6 @@
     @endisset
 
     {{-- Zone d'erreurs / alertes modernisées --}}
-    <x-error-display />
 
     {{-- CONTENU PRINCIPAL AVEC ESPACE --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
