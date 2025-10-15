@@ -6,7 +6,7 @@
     </x-slot>
 
     <x-block-div>
-        @livewire('formationList', ['team' => $team,'display'=>'admin'])
+        @livewire('FormationList', ['team' => $team,'display'=>'admin'])
     </x-block-div>
 
     <x-block-div>

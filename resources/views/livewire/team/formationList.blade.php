@@ -72,7 +72,7 @@
                     @if($display === 'eleve')
                     @if( $formation->formation_user )
                     <div class="mt-6 flex justify-end">
-                        <a
+                        <a href="{{ route('application.eleve.formations.continue', [$team, $formation]) }}"
                             class="text-secondary hover:text-primary/80 font-semibold flex items-center transition-colors">
                             Continuer la formation
                             <span class="material-symbols-outlined ml-1">arrow_forward</span>
@@ -80,7 +80,7 @@
                     </div>
                     @else
                     <div class="mt-6 flex justify-end">
-                        <a href="{{ route('application.eleve.formation.preview', [$team, $formation]) }}" class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
+                        <a href="{{ route('application.eleve.formations.preview', [$team, $formation]) }}" class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
                             Commencer la formation
                             <span class="material-symbols-outlined ml-1">arrow_forward</span>
                         </a>

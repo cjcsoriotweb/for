@@ -11,7 +11,7 @@
     <x-block-div>
 
         <x-block-navigation :navigation="[
-            ['title' => 'Formations entamées', 'description' => 'Continuez une formation', 'route' => 'application.eleve.formation.index', 'icon' => 'cog'],
+            ['title' => 'Formations entamées', 'description' => 'Continuez une formation', 'route' => 'application.eleve.formations.list', 'icon' => 'cog'],
 
         ]" card="bg-red-500" :team="$team"  back="{{ route('application.index',$team) }}" />
 

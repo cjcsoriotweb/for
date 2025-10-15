@@ -13,6 +13,7 @@ class Formation extends Model
         'team_id',
         'title',
         'summary',
+        'description',
         'published',
     ];
 
