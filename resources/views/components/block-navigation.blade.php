@@ -7,6 +7,10 @@
 </p>
 @endif
 
+@if(isset($title))
+<h1 class="text-2xl font-bold mb-4">{{ $title }}</h1>
+@endif
+
 @php use App\Support\RouteAccess; @endphp
 
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 py-2">
@@ -44,3 +48,5 @@
     @endif
 @endforeach
 </section>
+
+<hr>
