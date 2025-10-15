@@ -1,11 +1,4 @@
 <x-application-layout :team="$team">
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ $formation->title  }}
-        </h2>
-        <x-slot name="subtitle">Aperçu avant inscription</x-slot>
-        <x-slot name="headerIcon">visibility</x-slot>
-    </x-slot>
 
     <div class="py-8 space-y-8">
         <!-- Présentation de la formation -->

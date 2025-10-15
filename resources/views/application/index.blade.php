@@ -2,13 +2,6 @@
 
 
 
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight text-white">
-            {{ __('Accueil') }} <b>{{ $team->name }}</b>
-        </h2>
-    </x-slot>
-
-
 
     <x-block-div>
 
