@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\FormationFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -18,6 +20,12 @@ use Illuminate\Support\Facades\DB;
  */
 class Formation extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory()
+    {
+        return FormationFactory::new();
+    }
     protected $fillable = [
         'team_id',
         'title',

@@ -8,6 +8,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Database\Factories\FormationFactory;
 
 class EleveControllerTest extends TestCase
 {
@@ -85,6 +86,22 @@ class EleveControllerTest extends TestCase
 
         // Vérifier que l'utilisateur est inscrit
         $this->assertTrue($this->formation->learners()->where('users.id', $this->user->id)->exists());
+    }
+
+    public function test_formation_enable_redirects_on_get_request()
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->get(route('application.eleve.formations.enable', [
+            'team' => $this->team->id,
+            'formation' => $this->formation->id,
+        ]));
+
+        // Should redirect to preview page
+        $response->assertRedirect(route('application.eleve.formations.preview', [
+            $this->team->id,
+            $this->formation->id,
+        ]));
     }
 
     public function test_formation_enable_redirects_with_info_when_already_enrolled()

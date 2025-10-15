@@ -8,6 +8,7 @@ use App\Models\Formation;
 use App\Models\Team;
 use App\Services\FormationEnrollmentService;
 use App\Services\FormationVisibilityService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EleveController extends Controller
