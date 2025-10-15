@@ -37,8 +37,7 @@ class formationList extends Component
     public function formationToEleveTeam(){
 
 
-        $this->formations = Formation::
-            ForTeam($this->team->id)->get();
+        $this->formations = Formation::query()->forTeam($this->team)->get();
 
 
     }

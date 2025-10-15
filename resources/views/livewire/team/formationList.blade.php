@@ -22,39 +22,46 @@
 
                         @endif
                     </div>
-                    
-                            <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">{{ $formation->description }}</p>
+
+                    <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">{{ $formation->description }}</p>
                 </div>
                 <div>
                     <div class="mb-2">
                         @if($formation->formation_user)
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm font-medium text-secondary dark:text-gray-300">Progression</span>
-                            <span class="text-sm font-medium text-secondary">{{ $formation->formation_user->progress_percent }}%</span>
+                            <span class="text-sm font-medium text-secondary">{{
+                                $formation->formation_user->progress_percent }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-secondary rounded-full h-2.5">
-                            <div class="bg-primary h-2.5 rounded-full" style="width: {{ $formation->formation_user->progress_percent }}%"></div>
+                            <div class="bg-primary h-2.5 rounded-full"
+                                style="width: {{ $formation->formation_user->progress_percent }}%"></div>
                         </div>
                         @endif
 
                     </div>
                     @if($display === 'admin')
                     <div class="mt-4">
-                        
+
                         @if($formation->pivot_active)
 
-                        <form method="POST" action="{{ route('application.admin.formations.disable', [$team,$formation]) }}">
+                        <form method="POST"
+                            action="{{ route('application.admin.formations.disable', [$team,$formation]) }}">
                             @csrf
                             <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit" class="focus:outline-none text-white bg-red-500 hover:bg-red-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
-                                <span class="material-symbols-outlined text-sm mr-1">south</span> Désactiver cette formation</button>
+                            <button type="submit"
+                                class="focus:outline-none text-white bg-red-500 hover:bg-red-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
+                                <span class="material-symbols-outlined text-sm mr-1">south</span> Désactiver cette
+                                formation</button>
                         </form>
                         @else
-                
-                        <form method="POST" action="{{ route('application.admin.formations.enable', [$team,$formation]) }}">
+
+                        <form method="POST"
+                            action="{{ route('application.admin.formations.enable', [$team,$formation]) }}">
                             @csrf
                             <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit" class="focus:outline-none text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
+                            <button type="submit"
+                                class="focus:outline-none text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
                                 <span class="material-symbols-outlined text-sm mr-1">adjust</span>
                                 Activer cette formation</button>
                         </form>
@@ -65,14 +72,15 @@
                     @if($display === 'eleve')
                     @if( $formation->formation_user )
                     <div class="mt-6 flex justify-end">
-                        <a class="text-secondary hover:text-primary/80 font-semibold flex items-center transition-colors">
+                        <a
+                            class="text-secondary hover:text-primary/80 font-semibold flex items-center transition-colors">
                             Continuer la formation
                             <span class="material-symbols-outlined ml-1">arrow_forward</span>
                         </a>
                     </div>
                     @else
                     <div class="mt-6 flex justify-end">
-                        <a class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
+                        <a href="{{ route('application.eleve.formation.show', [$team, $formation]) }}" class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
                             Commencer la formation
                             <span class="material-symbols-outlined ml-1">arrow_forward</span>
                         </a>

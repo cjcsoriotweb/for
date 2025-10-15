@@ -51,47 +51,18 @@ class Formation extends Model
             ->withTimestamps();
     }
 
-    public function eleveStartThisFormation($eleveId, $teamId = null)
-    {
-        return $this->learners()->where('user_id', $eleveId)->where('team_id', $teamId)->exists();
-    }
 
 
     public function teams(): BelongsToMany
     {
         return $this->belongsToMany(Team::class, 'formation_teams')
-            ->withTimestamps(); // .withPivot('...') si besoin
+            ->withTimestamps(); 
     }
 
-    /** Scope: formations rattachées à une team donnée */
-    public function scopeForTeam(Builder $query, int|Team $team): Builder
-    {
-        $teamId = $team instanceof Team ? $team->id : $team;
 
-        return $query->whereHas('teams', fn ($q) =>
-            $q->where('teams.id', $teamId)
-        );
-    }
+
    
 
 
-    public function scopeAdminWithTeamLink(Builder $query, int|Team $team): Builder
-    {
-        $teamId = $team instanceof Team ? $team->id : $team;
-
-        return $query
-            ->leftJoin('formation_teams as ft', function ($join) use ($teamId) {
-                $join->on('ft.formation_id', '=', 'formations.id')
-                     ->where('ft.team_id', '=', $teamId);
-            })
-            ->select('formations.*')
-            ->addSelect([
-                FacadesDB::raw('CASE WHEN ft.formation_id IS NULL THEN 0 ELSE 1 END AS is_linked'),
-                FacadesDB::raw('ft.id AS pivot_id'),
-                FacadesDB::raw('ft.team_id AS pivot_team_id'),
-                FacadesDB::raw('ft.visible AS pivot_active'),   // adapte si tu as ce champ
-                // FacadesDB::raw('ft.visible_at AS pivot_visible_at'),
-            ]);
-    }
 
 }

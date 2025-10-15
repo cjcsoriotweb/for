@@ -1,7 +1,7 @@
 <x-application-layout :team="$team">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tableau de bord') }}
+            {{ __('Tableau de bord Administrateur') }}
         </h2>
     </x-slot>
 
