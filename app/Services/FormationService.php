@@ -28,6 +28,11 @@ class FormationService
         return Formation::ForTeam($team->id)->get();
     }
 
+    public function getDisponibleFormations()
+    {
+        return Formation::get();
+    }
+
 
     public function createFormation($title = "Titre par défaut", $description = "Description par défaut", $level = "debutant", $money_amount = 0)
     {

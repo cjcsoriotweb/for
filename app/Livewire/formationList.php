@@ -40,7 +40,7 @@ class FormationList extends Component
 
             $this->formations = (new FormationService())->getVisibleFormations($this->team);
         } else {
-            $this->formations = Formation::AdminWithTeamLink($this->team)->get();
+            $this->formations = (new FormationService())->getDisponibleFormations();
         }
     }
 
