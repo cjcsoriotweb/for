@@ -28,3 +28,4 @@ Route::middleware(['auth', 'verified'])->prefix('application/{team}/eleve')->nam
         Route::post('/{formation}/chapter/{chapter}/lesson/{lesson}/quiz/{quiz}/submit', [EleveController::class, 'formationQuizSubmit'])->name('quiz.submit');
     });
 });
+
