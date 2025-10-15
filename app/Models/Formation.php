@@ -28,18 +28,18 @@ class Formation extends Model
         return FormationFactory::new();
     }
     protected $fillable = [
-        'team_id',
         'title',
-        'summary',
         'description',
-        'published',
+        'level',
+        'money_amount',
     ];
 
     protected function casts(): array
     {
         return [
-            'published' => 'bool',
-            'team_id' => 'integer',
+            'title' => 'string',
+            'description' => 'string',
+            'level' => 'string',
             'money_amount' => 'integer',
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Application\Admin\Formation;
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
 use App\Models\Team;
+use App\Services\FormationService;
 use App\Services\FormationVisibilityService;
 use Illuminate\Http\Request;
 
@@ -29,8 +30,11 @@ class ApplicationAdminFormation extends Controller
     }
 
     /* POST */
-    public function formationEnable(Request $request, Team $team)
+    public function formationEnable(FormationService $formationService, Request $request, Team $team)
     {
+        dd(
+            $formationService->createFormation('Formation 1', 'Description 1', 'debutant', 100)
+        );
         $validated = $request->validate([
             'formation_id' => 'required|exists:formations,id',
         ]);
