@@ -12,7 +12,7 @@
 
     <x-block-div>
 
-        @if(auth()->user()->hasTeamPermission($team,'admin'))
+        @if(auth()->user()->hasTeamRole($team,'admin'))
         <x-block-navigation title="Administrateur" :navigation="[
             ['title' => 'Tableau de bord', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
 
@@ -20,14 +20,14 @@
 
         @endif
 
-        @if(auth()->user()->hasTeamPermission($team,'manager'))
+        @if(auth()->user()->hasTeamRole($team,'manager'))
         <x-block-navigation title="Organisme" :navigation="[
             ['title' => 'Suivis', 'description' => 'Acceder aux suivis des apprentis', 'route' => 'application.eleve.index', 'icon' => 'cog'],
 
         ]" back="0" :team="$team" />
         @endif
 
-        @if(auth()->user()->hasTeamPermission($team,'eleve'))
+        @if(auth()->user()->hasTeamRole($team,'eleve'))
         <x-block-navigation title="Apprentis" :navigation="[
             ['title' => 'Espace Apprentis', 'description' => 'Gérer l\'espace des apprentis', 'route' => 'application.eleve.index', 'icon' => 'cog'],
 

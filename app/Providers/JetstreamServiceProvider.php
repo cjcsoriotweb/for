@@ -56,7 +56,6 @@ class JetstreamServiceProvider extends ServiceProvider
   
 
         Jetstream::role('eleve', 'Apprentis', [
-            'eleve',
             'read',
         ])->description('Peut consulter les contenus de l’organisme.');
     }

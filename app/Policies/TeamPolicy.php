@@ -105,7 +105,7 @@ class TeamPolicy
 
     public function eleve(User $user, Team $team): bool
     {
-        if ($user->hasTeamPermission($team, 'eleve')) {
+        if ($user->hasTeamRole($team, 'eleve')) {
             return true;
         } else {
             return abort(403, 'Accès refusé. Vous n\'êtes pas membre de cette équipe.');
