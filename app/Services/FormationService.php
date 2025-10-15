@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Formation;
+use App\Models\FormationTeam;
+use App\Models\Team;
 
 class FormationService
 {
@@ -16,6 +18,16 @@ class FormationService
     {
         return Formation::all();
     }
+
+    /*
+    * Récupère toutes les formations visibles pour un équipe
+    */
+
+    public function getVisibleFormations(Team $team)
+    {
+        return Formation::ForTeam($team->id)->get();
+    }
+
 
     public function createFormation($title = "Titre par défaut", $description = "Description par défaut", $level = "debutant", $money_amount = 0)
     {

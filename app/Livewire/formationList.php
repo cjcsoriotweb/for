@@ -6,6 +6,7 @@ use App\Models\Formation;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Services\FormationEnrollmentService;
+use App\Services\FormationService;
 
 class FormationList extends Component
 {
@@ -36,7 +37,8 @@ class FormationList extends Component
     protected function loadFormations()
     {
         if ($this->display === 'eleve') {
-            $this->formations = 
+
+            $this->formations = (new FormationService())->getVisibleFormations($this->team);
         } else {
             $this->formations = Formation::AdminWithTeamLink($this->team)->get();
         }
