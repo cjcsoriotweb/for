@@ -27,7 +27,8 @@ class ApplicationAdminFormation extends Controller
         return view('application.admin.formations.list', compact('team'));
     }
 
-    /* POST */
+    /* Client Request Post */
+    // Enable Formation By Admin Team
     public function formationEnable(EditVisibleFormationRequest $request, Team $team)
     {
         $validated = $request->validated();
@@ -38,6 +39,8 @@ class ApplicationAdminFormation extends Controller
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation enabled successfully!'));
     }
 
+    /* Client Request Post */
+    // Disable Formation By Admin Team
     public function formationDisable(EditVisibleFormationRequest $request, Team $team)
     {
         $validated = $request->validated();
