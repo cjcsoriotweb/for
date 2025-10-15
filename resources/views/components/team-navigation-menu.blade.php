@@ -132,7 +132,7 @@
 
 
 
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures() && Auth::user()->hasTeamRole($team, 'eleve'))
+                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures() && Auth::user()->belongsToTeam($team))
                 <div class="ms-3 relative">
                     <x-dropdown align="right" width="60">
                         <x-slot name="trigger">
@@ -163,12 +163,12 @@
 
 
                                 <!-- Team Settings -->
-                                <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('application.eleve.formations.list', $team) }}">
                                     {{ __('Formations en cours') }}
                                 </x-dropdown-link>
 
                                 <!-- Team Settings -->
-                                <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
+                                <x-dropdown-link href="{{ route('application.eleve.formations.list', $team) }}">
                                     {{ __('Rejoindre une formation') }}
                                 </x-dropdown-link>
 

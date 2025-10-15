@@ -95,11 +95,9 @@ class TeamPolicy
 
     public function eleve(User $user, Team $team): bool
     {
-        if ($user->hasTeamRole($team, 'eleve')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'êtes pas membre de cette équipe.');
-        }
+        // Pour l'instant, permettre à tous les membres de l'équipe d'accéder à l'espace élève
+        // Plus tard, on pourra restreindre par rôle spécifique
+        return $user->belongsToTeam($team);
     }
     
 }

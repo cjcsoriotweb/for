@@ -24,20 +24,7 @@ class EnableFormationRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'formation' => 'required|exists:formations,id',
-        ];
-    }
-
-    /**
-     * Messages d'erreur personnalisés.
-     */
-    public function messages(): array
-    {
-        return [
-            'formation.required' => 'Une formation doit être spécifiée.',
-            'formation.exists' => 'Cette formation n\'existe pas.',
-        ];
+        return [];
     }
 
     /**
@@ -46,7 +33,7 @@ class EnableFormationRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $formation = \App\Models\Formation::find($this->input('formation'));
+            $formation = $this->route('formation');
             $team = $this->route('team');
 
             if (!$formation || !$formation->teams()->where('teams.id', $team->id)->wherePivot('visible', true)->exists()) {

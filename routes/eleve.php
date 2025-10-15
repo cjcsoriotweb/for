@@ -16,7 +16,7 @@ Route::prefix('application/{team:id}/apprentissage')
         Route::get('/formations/{formation}/continuer', [EleveController::class, 'formationContinue'])->name('formations.continue');
         Route::get('/formations/{formation}/activer', function (Team $team, Formation $formation) {
             return redirect()->route('application.eleve.formations.preview', [$team, $formation]);
-        })->middleware('auth');
+        })->name('formations.activer');
         Route::post('/formations/{formation}/activer', [EleveController::class, 'formationEnable'])->name('formations.enable');
 
 

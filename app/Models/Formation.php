@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -59,6 +60,18 @@ class Formation extends Model
             'id',              // clé locale formations.id
             'id'               // clé locale chapters.id
         );
+    }
+
+    public function getFormationUserAttribute()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return null;
+        }
+
+        return $this->learners()
+            ->where('users.id', $user->id)
+            ->first()?->pivot;
     }
 
     public function learners() // utilisateurs inscrits

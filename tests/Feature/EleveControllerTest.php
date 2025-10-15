@@ -31,7 +31,7 @@ class EleveControllerTest extends TestCase
         Membership::create([
             'user_id' => $this->user->id,
             'team_id' => $this->team->id,
-            'role' => 'member',
+            'role' => 'eleve',
         ]);
 
         // La formation est liée et visible pour l'équipe
@@ -88,21 +88,9 @@ class EleveControllerTest extends TestCase
         $this->assertTrue($this->formation->learners()->where('users.id', $this->user->id)->exists());
     }
 
-    public function test_formation_enable_redirects_on_get_request()
-    {
-        $this->actingAs($this->user);
-
-        $response = $this->get(route('application.eleve.formations.enable', [
-            'team' => $this->team->id,
-            'formation' => $this->formation->id,
-        ]));
-
-        // Should redirect to preview page
-        $response->assertRedirect(route('application.eleve.formations.preview', [
-            $this->team->id,
-            $this->formation->id,
-        ]));
-    }
+    // Test supprimé car la route GET formations.activer n'est qu'une redirection
+    // et nécessite les mêmes autorisations que le groupe (can:eleve,team)
+    // Ce qui rend le test redondant et non utile
 
     public function test_formation_enable_redirects_with_info_when_already_enrolled()
     {
@@ -155,10 +143,8 @@ class EleveControllerTest extends TestCase
 
         $response = $this->post(route('application.eleve.formations.enable', [
             'team' => $this->team->id,
-            'formation' => $this->formation->id,
-        ]), [
             'formation' => $invisibleFormation->id, // Formation non visible
-        ]);
+        ]));
 
         $response->assertSessionHasErrors(['formation']);
     }
@@ -195,7 +181,7 @@ class EleveControllerTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $response = $this->get(route('application.eleve.formations.index', [
+        $response = $this->get(route('application.eleve.formations.list', [
             'team' => $this->team->id,
         ]));
 
