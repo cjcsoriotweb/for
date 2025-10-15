@@ -11,7 +11,7 @@
 ])
 
 @php
-$cardBase = 'rounded-xl shadow-lg transition duration-300 flex flex-col p-8';
+$cardBase = 'rounded-xl  transition duration-300 flex flex-col p-8';
 $card = $disabled
 ? $cardBase . ' bg-gray-100 text-gray-500 opacity-60 cursor-not-allowed'
 : $cardBase . ' bg-white';
