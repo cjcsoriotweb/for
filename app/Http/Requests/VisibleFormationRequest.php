@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Formation;
 use App\Models\Team;
 
-class EnableFormationRequest extends FormRequest
+class VisibleFormationRequest extends FormRequest
 {
     /**
      * Détermine si l'utilisateur est autorisé à faire cette requête.
@@ -32,13 +32,5 @@ class EnableFormationRequest extends FormRequest
         ];
     }
 
-    /**
-     * Valider que la formation est accessible pour l'équipe et que les fonds sont suffisa
 
-     * Vérifie si l'équipe a les fonds nécessaires pour commencer une formation
-     */
-    private function canTeamAffordFormation(Team $team, Formation $formation): bool
-    {
-        return $team->money >= $formation->money_amount;
-    }
 }

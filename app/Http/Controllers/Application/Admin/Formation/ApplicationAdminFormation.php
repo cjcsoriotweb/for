@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Application\Admin\Formation;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\EnableFormationRequest;
+use App\Http\Requests\VisibleFormationRequest;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Services\FormationVisibilityService;
@@ -30,7 +30,7 @@ class ApplicationAdminFormation extends Controller
     }
 
     /* POST */
-    public function formationEnable(EnableFormationRequest $request, Team $team)
+    public function formationEnable(VisibleFormationRequest $request, Team $team)
     {
         $validated = $request->validated();
 
@@ -40,11 +40,9 @@ class ApplicationAdminFormation extends Controller
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation enabled successfully!'));
     }
 
-    public function formationDisable(Request $request, Team $team)
+    public function formationDisable(VisibleFormationRequest $request, Team $team)
     {
-        $validated = $request->validate([
-            'formation_id' => 'required|exists:formations,id',
-        ]);
+        $validated = $request->validated();
 
         $formation = Formation::find($validated['formation_id']);
         $this->visibilityService->makeFormationInvisibleForTeam($formation, $team);
