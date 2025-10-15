@@ -16,6 +16,7 @@ class FormationSeeder extends Seeder
             'title' => 'Programmation Python Avancée',
             'description' => 'Apprenez les concepts et techniques avancés de Python pour construire des applications robustes.',
             'level' => 'avancé',
+            'money_amount' => 500,
         ]);
 
         \App\Models\Formation::create([

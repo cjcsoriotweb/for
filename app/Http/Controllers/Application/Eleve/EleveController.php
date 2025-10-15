@@ -64,10 +64,31 @@ class EleveController extends Controller
                 ->with('info', 'Vous êtes déjà inscrit à cette formation.');
         }
 
-        // Inscrire l'utilisateur à la formation
-        $this->enrollmentService->enrollUser($formation, $team);
+        // Inscrire l'utilisateur à la formation et débiter les fonds
+        $success = $this->enrollmentService->enrollUser($formation, $team);
+
+        if (!$success) {
+            return redirect()->route('application.eleve.formations.preview', [$team, $formation])
+                ->with('error', "Les fonds de l'équipe sont insuffisants pour commencer cette formation (requis : {$formation->money_amount}€).");
+        }
 
         return redirect()->route('application.eleve.formations.continue', [$team, $formation])
             ->with('success', "La formation '{$formation->title}' a été activée.");
+    }
+
+    /**
+     * Vérifie si l'équipe a les fonds nécessaires pour commencer une formation
+     */
+    private function canTeamAffordFormation(Team $team, Formation $formation): bool
+    {
+        return $team->money >= $formation->money_amount;
+    }
+
+    /**
+     * Débite les fonds de l'équipe pour une formation
+     */
+    private function debitTeamFunds(Team $team, Formation $formation): void
+    {
+        $team->decrement('money', $formation->money_amount);
     }
 }

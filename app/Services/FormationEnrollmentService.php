@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Auth;
 class FormationEnrollmentService
 {
     /**
+     * Vérifie si l'équipe a les fonds nécessaires pour commencer une formation
+     */
+    public function canTeamAffordFormation(Team $team, Formation $formation): bool
+    {
+        return $team->money >= $formation->money_amount;
+    }
+    /**
      * Vérifie si un utilisateur est déjà inscrit à une formation
      */
     public function isUserEnrolled(Formation $formation, ?int $userId = null): bool
@@ -21,11 +28,16 @@ class FormationEnrollmentService
     }
 
     /**
-     * Inscrit un utilisateur à une formation
+     * Inscrit un utilisateur à une formation et débite les fonds
      */
     public function enrollUser(Formation $formation, Team $team, ?int $userId = null): bool
     {
         $userId = $userId ?? Auth::id();
+
+        // Vérifier que l'équipe a les fonds nécessaires
+        if (!$this->canTeamAffordFormation($team, $formation)) {
+            return false;
+        }
 
         $formation->learners()->attach($userId, [
             'team_id' => $team->id,
@@ -35,6 +47,9 @@ class FormationEnrollmentService
             'progress_percent' => 0,
             'current_lesson_id' => null,
         ]);
+
+        // Débiter les fonds de l'équipe
+        $team->decrement('money', $formation->money_amount);
 
         return true;
     }

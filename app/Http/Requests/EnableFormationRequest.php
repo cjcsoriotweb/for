@@ -28,17 +28,29 @@ class EnableFormationRequest extends FormRequest
     }
 
     /**
-     * Valider que la formation est accessible pour l'équipe.
+     * Valider que la formation est accessible pour l'équipe et que les fonds sont suffisants.
      */
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $formation = $this->route('formation');
+            $formation = \App\Models\Formation::find($this->input('formation'));
             $team = $this->route('team');
 
             if (!$formation || !$formation->teams()->where('teams.id', $team->id)->wherePivot('visible', true)->exists()) {
                 $validator->errors()->add('formation', 'Cette formation n\'est pas accessible pour votre équipe.');
             }
+
+            if ($formation && !$this->canTeamAffordFormation($team, $formation)) {
+                $validator->errors()->add('formation', "Les fonds de l'équipe sont insuffisants pour commencer cette formation (requis : {$formation->money_amount}€).");
+            }
         });
+    }
+
+    /**
+     * Vérifie si l'équipe a les fonds nécessaires pour commencer une formation
+     */
+    private function canTeamAffordFormation($team, $formation): bool
+    {
+        return $team->money >= $formation->money_amount;
     }
 }

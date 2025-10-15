@@ -11,6 +11,22 @@
 
     <form method="POST" action="{{ route('application.eleve.formations.enable', [$team, $formation]) }}">
         @csrf
-        <button type="submit" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">{{ __('Commencer cette formation') }}</button>
+        {{-- Token pour la formation --}}
+        <input type="hidden" name="formation" value="{{ $formation->id }}">
+
+        {{-- Affichage des fonds requis --}}
+        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 class="text-sm font-medium text-blue-800 mb-2">Coût de la formation</h4>
+            <p class="text-sm text-blue-600">Cette formation coûte <strong>{{ $formation->money_amount }}€</strong></p>
+            <p class="text-xs text-blue-500">Fonds disponibles dans l'équipe : <strong>{{ $team->money }}€</strong></p>
+        </div>
+
+        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            {{ __('Commencer cette formation') }}
+        </button>
+
+        @if($formation->money_amount > $team->money)
+            <p class="text-red-600 text-sm mt-2">⚠️ Fonds insuffisants ! Il manque {{ $formation->money_amount - $team->money }}€</p>
+        @endif
     </form>
 </x-application-layout>
