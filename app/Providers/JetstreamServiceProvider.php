@@ -53,7 +53,9 @@ class JetstreamServiceProvider extends ServiceProvider
             'configuration',
         ])->description('Accès complet à l’équipe.');
 
-  
+        Jetstream::role('manager', 'Organisateur', [
+            'read', 'create', 'update',  
+        ])->description('Acceder aux suivis d\'éleve.');
 
         Jetstream::role('eleve', 'Apprentis', [
             'read',
