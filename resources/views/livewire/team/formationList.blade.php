@@ -1,98 +1,107 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-10">Formations</h1>
-    <div class="space-y-8">
+    <div class="mb-12">
+        <div class="flex items-center space-x-4 mb-4">
+            <div class="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl text-slate-600 dark:text-slate-400">school</span>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Formations</h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-1">Découvrez et suivez vos formations professionnelles</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         @forelse($formations as $formation)
 
-        <div
-            class="bg-white dark:bg-gray-800/50 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col lg:flex-row transform hover:-translate-y-1">
-            <div class="w-full lg:w-1/3 h-56 lg:h-auto bg-cover bg-center"
-                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBZOAyTLsUVYOH664CceZ4BLWDoijkS6Wd4ioO8jp938ceKj6ALdUQfMjQL-IaFltRvB-0xIgyCOvFDR9IH3QagZic7l-ravkxs-w1dEBCZe5fW9CB7FcbeOvtrACQP9n1_mWRIbe2Efd4JYTcBAzvCYSIPw8LSlStYl80zobB59rPJRbkalO3P_umt2zpv-pLqAZb1zcmR4VN8U4S7itruqpq39sj5JC1sEZjnz6Rkih5iW2NAl381X1OXeE8l83BA0EYo7iryqxSD');">
-            </div>
-            <div class="p-6 lg:p-8 flex-1 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $formation->title }}
-                        </h2>
-                        @if( $formation->formation_user )
-                        <span
-                            class="bg-blue-100 text-primary text-xs font-semibold px-3 py-1 rounded-full flex items-center">
-                            <span class="material-symbols-outlined text-sm mr-1">timelapse</span>
-                            En cours
-                        </span>
-
-                        @endif
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col">
+            <!-- Header with icon -->
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="w-12 h-12 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-xl text-slate-600 dark:text-slate-400">business_center</span>
                     </div>
-
-                    <p class="text-gray-600 dark:text-gray-400 mt-2 mb-4">{{ $formation->description }}</p>
-                </div>
-                <div>
-                    <div class="mb-2">
-                        @if($formation->formation_user)
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm font-medium text-secondary dark:text-gray-300">Progression</span>
-                            <span class="text-sm font-medium text-secondary">{{
-                                $formation->formation_user->progress_percent }}%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 dark:bg-secondary rounded-full h-2.5">
-                            <div class="bg-primary h-2.5 rounded-full"
-                                style="width: {{ $formation->formation_user->progress_percent }}%"></div>
-                        </div>
-                        @endif
-
-                    </div>
-                    @if($display === 'admin')
-                    <div class="mt-4">
-
-                        @if($formation->pivot_active)
-
-                        <form method="POST"
-                            action="{{ route('application.admin.formations.disable', [$team,$formation]) }}">
-                            @csrf
-                            <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit"
-                                class="focus:outline-none text-white bg-red-500 hover:bg-red-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
-                                <span class="material-symbols-outlined text-sm mr-1">south</span> Désactiver cette
-                                formation</button>
-                        </form>
-                        @else
-
-                        <form method="POST"
-                            action="{{ route('application.admin.formations.enable', [$team,$formation]) }}">
-                            @csrf
-                            <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit"
-                                class="focus:outline-none text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
-                                <span class="material-symbols-outlined text-sm mr-1">adjust</span>
-                                Activer cette formation</button>
-                        </form>
-                        @endif
-                    </div>
-                    @endif
-
-                    @if($display === 'eleve')
                     @if( $formation->formation_user )
-                    <div class="mt-6 flex justify-end">
-                        <a href="{{ route('application.eleve.formations.continue', [$team, $formation]) }}"
-                            class="text-secondary hover:text-primary/80 font-semibold flex items-center transition-colors">
-                            Continuer la formation
-                            <span class="material-symbols-outlined ml-1">arrow_forward</span>
-                        </a>
-                    </div>
-                    @else
-                    <div class="mt-6 flex justify-end">
-                        <a href="{{ route('application.eleve.formations.preview', [$team, $formation]) }}" class="text-primary hover:text-primary/80 font-semibold flex items-center transition-colors">
-                            Commencer la formation
-                            <span class="material-symbols-outlined ml-1">arrow_forward</span>
-                        </a>
-                    </div>
-
-                    @endif
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center shrink-0">
+                        <span class="material-symbols-outlined text-sm mr-1">timelapse</span>
+                        En cours
+                    </span>
                     @endif
                 </div>
+                <h2 class="text-xl font-semibold text-slate-900 dark:text-white leading-tight">{{ $formation->title }}</h2>
+                <p class="text-slate-600 dark:text-slate-400 mt-2 text-sm leading-relaxed">{{ $formation->description }}</p>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 flex-1 flex flex-col">
+                <!-- Progress bar for enrolled formations -->
+                @if($formation->formation_user)
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Progression</span>
+                        <span class="text-sm font-semibold text-slate-900 dark:text-white">{{ $formation->formation_user->progress_percent }}%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                        <div class="bg-slate-700 dark:bg-slate-300 h-2 rounded-full transition-all duration-300" style="width: {{ $formation->formation_user->progress_percent }}%"></div>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Admin controls -->
+                @if($display === 'admin')
+                <div class="mt-auto">
+                    @if($formation->pivot_active)
+                    <form method="POST" action="{{ route('application.admin.formations.disable', [$team,$formation]) }}">
+                        @csrf
+                        <input type="hidden" name="formation_id" value="{{ $formation->id }}">
+                        <button type="submit" class="w-full focus:outline-none text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200">
+                            <span class="material-symbols-outlined text-sm mr-2">block</span>
+                            Désactiver
+                        </button>
+                    </form>
+                    @else
+                    <form method="POST" action="{{ route('application.admin.formations.enable', [$team,$formation]) }}">
+                        @csrf
+                        <input type="hidden" name="formation_id" value="{{ $formation->id }}">
+                        <button type="submit" class="w-full focus:outline-none text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200">
+                            <span class="material-symbols-outlined text-sm mr-2">check_circle</span>
+                            Activer
+                        </button>
+                    </form>
+                    @endif
+                </div>
+                @endif
+
+                <!-- Student actions -->
+                @if($display === 'eleve')
+                <div class="mt-auto">
+                    @if( $formation->formation_user )
+                    <a href="{{ route('application.eleve.formations.continue', [$team, $formation]) }}"
+                        class="w-full inline-flex items-center justify-center py-2.5 px-4 border border-slate-300 dark:border-slate-600 shadow-sm text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-colors duration-200">
+                        <span class="material-symbols-outlined text-sm mr-2">play_arrow</span>
+                        Continuer
+                    </a>
+                    @else
+                    <a href="{{ route('application.eleve.formations.preview', [$team, $formation]) }}"
+                        class="w-full inline-flex items-center justify-center py-2.5 px-4 border border-slate-700 dark:border-slate-300 shadow-sm text-sm font-medium rounded-lg text-white bg-slate-700 dark:bg-slate-300 hover:bg-slate-800 dark:hover:bg-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-colors duration-200">
+                        <span class="material-symbols-outlined text-sm mr-2">rocket_launch</span>
+                        Commencer
+                    </a>
+                    @endif
+                </div>
+                @endif
             </div>
         </div>
         @empty
-        <p class="text-gray-600 dark:text-gray-400">Aucune formation en cours pour le moment.</p>
+        <div class="col-span-full">
+            <div class="text-center py-16">
+                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="material-symbols-outlined text-3xl text-slate-400">school</span>
+                </div>
+                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">Aucune formation disponible</h3>
+                <p class="text-slate-600 dark:text-slate-400">Les formations seront bientôt disponibles pour votre équipe.</p>
+            </div>
+        </div>
         @endforelse
     </div>
 </div>
