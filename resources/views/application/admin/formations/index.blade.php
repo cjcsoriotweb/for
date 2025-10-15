@@ -13,13 +13,8 @@
         <x-block-navigation 
         :navigation="[
             [
-                'title' => 'Activer une formation',
-                'description' => '..', 
-                'route' => 'application.admin.configuration.index'
-            ],
-            [
-                'title' => 'Toutes les formations',
-                'description' => '..', 
+                'title' => 'Gerer les formations',
+                'description' => __('Ajouter ou desactiver une formation.'), 
                 'route' => 'application.admin.formations.list'
             ],
      

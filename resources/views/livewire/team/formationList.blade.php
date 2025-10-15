@@ -46,7 +46,7 @@
                         <form method="POST" action="{{ route('application.admin.formations.disable', [$team,$formation]) }}">
                             @csrf
                             <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit" class=" hover:underline bg-red-500 button ">
+                            <button type="submit" class="focus:outline-none text-white bg-red-500 hover:bg-red-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
                                 <span class="material-symbols-outlined text-sm mr-1">south</span> Désactiver cette formation</button>
                         </form>
                         @else
@@ -54,7 +54,7 @@
                         <form method="POST" action="{{ route('application.admin.formations.enable', [$team,$formation]) }}">
                             @csrf
                             <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                            <button type="submit" class="text-sm font-medium text-primary hover:underline">
+                            <button type="submit" class="focus:outline-none text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
                                 <span class="material-symbols-outlined text-sm mr-1">adjust</span>
                                 Activer cette formation</button>
                         </form>
