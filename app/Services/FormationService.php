@@ -28,9 +28,9 @@ class FormationService
         return Formation::ForTeam($team->id)->get();
     }
 
-    public function getDisponibleFormations()
+    public function getDisponibleFormations(Team $team)
     {
-        return Formation::get();
+        return Formation::AdminWithTeamLink($team)->get();
     }
 
 
