@@ -5,16 +5,21 @@ namespace App\Livewire;
 use App\Models\Formation;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use App\Services\FormationEnrollmentService;
 
 class FormationList extends Component
 {
     public $formations = [];
     public $team;
     public $display = 'eleve'; // eleve | admin
+    protected FormationEnrollmentService $formationService;
+
+    public function __construct()
+    {
+        $this->formationService = app(FormationEnrollmentService::class);
+    }
 
     public function mount($team, $display = 'eleve'){
-
-
         $this->team = $team;
 
         // Sécurise la valeur
@@ -25,41 +30,25 @@ class FormationList extends Component
             abort_unless(Auth::user()->can('admin', $team), 403);
         }
 
-        // Si tu veux précharger/initialiser, OK, mais évite les requêtes lourdes ici
+        $this->loadFormations();
+    }
+
+    protected function loadFormations()
+    {
         if ($this->display === 'eleve') {
-            $this->formationToEleveTeam();   // idéalement prépare l’état (filtres), pas un fetch massif
+            $this->formations = Formation::query()
+                ->forTeam($this->team)
+                ->with(['learners' => function($query) {
+                    $query->where('users.id', Auth::id());
+                }])
+                ->get();
         } else {
-            $this->formationToAdminTeam();
+            $this->formations = Formation::AdminWithTeamLink($this->team)->get();
         }
-    }
-
-
-    // Récupère les formations associées à l'équipe de l'élève connecté
-    public function formationToEleveTeam(){
-
-
-        $this->formations = Formation::query()
-            ->forTeam($this->team)
-            ->with(['learners' => function($query) {
-                $query->where('users.id', auth()->id());
-            }])
-            ->get();
-
-
-    }
-    // Récupère les formations associées à l'équipe de l'admin connecté
-    public function formationToAdminTeam(){
-
-
-        $this->formations = Formation::
-            AdminWithTeamLink($this->team)->get();
-
-
     }
 
     public function render()
     {
-        
-        return view('livewire.team.formationList');
+        return view('livewire.team.formation-list');
     }
 }

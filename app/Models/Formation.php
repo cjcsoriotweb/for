@@ -74,6 +74,12 @@ class Formation extends Model
             ->first()?->pivot;
     }
 
+    public function progressTarget()
+    {
+        // Cible de progression par défaut - peut être configuré dynamiquement
+        return 80;
+    }
+
     public function learners() // utilisateurs inscrits
     {
         return $this->belongsToMany(User::class, 'formation_user')

@@ -20,4 +20,19 @@ class Lesson extends Model
             ->withTimestamps();
     }
 
+    public function videoContent()
+    {
+        return $this->hasOne(VideoContent::class);
+    }
+
+    public function textContent()
+    {
+        return $this->hasOne(TextContent::class);
+    }
+
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class);
+    }
+
 }

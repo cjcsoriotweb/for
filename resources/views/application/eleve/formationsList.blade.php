@@ -99,9 +99,5 @@
         </div>
     </div>
 
-    <x-block-div>
-        <x-block-navigation :navigation="[
-        ]" card="bg-white dark:bg-slate-800" :team="$team" back="{{ route('application.eleve.index',$team) }}" />
-    </x-block-div>
 
 </x-application-layout>

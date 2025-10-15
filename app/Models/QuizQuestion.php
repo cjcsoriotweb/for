@@ -9,4 +9,14 @@ class QuizQuestion extends Model
 {
     /** @use HasFactory<\Database\Factories\QuizQuestionFactory> */
     use HasFactory;
+
+    public function quiz()
+    {
+        return $this->belongsTo(Quiz::class);
+    }
+
+    public function quizChoices()
+    {
+        return $this->hasMany(QuizChoice::class, 'question_id');
+    }
 }

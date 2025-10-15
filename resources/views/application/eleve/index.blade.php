@@ -18,20 +18,6 @@
                 <div class="flex-1">
                     <h1 class="text-3xl font-bold mb-2">Bienvenue sur votre espace d'apprentissage</h1>
                     <p class="text-blue-100 text-lg mb-6">Découvrez et suivez des formations adaptées à vos besoins professionnels.</p>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="inline-flex items-center px-3 py-1 bg-blue-500 bg-opacity-30 rounded-full text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm mr-1">workspace_premium</span>
-                            Formation certifiante
-                        </span>
-                        <span class="inline-flex items-center px-3 py-1 bg-green-500 bg-opacity-30 rounded-full text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm mr-1">schedule</span>
-                            Rythme flexible
-                        </span>
-                        <span class="inline-flex items-center px-3 py-1 bg-purple-500 bg-opacity-30 rounded-full text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm mr-1">group</span>
-                            Apprentissage collaboratif
-                        </span>
-                    </div>
                 </div>
                 <div class="hidden lg:block">
                     <div class="w-32 h-32 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
