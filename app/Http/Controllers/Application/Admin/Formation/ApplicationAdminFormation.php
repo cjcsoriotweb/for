@@ -32,27 +32,22 @@ class ApplicationAdminFormation extends Controller
     /* POST */
     public function formationEnable(FormationService $formationService, Request $request, Team $team)
     {
-        dd(
-            $formationService->createFormation('Formation 1', 'Description 1', 'debutant', 100)
-        );
         $validated = $request->validate([
             'formation_id' => 'required|exists:formations,id',
         ]);
 
-        $formation = Formation::find($validated['formation_id']);
-        $this->visibilityService->makeFormationVisibleForTeam($formation, $team);
+        $formationService->teamEnableFormation($validated['formation_id'], $team);
 
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation enabled successfully!'));
     }
 
-    public function formationDisable(Request $request, Team $team)
+    public function formationDisable(FormationService $formationService, Request $request, Team $team)
     {
         $validated = $request->validate([
             'formation_id' => 'required|exists:formations,id',
         ]);
 
-        $formation = Formation::find($validated['formation_id']);
-        $this->visibilityService->makeFormationInvisibleForTeam($formation, $team);
+        $formationService->teamDisableFormation($validated['formation_id'], $team);
 
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation disabled successfully!'));
     }
