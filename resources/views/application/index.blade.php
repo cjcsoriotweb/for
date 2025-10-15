@@ -27,10 +27,12 @@
         ]" back="0" :team="$team" />
         @endif
 
+        @if(auth()->user()->hasTeamPermission($team,'eleve'))
         <x-block-navigation title="Apprentis" :navigation="[
             ['title' => 'Espace Apprentis', 'description' => 'Gérer l\'espace des apprentis', 'route' => 'application.eleve.index', 'icon' => 'cog'],
 
         ]" back="0" :team="$team" />
+        @endif
 
     </x-block-div>
 </x-application-layout>
