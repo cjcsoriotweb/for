@@ -16,7 +16,6 @@ class EditVisibleFormationRequest extends FormRequest
     {
 
         return Auth::user()->hasTeamRole($this->route('team'), 'admin');
-        // Vérifier que l'utilisateur est membre de l'équipe via les relations team->users
   
     }
 
