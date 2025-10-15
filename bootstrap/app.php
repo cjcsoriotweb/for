@@ -2,6 +2,7 @@
 
 use App\Models\Team;
 use App\Models\User;
+use App\Policies\SuperAdminPolicy;
 use App\Policies\TeamPolicy;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             // Policies
             Gate::policy(Team::class, TeamPolicy::class);
+            Gate::policy(User::class, SuperAdminPolicy::class);
 
             // Gates
             Gate::define('access-team', function (User $user, $team) {

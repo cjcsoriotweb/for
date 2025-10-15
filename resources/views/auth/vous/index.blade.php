@@ -8,4 +8,5 @@
     <div class="py-12">
         @include('auth.vous.application-list')
     </div>
+
 </x-app-layout>
