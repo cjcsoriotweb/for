@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Formation;
 use App\Models\Team;
 
-class VisibleFormationRequest extends FormRequest
+class EditVisibleFormationRequest extends FormRequest
 {
     /**
      * Détermine si l'utilisateur est autorisé à faire cette requête.

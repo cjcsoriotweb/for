@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Application\Admin\Formation;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\VisibleFormationRequest;
+use App\Http\Requests\EditVisibleFormationRequest;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Services\FormationVisibilityService;
-use Illuminate\Http\Request;
 
 class ApplicationAdminFormation extends Controller
 {
@@ -17,7 +16,6 @@ class ApplicationAdminFormation extends Controller
     {
         $this->visibilityService = $visibilityService;
     }
-
 
     public function formationsIndex(Team $team)
     {
@@ -30,7 +28,7 @@ class ApplicationAdminFormation extends Controller
     }
 
     /* POST */
-    public function formationEnable(VisibleFormationRequest $request, Team $team)
+    public function formationEnable(EditVisibleFormationRequest $request, Team $team)
     {
         $validated = $request->validated();
 
@@ -40,7 +38,7 @@ class ApplicationAdminFormation extends Controller
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation enabled successfully!'));
     }
 
-    public function formationDisable(VisibleFormationRequest $request, Team $team)
+    public function formationDisable(EditVisibleFormationRequest $request, Team $team)
     {
         $validated = $request->validated();
 
