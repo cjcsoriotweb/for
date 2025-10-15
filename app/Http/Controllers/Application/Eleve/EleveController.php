@@ -22,8 +22,7 @@ class EleveController extends Controller
 
     public function formationShow(Team $team, Formation $formation)
     {
-        dd($formation);
-        return view('application.eleve.formationShow', compact('team', 'formation'));
+        return view('application.eleve.formationShowStart', compact('team', 'formation'));
     }
 
 }
