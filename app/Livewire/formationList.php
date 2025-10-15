@@ -36,12 +36,7 @@ class FormationList extends Component
     protected function loadFormations()
     {
         if ($this->display === 'eleve') {
-            $this->formations = Formation::query()
-                ->forTeam($this->team)
-                ->with(['learners' => function($query) {
-                    $query->where('users.id', Auth::id());
-                }])
-                ->get();
+            $this->formations = 
         } else {
             $this->formations = Formation::AdminWithTeamLink($this->team)->get();
         }
