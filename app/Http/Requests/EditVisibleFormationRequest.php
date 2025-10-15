@@ -14,15 +14,13 @@ class EditVisibleFormationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+
+        return Auth::user()->hasTeamRole($this->route('team'), 'admin');
         // Vérifier que l'utilisateur est membre de l'équipe via les relations team->users
-        return \request()->route('team')
-            ->users()
-            ->where('users.id', Auth::id())
-            ->exists();
+  
     }
 
-    /**
+    /**  
      * Définit les règles de validation pour cette requête.
      */
     public function rules(): array
