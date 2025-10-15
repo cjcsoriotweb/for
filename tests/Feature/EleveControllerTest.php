@@ -23,7 +23,10 @@ class EleveControllerTest extends TestCase
         parent::setUp();
 
         // Création d'un utilisateur et d'une équipe
-        $this->user = User::factory()->create();
+        /** @var User $user */
+        $user = User::factory()->create();
+        $user->markEmailAsVerified();
+        $this->user = $user;
         $this->team = Team::factory()->create();
         $this->formation = Formation::factory()->create();
 
@@ -121,7 +124,9 @@ class EleveControllerTest extends TestCase
 
     public function test_formation_enable_validates_team_membership()
     {
+        /** @var User $otherUser */
         $otherUser = User::factory()->create();
+        $otherUser->markEmailAsVerified();
         $this->actingAs($otherUser);
 
         $response = $this->post(route('application.eleve.formations.enable', [

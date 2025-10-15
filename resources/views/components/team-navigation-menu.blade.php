@@ -4,20 +4,22 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('application.index', ['team' => $team->id]) }}">
-                        @if(!$team->profile_photo_path)
+                    <a href="{{ isset($team) ? route('application.index', ['team' => $team->id]) : '#' }}">
+                        @if(isset($team) && !$team->profile_photo_path)
                         <x-application-mark class="block h-9 w-auto" />
-                        @else
+                        @elseif(isset($team) && $team->profile_photo_path)
                         <img src="{{ $team->profile_photo_url }}" alt="Logo" class="block h-9 w-auto" />
+                        @else
+                        <x-application-mark class="block h-9 w-auto" />
                         @endif
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                @if(!$team->profile_photo_path)
+                @if(isset($team) && !$team->profile_photo_path)
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('application.index', ['team' => $team->id]) }}"
+                    <x-nav-link href="{{ isset($team) ? route('application.index', ['team' => $team->id]) : '#' }}"
                         :active="request()->routeIs('dashboard')">
                         {{ $team->name }}</b>
                     </x-nav-link>
@@ -90,7 +92,7 @@
                     </div>
                 </div>
     
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures() && Auth::user()->hasTeamPermission($team, 'admin'))
+                @if (isset($team) && Laravel\Jetstream\Jetstream::hasTeamFeatures() && Auth::user()->hasTeamPermission($team, 'admin'))
                 <div class="ms-3 relative">
                     <x-dropdown align="right" width="60">
                         <x-slot name="trigger">
@@ -192,7 +194,7 @@
                 </form>
 
                 <!-- Team Management -->
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
+                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures() && isset($team))
                 <div class="border-t border-gray-200"></div>
 
                 <div class="block px-4 py-2 text-xs text-gray-400">

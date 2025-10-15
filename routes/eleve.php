@@ -3,7 +3,7 @@
 use App\Http\Controllers\Application\Eleve\EleveController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->prefix('eleve')->name('application.eleve.')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('application/{team}/eleve')->name('application.eleve.')->group(function () {
     Route::get('/', [EleveController::class, 'index'])->name('index');
 
     Route::prefix('formations')->name('formations.')->group(function () {
