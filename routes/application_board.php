@@ -18,7 +18,16 @@ Route::prefix('application/{team:id}/tableau-de-bord')
         // Formations
         Route::middleware('can:admin,team')->prefix('formations')->name('formations.')->group(function () {
             Route::get('/', [ApplicationAdminFormation::class, 'formationsIndex'])->name('index');
+            Route::get('/formations-list', [ApplicationAdminFormation::class, 'formationsList'])->name('list');
+
+            Route::post('/formation/enable', [ApplicationAdminFormation::class, 'formationEnable'])->name('enable');
+            Route::post('/formation/disable', [ApplicationAdminFormation::class, 'formationEnable'])->name('disable');
+
+
         });
+
+
+
 
         // Configuration
         Route::prefix('configuration')->middleware('can:admin,team')->name('configuration.')->group(function () {

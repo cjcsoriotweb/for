@@ -20,5 +20,17 @@ class ApplicationAdminFormation extends Controller
         return view('application.admin.formations.list', compact('team'));
     }
 
+    /* POST */
+    public function formationEnable(Team $team)
+    {
+  
+
+        $formationId = request()->input('formation_id');
+        $x = $team->formations()->updateExistingPivot($formationId, ['visible' => true,'team_id'=>$team->id,'formation_id'=>$formationId]);
+
+
+        return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation enabled successfully!'));
+    }
+    
 
 }

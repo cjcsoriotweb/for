@@ -18,9 +18,9 @@
                 'route' => 'application.admin.configuration.index'
             ],
             [
-                'title' => 'Gerer vos formation',
+                'title' => 'Toutes les formations',
                 'description' => '..', 
-                'route' => 'application.admin.configuration.index'
+                'route' => 'application.admin.formations.list'
             ],
      
             

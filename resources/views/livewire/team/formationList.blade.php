@@ -46,13 +46,15 @@
                             Admin
                         </span>
                         @if($formation->pivot_active)
-                        <form method="POST" action="{{ route('team.admin.formation.disable', [$team,$formation]) }}">
+                        <form method="POST" action="{{ route('application.admin.formations.disable', [$team,$formation]) }}">
                             @csrf
+                            <input type="hidden" name="formation_id" value="{{ $formation->id }}">
                             <button type="submit" class="text-sm font-medium text-primary hover:underline">Désactiver cette formation</button>
                         </form>
                         @else
-                        <form method="POST" action="{{ route('team.admin.formation.enable', [$team,$formation]) }}">
+                        <form method="POST" action="{{ route('application.admin.formations.enable', [$team,$formation]) }}">
                             @csrf
+                            <input type="hidden" name="formation_id" value="{{ $formation->id }}">
                             <button type="submit" class="text-sm font-medium text-primary hover:underline">Activer cette formation</button>
                         </form>
                         @endif
