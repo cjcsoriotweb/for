@@ -13,8 +13,9 @@
     <x-block-div>
 
         <x-block-navigation :navigation="[
-            ['title' => 'Application', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
+            ['title' => 'Tableau de bord', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
             ['title' => 'Espace Apprentis', 'description' => 'Gérer l\'espace des apprentis', 'route' => 'application.eleve.index', 'icon' => 'cog'],
+            ['title' => 'Suivis', 'description' => 'Acceder aux suivis des apprentis', 'route' => 'application.eleve.index', 'icon' => 'cog'],
 
         ]" back="0" :team="$team" />
 

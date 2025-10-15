@@ -31,7 +31,6 @@ Route::prefix('application/{team:id}/tableau-de-bord')
         Route::prefix('users')->middleware('can:manage_users,team')->name('users.')->group(function () {
             Route::get('/', [ApplicationAdminUsers::class, 'usersIndex'])->name('index');
             Route::get('/manager', [ApplicationAdminUsers::class, 'usersManager'])->middleware('can:invite_users,team')->name('manager');
-            Route::get('/list', [ApplicationAdminUsers::class, 'usersList'])->middleware('can:list_users,team')->name('list');
         });
 
         Route::middleware('can:access-team,team')->group(function () {
