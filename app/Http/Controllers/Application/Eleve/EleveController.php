@@ -57,6 +57,7 @@ class EleveController extends Controller
 
         // Inscrire l'utilisateur à la formation
         $formation->learners()->attach($user, [
+            'team_id' => $team->id, // Ajouter team_id obligatoire
             'status' => 'in_progress',
             'enrolled_at' => now(),
             'last_seen_at' => now(),
