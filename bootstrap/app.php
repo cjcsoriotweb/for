@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             __DIR__ . '/../routes/application.php',
             __DIR__ . '/../routes/application_board.php',
             __DIR__ . '/../routes/eleve.php',
+            __DIR__ . '/../routes/superadmin.php',
         ],
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
@@ -26,12 +27,15 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             // Policies
             Gate::policy(Team::class, TeamPolicy::class);
-            Gate::policy(User::class, SuperAdminPolicy::class);
 
             // Gates
             Gate::define('access-team', function (User $user, $team) {
                 $team = $team instanceof Team ? $team : Team::query()->findOrFail($team);
                 return $user->belongsToTeam($team);
+            });
+
+            Gate::define('isSuperAdmin', function (User $user) {
+                return (bool) $user->superadmin;
             });
 
         }
