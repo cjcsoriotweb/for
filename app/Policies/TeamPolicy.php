@@ -71,15 +71,6 @@ class TeamPolicy
         return $user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin');
     }
 
-
-    public function configuration(User $user, Team $team): bool
-    {
-        if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'configuration')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour modifier la configuration de cette équipe.');
-        }
-    }
     /**
      * Determine whether the user can update the model.
      */
@@ -91,77 +82,8 @@ class TeamPolicy
             return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour le tableau de bord de cette équipe.');
         }
     }
-    /**
-     * Determine whether the user can manage formations.
-     */
 
-    public function manage_formation(User $user, Team $team): bool
-    {
-        if ($user->hasTeamPermission($team, 'manage_formation')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour gérer les formations de cette équipe.');
-        }
-    }
 
-    /**
-     * Determine whether the user can manage users.
-     */
-    public function manage_roles(User $user, Team $team): bool
-    {
-        if ($user->hasTeamPermission($team, 'manage_roles')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour gérer les utilisateurs de cette équipe.');
-        }
-    }
-    /**
-     * Determine whether the user can list users.
-     */
-    public function list_users(User $user, Team $team): bool
-    {
-        if ($user->hasTeamPermission($team, 'list_users')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'êtes pas membre de cette équipe.');
-        }
-    }
-    /**
-     * Determine whether the user can invite users.
-     */
-
-    public function invite_users(User $user, Team $team): bool
-    {
-        if ($user->hasTeamPermission($team, 'invite_users')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour inviter des membres dans cette équipe.');
-        }
-    }
-    /**
-     * Determine whether the user can manage users.
-     */
-
-    public function manage_users(User $user, Team $team): bool
-    {
-        if ($user->hasTeamPermission($team, 'manage_users')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour gérer les utilisateurs de cette équipe.');
-        }
-    }
-    /**
-     * Determine whether the user can invite users.
-     */
-    
-    public function invite(User $user, Team $team): bool
-    {
-        if ($user->hasTeamPermission($team, 'invite_users')) {
-            return true;
-        } else {
-            return abort(403, 'Accès refusé. Vous n\'avez pas les droits pour inviter des membres dans cette équipe.');
-        }
-    }
     /**
      * Determine whether the user is admin of the team.
      */

@@ -15,13 +15,6 @@
                 'description' => 'Voir les invitations et permissions', 
                 'route' => 'application.admin.users.manager'
             ],
-            [
-                'title' => 'Liste de vos utilisateurs *',
-                'description' => 'Voir la liste complète de vos utilisateurs', 
-                'route' => 'application.admin.users.list'
-            ],
-     
-            
         ]" 
         :team="$team" 
         backTitle="Retour à l'Administration"
