@@ -12,17 +12,17 @@
 
     <x-block-div>
 
-        <x-block-navigation title="Espace Administrateur" :navigation="[
+        <x-block-navigation title="Administrateur" :navigation="[
             ['title' => 'Tableau de bord', 'description' => 'Gérer les paramètres de l\'application', 'route' => 'application.admin.index', 'icon' => 'cog'],
 
         ]" back="0" :team="$team" />
 
-        <x-block-navigation title="Espace Organisme" :navigation="[
+        <x-block-navigation title="Organisme" :navigation="[
             ['title' => 'Suivis', 'description' => 'Acceder aux suivis des apprentis', 'route' => 'application.eleve.index', 'icon' => 'cog'],
 
         ]" back="0" :team="$team" />
 
-        <x-block-navigation title="Espace Apprentis" :navigation="[
+        <x-block-navigation title="Apprentis" :navigation="[
             ['title' => 'Espace Apprentis', 'description' => 'Gérer l\'espace des apprentis', 'route' => 'application.eleve.index', 'icon' => 'cog'],
 
         ]" back="0" :team="$team" />
