@@ -20,6 +20,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        // Créer des formations si elles n'existent pas
+        if (\App\Models\Formation::count() == 0) {
+            $this->call(FormationSeeder::class);
+        }
+
         // Lier les formations à l'équipe créée
         $user = User::where('email', 'test@example.com')->first();
         $team = $user->currentTeam;
