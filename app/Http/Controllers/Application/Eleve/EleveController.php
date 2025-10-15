@@ -32,7 +32,7 @@ class EleveController extends Controller
 
     public function formationEnable(Team $team, Formation $formation)
     {
-        return redirect()->route('application.eleve.formation.continue', [$team,$formation])->with('success', "La formation '{$formation->title}' a été activée pour votre équipe '{$team->name}'.");
+        return redirect()->route('application.eleve.formation.continue', [$team,$formation])->with('success', "La formation '{$formation->title}' a été activée.");
     }
 
 }
