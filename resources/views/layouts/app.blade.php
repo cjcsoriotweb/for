@@ -24,10 +24,7 @@
         @isset($header)
             <header class="bg-white/70 backdrop-blur-sm dark:bg-gray-800/60 shadow-sm">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-                    {{ $header }}
-                    @if(Auth::user()->superadmin)
-                        <a href="#" class="text-sm text-blue-600 hover:underline">SuperAdmin</a>
-                    @endif
+                    <a href="{{ route('vous.index') }}">{{ $header }}</a>
                 </div>
             </header>
         @endisset

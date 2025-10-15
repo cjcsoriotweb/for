@@ -8,6 +8,7 @@ Route::prefix('superadmin')
     ->middleware(['auth', 'can:isSuperAdmin'])
     ->group(function () {
 
-        Route::view('/', 'welcome')->name('home');
+        Route::view('/', 'superadmin.index')->name('home');
+        Route::view('/create-team', 'superadmin.create-team')->name('team.create');
 
     });
