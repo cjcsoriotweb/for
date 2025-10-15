@@ -1,9 +1,9 @@
-<header class="header">
-    <div class="logo">
-        <a href="{{ route('home') }}">{{ $team->name }}</a>
+<header class="flex justify-between items-center bg-gray-900 text-white py-4 px-6">
+    <div class="flex items-center">
+        <a href="{{ route('home') }}" class="text-white hover:text-gray-300 transition-colors font-medium">{{ $team->name }}</a>
     </div>
 
-    <div class="buttons">
+    <div class="flex items-center gap-4">
         @if(Auth::check())
 
         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -64,18 +64,18 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('logout') }}" class="inline">
+        <form method="POST" action="{{ route('logout') }}" class="hidden">
             @csrf
-            <button type="submit" class="btn-primary">{{ __('Deconnexion')}}</button>
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">{{ __('Deconnexion')}}</button>
         </form>
         @else
-        <a href="{{ route('login') }}" class="btn-primary">Connexion</a>
-        <a href="{{ route('register') }}" class="btn-secondary">S'inscrire</a>
+        <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Connexion</a>
+        <a href="{{ route('register') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">S'inscrire</a>
         @endif
 
     </div>
 
-    <button class="mobile-menu-btn" id="mobile-menu-btn">
+    <button class="sm:hidden p-2 text-white hover:bg-gray-800 rounded-lg transition-colors" id="mobile-menu-btn">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
             </path>

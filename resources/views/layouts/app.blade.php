@@ -22,7 +22,7 @@
 
         {{-- En-tête de page optionnel --}}
         @isset($header)
-            <header class="bg-white/70 backdrop-blur-sm dark:bg-gray-800/60 shadow-sm">
+            <header class="bg-white bg-opacity-70 backdrop-blur-sm shadow-sm">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
                     <a >{{ $header }}</a>
                 </div>

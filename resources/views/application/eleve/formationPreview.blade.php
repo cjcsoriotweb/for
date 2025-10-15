@@ -1,10 +1,14 @@
 <x-application-layout :team="$team">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ $formation->title  }}
-        </h2>
-        <x-slot name="subtitle">Aperçu avant inscription</x-slot>
-        <x-slot name="headerIcon">visibility</x-slot>
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-xl">visibility</span>
+            </div>
+            <div class="flex-1">
+                <h2 class="font-bold text-xl text-white leading-tight">{{ $formation->title }}</h2>
+                <p class="text-orange-100 text-sm">Aperçu avant inscription à la formation</p>
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-8 space-y-8">
@@ -69,7 +73,7 @@
                         <span class="text-sm font-medium text-slate-900 dark:text-white">{{ min(100, round(($team->money / max(1, $formation->money_amount)) * 100)) }}%</span>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
-                        <div class="bg-slate-700 dark:bg-slate-300 h-3 rounded-full transition-all duration-300"
+                        <div class="bg-slate-700 dark:bg-slate-300 h-3 rounded-full transition-all duration-300 @if(min(100, round(($team->money / max(1, $formation->money_amount)) * 100)) >= 100) w-full @endif"
                             style="width: {{ min(100, round(($team->money / max(1, $formation->money_amount)) * 100)) }}%"></div>
                     </div>
                 </div>
