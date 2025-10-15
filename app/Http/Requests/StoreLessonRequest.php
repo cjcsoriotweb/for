@@ -11,7 +11,7 @@ class StoreLessonRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return (bool) \Illuminate\Support\Facades\Auth::user()?->superadmin;
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreLessonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'chapter_id' => ['required', 'integer', 'exists:chapters,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'content_type' => ['required', 'in:text,video,quiz'],
+            'order' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 }

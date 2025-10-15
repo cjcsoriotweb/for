@@ -11,7 +11,8 @@ class UpdateFormationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Only superadmin can update formations
+        return (bool) \Illuminate\Support\Facades\Auth::user()?->superadmin;
     }
 
     /**
@@ -22,7 +23,10 @@ class UpdateFormationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['sometimes', 'string', 'max:255'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'is_public' => ['sometimes', 'boolean'],
+            'money_amount' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 }

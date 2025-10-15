@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Formation;
+use App\Models\Team;
 
 class EnableFormationRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class EnableFormationRequest extends FormRequest
     public function authorize(): bool
     {
         // Vérifier que l'utilisateur est membre de l'équipe via les relations team->users
-        return $this->route('team')
+        return \request()->route('team')
             ->users()
             ->where('users.id', Auth::id())
             ->exists();
@@ -24,7 +26,9 @@ class EnableFormationRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [];
+        return [
+            'formation' => ['required', 'integer', 'exists:formations,id'],
+        ];
     }
 
     /**
@@ -33,8 +37,10 @@ class EnableFormationRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $formation = \App\Models\Formation::find($this->input('formation'));
-            $team = $this->route('team');
+            /** @var Formation|null $formation */
+            $formation = Formation::query()->find(\request()->input('formation'));
+            /** @var Team $team */
+            $team = \request()->route('team');
 
             if (!$formation || !$formation->teams()->where('teams.id', $team->id)->wherePivot('visible', true)->exists()) {
                 $validator->errors()->add('formation', 'Cette formation n\'est pas accessible pour votre équipe.');
@@ -49,7 +55,7 @@ class EnableFormationRequest extends FormRequest
     /**
      * Vérifie si l'équipe a les fonds nécessaires pour commencer une formation
      */
-    private function canTeamAffordFormation($team, $formation): bool
+    private function canTeamAffordFormation(Team $team, Formation $formation): bool
     {
         return $team->money >= $formation->money_amount;
     }

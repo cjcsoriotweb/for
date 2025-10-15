@@ -35,9 +35,14 @@ class Formation extends Model
         'published',
     ];
 
-    protected $casts = [
-        'published' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'published' => 'bool',
+            'team_id' => 'integer',
+            'money_amount' => 'integer',
+        ];
+    }
 
     public function team()
     {

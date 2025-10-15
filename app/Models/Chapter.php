@@ -9,6 +9,14 @@ class Chapter extends Model
 {
     /** @use HasFactory<\Database\Factories\ChapterFactory> */
     use HasFactory;
+    
+    protected function casts(): array
+    {
+        return [
+            'formation_id' => 'integer',
+            'position' => 'integer',
+        ];
+    }
     public function formation()
     {
         return $this->belongsTo(Formation::class);

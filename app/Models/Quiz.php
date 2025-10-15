@@ -9,6 +9,13 @@ class Quiz extends Model
 {
     /** @use HasFactory<\Database\Factories\QuizFactory> */
     use HasFactory;
+    
+    protected function casts(): array
+    {
+        return [
+            'lesson_id' => 'integer',
+        ];
+    }
 
     public function lesson()
     {

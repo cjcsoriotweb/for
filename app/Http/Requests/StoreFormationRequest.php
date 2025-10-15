@@ -11,7 +11,7 @@ class StoreFormationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return (bool) \Illuminate\Support\Facades\Auth::user()?->superadmin;
     }
 
     /**
@@ -22,7 +22,11 @@ class StoreFormationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'is_public' => ['sometimes', 'boolean'],
+            // Payment-related: ensure a non-negative amount is provided when present
+            'money_amount' => ['required', 'integer', 'min:0'],
         ];
     }
 }

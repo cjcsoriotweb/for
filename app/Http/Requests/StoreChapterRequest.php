@@ -11,7 +11,8 @@ class StoreChapterRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Superadmin controls content creation
+        return (bool) \Illuminate\Support\Facades\Auth::user()?->superadmin;
     }
 
     /**
@@ -22,7 +23,9 @@ class StoreChapterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'formation_id' => ['required', 'integer', 'exists:formations,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'order' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 }

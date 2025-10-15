@@ -9,6 +9,14 @@ class Lesson extends Model
 {
     /** @use HasFactory<\Database\Factories\LessonFactory> */
     use HasFactory;
+    
+    protected function casts(): array
+    {
+        return [
+            'chapter_id' => 'integer',
+            'position' => 'integer',
+        ];
+    }
     public function chapter()
     {
         return $this->belongsTo(Chapter::class);
