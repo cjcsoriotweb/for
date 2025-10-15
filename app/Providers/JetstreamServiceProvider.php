@@ -51,7 +51,6 @@ class JetstreamServiceProvider extends ServiceProvider
             'read', 'create', 'update',  
             'admin',
             'configuration',
-            'eleve',
         ])->description('Accès complet à l’équipe.');
 
   
