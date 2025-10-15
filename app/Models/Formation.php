@@ -4,9 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\DB as FacadesDB;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\DB;
 
+/**
+ * Modèle Formation
+ *
+ * Représente une formation dans le système d'apprentissage.
+ * Une formation appartient à une équipe propriétaire et peut être visible pour d'autres équipes.
+ */
 class Formation extends Model
 {
     protected $fillable = [
@@ -81,11 +90,11 @@ class Formation extends Model
             })
             ->select('formations.*')
             ->addSelect([
-                FacadesDB::raw('CASE WHEN ft.formation_id IS NULL THEN 0 ELSE 1 END AS is_linked'),
-                FacadesDB::raw('ft.id AS pivot_id'),
-                FacadesDB::raw('ft.team_id AS pivot_team_id'),
-                FacadesDB::raw('ft.visible AS pivot_active'),   // adapte si tu as ce champ
-                // FacadesDB::raw('ft.visible_at AS pivot_visible_at'),
+                DB::raw('CASE WHEN ft.formation_id IS NULL THEN 0 ELSE 1 END AS is_linked'),
+                DB::raw('ft.id AS pivot_id'),
+                DB::raw('ft.team_id AS pivot_team_id'),
+                DB::raw('ft.visible AS pivot_active'),   // adapte si tu as ce champ
+                // DB::raw('ft.visible_at AS pivot_visible_at'),
             ]);
     }
 }

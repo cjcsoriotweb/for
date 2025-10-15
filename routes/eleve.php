@@ -14,7 +14,7 @@ Route::prefix('application/{team:id}/apprentissage')
         Route::get('/formations/{formation}', [EleveController::class, 'formationShow'])->name('formations.show');
         Route::get('/formations/{formation}/apercu', [EleveController::class, 'formationPreview'])->name('formations.preview');
         Route::get('/formations/{formation}/continuer', [EleveController::class, 'formationContinue'])->name('formations.continue');
-        Route::get('/formations/{formation}/activer', [EleveController::class, 'formationEnable'])->name('formations.enable');
+        Route::post('/formations/{formation}/activer', [EleveController::class, 'formationEnable'])->name('formations.enable');
 
 
     });
