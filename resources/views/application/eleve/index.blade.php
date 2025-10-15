@@ -19,23 +19,23 @@
                     <h1 class="text-3xl font-bold mb-2">Bienvenue sur votre espace d'apprentissage</h1>
                     <p class="text-blue-100 text-lg mb-6">Découvrez et suivez des formations adaptées à vos besoins professionnels.</p>
                     <div class="flex flex-wrap gap-3">
-                        <span class="inline-flex items-center px-3 py-1 bg-blue-500/30 rounded-full text-sm font-medium">
+                        <span class="inline-flex items-center px-3 py-1 bg-blue-500 bg-opacity-30 rounded-full text-sm font-medium">
                             <span class="material-symbols-outlined text-sm mr-1">workspace_premium</span>
                             Formation certifiante
                         </span>
-                        <span class="inline-flex items-center px-3 py-1 bg-green-500/30 rounded-full text-sm font-medium">
+                        <span class="inline-flex items-center px-3 py-1 bg-green-500 bg-opacity-30 rounded-full text-sm font-medium">
                             <span class="material-symbols-outlined text-sm mr-1">schedule</span>
                             Rythme flexible
                         </span>
-                        <span class="inline-flex items-center px-3 py-1 bg-purple-500/30 rounded-full text-sm font-medium">
+                        <span class="inline-flex items-center px-3 py-1 bg-purple-500 bg-opacity-30 rounded-full text-sm font-medium">
                             <span class="material-symbols-outlined text-sm mr-1">group</span>
                             Apprentissage collaboratif
                         </span>
                     </div>
                 </div>
                 <div class="hidden lg:block">
-                    <div class="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-6xl text-white/80">rocket_launch</span>
+                    <div class="w-32 h-32 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-6xl text-white text-opacity-80">rocket_launch</span>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
                 <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
                         <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">play_circle</span>
                     </div>
                     <div>
@@ -57,7 +57,7 @@
 
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
                 <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
                         <span class="material-symbols-outlined text-green-600 dark:text-green-400">check_circle</span>
                     </div>
                     <div>
@@ -69,7 +69,7 @@
 
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
                 <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
                         <span class="material-symbols-outlined text-purple-600 dark:text-purple-400">trophy</span>
                     </div>
                     <div>
@@ -80,21 +80,12 @@
             </div>
         </div>
 
-        <!-- Actions principales -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <x-block-navigation :navigation="[
-                ['title' => 'Parcourir les formations', 'description' => 'Découvrez notre catalogue complet de formations', 'route' => 'application.eleve.formations.list', 'icon' => 'library_books', 'color' => 'bg-blue-500'],
-            ]" card="bg-white dark:bg-slate-800" :team="$team" back="{{ route('application.index',$team) }}" />
 
-            <x-block-navigation :navigation="[
-                ['title' => 'Mes formations', 'description' => 'Continuez vos formations en cours', 'route' => 'application.eleve.formations.list', 'icon' => 'school', 'color' => 'bg-green-500'],
-            ]" card="bg-white dark:bg-slate-800" :team="$team" back="{{ route('application.index',$team) }}" />
-        </div>
 
         <!-- Section motivation -->
-        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl p-8 border border-emerald-200 dark:border-emerald-800">
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900 dark:bg-opacity-20 dark:to-teal-900 dark:bg-opacity-20 rounded-2xl p-8 border border-emerald-200 dark:border-emerald-800">
             <div class="flex items-center space-x-6">
-                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
                     <span class="material-symbols-outlined text-3xl text-emerald-600 dark:text-emerald-400">celebration</span>
                 </div>
                 <div class="flex-1">
@@ -114,9 +105,15 @@
         </div>
     </div>
 
-    <div class="pb-4">
-        <x-block-navigation :navigation="[
-        ]" card="bg-white dark:bg-slate-800" :team="$team" back="{{ route('application.index',$team) }}" />
-    </div>
+            <!-- Actions principales -->
+        <div class="">
+            <x-block-navigation :navigation="[
+                ['title' => 'Parcourir les formations', 'description' => 'Découvrez notre catalogue complet de formations', 'route' => 'application.eleve.formations.list', 'icon' => 'library_books', 'color' => 'bg-blue-500'],
+                 ['title' => 'Mes formations', 'description' => 'Continuez vos formations en cours', 'route' => 'application.eleve.formations.list', 'icon' => 'school', 'color' => 'bg-green-500']
+            ]" card="bg-white dark:bg-slate-800" :team="$team" back="0" />
+
+        </div>
+
+
 
 </x-application-layout>
