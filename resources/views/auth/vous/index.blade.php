@@ -18,12 +18,17 @@
     <main class="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
         <div class="w-full max-w-4xl space-y-12">
             <div>
-                <h1 class="text-4xl font-bold tracking-tight text-background-dark dark:text-background-light">Choose
-                    your learning application</h1>
+                <h1 class="text-4xl font-bold tracking-tight text-background-dark dark:text-background-light">
+                    {{ __('Bienvenue sur votre espace de formation')}}
+                </h1>
             </div>
             <div>
-                <h2 class="text-2xl font-bold text-background-dark dark:text-background-light mb-6">Available
-                    applications</h2>
+                <h2 class="text-2xl font-bold text-background-dark dark:text-background-light mb-6 relative">
+                    <span class="material-symbols-outlined text-4xl mr-2 animate-bounce ease-in-out duration-500 cursor-pointer">
+                        arrow_downward
+                    </span>
+                    {{ __('Cliquez sur l\'organisme')}}
+                </h2>
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     <div
                         class="flex cursor-pointer flex-col gap-4 rounded-xl border border-primary/20 bg-white p-6 shadow-sm transition-all hover:shadow-lg dark:border-primary/30 dark:bg-background-dark/50 dark:hover:bg-background-dark">
