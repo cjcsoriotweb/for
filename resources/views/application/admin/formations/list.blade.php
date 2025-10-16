@@ -6,7 +6,11 @@
     </x-slot>
 
     <x-block-div>
-        @livewire('FormationList', ['team' => $team,'display'=>'admin'])
+        
+        <div>
+            <p>Nombre de formations activé : {{ $formations->count() }}</p>
+        </div>
+
     </x-block-div>
 
     <x-block-div>

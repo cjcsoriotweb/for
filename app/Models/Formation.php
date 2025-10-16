@@ -43,7 +43,7 @@ class Formation extends Model
             'money_amount' => 'integer',
         ];
     }
-
+    /*
     public function team()
     {
         return $this->belongsTo(Team::class);
@@ -98,7 +98,7 @@ class Formation extends Model
             ->withTimestamps();
     }
 
-    /* Scopes */
+
 
     public function scopeForTeam(Builder $query, int|Team $team): Builder
     {
@@ -129,4 +129,5 @@ class Formation extends Model
                 // DB::raw('ft.visible_at AS pivot_visible_at'),
             ]);
     }
+    */
 }
