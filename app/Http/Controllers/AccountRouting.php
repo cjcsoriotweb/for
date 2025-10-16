@@ -11,6 +11,7 @@ class AccountRouting extends Controller
     {
         return view('auth.vous.index', [
             'items' => (new TeamService())->getUsersTeam(),
+            'invitations_pending' => (new TeamService())->getTeamInvitedMe(),
             'route' => 'team.show'
         ]);
     }
