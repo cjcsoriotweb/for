@@ -11,7 +11,7 @@
             <p>Nombre de formations activé : {{ $formationsByTeam->count() }} / {{ $formationsAll->count() }}</p>
         </div>
         @foreach($formationsAll as $formation)
-            <div class="p-8 bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+            <div class="{{ $formation->is_attached ? 'bg-green-100' : 'bg-red-100' }} p-8 dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
                 <div class="flex justify-between items-center">
                     <h3 class="font-semibold text-xl mb-2">{{ $formation->title }}</h3>
                     <div class="flex items-center space-x-2">
