@@ -7,6 +7,11 @@ use App\Services\TeamService;
 
 class AccountRouting extends Controller
 {
+    public function acceptInvitation(Request $request, $id)
+    {
+        (new TeamService())->acceptInvitation($id);
+        return redirect()->route('vous.index');
+    }
     public function index()
     {
         return view('auth.vous.index', [

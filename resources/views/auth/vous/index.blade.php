@@ -56,15 +56,22 @@
                         class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm dark:bg-background-dark/50">
                         <div class="flex items-center gap-4">
                             <div class="h-14 w-14 flex-shrink-0 rounded-lg bg-cover bg-center"
-                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAf__oHvHTPwOTwkRfmRf1McbFv0g_1jMgoPtTwZseCxNVq6aSXAXLK-3ZJlQMbcxNpjRQgBK78kzjSDDq-dQgw60gHwxYpFk-CbidGf1MvQBzStF_5vXRasJhVQQubbMfxQWiihgOr5CLlfft4M-w7LKznp7UlentKoRoaMAHWpC-DhSXYhsYaetc6APktKe6PW3robH9y3jN0VAApOaAKuELNENF7B4jawDgNPzWhTZXC4MANg-KHhvnFOHd7PSy_Oix2ex-O1CI");'>
+                                style='background-image: url("{{ $invitation->team->profile_photo_url }}");'>
                             </div>
                             <div>
                                 <p class="font-medium text-background-dark dark:text-background-light">{{ __("Invitation de l'organisme")}}
                                     {{ $invitation->team->name }}</p>
                             </div>
                         </div>
-                        <button
-                            class="h-9 min-w-[84px] rounded bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-primary/90">Accept</button>
+                        <form method="POST" action="{{ route('vous.invitation.accept', $invitation->id) }}">
+                            @csrf
+                            <button type="submit"
+                                class="h-9 min-w-[84px] rounded bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-primary/90">
+                                {{ __('Accepter') }}
+                            </button>
+                            @method('PATCH')
+                            @csrf
+                        </form>
                     </div>
                     @endforeach
                 </div>

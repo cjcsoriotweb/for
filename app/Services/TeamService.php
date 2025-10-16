@@ -8,7 +8,17 @@ use Illuminate\Support\Facades\Auth;
 class TeamService
 {
 
+    public function acceptInvitation($id){
+        $invitation = TeamInvitation::find($id);
 
+        if(!$invitation){
+            throw new \Exception('Invitation not found');
+        }
+
+        $invitation->delete();
+
+        $invitation->team->users()->attach(Auth::user()->id, ['role' => $invitation->role]);
+    }
     public function getUsersTeam(){
         return Auth::user()->allTeams();
     }
