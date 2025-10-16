@@ -27,23 +27,23 @@
             </div>
         </div>
 
-        <!-- Actions rapides -->
+                <!-- Actions rapides -->
         <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900 dark:bg-opacity-20 dark:to-teal-900 dark:bg-opacity-20 rounded-2xl p-8 border border-emerald-200 dark:border-emerald-800">
             <div class="flex items-center space-x-6">
                 <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
-                    <span class="material-symbols-outlined text-3xl text-emerald-600 dark:text-emerald-400">person_add</span>
+                    <span class="material-symbols-outlined text-3xl text-emerald-600 dark:text-emerald-400">person</span>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">Inviter des utilisateurs</h3>
+                    <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">Controller un utilisateur</h3>
                     <p class="text-emerald-700 dark:text-emerald-300">
-                        Gérez les invitations et permissions des utilisateurs de votre plateforme.
+                        Accédez aux informations et aux permissions d'un utilisateur spécifique.
                     </p>
                 </div>
                 <div class="hidden md:block">
-                    <a href="{{ route('application.admin.users.manager', $team) }}"
+                    <a href=""
                         class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-sm transition-colors">
                         <span class="material-symbols-outlined mr-2">arrow_forward</span>
-                        Gérer les utilisateurs
+                        Controller un utilisateur
                     </a>
                 </div>
             </div>
