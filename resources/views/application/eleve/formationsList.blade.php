@@ -22,40 +22,31 @@
             </div>
         </div>
 
-        <!-- Filtres et recherche -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-            <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div class="flex-1 max-w-md">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400">search</span>
-                        </div>
-                        <input type="text" placeholder="Rechercher une formation..."
-                            class="block w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                </div>
-                <div class="flex flex-wrap gap-3">
-                    <select class="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        <option>Toutes les catégories</option>
-                        <option>Technique</option>
-                        <option>Management</option>
-                        <option>Communication</option>
-                    </select>
-                    <select class="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        <option>Trier par</option>
-                        <option>Plus récentes</option>
-                        <option>Plus populaires</option>
-                        <option>Note décroissante</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
         <!-- Liste des formations -->
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            @foreach($formationsByTeam as $formation)
             <div class="p-8">
-qsdsdq
+                <div class="flex items-start space-x-6">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl text-slate-600 dark:text-slate-400">library_books</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Formation de test</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Une description de la formation de test.</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 mt-4">
+                    <div class="flex-1">
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
+                            <div class="bg-purple-600 h-3 rounded-full transition-all duration-500" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="#" class="text-purple-600 hover:underline">Continuer</a>
+                    </div>
+                </div>
             </div>
+            @endforeach
         </div>
 
         <!-- Aide et support -->

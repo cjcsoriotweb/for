@@ -38,7 +38,9 @@ class EleveController extends Controller
 
     public function formationIndex(Team $team)
     {
-        return view('application.eleve.formationsList', compact('team'));
+        $formationsByTeam = $team->formationsByTeam()->get();
+
+        return view('application.eleve.formationsList', compact('team', 'formationsByTeam'));
     }
 
     public function formationPreview(Team $team, Formation $formation)
