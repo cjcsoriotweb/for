@@ -51,6 +51,7 @@ class JetstreamServiceProvider extends ServiceProvider
             'read', 'create', 'update',  
             'admin',
             'configuration',
+            'addTeamMember'
         ])->description('Accès complet à l’équipe.');
 
         Jetstream::role('manager', 'Organisateur', [

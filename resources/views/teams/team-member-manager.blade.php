@@ -1,6 +1,5 @@
 <div>
-    @if (Gate::check('addTeamMember', $team))
-        <x-section-border />
+    @if (auth()->user()->hasTeamPermission($team, 'addTeamMember'))
 
         <!-- Add Team Member -->
         <div class="mt-10 sm:mt-0">
@@ -37,7 +36,7 @@
 
                                 @foreach ($this->roles as $index => $role)
                                 
-                                    @if(auth()->user()->hasTeamPermission($team, 'invite:'.$role->key) || auth()->user()->ownsTeam($team))
+                                    @if(auth()->user()->ownsTeam($team) || auth()->user()->hasTeamPermission($team, 'addTeamMember'))
                                     <button type="button" class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 {{ $index > 0 ? 'border-t border-gray-200 focus:border-none rounded-t-none' : '' }} {{ ! $loop->last ? 'rounded-b-none' : '' }}"
                                                     wire:click="$set('addTeamMemberForm.role', '{{ $role->key }}')">
                                         <div class="{{ isset($addTeamMemberForm['role']) && $addTeamMemberForm['role'] !== $role->key ? 'opacity-50' : '' }}">
@@ -80,7 +79,8 @@
         </div>
     @endif
 
-    @if ($team->teamInvitations->isNotEmpty() && Gate::check('addTeamMember', $team))
+    <br>
+    @if ($team->teamInvitations->isNotEmpty() && auth()->user()->hasTeamPermission($team, 'addTeamMember'))
         <x-section-border />
 
         <!-- Team Member Invitations -->
@@ -101,7 +101,7 @@
                                 <div class="text-gray-600">{{ $invitation->email }}</div>
 
                                 <div class="flex items-center">
-                                    @if (Auth::user()->hasTeamPermission( $team,'team:action:users_invite'))
+                                    @if (Auth::user()->hasTeamPermission( $team,'addTeamMember'))
                                         <!-- Cancel Team Invitation -->
                                         <button class="cursor-pointer ms-6 text-sm text-red-500 focus:outline-none"
                                                             wire:click="cancelTeamInvitation({{ $invitation->id }})">
@@ -118,8 +118,6 @@
     @endif
 
     @if ($team->users->isNotEmpty())
-        <x-section-border />
-
         <!-- Manage Team Members -->
         <div class="mt-10 sm:mt-0">
             <x-action-section>

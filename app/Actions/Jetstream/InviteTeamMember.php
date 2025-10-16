@@ -25,13 +25,10 @@ class InviteTeamMember implements InvitesTeamMembers
     public function invite(User $user, Team $team, string $email, ?string $role = null): void
     {
 
-        
-
-        if(!auth()->user()->hasTeamPermission($team, 'invite:'.$role)){
-            Gate::forUser($user)->authorize('invite:'.$role, $team);
+        if(auth()->user()->hasTeamPermission($team, 'admiaan')){
+            throw new \Exception('Unauthorized');
         }
 
-        Gate::forUser($user)->authorize('addTeamMember', $team);
 
         $this->validate($team, $email, $role);
 
