@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full antialiased">
+
 <head>
-    <title>@hasSection('title')@yield('title') — @endif{{ config('app.name', 'Application') }}</title>
+    <title>
+        @hasSection('title')
+            @yield('title') —
+        @endif{{ config('app.name', 'Application') }}
+    </title>
     <link rel="icon" href="{{ asset('favicon.ico') }}">
-    @vite(['resources/css/app.css','resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <x-header />
     @stack('head')
 </head>
 
 <body class="h-full bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50
+    <a href="#main-content"
+        class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50
        focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:text-blue-700 dark:focus:bg-gray-800">
         Aller au contenu
     </a>
@@ -18,17 +24,20 @@
     <x-banner />
 
     <div class="min-h-screen flex flex-col">
-        {{ $nav ?? '' }}
 
         {{-- En-tête de page optionnel --}}
         @isset($header)
-            <header class="bg-white bg-opacity-70 backdrop-blur-sm shadow-sm">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-                    <a >{{ $header }}</a>
+            {{ $header }}
+        @else
+            <div class="bg-white bg-opacity-80 backdrop-blur-sm shadow-sm flex items-center justify-between py-4 px-6">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ route('logout') }}"
+                        class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-900 focus:ring-gray-300">Se
+                        déconnecter</a>
                 </div>
-            </header>
+            </div>
         @endisset
-        
+
 
         {{-- 👉 Slot BLOCK optionnel (carte centrale au-dessus du contenu) --}}
         @isset($block)
@@ -67,7 +76,7 @@
             </div>
         </footer>
 
-        
+
         <div class="py-12">
             <a href="{{ route('superadmin.home') }}" type="button"
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Superadmin') }}</a>
@@ -82,4 +91,5 @@
     <x-auth-debug-panel />
 
 </body>
+
 </html>

@@ -1,11 +1,5 @@
 <x-app-layout>
 
-    {{-- NAV : ton menu d'équipe --}}
-    <x-slot name="nav">
-        <x-team-navigation-menu :team="$team" />
-    </x-slot>
-
-    {{-- HEADER PROFESSIONNEL --}}
     @isset($header)
         <x-slot name="header">
             <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700">
@@ -23,8 +17,14 @@
                             </div>
                         </div>
                         @isset($headerActions)
+                            {{ $headerActions }}
+                        @else
                             <div class="flex items-center space-x-3">
-                                {{ $headerActions }}
+                                <a href="{{ route('logout') }}"
+                                    class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
+                                    <span class="material-symbols-outlined mr-2">logout</span>
+                                   
+                                </a>
                             </div>
                         @endisset
                     </div>

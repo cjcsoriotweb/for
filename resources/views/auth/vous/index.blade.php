@@ -1,15 +1,12 @@
 <x-app-layout>
-    <x-slot name="header" class="bg-red-500">
-        <h2 class="font-semibold text-xl leading-tight text-white">
+    <x-slot name="header">
             {{ __('Accueil') }}
-            @livewire('notifications-bell')
-        </h2>
 
     </x-slot>
 
 
 
-    <div class="py-12">
+    <div class="py-12" style="display: none;">
         <x-block-div>
             @if ($items->count() > 0)
                 <div class=" flex flex-wrap justify-center gap-6 pb-6 px-6">
