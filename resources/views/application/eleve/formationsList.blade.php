@@ -18,25 +18,6 @@
                 <div class="flex-1">
                     <h1 class="text-3xl font-bold mb-2">Explorez notre catalogue</h1>
                     <p class="text-purple-100 text-lg mb-6">Accédez à des formations de qualité pour développer vos compétences.</p>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm mr-1">filter_list</span>
-                            Toutes les catégories
-                        </span>
-                        <span class="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm mr-1">local_fire_department</span>
-                            Tendances
-                        </span>
-                        <span class="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm mr-1">star</span>
-                            Populaires
-                        </span>
-                    </div>
-                </div>
-                <div class="hidden lg:block">
-                    <div class="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-6xl text-white/80">explore</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -73,12 +54,12 @@
         <!-- Liste des formations -->
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="p-8">
-                @livewire('FormationList', ['team' => $team, 'display'=>'eleve'])
+qsdsdq
             </div>
         </div>
 
         <!-- Aide et support -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8 border border-blue-200 dark:border-blue-800">
+        <div style="display:none;" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8 border border-blue-200 dark:border-blue-800">
             <div class="flex items-center space-x-6">
                 <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
                     <span class="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400">help_center</span>
