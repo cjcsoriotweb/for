@@ -67,20 +67,17 @@
             </div>
         </main>
 
-        <footer class="border-t border-gray-200 dark:border-gray-800">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-sm text-gray-500 dark:text-gray-400">
-                <p><b>© {{ now()->year }} {{ config('app.name') }} — {{ __('Tous droits réservés.') }}</b></p>
-                <p>
-                    <a href="{{ route('policy') }}">{{ __('Mentions légales') }}</a>
+        <footer class="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <span>&copy; {{ now()->year }} {{ config('app.name') }} — </span>
+                    <a href="{{ route('policy') }}" class="text-blue-600 hover:underline dark:text-blue-500">{{ __('Mentions légales') }}</a>
+                    <span> — {{ __('Tous droits réservés.') }}</span>
                 </p>
             </div>
         </footer>
 
 
-        <div class="py-12">
-            <a href="{{ route('superadmin.home') }}" type="button"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Superadmin') }}</a>
-        </div>
     </div>
 
     {{-- Panneau de debug Auth (Gate/Policy) --}}
