@@ -14,56 +14,59 @@
         <h2 class="font-semibold text-xl leading-tight text-gray-900">
             {{ __('Bienvenue') }} <b>{{ $team->name }}</b>
         </h2>
-        <p class="mt-2 text-sm text-gray-500">
-            {{ __('Vous êtes connecté en tant que') }} <b>{{ auth()->user()->name }} </b>
-        </p>
+        <div class="mt-2 flex items-center">
+
+            <p class="ml-2 text-sm text-gray-500">
+                {{ __('Vous êtes connecté en tant que') }} <b>{{ auth()->user()->name }} </b>
+            </p>
+            <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-200 text-gray-800">
+                {{ Auth::user()->teamRole($team)->name }}
+            </span>
+        </div>
 
         <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-            @if(auth()->user()->hasTeamRole($team,'admin'))
-
-            <div class="bg-white rounded-lg shadow p-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-2">
-                    Administrateur
-                </h3>
-                <p class="text-gray-500 mb-4">
-                    Gérer les paramètres de l'application
-                </p>
-                <a href="{{ route('application.admin.index', $team) }}"
-                    class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition-all duration-200 hover:scale-105">
-                    Tableau de bord
-                </a>
-            </div>
+            @if (auth()->user()->hasTeamRole($team, 'admin'))
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        Administrateur
+                    </h3>
+                    <p class="text-gray-500 mb-4">
+                        Gérer les paramètres de l'application
+                    </p>
+                    <a href="{{ route('application.admin.index', $team) }}"
+                        class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition-all duration-200 hover:scale-105">
+                        Tableau de bord
+                    </a>
+                </div>
             @endif
 
-            @if(auth()->user()->hasTeamRole($team,'manager'))
-
-            <div class="bg-white rounded-lg shadow p-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-2">
-                    Organisme
-                </h3>
-                <p class="text-gray-500 mb-4">
-                    Acceder aux suivis des apprentis
-                </p>
-                <a href="{{ route('application.eleve.index', $team) }}"
-                    class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition-all duration-200 hover:scale-105">
-                    Suivis
-                </a>
-            </div>
+            @if (auth()->user()->hasTeamRole($team, 'manager'))
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        Organisme
+                    </h3>
+                    <p class="text-gray-500 mb-4">
+                        Acceder aux suivis des apprentis
+                    </p>
+                    <a href="{{ route('application.eleve.index', $team) }}"
+                        class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition-all duration-200 hover:scale-105">
+                        Suivis
+                    </a>
+                </div>
             @endif
-            @if(auth()->user()->hasTeamRole($team,'eleve'))
-
-            <div class="bg-white rounded-lg shadow p-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-2">
-                    Apprentis
-                </h3>
-                <p class="text-gray-500 mb-4">
-                    Gérer l'espace des apprentis
-                </p>
-                <a href="{{ route('application.eleve.index', $team) }}"
-                    class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition-all duration-200 hover:scale-105">
-                    Espace apprentis
-                </a>
-            </div>
+            @if (auth()->user()->hasTeamRole($team, 'eleve'))
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        Apprentis
+                    </h3>
+                    <p class="text-gray-500 mb-4">
+                        Gérer l'espace des apprentis
+                    </p>
+                    <a href="{{ route('application.eleve.index', $team) }}"
+                        class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition-all duration-200 hover:scale-105">
+                        Espace apprentis
+                    </a>
+                </div>
             @endif
 
         </div>
