@@ -6,9 +6,20 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                                <span class="material-symbols-outlined text-lg text-white">{{ $headerIcon ?? 'school' }}</span>
-                            </div>
+                            @if($team->profile_photo_path)
+                                <div class="relative">
+                                    <a href="{{ route('application.index', $team) }}" class="w-12 h-12 bg-white bg-opacity-15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white border-opacity-30 shadow-lg overflow-hidden">
+                                        <img src="{{ asset('storage/'.$team->profile_photo_path) }}"
+                                             alt="Logo {{ $team->name }}"
+                                             class="w-full h-full rounded-lg object-contain p-1">
+                                    </a>
+                                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
+                                </div>
+                            @else
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <span class="material-symbols-outlined text-lg text-white">{{ $headerIcon ?? 'school' }}</span>
+                                </div>
+                            @endif
                             <div>
                                 <h2 class="text-2xl font-bold text-white">{{ $header }}</h2>
                                 @isset($subtitle)
@@ -38,9 +49,20 @@
                 <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-6">
-                            <div class="w-12 h-12 bg-white bg-opacity-10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white border-opacity-20">
-                                <span class="material-symbols-outlined text-2xl text-white">dashboard</span>
-                            </div>
+                            @if($team->profile_photo_path)
+                                <div class="relative">
+                                    <div class="w-16 h-16 bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white border-opacity-30 shadow-2xl overflow-hidden">
+                                        <img src="{{ asset('storage/'.$team->profile_photo_path) }}"
+                                             alt="Logo {{ $team->name }}"
+                                             class="w-full h-full rounded-xl object-contain p-1">
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
+                                </div>
+                            @else
+                                <div class="w-16 h-16 bg-white bg-opacity-10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white border-opacity-20">
+                                    <span class="material-symbols-outlined text-2xl text-white">dashboard</span>
+                                </div>
+                            @endif
                             <div>
                                 <h1 class="text-3xl font-bold text-white">{{ config('app.name', 'Application') }}</h1>
                                 <p class="text-slate-300 mt-1">Espace équipe professionnel</p>
