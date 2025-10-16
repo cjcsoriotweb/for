@@ -112,6 +112,13 @@
         .dark ::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+
+        /* Ensure Tailwind utilities are available */
+        .bg-primary { background-color: #137fec; }
+        .text-primary { color: #137fec; }
+        .border-primary { border-color: #137fec; }
+        .hover\:bg-primary:hover { background-color: #137fec; }
+        .hover\:text-primary:hover { color: #137fec; }
     </style>
 </body>
 
