@@ -45,8 +45,8 @@ class ApplicationAdminFormation extends Controller
     {
         $validated = $request->validated();
 
-        $formation = Formation::find($validated['formation_id']);
-        $this->visibilityService->makeFormationVisibleForTeam($formation, $team);
+        $formation = (new FormationService())->makeFormationVisibleForTeam(Formation::find($validated['formation_id']), $team);
+        
 
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation enabled successfully!'));
     }
@@ -57,8 +57,7 @@ class ApplicationAdminFormation extends Controller
     {
         $validated = $request->validated();
 
-        $formation = Formation::find($validated['formation_id']);
-        $this->visibilityService->makeFormationInvisibleForTeam($formation, $team);
+        $formation = (new FormationService())->makeFormationInvisibleForTeam(Formation::find($validated['formation_id']), $team);
 
         return redirect()->route('application.admin.formations.list', $team)->with('status', __('Formation disabled successfully!'));
     }

@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class FormationInTeams extends Model
 {
-
+    public $fillable = [
+        'formation_id',
+        'team_id',
+        'visible',
+    ];
  
     public function formation()
     {
