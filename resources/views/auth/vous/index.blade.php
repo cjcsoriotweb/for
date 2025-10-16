@@ -1,26 +1,51 @@
 <x-app-layout>
     <x-slot name="header">
-        <header class="flex items-center justify-between p-6 bg-slate-700 text-white">
-            <h2 class="flex items-center">
-                <span class="material-symbols-outlined text-4xl mr-2">home</span>
-                {{ __('Accueil') }}
-            </h2>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <x-button class="text-white hover:bg-red-600">
-                    <span class="material-symbols-outlined text-xl">logout</span>
-                    Déconnexion
-                </x-button>
-            </form>
+        <header class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+            <!-- Background decoration -->
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+
+            <div class="relative flex items-center justify-between p-8 backdrop-blur-sm">
+                <div class="flex items-center space-x-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
+                        <span class="material-symbols-outlined text-2xl text-white">school</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-white">{{ __('Accueil') }}</h2>
+                        <p class="text-sm text-slate-300">{{ __('Espace de formation') }}</p>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('logout') }}" class="flex items-center space-x-2">
+                    @csrf
+                    <div class="hidden sm:block text-right mr-3">
+                        <p class="text-sm font-medium text-white">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-slate-300">{{ auth()->user()->email }}</p>
+                    </div>
+                    <button type="submit" class="group flex items-center space-x-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-red-500/20 hover:scale-105">
+                        <span class="material-symbols-outlined text-lg transition-transform group-hover:rotate-12">logout</span>
+                        <span class="hidden sm:inline">{{ __('Déconnexion') }}</span>
+                    </button>
+                </form>
+            </div>
         </header>
     </x-slot>
 
-    <main class="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-4xl space-y-12">
-            <div>
-                <h1 class="text-4xl font-bold tracking-tight text-background-dark dark:text-background-light">
-                    {{ __('Bienvenue sur votre espace de formation') }}
+    <main class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+            <!-- Hero Section -->
+            <div class="mb-16 text-center">
+                <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
+                    <span class="material-symbols-outlined text-3xl text-white">auto_awesome</span>
+                </div>
+                <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+                    {{ __('Bienvenue sur votre') }}
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        {{ __('espace de formation') }}
+                    </span>
                 </h1>
+                <p class="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300">
+                    {{ __('Gérez vos formations et rejoignez de nouveaux organismes en toute simplicité') }}
+                </p>
             </div>
             @if ($items->count() > 0)
                 <div>
