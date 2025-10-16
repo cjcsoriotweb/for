@@ -43,6 +43,15 @@ class Formation extends Model
             'money_amount' => 'integer',
         ];
     }
+
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'formation_in_teams')
+            ->withPivot(['visible','approved_at','approved_by'])
+            ->withTimestamps();
+    }
+
     /*
     public function team()
     {
@@ -92,13 +101,12 @@ class Formation extends Model
             ->withTimestamps();
     }
 
+
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(Team::class, 'formation_teams')
+        return $this->belongsToMany(Team::class, 'formation_in_teams')
             ->withTimestamps();
     }
-
-
 
     public function scopeForTeam(Builder $query, int|Team $team): Builder
     {

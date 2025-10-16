@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Application\Admin\Formation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EditVisibleFormationRequest;
 use App\Models\Formation;
+use App\Models\FormationInTeams;
 use App\Models\Team;
+use App\Services\FormationService;
 use App\Services\FormationVisibilityService;
 
 class ApplicationAdminFormation extends Controller
@@ -22,9 +24,19 @@ class ApplicationAdminFormation extends Controller
         return view('application.admin.formations.index', compact('team'));
     }
 
-    public function formationsList(Team $team)
+    public function formationsList(Team $team, FormationService $formations)
     {
-        return view('application.admin.formations.list', compact('team'));
+        $formationsByTeam = $team->formationsByTeam()->get();
+        $formationsAll = $formations->paginateWithTeamFlags(
+            team: $team,
+            perPage: request('per_page', 15),
+            search: request('q'),
+            orderBy: request('order_by', 'title'),
+            direction: request('direction', 'asc'),
+        );
+
+
+        return view('application.admin.formations.list', compact('team', 'formationsByTeam','formationsAll'));
     }
 
     /* Client Request Post */

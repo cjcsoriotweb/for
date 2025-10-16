@@ -8,9 +8,20 @@
     <x-block-div>
         
         <div>
-            <p>Nombre de formations activé : {{ $formations->count() }}</p>
+            <p>Nombre de formations activé : {{ $formationsByTeam->count() }} / {{ $formationsAll->count() }}</p>
         </div>
-
+        @foreach($formationsAll as $formation)
+            <div class="p-8 bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-semibold text-xl mb-2">{{ $formation->title }}</h3>
+                    <div class="flex items-center space-x-2">
+                        <a href="{{ url('application.admin.formations.edit', [$team, $formation]) }}" class="text-blue-500 hover:underline">Editer</a>
+                        <a href="{{ url('application.admin.formations.show', [$team, $formation]) }}" class="text-blue-500 hover:underline">Voir</a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        @endforeach
     </x-block-div>
 
     <x-block-div>

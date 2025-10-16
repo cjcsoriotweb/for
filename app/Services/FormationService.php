@@ -5,34 +5,52 @@ namespace App\Services;
 use App\Models\Formation;
 use App\Models\FormationTeam;
 use App\Models\Team;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class FormationService
 {
 
 
-
-    /*
-    * Récupère toutes les formations
-    */
-    public function getAllFormations()
+    public function listWithTeamFlags(Team $team): Collection
     {
-        return Formation::all();
+        return Formation::query()
+            ->withCount([
+                'teams as is_attached' => fn ($q) => $q->where('teams.id', $team->id),
+                'teams as is_visible'  => fn ($q) => $q
+                    ->where('teams.id', $team->id)
+                    ->where('formation_in_teams.visible', true),
+            ])
+            ->get();
     }
+    public function paginateWithTeamFlags(
+        Team $team,
+        int $perPage = 15,
+        ?string $search = null,
+        ?string $orderBy = 'title',
+        string $direction = 'asc'
+    ): LengthAwarePaginator {
+        $q = Formation::query()
+            ->withCount([
+                'teams as is_attached' => fn ($q) => $q->where('teams.id', $team->id),
+                'teams as is_visible'  => fn ($q) => $q
+                    ->where('teams.id', $team->id)
+                    ->where('formation_in_teams.visible', true),
+            ]);
 
-    /*
-    * Récupère toutes les formations visibles pour un équipe
-    */
+        if ($search) {
+            $q->where(fn($w) =>
+                $w->where('title', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+            );
+        }
 
-    public function getVisibleFormations(Team $team)
-    {
-        return Formation::ForTeam($team->id)->get();
+        if ($orderBy) {
+            $q->orderBy($orderBy, $direction);
+        }
+
+        return $q->paginate($perPage)->withQueryString();
     }
-
-    public function getDisponibleFormations(Team $team)
-    {
-        return Formation::AdminWithTeamLink($team)->get();
-    }
-
     
 
 
