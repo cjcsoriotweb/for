@@ -90,16 +90,4 @@
             </div>
         </div>
     </div>
-
-            <!-- Actions principales -->
-        <div class="">
-            <x-block-navigation :navigation="[
-                ['title' => 'Parcourir les formations', 'description' => 'Découvrez notre catalogue complet de formations', 'route' => 'application.eleve.formations.list', 'icon' => 'library_books', 'color' => 'bg-blue-500'],
-                 ['title' => 'Mes formations', 'description' => 'Continuez vos formations en cours', 'route' => 'application.eleve.formations.list', 'icon' => 'school', 'color' => 'bg-green-500']
-            ]" card="bg-white dark:bg-slate-800" :team="$team" back="0" />
-
-        </div>
-
-
-
 </x-application-layout>
