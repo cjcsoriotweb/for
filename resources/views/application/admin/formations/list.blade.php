@@ -1,7 +1,7 @@
 <x-application-layout :team="$team">
     <x-slot name="header">
         <h2 class="font-semibold text-xl leading-tight text-white">
-            {{ __('Configuration') }}
+            {{ __('Gerer les formations de') . ' ' . $team->name }}
         </h2>
     </x-slot>
 
