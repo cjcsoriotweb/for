@@ -8,9 +8,8 @@
         @endif{{ config('app.name', 'Application') }}
     </title>
     <link rel="icon" href="{{ asset('favicon.ico') }}">
-    @livewireStyles
     <x-header />
-    @stack('head')
+
 </head>
 
 <body>
