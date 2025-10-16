@@ -33,6 +33,8 @@ class FormationService
         return Formation::AdminWithTeamLink($team)->get();
     }
 
+    
+
 
     public function createFormation($title = "Titre par défaut", $description = "Description par défaut", $level = "debutant", $money_amount = 0)
     {
