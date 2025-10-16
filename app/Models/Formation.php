@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\VisibleScope;
 use Database\Factories\FormationFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,7 +23,6 @@ use Illuminate\Support\Facades\DB;
 class Formation extends Model
 {
     use \Illuminate\Database\Eloquent\Factories\HasFactory;
-
     protected static function newFactory()
     {
         return FormationFactory::new();

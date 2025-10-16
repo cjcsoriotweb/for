@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\VisibleScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class FormationTeam extends Model
 {
-    //
+    use VisibleScope;
+
+    
     protected $table = 'formation_teams';
     protected $fillable = [
         'formation_id',

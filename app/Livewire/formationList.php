@@ -39,6 +39,7 @@ class FormationList extends Component
         if ($this->display === 'eleve') {
 
             $this->formations = (new FormationService())->getVisibleFormations($this->team);
+            dd($this->formations);
         } else {
             $this->formations = (new FormationService())->getDisponibleFormations($this->team);
         }
