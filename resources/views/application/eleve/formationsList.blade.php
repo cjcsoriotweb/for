@@ -23,8 +23,9 @@
         </div>
 
         <!-- Liste des formations -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
             @foreach($formationsByTeam as $formation)
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+
             <div class="p-8">
                 <div class="flex items-start space-x-6">
                     <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
@@ -36,18 +37,16 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4 mt-4">
-                    <div class="flex-1">
-                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
-                            <div class="bg-purple-600 h-3 rounded-full transition-all duration-500" style="width: 50%"></div>
-                        </div>
-                    </div>
                     <div>
-                        <a href="#" class="text-purple-600 hover:underline">Continuer</a>
+                        <a href="#" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                            Voir cette formation
+                        </a>
                     </div>
                 </div>
             </div>
-            @endforeach
         </div>
+
+            @endforeach
 
         <!-- Aide et support -->
         <div style="display:none;" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8 border border-blue-200 dark:border-blue-800">
