@@ -2,27 +2,29 @@
 
 use App\Models\Team;
 use App\Models\User;
-use App\Policies\SuperAdminPolicy;
 use App\Policies\TeamPolicy;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         // On peut passer un ARRAY de fichiers pour "web"
         web: [
-            __DIR__ . '/../routes/web.php',
-            __DIR__ . '/../routes/account.php',
-            __DIR__ . '/../routes/application.php',
-            __DIR__ . '/../routes/eleve.php',
-            __DIR__ . '/../routes/administration.php',
-            __DIR__ . '/../routes/superadmin.php',
+            __DIR__.'/../routes/clean/.php',
+            /*
+            __DIR__.'/../routes/web.php',
+            __DIR__.'/../routes/account.php',
+            __DIR__.'/../routes/application.php',
+            __DIR__.'/../routes/eleve.php',
+            __DIR__.'/../routes/administration.php',
+            __DIR__.'/../routes/superadmin.php',
+            */
         ],
-        api: __DIR__ . '/../routes/api.php',
-        commands: __DIR__ . '/../routes/console.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
             // Policies
@@ -31,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Gates
             Gate::define('access-team', function (User $user, $team) {
                 $team = $team instanceof Team ? $team : Team::query()->findOrFail($team);
+
                 return $user->belongsToTeam($team);
             });
 
@@ -41,7 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-       $middleware->appendToGroup('web', \App\Http\Middleware\AuthDebugMiddleware::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\AuthDebugMiddleware::class);
     })
     ->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions) {
         // Policies / Gate::authorize() -> AuthorizationException (403)
@@ -58,6 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => method_exists($e, 'getMessage') ? $e->getMessage() : null,
                 ], 403);
             }
+
             return null;
         });
     })

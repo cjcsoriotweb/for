@@ -67,18 +67,6 @@
                 </a>
             </div>
 
-            {{-- (Optionnel) barre de recherche interne --}}
-            <form action="{{ url('/search') }}" method="GET" class="mt-8">
-                <label class="sr-only" for="q">Rechercher</label>
-                <div class="relative mx-auto max-w-md">
-                    <input id="q" name="q" type="search" placeholder="Rechercher un contenu…"
-                           class="w-full rounded-xl border border-slate-300 bg-white/70 px-4 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-800/70">
-                    <button class="absolute right-1 top-1 rounded-lg bg-slate-900/90 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-900">
-                        Rechercher
-                    </button>
-                </div>
-            </form>
-
             {{-- (Dev) Infos utiles en local --}}
             @if (app()->environment('local'))
                 <p class="mt-6 text-xs text-slate-500">

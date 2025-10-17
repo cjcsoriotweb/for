@@ -1,27 +1,27 @@
 <?php
 
-use App\Models\Formation;
 use App\Models\Team;
+use App\Services\FormationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Services\FormationService;
 
+/*
 
 Route::get('/', function(){
-    
+
     if(Auth::user()){
         return view('welcome.welcome-back-auth');
     } else {
         return view('welcome.hello-guest');
     }
-    
+
 })->name('home');
 
 Route::get('/presentation', function(){
-    
+
     return view('welcome.presentation');
 
-    
+
 })->name('presentation');
 
 Route::view('/policy', 'policy')->name('policy');
@@ -38,3 +38,5 @@ Route::get('/test', function (FormationService $formations) {
         ]),
     ]);
 });
+
+*/
