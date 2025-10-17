@@ -8,10 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class AccountPageController extends Controller
 {
+    public function __construct(
+        private readonly AccountService $accountService,
+    ) {
+    }
+
     public function dashboard()
     {
-        $x = new AccountService;
-        dd($x->listByUser(Auth::user()));
+        dd($this->accountService->teams()->listByUser(Auth::user()));
 
         return view('clean.account.dashboard');
     }

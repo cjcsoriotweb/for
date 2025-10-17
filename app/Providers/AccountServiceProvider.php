@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Clean\Account\AccountService;
-use App\Services\Clean\Account\OrganisationService;
+use App\Services\Clean\Account\TeamService;
 use Illuminate\Support\ServiceProvider;
 
 class AccountServiceProvider extends ServiceProvider
@@ -15,7 +15,7 @@ class AccountServiceProvider extends ServiceProvider
     {
         $this->app->bind(AccountService::class, function ($app) {
             return new AccountService(
-                $app->make(OrganisationService::class),
+                $app->make(TeamService::class),
             );
         });
     }
