@@ -25,18 +25,12 @@ class ApplicationAdminFormation extends Controller
     }
 
     public function formationsList(Team $team, FormationService $formations)
-    {
-        $formationsByTeam = $team->formationsByTeam()->get();
-        $formationsAll = $formations->paginateWithTeamFlags(
-            team: $team,
-            perPage: request('per_page', 15),
-            search: request('q'),
-            orderBy: request('order_by', 'title'),
-            direction: request('direction', 'asc'),
-        );
+    {   
+       
+        $formations = $formations->team()->listWithTeamFlags(Team::find(1));
 
 
-        return view('application.admin.formations.list', compact('team', 'formationsByTeam','formationsAll'));
+        return view('application.admin.formations.list', compact('team', 'formations'));
     }
 
     /* Client Request Post */

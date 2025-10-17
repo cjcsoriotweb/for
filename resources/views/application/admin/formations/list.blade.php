@@ -35,7 +35,7 @@
                         <span class="material-symbols-outlined text-green-600 dark:text-green-400">check_circle</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ $formationsByTeam->count() }}</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ dd($formations->where('is_active','=',1)->count()) }}</div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Formations activées</div>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                         <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">library_books</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ $formationsAll->count() }}</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ $formations->count() }}</div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Total des formations</div>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                         <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">trending_up</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ round(($formationsByTeam->count() / max($formationsAll->count(), 1)) * 100) }}%</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ round(($formations->count() / max($formations->count(), 1)) * 100) }}%</div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Taux d'activation</div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
 
         <!-- Formations Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            @foreach ($formationsAll as $formation)
+            @foreach ($formations as $formation)
                 <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 hover:shadow-md transition-shadow">
                     <!-- Status Badge -->
                     <div class="flex items-center justify-between mb-4">
@@ -134,7 +134,7 @@
         </div>
 
         <!-- Empty State -->
-        @if($formationsAll->isEmpty())
+        @if($formations->isEmpty())
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-12 text-center">
                 <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span class="material-symbols-outlined text-2xl text-slate-400">library_books</span>

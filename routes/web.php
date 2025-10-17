@@ -27,7 +27,7 @@ Route::get('/presentation', function(){
 Route::view('/policy', 'policy')->name('policy');
 
 Route::get('/test', function (FormationService $formations) {
-    $x = $formations->team()->makeFormationVisibleForTeam(Formation::find(1),Team::find(1));
+    $x = $formations->team()->listWithTeamFlags(Team::find(1));
     dd($x);
     return response()->json([
         'all_formations' => $formations->admin()->list()->map->only([
