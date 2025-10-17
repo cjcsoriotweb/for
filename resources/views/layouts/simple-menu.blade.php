@@ -78,10 +78,9 @@
                         </svg>
                     </div>
                     <h2
-                        class="text-3xl font-bold text-gray-900 dark:text-white mb-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                        {{__('Bienvenue sur votre application de formation')}}</h2>
-                    <p class="text-gray-600 dark:text-gray-400 text-base leading-relaxed">Comment souhaitez-vous
-                        utiliser notre plateforme ?</p>
+                        class="text-3xl font-bold text-gray-900 dark:text-white mb-3 bg-none dark:from-none dark:to-none">
+                        {{ $title}}</h2>
+                    <p class="text-gray-900 dark:text-gray-200 text-base leading-relaxed">{{ $description}}</p>
                 </div>
 
                 <!-- Options -->

@@ -5,6 +5,7 @@ use App\Http\Controllers\AccountRouting;
 
 Route::prefix('vous')
     ->name('vous.')
+    ->middleware('auth')
     ->group(function () {
         Route::get('/', [AccountRouting::class, 'index'])->name('index');
 
