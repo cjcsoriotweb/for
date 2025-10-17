@@ -2,7 +2,7 @@
 
 namespace App\Services\Clean\Account;
 
-class AccountService extends BaseAccountService
+class AccountService 
 {
     public function __construct(
         private readonly TeamService $teamService,
