@@ -92,7 +92,7 @@ class FormationWorkflowTest extends TestCase
         ]));
 
         $showResponse->assertStatus(200);
-        $showResponse->assertViewIs('application.eleve.formationShow');
+        $showResponse->assertViewIs('application.eleve.formations.show');
 
         // Étape 5: Apprenant peut continuer sa formation
         $continueResponse = $this->get(route('application.eleve.formations.continue', [
@@ -101,7 +101,7 @@ class FormationWorkflowTest extends TestCase
         ]));
 
         $continueResponse->assertStatus(200);
-        $continueResponse->assertViewIs('application.eleve.formationContinue');
+        $continueResponse->assertViewIs('application.eleve.formations.continue');
     }
 
     public function test_unauthorized_user_cannot_access_formation_workflow()

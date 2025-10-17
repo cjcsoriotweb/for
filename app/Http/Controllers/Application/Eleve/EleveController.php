@@ -33,24 +33,24 @@ class EleveController extends Controller
 
     public function index(Team $team)
     {
-        return view('application.eleve.eleveHomePage', compact('team'));
+        return view('application.eleve.dashboard', compact('team'));
     }
 
     public function formationIndex(Team $team)
     {
         $formationsByTeam = $team->formationsByTeam()->get();
 
-        return view('application.eleve.formationsList', compact('team', 'formationsByTeam'));
+        return view('application.eleve.formations.index', compact('team', 'formationsByTeam'));
     }
 
     public function formationPreview(Team $team, Formation $formation)
     {
-        return view('application.eleve.formationPreview', compact('team', 'formation'));
+        return view('application.eleve.formations.preview', compact('team', 'formation'));
     }
 
     public function formationContinue(Team $team, Formation $formation)
     {
-        return view('application.eleve.formationContinue', compact('team', 'formation'));
+        return view('application.eleve.formations.continue', compact('team', 'formation'));
     }
 
     public function formationShow(Team $team, Formation $formation)
@@ -60,7 +60,7 @@ class EleveController extends Controller
             abort(403, 'Formation non accessible.');
         }
 
-        return view('application.eleve.formationShow', compact('team', 'formation'));
+        return view('application.eleve.formations.show', compact('team', 'formation'));
     }
 
     public function formationEnable(EnableFormationRequest $request, Team $team, Formation $formation)
@@ -127,7 +127,7 @@ class EleveController extends Controller
         $videoContent = $lesson->videoContent; // Relation à définir
         $textContent = $lesson->textContent;   // Relation à définir
 
-        return view('application.eleve.formationLesson', compact('team', 'formation', 'chapter', 'lesson', 'videoContent', 'textContent'));
+        return view('application.eleve.formations.lesson', compact('team', 'formation', 'chapter', 'lesson', 'videoContent', 'textContent'));
     }
 
     public function formationLessonComplete(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
@@ -181,7 +181,7 @@ class EleveController extends Controller
 
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
-        return view('application.eleve.formationQuiz', compact('team', 'formation', 'chapter', 'lesson', 'quiz', 'questions'));
+        return view('application.eleve.formations.quiz', compact('team', 'formation', 'chapter', 'lesson', 'quiz', 'questions'));
     }
 
     public function formationQuizSubmit(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, Quiz $quiz, Request $request)

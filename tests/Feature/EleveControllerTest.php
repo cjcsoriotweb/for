@@ -51,7 +51,7 @@ class EleveControllerTest extends TestCase
         ]));
 
         $response->assertStatus(200);
-        $response->assertViewIs('application.eleve.formationShow');
+        $response->assertViewIs('application.eleve.formations.show');
         $response->assertViewHasAll(['team', 'formation']);
     }
 
@@ -164,7 +164,7 @@ class EleveControllerTest extends TestCase
         ]));
 
         $response->assertStatus(200);
-        $response->assertViewIs('application.eleve.formationPreview');
+        $response->assertViewIs('application.eleve.formations.preview');
         $response->assertViewHasAll(['team', 'formation']);
     }
 
@@ -178,7 +178,7 @@ class EleveControllerTest extends TestCase
         ]));
 
         $response->assertStatus(200);
-        $response->assertViewIs('application.eleve.formationContinue');
+        $response->assertViewIs('application.eleve.formations.continue');
         $response->assertViewHasAll(['team', 'formation']);
     }
 
@@ -191,7 +191,7 @@ class EleveControllerTest extends TestCase
         ]));
 
         $response->assertStatus(200);
-        $response->assertViewIs('application.eleve.formationsList');
+        $response->assertViewIs('application.eleve.formations.index');
         $response->assertViewHas('team');
     }
 
@@ -204,7 +204,7 @@ class EleveControllerTest extends TestCase
         ]));
 
         $response->assertStatus(200);
-        $response->assertViewIs('application.eleve.index');
+        $response->assertViewIs('application.eleve.dashboard');
         $response->assertViewHas('team');
     }
 }
