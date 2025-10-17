@@ -33,7 +33,7 @@ class EleveController extends Controller
 
     public function index(Team $team)
     {
-        return view('application.eleve.index', compact('team'));
+        return view('application.eleve.eleveHomePage', compact('team'));
     }
 
     public function formationIndex(Team $team)

@@ -12,21 +12,6 @@
     </x-slot>
 
     <div class="py-8 space-y-8">
-        <!-- Hero section -->
-        <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-2xl p-8 text-white">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <h1 class="text-3xl font-bold mb-2">Bienvenue sur votre espace d'apprentissage</h1>
-                    <p class="text-blue-100 text-lg mb-6">Découvrez et suivez des formations adaptées à vos besoins professionnels.</p>
-                </div>
-                <div class="hidden lg:block">
-                    <div class="w-32 h-32 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-6xl text-white text-opacity-80">rocket_launch</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Stats rapide -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
@@ -75,7 +60,7 @@
                     <span class="material-symbols-outlined text-3xl text-emerald-600 dark:text-emerald-400">celebration</span>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">Prêt à apprendre ?</h3>
+                    <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">{{ __('Formation disponible pour vous') }}</h3>
                     <p class="text-emerald-700 dark:text-emerald-300">
                         Choisissez une formation et commencez votre parcours d'apprentissage. Chaque étape vous rapproche de vos objectifs professionnels.
                     </p>
@@ -84,7 +69,7 @@
                     <a href="{{ route('application.eleve.formations.list', $team) }}"
                         class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-sm transition-colors">
                         <span class="material-symbols-outlined mr-2">arrow_forward</span>
-                        Commencer
+                        {{ __('Chercher') }}
                     </a>
                 </div>
             </div>
