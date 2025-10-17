@@ -12,7 +12,7 @@
 
 declare(strict_types=1);
 
-class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
+class Container_ae4188078c extends _PHPStan_6597ef616\Nette\DI\Container
 {
 	protected $tags = [
 		'phpstan.broker.dynamicMethodReturnTypeExtension' => [
@@ -4929,7 +4929,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_2fc6acd8c5 $container)
+			public function __construct(Container_ae4188078c $container)
 			{
 				$this->container = $container;
 			}
@@ -4949,7 +4949,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_2fc6acd8c5 $container)
+			public function __construct(Container_ae4188078c $container)
 			{
 				$this->container = $container;
 			}
@@ -4972,7 +4972,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_2fc6acd8c5 $container)
+			public function __construct(Container_ae4188078c $container)
 			{
 				$this->container = $container;
 			}
@@ -4992,7 +4992,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_2fc6acd8c5 $container)
+			public function __construct(Container_ae4188078c $container)
 			{
 				$this->container = $container;
 			}
@@ -5057,7 +5057,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_2fc6acd8c5 $container)
+			public function __construct(Container_ae4188078c $container)
 			{
 				$this->container = $container;
 			}
@@ -5115,7 +5115,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_2fc6acd8c5 $container)
+			public function __construct(Container_ae4188078c $container)
 			{
 				$this->container = $container;
 			}
@@ -8411,7 +8411,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 	}
 
 
-	public function createServiceContainer(): Container_2fc6acd8c5
+	public function createServiceContainer(): Container_ae4188078c
 	{
 		return $this;
 	}
@@ -9067,23 +9067,6 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 				'ALLUSERSPROFILE' => 'C:\ProgramData',
 				'AMDRMPATH' => 'C:\Program Files\AMD\RyzenMaster\\',
 				'APPDATA' => 'C:\Users\cjcso\AppData\Roaming',
-				'APP_DEBUG' => 'true',
-				'APP_ENV' => 'local',
-				'APP_FAKER_LOCALE' => 'en_US',
-				'APP_FALLBACK_LOCALE' => 'en',
-				'APP_KEY' => 'base64:TzWeoeMzwKILSNtZFLMEbwR2qWYI7bSLAN6aQwCgG28=',
-				'APP_LOCALE' => 'en',
-				'APP_MAINTENANCE_DRIVER' => 'file',
-				'APP_NAME' => 'FormAcademy',
-				'APP_URL' => 'http://for.test',
-				'AWS_ACCESS_KEY_ID' => '',
-				'AWS_BUCKET' => '',
-				'AWS_DEFAULT_REGION' => 'us-east-1',
-				'AWS_SECRET_ACCESS_KEY' => '',
-				'AWS_USE_PATH_STYLE_ENDPOINT' => 'false',
-				'BCRYPT_ROUNDS' => '12',
-				'BROADCAST_CONNECTION' => 'log',
-				'CACHE_STORE' => 'database',
 				'CHROME_CRASHPAD_PIPE_NAME' => '\\\.\pipe\crashpad_29712_FXGCKNTNSJRPATAK',
 				'COLORTERM' => 'truecolor',
 				'COLUMNS' => '128',
@@ -9095,17 +9078,10 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 				'ChocolateyLastPathUpdate' => '134044300700027063',
 				'CommonProgramFiles(x86)' => 'C:\Program Files (x86)\Common Files',
 				'CommonProgramW6432' => 'C:\Program Files\Common Files',
-				'DB_CONNECTION' => 'mysql',
-				'DB_DATABASE' => 'for',
-				'DB_HOST' => '127.0.0.1',
-				'DB_PASSWORD' => '',
-				'DB_PORT' => '3306',
-				'DB_USERNAME' => 'root',
 				'DISPLAY' => 'needs-to-be-defined',
 				'DriverData' => 'C:\Windows\System32\Drivers\DriverData',
 				'EFC_4368_1592913036' => '1',
 				'EXEPATH' => 'C:\Program Files\Git\bin',
-				'FILESYSTEM_DISK' => 'local',
 				'GIT_ASKPASS' => 'c:\Users\cjcso\AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\git\dist\askpass.sh',
 				'HOME' => 'C:\Users\cjcso',
 				'HOMEDRIVE' => 'C:',
@@ -9113,23 +9089,10 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 				'HOSTNAME' => 'pc1',
 				'INFOPATH' => 'C:\Program Files\Git\mingw64\local\info;C:\Program Files\Git\mingw64\share\info;C:\Program Files\Git\usr\local\info;C:\Program Files\Git\usr\share\info;C:\Program Files\Git\usr\info;C:\Program Files\Git\share\info',
 				'LANG' => 'en_US.UTF-8',
-				'LINES' => '14',
+				'LINES' => '42',
 				'LOCALAPPDATA' => 'C:\Users\cjcso\AppData\Local',
 				'LOGONSERVER' => '\\\PC1',
-				'LOG_CHANNEL' => 'stack',
-				'LOG_DEPRECATIONS_CHANNEL' => 'null',
-				'LOG_LEVEL' => 'debug',
-				'LOG_STACK' => 'single',
-				'MAIL_ENCRYPTION' => 'null',
-				'MAIL_FROM_ADDRESS' => 'no-reply@exemple.test',
-				'MAIL_FROM_NAME' => 'FormAcademy',
-				'MAIL_HOST' => '127.0.0.1',
-				'MAIL_MAILER' => 'smtp',
-				'MAIL_PASSWORD' => 'null',
-				'MAIL_PORT' => '1025',
-				'MAIL_USERNAME' => 'null',
 				'MANPATH' => 'C:\Program Files\Git\mingw64\local\man;C:\Program Files\Git\mingw64\share\man;C:\Program Files\Git\usr\local\man;C:\Program Files\Git\usr\share\man;C:\Program Files\Git\usr\man;C:\Program Files\Git\share\man',
-				'MEMCACHED_HOST' => '127.0.0.1',
 				'MINGW_CHOST' => 'x86_64-w64-mingw32',
 				'MINGW_PACKAGE_PREFIX' => 'mingw-w64-x86_64',
 				'MINGW_PREFIX' => 'C:/Program Files/Git/mingw64',
@@ -9147,7 +9110,6 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 				'OneDrive' => 'C:\Users\cjcso\OneDrive',
 				'PATH' => 'C:\Users\cjcso\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\cjcso\bin;C:\Python313\Scripts;C:\Python313;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Git\cmd;C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64;C:\ProgramData\ComposerSetup\bin;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\nodejs;C:\ProgramData\chocolatey\bin;C:\Program Files\cursor\resources\app\bin;C:\Users\cjcso\AppData\Local\Microsoft\WindowsApps;C:\Users\cjcso\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\cjcso\AppData\Roaming\Composer\vendor\bin;C:\Users\cjcso\AppData\Local\GitHubDesktop\bin;C:\Users\cjcso\AppData\Roaming\npm;C:\Users\cjcso\AppData\Local\Programs\Ollama;C:\Users\cjcso\AppData\Local\Programs\Windsurf\bin;C:\Users\cjcso\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\debugCommand;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl',
 				'PATHEXT' => '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.PY;.PYW',
-				'PHP_CLI_SERVER_WORKERS' => '4',
 				'PKG_CONFIG_PATH' => 'C:\Program Files\Git\mingw64\lib\pkgconfig;C:\Program Files\Git\mingw64\share\pkgconfig',
 				'PKG_CONFIG_SYSTEM_INCLUDE_PATH' => 'C:/Program Files/Git/mingw64/include',
 				'PKG_CONFIG_SYSTEM_LIBRARY_PATH' => 'C:/Program Files/Git/mingw64/lib',
@@ -9164,17 +9126,7 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 				'ProgramData' => 'C:\ProgramData',
 				'ProgramFiles(x86)' => 'C:\Program Files (x86)',
 				'ProgramW6432' => 'C:\Program Files',
-				'QUEUE_CONNECTION' => 'database',
-				'REDIS_CLIENT' => 'phpredis',
-				'REDIS_HOST' => '127.0.0.1',
-				'REDIS_PASSWORD' => 'null',
-				'REDIS_PORT' => '6379',
 				'SESSIONNAME' => 'Console',
-				'SESSION_DOMAIN' => 'null',
-				'SESSION_DRIVER' => 'database',
-				'SESSION_ENCRYPT' => 'false',
-				'SESSION_LIFETIME' => '120',
-				'SESSION_PATH' => '/',
 				'SHELL' => 'C:\Program Files\Git\usr\bin\bash.exe',
 				'SHELL_VERBOSITY' => '0',
 				'SHLVL' => '1',
@@ -9191,7 +9143,6 @@ class Container_2fc6acd8c5 extends _PHPStan_6597ef616\Nette\DI\Container
 				'USERDOMAIN_ROAMINGPROFILE' => 'PC1',
 				'USERNAME' => 'cjcso',
 				'USERPROFILE' => 'C:\Users\cjcso',
-				'VITE_APP_NAME' => 'FormAcademy',
 				'VSCODE_GIT_ASKPASS_EXTRA_ARGS' => '',
 				'VSCODE_GIT_ASKPASS_MAIN' => 'c:\Users\cjcso\AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\git\dist\askpass-main.js',
 				'VSCODE_GIT_ASKPASS_NODE' => 'C:\Users\cjcso\AppData\Local\Programs\Microsoft VS Code\Code.exe',
