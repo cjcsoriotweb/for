@@ -35,7 +35,7 @@
                         <span class="material-symbols-outlined text-green-600 dark:text-green-400">check_circle</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ count($formations->admin()->listActiveForTeam($team)) }}</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ $activeFormationsCount }}</div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Formations activées</div>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                         <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">library_books</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ $formations->count() }}</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ $totalFormationsCount }}</div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Total des formations</div>
                     </div>
                 </div>
@@ -59,7 +59,9 @@
                         <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">trending_up</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ round(($formations->count() / max($formations->count(), 1)) * 100) }}%</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">
+                            {{ $totalFormationsCount > 0 ? round(($activeFormationsCount / $totalFormationsCount) * 100) : 0 }}%
+                        </div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Taux d'activation</div>
                     </div>
                 </div>

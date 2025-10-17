@@ -25,12 +25,20 @@ class ApplicationAdminFormation extends Controller
     }
 
     public function formationsList(Team $team, FormationService $formations)
-    {   
-       
-        $formations = $formations->admin()->listFormations();
+    {
+        $adminService = $formations->admin();
 
+        $catalog = $adminService->listWithTeamFlags($team);
 
-        return view('application.admin.formations.list', compact('team', 'formations'));
+        $activeCount = $catalog->where('is_visible', '>', 0)->count();
+        $totalCount = $catalog->count();
+
+        return view('application.admin.formations.list', [
+            'team' => $team,
+            'formations' => $catalog,
+            'activeFormationsCount' => $activeCount,
+            'totalFormationsCount' => $totalCount,
+        ]);
     }
 
     /* Client Request Post */

@@ -43,13 +43,7 @@ class AdminFormationService extends BaseFormationService
     {
         return $this->list($options + [
             'team' => $team,
-            'visible' => true,
-        ]);
-    }
-    public function listFormations(array $options = []): Collection
-    {
-        return $this->list($options + [
-            'visible' => true,
+            'only_visible' => true,
         ]);
     }
 
