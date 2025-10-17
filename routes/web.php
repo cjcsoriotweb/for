@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function(){
     
     if(Auth::user()){
-        return view('welcome.indexAuth');
+        return view('welcome.welcome-back-auth');
     } else {
-        return view('welcome.index');
+        return view('welcome.hello-guest');
     }
     
 })->name('home');
