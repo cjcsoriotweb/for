@@ -47,7 +47,7 @@
                         <span class="material-symbols-outlined text-green-600 dark:text-green-400">school</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">0</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{count($formationsByTeam)}}/{{count($formationsAll)}}</div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Formations disponibles</div>
                     </div>
                 </div>
