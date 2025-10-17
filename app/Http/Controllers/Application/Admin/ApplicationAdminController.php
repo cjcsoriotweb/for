@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Application\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
 use App\Services\FormationService;
+use App\Services\TeamService;
 
 class ApplicationAdminController extends Controller
 {
@@ -20,8 +21,9 @@ class ApplicationAdminController extends Controller
                 orderBy: request('order_by', 'title'),
                 direction: request('direction', 'asc'),
             );
+        $usersInTeam = (new TeamService())->getUsersInTeam($team);
 
-        return view('application.admin.index', ['team' => $team, 'formationsByTeam' => $formationsByTeam, 'formationsAll' => $formationsAll]);
+        return view('application.admin.index', compact('team', 'formationsByTeam', 'formationsAll', 'usersInTeam'));
     }
 
 

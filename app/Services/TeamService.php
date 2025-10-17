@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Team;
 use App\Models\TeamInvitation;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,6 +19,9 @@ class TeamService
         $invitation->delete();
 
         $invitation->team->users()->attach(Auth::user()->id, ['role' => $invitation->role]);
+    }
+    public function getUsersInTeam(Team $team){
+        return $team->users()->get();
     }
     public function getUsersTeam(){
         return Auth::user()->allTeams();
