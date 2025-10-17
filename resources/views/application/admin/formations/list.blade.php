@@ -35,7 +35,7 @@
                         <span class="material-symbols-outlined text-green-600 dark:text-green-400">check_circle</span>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ dd($formations->where('is_active','=',1)->count()) }}</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ count($formations->admin()->listActiveForTeam($team)) }}</div>
                         <div class="text-sm text-slate-600 dark:text-slate-400">Formations activées</div>
                     </div>
                 </div>

@@ -27,7 +27,7 @@ class ApplicationAdminFormation extends Controller
     public function formationsList(Team $team, FormationService $formations)
     {   
        
-        $formations = $formations->team()->listWithTeamFlags(Team::find(1));
+        $formations = $formations->admin()->listFormations();
 
 
         return view('application.admin.formations.list', compact('team', 'formations'));

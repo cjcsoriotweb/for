@@ -32,9 +32,25 @@ class AdminFormationService extends BaseFormationService
         ])->delete();
     }
 
+
+
     public function listWithTeamFlags(Team $team, array $options = []): Collection
     {
         return $this->list($options + ['team' => $team]);
+    }
+
+    public function listActiveForTeam(Team $team, array $options = []): Collection
+    {
+        return $this->list($options + [
+            'team' => $team,
+            'visible' => true,
+        ]);
+    }
+    public function listFormations(array $options = []): Collection
+    {
+        return $this->list($options + [
+            'visible' => true,
+        ]);
     }
 
     public function paginateWithTeamFlags(
@@ -61,17 +77,27 @@ class AdminFormationService extends BaseFormationService
     protected function decorateQuery(Builder $query, array $options): Builder
     {
         $team = $options['team'] ?? null;
+        $onlyVisible = (bool) ($options['only_visible'] ?? false);
 
         if (!$team instanceof Team) {
             return $query;
         }
 
-        return $query->withCount([
+        $query->withCount([
             'teams as is_attached' => fn ($subQuery) => $subQuery->where('teams.id', $team->id),
             'teams as is_visible' => fn ($subQuery) => $subQuery
                 ->where('teams.id', $team->id)
                 ->where('formation_in_teams.visible', true),
         ]);
+
+        if ($onlyVisible) {
+            $query->whereHas('teams', function ($subQuery) use ($team): void {
+                $subQuery
+                    ->where('teams.id', $team->id)
+                    ->wherePivot('visible', true);
+            });
+        }
+
+        return $query;
     }
 }
-
