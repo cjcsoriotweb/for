@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\account\team;
 
+use App\Models\Team;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +14,12 @@ class SwitchTeamRequest extends FormRequest
     public function authorize(): bool
     {
 
-        return true;
+        $team = Team::findOrFail(request()->get('team_id'));
+
+        if (Auth::user()->belongsToTeam($team)) {
+            return true;
+        }
+        return false;
   
     }
 
