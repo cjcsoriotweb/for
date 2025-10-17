@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // On peut passer un ARRAY de fichiers pour "web"
         web: [
             __DIR__.'/../routes/clean/GuestRoute.php',
+            __DIR__.'/../routes/clean/UserRoute.php',
             /*
             __DIR__.'/../routes/web.php',
             __DIR__.'/../routes/account.php',

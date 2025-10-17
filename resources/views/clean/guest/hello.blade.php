@@ -2,7 +2,7 @@
     <x-slot name="title">{{__('Bienvenue sur votre application de formation')}}</x-slot>
     <x-slot name="description">{{__('Vous êtes déjà inscrit ?')}}</x-slot>
     <!-- Fond stylé avec éléments décoratifs modernes -->
-    <a href="{{ route('vous.index') }}"
+    <a href="{{ route('user.dashboard') }}"
         class="group w-full flex items-center p-5 border border-gray-200/60 dark:border-gray-600/60 rounded-2xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-300 dark:hover:border-blue-600 hover:-translate-y-0.5">
         <div class="flex-shrink-0 mr-4">
             <div
