@@ -97,9 +97,9 @@
                         <div class="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
                             <div class="text-sm text-slate-500 dark:text-slate-400">
                                 @if ($formation->is_attached)
-                                    Disponible pour l'équipe
+                                    {{ __('Disponible pour les élèves')}}
                                 @else
-                                    Non disponible
+                                    {{ __('Non disponible')}}
                                 @endif
                             </div>
 
@@ -109,19 +109,20 @@
                                         @csrf
                                         @method('POST')
                                         <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg text-sm transition-colors">
-                                            <span class="material-symbols-outlined mr-2 text-sm">block</span>
-                                            Désactiver
+                           
+
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 text-gray font-medium rounded-lg text-sm transition-colors">
+                                            {{ __('Desactiver cette formation') }}
                                         </button>
                                     </form>
                                 @else
-                                    <form action="{{ route('application.admin.formations.enable', [$team, $formation]) }}" method="POST" class="inline">
+                                    <form action="{{ route('application.admin.formations.enable', [$team, $formation]) }}" method="POST" class="inline relative opacity-50 hover:opacity-100">
                                         @csrf
                                         @method('POST')
                                         <input type="hidden" name="formation_id" value="{{ $formation->id }}">
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm transition-colors">
-                                            <span class="material-symbols-outlined mr-2 text-sm">check_circle</span>
-                                            Activer
+                         
+                                        <button type="submit" class="inline-flex items-center px-3 py-2 bg-green-600 rounded-lg text-white text-xs font-medium transition-opacity">
+                                            <span class="material-symbols-outlined mr-1 text-sm">check</span> Activer
                                         </button>
                                     </form>
                                 @endif
