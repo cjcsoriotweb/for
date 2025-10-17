@@ -13,7 +13,7 @@ class SwitchTeamRequest extends FormRequest
     public function authorize(): bool
     {
 
-        return Auth::user()->hasTeamRole($this->route('team'), 'admin');
+        return true;
   
     }
 
@@ -23,7 +23,7 @@ class SwitchTeamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'formation_id' => ['required', 'integer', 'exists:formations,id'],
+            'team_id' => ['required'],
         ];
     }
 

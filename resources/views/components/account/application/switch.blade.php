@@ -1,7 +1,18 @@
 <form method="POST" action="{{ route('user.switch', $application) }}">
-    @csrf
+    @csrf @csrf @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <button
         type="submit"
+        name="team_id"
+        value="{{ $application->id }}"
         class="group/btn w-full relative overflow-hidden rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition-all duration-500 hover:shadow-xl hover:ring-2 hover:ring-blue-500/20 hover:scale-[1.02] dark:bg-slate-800/50 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:ring-blue-400/30"
     >
         <!-- Animated background gradient on hover -->

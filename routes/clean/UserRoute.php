@@ -9,5 +9,5 @@ Route::prefix('mon-compte')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [AccountPageController::class, 'dashboard'])->name('dashboard');
-        Route::post('/switch', [AccountPageController::class, 'switch'])->name('switch');
+        Route::post('/switch/team/{team:id}', [AccountPageController::class, 'switch'])->name('switch');
     });
