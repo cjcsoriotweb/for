@@ -13,7 +13,11 @@ class ApplicationController extends Controller
     public function index(Team $team)
     {
         if(Auth::user()->hasTeamRole($team, 'eleve')) {
-            return view('application.loadingPage', ['team'=>$team,'redirectUrl'=>route('application.eleve.index', $team)]);
+            return view('application.loading.loadingTemplate', [
+                'team'=>$team,
+                'redirectUrl'=>route('application.eleve.index', $team),
+                'icon'=>'👨‍🎓'
+            ]);
         }
         return view('application.index', compact('team'));
     }

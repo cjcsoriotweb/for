@@ -20,7 +20,7 @@
 
                     <!-- Icône élève stylisée -->
                     <div class="text-6xl mb-4 animate-bounce">
-                        👨‍🎓
+                        {{ $icon }}
                     </div>
                 </div>
 
@@ -31,7 +31,7 @@
                     </h3>
 
                     <p class="text-lg text-gray-600 dark:text-gray-300">
-                        Vous êtes identifié comme <span class="font-semibold text-blue-600 dark:text-blue-400">élève</span>
+                        Vous êtes identifié comme <span class="font-semibold text-blue-600 dark:text-blue-400">{{ Auth::user()->teamRole($team)->name }}</span>
                     </p>
 
                     <div class="flex items-center justify-center space-x-2 text-gray-500 dark:text-gray-400">
@@ -40,7 +40,7 @@
                             <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse animation-delay-150"></div>
                             <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse animation-delay-300"></div>
                         </div>
-                        <span class="text-sm">Redirection vers votre espace élève</span>
+                        <span class="text-sm">Redirection vers votre espace {{ Auth::user()->teamRole($team)->name }}</span>
                     </div>
                 </div>
 
