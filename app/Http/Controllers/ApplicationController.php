@@ -12,14 +12,34 @@ class ApplicationController extends Controller
 {
     public function index(Team $team)
     {
-        if(Auth::user()->hasTeamRole($team, 'eleve')) {
-            return view('application.loading.loadingTemplate', [
-                'team'=>$team,
-                'redirectUrl'=>route('application.eleve.index', $team),
-                'icon'=>'👨‍🎓'
-            ]);
+        $role = Auth::user()->teamRole($team)->key;
+        switch ($role) {
+            case 'eleve':
+                return view('application.loading.loadingTemplate', [
+                    'team'=>$team,
+                    'redirectUrl'=>route('application.eleve.index', $team),
+                    'icon'=>'👨‍🎓'
+                ]);
+                break;
+            case 'manager':
+                return view('application.loading.loadingTemplate', [
+                    'team'=>$team,
+                    'redirectUrl'=>route('application.manager.index', $team),
+                    'icon'=>'👨‍🏫'
+                ]);
+                break;
+            case 'admin':
+                return view('application.loading.loadingTemplate', [
+                    'team'=>$team,
+                    'redirectUrl'=>route('application.admin.index', $team),
+                    'icon'=>'👨‍💻'
+                ]);
+                break;
+            default:
+                return view('application.index', compact('team'));
+                break;
         }
-        return view('application.index', compact('team'));
+        return abort(403, 'Aucun rôle trouvé');
     }
     
 
