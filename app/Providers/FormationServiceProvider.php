@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\Formation\AdminFormationService;
+use App\Services\Formation\StudentFormationService;
+use App\Services\Formation\SuperAdminFormationService;
 use App\Services\FormationService;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,7 +16,11 @@ class FormationServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(FormationService::class, function ($app) {
-            return new FormationService();
+            return new FormationService(
+                $app->make(SuperAdminFormationService::class),
+                $app->make(AdminFormationService::class),
+                $app->make(StudentFormationService::class),
+            );
         });
     }
 

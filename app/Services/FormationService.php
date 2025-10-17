@@ -3,69 +3,82 @@
 namespace App\Services;
 
 use App\Models\Formation;
-use App\Models\FormationInTeams;
-use App\Models\FormationTeam;
 use App\Models\Team;
+use App\Services\Formation\AdminFormationService;
+use App\Services\Formation\StudentFormationService;
+use App\Services\Formation\SuperAdminFormationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class FormationService
 {
+    public function __construct(
+        private readonly SuperAdminFormationService $superAdminService,
+        private readonly AdminFormationService $adminService,
+        private readonly StudentFormationService $studentService
+    ) {
+    }
+
+    public function superAdmin(): SuperAdminFormationService
+    {
+        return $this->superAdminService;
+    }
+
+    public function admin(): AdminFormationService
+    {
+        return $this->adminService;
+    }
+
+    /**
+     * Alias utile pour conserver la compatibilite du code existant.
+     */
+    public function team(): AdminFormationService
+    {
+        return $this->adminService;
+    }
+
+    public function student(): StudentFormationService
+    {
+        return $this->studentService;
+    }
+
     public function makeFormationVisibleForTeam(Formation $formation, Team $team)
     {
-        return FormationInTeams::updateOrCreate(
-            [
-                'formation_id' => $formation->id,
-                'team_id' => $team->id,
-            ],
-            [
-                'visible' => true,
-            ],
-        );
+        return $this->adminService->makeFormationVisibleForTeam($formation, $team);
     }
 
-        
     public function makeFormationInvisibleForTeam(Formation $formation, Team $team)
     {
-        return FormationInTeams::where([
-            'formation_id' => $formation->id,
-            'team_id' => $team->id,
-        ])->delete();
+        return $this->adminService->makeFormationInvisibleForTeam($formation, $team);
     }
+
     public function listWithTeamFlags(Team $team): Collection
     {
-        return Formation::query()
-            ->withCount([
-                'teams as is_attached' => fn($q) => $q->where('teams.id', $team->id),
-                'teams as is_visible' => fn($q) => $q->where('teams.id', $team->id)->where('formation_in_teams.visible', true),
-            ])
-            ->get();
-    }
-    public function paginateWithTeamFlags(Team $team, int $perPage = 15, ?string $search = null, ?string $orderBy = 'title', string $direction = 'asc'): LengthAwarePaginator
-    {
-        $q = Formation::query()->withCount([
-            'teams as is_attached' => fn($q) => $q->where('teams.id', $team->id),
-            'teams as is_visible' => fn($q) => $q->where('teams.id', $team->id)->where('formation_in_teams.visible', true),
-        ]);
-
-        if ($search) {
-            $q->where(fn($w) => $w->where('title', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%"));
-        }
-
-        if ($orderBy) {
-            $q->orderBy($orderBy, $direction);
-        }
-
-        return $q->paginate($perPage)->withQueryString();
+        return $this->adminService->listWithTeamFlags($team);
     }
 
-    public function createFormation($title = 'Titre par défaut', $description = 'Description par défaut', $level = 'debutant', $money_amount = 0)
-    {
-        return Formation::create([
+    public function paginateWithTeamFlags(
+        Team $team,
+        int $perPage = 15,
+        ?string $search = null,
+        ?string $orderBy = 'title',
+        string $direction = 'asc'
+    ): LengthAwarePaginator {
+        return $this->adminService->paginateWithTeamFlags($team, $perPage, $search, $orderBy, $direction);
+    }
+
+    public function createFormation(
+        $title = 'Titre par defaut',
+        $description = 'Description par defaut',
+        $level = 'debutant',
+        $moneyAmount = 0
+    ) {
+        return $this->superAdminService->createFormation([
             'title' => $title,
             'description' => $description,
             'level' => $level,
-            'money_amount' => $money_amount,
+            'money_amount' => $moneyAmount,
         ]);
     }
 }
+
