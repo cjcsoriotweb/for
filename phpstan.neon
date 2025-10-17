@@ -1,0 +1,14 @@
+parameters:
+  level: 7
+  paths:
+    - app
+    - routes
+    - database
+    - tests
+
+  # Qualité / perf
+  inferPrivatePropertyTypeFromConstructor: true
+  treatPhpDocTypesAsCertain: false
+  reportUnmatchedIgnoredErrors: true
+  tipsOfTheDay: false
+  tmpDir: storage/phpstan
