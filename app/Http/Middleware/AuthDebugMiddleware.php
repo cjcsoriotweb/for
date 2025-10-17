@@ -12,9 +12,7 @@ class AuthDebugMiddleware
     public function handle($request, Closure $next)
     {   
 
-        if (! config('app.debug')) {
-            return $next($request);
-        }
+
 
         $collector = app(AuthDebug::class);
 
