@@ -15,7 +15,11 @@
                     <div class="w-24 h-24 mx-auto mb-6 relative">
                         <div class="absolute inset-0 border-4 border-blue-200 dark:border-blue-700 rounded-full"></div>
                         <div class="absolute inset-0 border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
-                        <div class="absolute inset-0 border-4 border-transparent border-t-indigo-600 dark:border-t-indigo-400 rounded-full animate-spin animation-delay-300"></div>
+                        <div class="absolute inset-0 border-4 border-transparent border-t-indigo-600 dark:border-t-indigo-400 rounded-full animate-spin animation-delay-300">
+                        
+                        </div>
+                            <img style="object-fit: scale-down;transform: scale(0.5);"  src="{{ asset('storage/'.$team->profile_photo_path) }}" alt="" class="w-full h-full object-cover rounded-full">
+                        
                     </div>
 
                     <!-- Icône élève stylisée -->
