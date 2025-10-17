@@ -31,11 +31,12 @@
                             {{ $headerActions }}
                         @else
                             <div class="flex items-center space-x-3">
-                                <a href="{{ route('logout') }}"
-                                    class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
-                                    <span class="material-symbols-outlined mr-2">logout</span>
-                                   
-                                </a>
+                                <form method="POST" action="{{ route('logout') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
+                                        <span class="material-symbols-outlined mr-2">logout</span>
+                                    </button>
+                                </form>
                             </div>
                         @endisset
                     </div>
