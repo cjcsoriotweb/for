@@ -29,7 +29,7 @@
 
         <!-- Stats rapide -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <a href="{{route('application.admin.users.index', $team)}}" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
                         <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">people</span>
@@ -39,9 +39,9 @@
                         <div class="text-sm text-slate-600 dark:text-slate-400">Utilisateurs dans cette application</div>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <a href="{{route('application.admin.formations.list', $team)}}" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <a href="{{route('application.admin.formations.index', $team)}}" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-green-100 dark:bg-green-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
                         <span class="material-symbols-outlined text-green-600 dark:text-green-400">school</span>
@@ -73,23 +73,10 @@
                     <span class="material-symbols-outlined text-3xl text-emerald-600 dark:text-emerald-400">bolt</span>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">Actions rapides</h3>
-                    <p class="text-emerald-700 dark:text-emerald-300">
-                        Accédez rapidement aux fonctionnalités principales de votre administration.
-                    </p>
+                    <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">{{__('Actions rapides')}}</h3>
                 </div>
                 <div class="hidden md:block">
                     <div class="flex space-x-3">
-                        <a href="{{ route('application.admin.users.index', $team) }}"
-                            class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-sm transition-colors">
-                            <span class="material-symbols-outlined mr-2 text-sm">people</span>
-                            Utilisateurs
-                        </a>
-                        <a href="{{ route('application.admin.formations.index', $team) }}"
-                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm transition-colors">
-                            <span class="material-symbols-outlined mr-2 text-sm">school</span>
-                            Formations
-                        </a>
                         <a href="{{ route('application.admin.configuration.index', $team) }}"
                             class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-sm transition-colors">
                             <span class="material-symbols-outlined mr-2 text-sm">settings</span>
