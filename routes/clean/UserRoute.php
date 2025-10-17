@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('mon-compte')
     ->name('user.')
+    ->middleware(['auth'])
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [AccountPageController::class, 'dashboard'])->name('dashboard');
+        Route::post('/switch', [AccountPageController::class, 'switch'])->name('switch');
     });

@@ -15,8 +15,13 @@ class AccountPageController extends Controller
 
     public function dashboard()
     {
-        dd($this->accountService->teams()->listByUser(Auth::user()));
+        $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
-        return view('clean.account.dashboard');
+        return view('clean.account.dashboard', compact('organisations'));
+    }
+
+    public function switch()
+    {
+        $this->accountService->teams()->switch(Auth::user(), $team);
     }
 }

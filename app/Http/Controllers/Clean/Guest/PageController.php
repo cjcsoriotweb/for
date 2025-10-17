@@ -8,4 +8,8 @@ class PageController
     {
         return view('clean.guest.hello');
     }
+
+    public function policy(){
+        return view('clean.guest.policy');
+    }
 }
