@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         // On peut passer un ARRAY de fichiers pour "web"
         web: [
-            __DIR__.'/../routes/clean/.php',
+            __DIR__.'/../routes/clean/GuestRoute.php',
             /*
             __DIR__.'/../routes/web.php',
             __DIR__.'/../routes/account.php',
@@ -27,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            // Policies
+            /*
             Gate::policy(Team::class, TeamPolicy::class);
 
             // Gates
@@ -40,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Gate::define('isSuperAdmin', function (User $user) {
                 return (bool) $user->superadmin;
             });
+            */
 
         }
     )

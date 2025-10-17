@@ -4,23 +4,20 @@ namespace App\Http\Controllers\Application\Eleve;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EnableFormationRequest;
+use App\Models\Chapter;
 use App\Models\Formation;
+use App\Models\Lesson;
+use App\Models\Quiz;
 use App\Models\Team;
 use App\Services\FormationEnrollmentService;
 use App\Services\FormationVisibilityService;
 use Illuminate\Http\Request;
-use App\Models\Chapter;
-use App\Models\Lesson;
-use App\Models\Quiz;
-use App\Models\QuizQuestion;
-use App\Models\QuizChoice;
-use App\Models\QuizAttempt;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EleveController extends Controller
 {
     private FormationVisibilityService $visibilityService;
+
     private FormationEnrollmentService $enrollmentService;
 
     public function __construct(
@@ -56,7 +53,7 @@ class EleveController extends Controller
     public function formationShow(Team $team, Formation $formation)
     {
         // Vérifier que l'utilisateur peut accéder à cette formation
-        if (!$this->visibilityService->isFormationVisibleForTeam($formation, $team)) {
+        if (! $this->visibilityService->isFormationVisibleForTeam($formation, $team)) {
             abort(403, 'Formation non accessible.');
         }
 
@@ -76,7 +73,7 @@ class EleveController extends Controller
         // Inscrire l'utilisateur à la formation et débiter les fonds
         $success = $this->enrollmentService->enrollUser($formation, $team);
 
-        if (!$success) {
+        if (! $success) {
             return redirect()->route('application.eleve.formations.preview', [$team, $formation])
                 ->with('error', "Les fonds de l'équipe sont insuffisants pour commencer cette formation (requis : {$formation->money_amount}€).");
         }
@@ -104,18 +101,18 @@ class EleveController extends Controller
     public function formationLesson(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         // Vérifications de sécurité
-        if (!$this->visibilityService->isFormationVisibleForTeam($formation, $team)) {
+        if (! $this->visibilityService->isFormationVisibleForTeam($formation, $team)) {
             abort(403, 'Formation non accessible.');
         }
 
-        if (!$this->enrollmentService->isUserEnrolled($formation)) {
+        if (! $this->enrollmentService->isUserEnrolled($formation)) {
             abort(403, 'Vous devez être inscrit à cette formation.');
         }
 
         // Marquer la leçon comme commencée si pas encore fait
         $lessonProgress = $lesson->learners()->where('users.id', auth()->id())->first();
 
-        if (!$lessonProgress) {
+        if (! $lessonProgress) {
             $lesson->learners()->attach(auth()->id(), [
                 'team_id' => $team->id,
                 'status' => 'in_progress',
@@ -133,13 +130,13 @@ class EleveController extends Controller
     public function formationLessonComplete(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         // Vérifications
-        if (!$this->enrollmentService->isUserEnrolled($formation)) {
+        if (! $this->enrollmentService->isUserEnrolled($formation)) {
             abort(403);
         }
 
         $lessonProgress = $lesson->learners()->where('users.id', auth()->id())->first()?->pivot;
 
-        if (!$lessonProgress) {
+        if (! $lessonProgress) {
             abort(403);
         }
 
@@ -167,14 +164,14 @@ class EleveController extends Controller
     public function formationQuiz(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, Quiz $quiz)
     {
         // Vérifications
-        if (!$this->enrollmentService->isUserEnrolled($formation)) {
+        if (! $this->enrollmentService->isUserEnrolled($formation)) {
             abort(403);
         }
 
         // Vérifier si la leçon est complétée pour accéder au quiz
         $lessonProgress = $lesson->learners()->where('users.id', auth()->id())->first()?->pivot;
 
-        if (!$lessonProgress || $lessonProgress->status !== 'completed') {
+        if (! $lessonProgress || $lessonProgress->status !== 'completed') {
             return redirect()->route('application.eleve.formations.lesson', [$team, $formation, $chapter, $lesson])
                 ->with('warning', 'Vous devez d\'abord terminer la leçon.');
         }
