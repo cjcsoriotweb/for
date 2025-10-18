@@ -25,14 +25,14 @@ class AdminFormationController extends Controller
 
         if ($enabled) {
             $formation = $formationService->makeFormationVisibleForTeam($formation, $team);
-        return redirect()->route('application.admin.formations.index', $team)->with('status', __('Formation enabled successfully!'));
+        return redirect()->route('application.admin.formations.index', $team)->with('status', __("Formation activée avec succès!"));
 
         } else {
             $formation = $formationService->makeFormationInvisibleForTeam($formation, $team);
-        return redirect()->route('application.admin.formations.index', $team)->with('status', __('Formation disabled successfully!'));
+        return redirect()->route('application.admin.formations.index', $team)->with('status', __("Formation désactivée avec succès!"));
 
         }
-        return redirect()->route('application.admin.formations.index', $team)->with('status', __('Erreur !'));
+        return redirect()->route('application.admin.formations.index', $team)->with('status', __("Erreur la formation n'a pas été modifiée !"));
 
 
     }
