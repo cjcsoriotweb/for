@@ -19,7 +19,20 @@
         </div>
     </x-slot>
 
-    <x-admin.AdminFormations :team="$team" />
+    @if(Auth::user()->superadmin)
 
+    <a
+        href="{{ route('application.admin.index', ['team' => $team]) }}"
+        class="inline-block mb-4 text-sm text-blue-100 hover:underline"
+    >
+        <span class="material-symbols-outlined align-middle"
+            >supervisor_account</span
+        >
+        Créer une formation
+    </a>
+
+    @endif
+
+    <x-admin.AdminFormations :team="$team" />
     @include('clean.admin.partials.home-button', ['team' => $team])
 </x-application-layout>
