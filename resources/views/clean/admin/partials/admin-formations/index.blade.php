@@ -1,0 +1,44 @@
+<div class="space-y-6">
+    <!-- Formations List -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6">
+            <div class="space-y-4">
+                @foreach($formations as $formation)
+                <!-- Formation Admin,Partials,Admin-formations -->
+                <div
+                    class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                >
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            {{$formation->title}}
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">
+                            {{$formation->description}}
+                        </p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button
+                            class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                            Modifier
+                        </button>
+                        <button
+                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                            Supprimer
+                        </button>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- Empty State (si aucune formation) -->
+            <div class="text-center py-12 text-gray-500 hidden">
+                <p class="text-lg">Aucune formation trouvée</p>
+                <p class="text-sm mt-2">
+                    Créez votre première formation pour commencer
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

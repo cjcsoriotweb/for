@@ -11,5 +11,5 @@ Route::prefix('administrateur')
     ->group(function () {
         Route::get('/home/{team}', [AdminPageController::class, 'home'])->name('index');
         Route::get('/users/{team}', [AdminPageController::class, 'users'])->name('users.index');
-        Route::get('/formations/{team}', [AdminPageController::class, 'users'])->name('formations.index');
+        Route::get('/formations/{team}', [AdminPageController::class, 'formations'])->name('formations.index');
     });

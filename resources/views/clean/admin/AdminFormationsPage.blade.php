@@ -8,7 +8,6 @@
                     >admin_panel_settings</span
                 >
             </div>
-
             <div>
                 <h2 class="font-bold text-xl text-white leading-tight">
                     Tableau de bord Administrateur
@@ -19,5 +18,8 @@
             </div>
         </div>
     </x-slot>
-    <x-admin.admin-menu-fast :team="$team" />
+
+    <x-admin.AdminFormations :team="$team" />
+
+    @include('clean.admin.partials.home-button', ['team' => $team])
 </x-application-layout>
