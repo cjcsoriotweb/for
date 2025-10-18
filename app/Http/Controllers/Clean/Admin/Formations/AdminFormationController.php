@@ -20,13 +20,12 @@ class AdminFormationController extends Controller
     {
         $validated = $request->validated();
         $formation = Formation::findorfail($validated['formation_id']);
-        $team = Team::findorfail($validated['team_id']);
+      
         $enabled = $validated['enabled'];
 
         if ($enabled) {
             $formation = $formationService->makeFormationVisibleForTeam($formation, $team);
-        return redirect()->route('application.admin.formations.index', $team)->with('status', __("Formation activée avec succès!"));
-
+            return redirect()->route('application.admin.formations.index', $team)->with('status', __("Formation activée avec succès!"));
         } else {
             $formation = $formationService->makeFormationInvisibleForTeam($formation, $team);
         return redirect()->route('application.admin.formations.index', $team)->with('status', __("Formation désactivée avec succès!"));
