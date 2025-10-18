@@ -11,7 +11,7 @@ class TeamService
     public function listByUser(User $user)
     {
         // Retourne la liste des applications (teams) liees a l'utilisateur.
-        return $user->teams;
+        return $user->allTeams();
     }
     public function str_slug($string)
     {

@@ -225,6 +225,31 @@
                     </div>
                 </div>
                 @endif
+                <!-- Superadmin -->
+                @if(Auth::user()->superadmin)
+                <div class="mb-8 text-center">
+                    <h2
+                        class="mb-4 text-3xl font-bold text-slate-900 dark:text-white"
+                    >
+                        {{ __("Organisations") }}
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300">
+                        {{ __("Gérez les organismes de formation") }}
+                    </p>
+
+                    <!-- Button to create team -->
+                    <div class="mt-6 flex justify-center">
+                        <a
+                            href="{{ route('teams.create') }}"
+                            class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
+                        >
+                            {{ __("Créer une application") }}
+                        </a>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Invitation Component -->
                 <x-account.application.invitation />
             </div>
         </main>
