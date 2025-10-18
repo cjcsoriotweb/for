@@ -16,20 +16,20 @@ class AdminPageController extends Controller
     ) {
     }
 
-    public function dashboard(Team $team, FormationService $formations)
+    public function home(Team $team, FormationService $formations)
     {
 
 
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
-        return view('clean.admin.AdminApplication', compact(['organisations', 'team']));
+        return view('clean.admin.AdminHomePage', compact(['organisations', 'team']));
     }
 
     public function users(Team $team)
     {
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
-        return view('clean.admin.AdminApplication', compact(['organisations', 'team']));
+        return view('clean.admin.AdminUsersPage', compact(['organisations', 'team']));
     }
 
 
