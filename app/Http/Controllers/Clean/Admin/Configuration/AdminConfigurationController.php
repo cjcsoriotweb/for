@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Clean\Admin;
+namespace App\Http\Controllers\Clean\Admin\Configuration;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Configuration\PhotoUpdate;
