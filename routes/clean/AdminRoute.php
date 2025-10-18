@@ -14,8 +14,8 @@ Route::prefix('administrateur')
         Route::get('/users/{team}', [AdminPageController::class, 'users'])->name('users.index');
         Route::get('/formations/{team}', [AdminPageController::class, 'formations'])->name('formations.index');
         Route::get('/configuration/{team}', [AdminPageController::class, 'configuration'])->name('configuration.index');
-        
-  
+
+
         Route::put('/photo', [AdminConfigurationController::class, 'update'])->name('configuration.photo.update');
         Route::delete('/photo', [AdminConfigurationController::class, 'destroy'])->name('configuration.photo.destroy');
     

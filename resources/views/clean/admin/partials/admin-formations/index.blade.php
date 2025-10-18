@@ -16,11 +16,12 @@
                             {{$formation->description}}
                         </p>
                     </div>
+                    {{ $formation->is_visible }}
                     <div class="flex space-x-2">
                         <button
                             class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
                         >
-                            Modifier
+                            Activer
                         </button>
                         <button
                             class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"

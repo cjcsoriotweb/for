@@ -21,7 +21,7 @@
             <div class="flex space-x-3">
                 <a
                     href="{{
-                        route('application.admin.configuration.index', $team)
+                        route('application.admin.configuration.index', ['team' => $team, 'team_name' => $team->name])
                     }}"
                     class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-sm transition-colors"
                 >
@@ -34,5 +34,3 @@
         </div>
     </div>
 </div>
-
-dzadzadza

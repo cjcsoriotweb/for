@@ -38,7 +38,7 @@ class UpdateTeamName implements UpdatesTeamNames
                 mentionerId: auth()->id(),
                 mentionerName: auth()->user()->name,
                 context: "renommé l'équipe en '{$input['name']}'",
-                url: route('application.admin.configuration.name', $team)
+                url: route('application.admin.configuration.index', $team)
             )
         );
     }
