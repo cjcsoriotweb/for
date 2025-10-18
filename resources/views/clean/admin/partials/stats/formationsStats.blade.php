@@ -13,7 +13,7 @@
         </div>
         <div>
             <div class="text-2xl font-bold text-slate-900 dark:text-white">
-                { count($formationsByTeam) }/{ count($formationsAll) }
+                {{ $activeCount }}/{{ $totalCount }}
             </div>
             <div class="text-sm text-slate-600 dark:text-slate-400">
                 Formations disponibles

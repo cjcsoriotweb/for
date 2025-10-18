@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Clean\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
+use App\Services\FormationService;
+use App\Services\FormationVisibilityService;
 use Illuminate\Support\Facades\Auth;
 
 class AdminPageController extends Controller
@@ -14,9 +16,10 @@ class AdminPageController extends Controller
     ) {
     }
 
-    public function dashboard(Team $team)
+    public function dashboard(Team $team, FormationService $formations)
     {
-        
+
+
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
         return view('clean.admin.AdminApplication', compact(['organisations', 'team']));
