@@ -24,5 +24,8 @@
         </div>
     </x-slot>
     @include('clean.admin.partials.configuration.index', ['team' => $team])
+    <br />
     @include('clean.admin.partials.home-button', ['team' => $team])
+    <br />
+    @include('clean.admin.partials.configuration.add-credit', ['team' => $team])
 </x-application-layout>

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Clean\Admin\Configuration;
 
 use App\Http\Controllers\Controller;
+
+use App\Http\Requests\Admin\Configuration\CreditUpdate;
 use App\Http\Requests\Admin\Configuration\PhotoUpdate;
-use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
-use App\Services\FormationService;
-use App\Services\FormationVisibilityService;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Team;
+
 
 class AdminConfigurationController extends Controller
 {
@@ -17,7 +17,7 @@ class AdminConfigurationController extends Controller
     ) {
     }
 
-    public function update(PhotoUpdate $request, Team $team)
+    public function updatePhoto(PhotoUpdate $request, Team $team)
     {
         $data = $request->validated();
         $path = "teams/{$team->id}/photo.".$data['photo']->extension();
@@ -26,7 +26,14 @@ class AdminConfigurationController extends Controller
         $team->save();
         return back()->with('ok', 'Photo mise à jour.');
     }
-    public function destroy(){
+    public function addCredit(CreditUpdate $request, Team $team)
+    {
+        $data = $request->validated();
+        
+        $team->money += $data['montant'];
+        $team->save();
+        
+        return back()->with('ok', 'Crédit ajouté.');
 
     }
 
