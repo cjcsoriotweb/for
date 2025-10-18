@@ -84,10 +84,7 @@
             </footer>
         </div>
 
-        {{-- Panneau de debug Auth (Gate/Policy) --}}
-
         @stack('modals') @livewireScripts @stack('scripts')
-        <x-auth-debug-panel />
 
         <style>
             /* Custom scrollbar for webkit browsers */

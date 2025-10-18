@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Clean\Account\AccountPageController;
+use App\Http\Controllers\Clean\Admin\AdminConfigurationController;
 use App\Http\Controllers\Clean\Admin\AdminPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,4 +13,10 @@ Route::prefix('administrateur')
         Route::get('/home/{team}', [AdminPageController::class, 'home'])->name('index');
         Route::get('/users/{team}', [AdminPageController::class, 'users'])->name('users.index');
         Route::get('/formations/{team}', [AdminPageController::class, 'formations'])->name('formations.index');
+        Route::get('/configuration/{team}', [AdminPageController::class, 'configuration'])->name('configuration.index');
+        
+  
+        Route::put('/photo', [AdminConfigurationController::class, 'update'])->name('configuration.photo.update');
+        Route::delete('/photo', [AdminConfigurationController::class, 'destroy'])->name('configuration.photo.destroy');
+    
     });

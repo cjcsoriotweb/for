@@ -39,5 +39,12 @@ class AdminPageController extends Controller
         return view('clean.admin.AdminFormationsPage', compact(['organisations', 'team']));
     }
 
+    public function configuration(Team $team)
+    {
+        $organisations = $this->accountService->teams()->listByUser(Auth::user());
+
+        return view('clean.admin.AdminConfigurationPage', compact(['organisations', 'team']));
+    }
+
 
 }

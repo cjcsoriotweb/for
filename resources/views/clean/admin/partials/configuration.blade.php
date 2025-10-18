@@ -20,12 +20,9 @@
         <div class="hidden md:block">
             <div class="flex space-x-3">
                 <a
-                    href="{
-                            route(
-                                'application.admin.configuration.index',
-                                $team
-                            )
-                        }"
+                    href="{{
+                        route('application.admin.configuration.index', $team)
+                    }}"
                     class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-sm transition-colors"
                 >
                     <span class="material-symbols-outlined mr-2 text-sm"
@@ -37,3 +34,5 @@
         </div>
     </div>
 </div>
+
+dzadzadza
