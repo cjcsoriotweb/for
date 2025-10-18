@@ -9,7 +9,7 @@ Route::prefix('administrateur')
     ->middleware(['auth'])
     ->scopeBindings()
     ->group(function () {
-        Route::get('/{team}', [AdminPageController::class, 'dashboard'])->name('index');
-        Route::get('/{team}', [AdminPageController::class, 'users'])->name('users.index');
-        Route::get('/{team}', [AdminPageController::class, 'users'])->name('formations.index');
+        Route::get('/home/{team}', [AdminPageController::class, 'dashboard'])->name('index');
+        Route::get('/users/{team}', [AdminPageController::class, 'users'])->name('users.index');
+        Route::get('/formations/{team}', [AdminPageController::class, 'users'])->name('formations.index');
     });
