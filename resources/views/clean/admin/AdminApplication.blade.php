@@ -18,4 +18,5 @@
             </div>
         </div>
     </x-slot>
+    @include('clean.admin.partials.admin-menu-fast', ['team' => $team])
 </x-application-layout>
