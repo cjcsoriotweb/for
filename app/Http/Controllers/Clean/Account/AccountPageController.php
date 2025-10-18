@@ -32,6 +32,6 @@ class AccountPageController extends Controller
             abort(404);
         }
 
-        $this->accountService->teams()->switchTeam(Auth::user(), $team);
+        return $this->accountService->teams()->switchTeam(Auth::user(), $team);
     }
 }
