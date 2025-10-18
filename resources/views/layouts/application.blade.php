@@ -9,8 +9,11 @@
                     <div class="flex items-center space-x-4">
                         @if($team->profile_photo_path)
                         <div class="relative">
+                            @if(Auth::user()->hasTeamRole($team, 'admin'))
                             <a
-                                href="{ route('application.index', $team) }"
+                                href="{{
+                                    route('application.admin.index', $team)
+                                }}"
                                 class="w-12 h-12 bg-white bg-opacity-15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white border-opacity-30 shadow-lg overflow-hidden"
                             >
                                 <img
@@ -19,6 +22,7 @@
                                     class="w-full h-full rounded-lg object-contain p-1"
                                 />
                             </a>
+                            @endif
                             <div
                                 class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm"
                             ></div>
