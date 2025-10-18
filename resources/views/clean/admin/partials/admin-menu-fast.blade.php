@@ -45,7 +45,7 @@
                     <div
                         class="text-2xl font-bold text-slate-900 dark:text-white"
                     >
-                        {{ count($usersInTeam) }}
+                        {{ count($team->allUsers()) }}
                     </div>
                     <div class="text-sm text-slate-600 dark:text-slate-400">
                         Utilisateurs dans cette application

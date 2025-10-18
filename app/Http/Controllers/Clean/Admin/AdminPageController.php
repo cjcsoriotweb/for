@@ -16,6 +16,14 @@ class AdminPageController extends Controller
 
     public function dashboard(Team $team)
     {
+        
+        $organisations = $this->accountService->teams()->listByUser(Auth::user());
+
+        return view('clean.admin.AdminApplication', compact(['organisations', 'team']));
+    }
+
+    public function users(Team $team)
+    {
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
         return view('clean.admin.AdminApplication', compact(['organisations', 'team']));

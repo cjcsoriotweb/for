@@ -10,4 +10,6 @@ Route::prefix('administrateur')
     ->scopeBindings()
     ->group(function () {
         Route::get('/{team}', [AdminPageController::class, 'dashboard'])->name('index');
+        Route::get('/{team}', [AdminPageController::class, 'users'])->name('users.index');
+        Route::get('/{team}', [AdminPageController::class, 'users'])->name('formations.index');
     });
