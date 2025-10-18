@@ -25,7 +25,7 @@ class AdminMenuFast extends Component
     }
     public function render(): View
     {
-        return view('clean.admin.partials.admin-menu-fast', [
+        return view('clean.admin.partials.menu-fast.admin-menu-fast', [
             'team' => $this->team,
             'activeCount' => $this->activeCount,
             'totalCount' => $this->totalCount,

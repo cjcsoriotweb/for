@@ -28,9 +28,9 @@
 
     <!-- Stats rapide -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        @include('clean.admin.partials.stats.usersStats', ['team' => $team])
-        @include('clean.admin.partials.stats.formationsStats', [ 'team' =>
-        $team])
+        @include('clean.admin.partials.menu-fast.stats.usersStats', ['team' =>
+        $team]) @include('clean.admin.partials.menu-fast.stats.formationsStats',
+        [ 'team' => $team])
     </div>
 
     <!-- Section actions rapides -->
