@@ -8,6 +8,5 @@ Route::prefix('')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [PageController::class, 'index'])->name('index');
-        Route::get('/switch', [PageController::class, 'policy'])->name('policy');
 
     });
