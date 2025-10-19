@@ -98,10 +98,20 @@ class FormationLessonList extends Component
         $this->lessonEdition = null;
     }
 
-    /** Confirme la suppression d’une leçon */
+    /** Supprime une leçon après confirmation */
     public function confirmDeleteLesson(int $lessonId): void
     {
-        $this->dispatch('confirm-delete-lesson', lessonId: $lessonId);
+        $lesson = $this->chapter->lessons()->whereKey($lessonId)->firstOrFail();
+        $lesson->delete();
+
+        // Refresh chapter data
+        $this->chapter->refresh();
+        $this->chapter->loadMissing('lessons');
+
+        // Update lessonsById array with chapter-specific lessons
+        $this->lessonsById = $this->chapter->lessons->pluck('title', 'id')->toArray();
+
+        $this->dispatch('lesson-deleted', lessonId: $lessonId);
     }
 
     /** Supprime une leçon */
