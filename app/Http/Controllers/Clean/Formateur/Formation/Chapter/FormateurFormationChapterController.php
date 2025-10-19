@@ -31,4 +31,10 @@ class FormateurFormationChapterController
         $formationService->chapters()->deleteChapter($chapter);
         return redirect()->route('formateur.formation.edit', [$formation])->with('success', 'Chapitre supprimé avec succès.');
     }
+
+    public function editChapter(Formation $formation, Chapter $chapter)
+    {
+        // Logic to edit a chapter of the formation
+        return view('clean.formateur.Formation.Chapter.ChapterEdit', compact('formation', 'chapter'));
+    }
 }

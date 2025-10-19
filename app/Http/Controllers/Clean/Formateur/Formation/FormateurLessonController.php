@@ -1,26 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Clean\Formateur\Formation\Chapter\Lesson;
+namespace App\Http\Controllers\Clean\Formateur\Formation;
 
-use App\Http\Requests\Formateur\Formation\Chapter\DeleteChapter;
-use App\Http\Requests\Formateur\Formation\Chapter\UpdateChapter;
 use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\Lesson;
 use App\Services\FormationService;
 
-class FormateurFormationChapterLessonController
+class FormateurLessonController
 {
-    public function showFormation(Formation $formation)
-    {
-        return view('clean.formateur.Formation.FormationShow', compact('formation'));
-    }
 
-    public function editChapter(Formation $formation, Chapter $chapter)
-    {
-        // Logic to edit a chapter of the formation
-        return view('clean.formateur.Formation.Chapter.ChapterEdit', compact('formation', 'chapter'));
-    }
 
     public function createLesson(Formation $formation, Chapter $chapter, FormationService $formationService)
     {
