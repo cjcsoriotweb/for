@@ -25,7 +25,7 @@ class AdminFormations extends Component
     }
     public function render(): View
     {
-        return view('clean.admin.formations.list.index', [
+        return view('clean.admin.formations.listFormations', [
             'team' => $this->team,
             'activeCount' => $this->activeCount,
             'totalCount' => $this->totalCount,
