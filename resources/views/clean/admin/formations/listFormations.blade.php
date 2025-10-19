@@ -15,6 +15,10 @@
                         <p class="text-sm text-gray-600 mt-1">
                             {{$formation->description}}
                         </p>
+                        <br />
+                        @if(Auth::user()->superadmin())
+                        <a href="">Editer</a>
+                        @endif
                     </div>
 
                     <div class="flex space-x-2">
@@ -55,6 +59,7 @@
                         </form>
                     </div>
                 </div>
+
                 @endforeach
             </div>
         </div>
