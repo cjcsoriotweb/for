@@ -75,7 +75,7 @@
                             Enregistrer les modifications
                         </button>
                     </form>
-                    @if(request()->has('delete'))
+
                     <form
                         action="{{
                             route('formateur.formation.chapter.delete.post', [
@@ -86,25 +86,16 @@
                         method="post"
                     >
                         @method('POST') @csrf
-                        <button
-                            type="submit"
-                            class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
-                        >
+
+                            @livewire('compose.confirm', ['confirmText' => 'Supprimer'])
                             <input
                                 type="hidden"
                                 name="chapter_id"
                                 value="{{ $chapter->id }}"
                             />
-                            {{ __("Confirmer la suppression") }}
+            
                         </button>
                     </form>
-                    @else
-                    <a
-                        class="inline-block my-2 py-2 px-4 rounded-lg transition duration-200 bg-red-500 text-white hover:text-red-700"
-                        href="?delete=1"
-                        >{{ __("Supprimer") }}</a
-                    >
-                    @endif
                 </div>
             </div>
         </div>
