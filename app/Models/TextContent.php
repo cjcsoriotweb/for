@@ -30,10 +30,7 @@ class TextContent extends Model
         ];
     }
 
-    public function lesson()
-    {
-        return $this->belongsTo(Lesson::class);
-    }
+
 
     /**
      * Get the lesson that owns the text content (polymorphic)

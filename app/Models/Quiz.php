@@ -10,17 +10,24 @@ class Quiz extends Model
     /** @use HasFactory<\Database\Factories\QuizFactory> */
     use HasFactory;
 
+    public $fillable = [
+        'lesson_id',
+        'title',
+        'description',
+        'passing_score',
+        'max_attempts',
+    ];
+
     protected function casts(): array
     {
         return [
             'lesson_id' => 'integer',
+            'passing_score' => 'integer',
+            'max_attempts' => 'integer',
         ];
     }
 
-    public function lesson()
-    {
-        return $this->belongsTo(Lesson::class);
-    }
+
 
     public function quizQuestions()
     {
