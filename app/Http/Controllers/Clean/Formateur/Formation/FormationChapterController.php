@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Clean\Formateur\Formation\Chapter;
+namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Requests\Formateur\Formation\Chapter\DeleteChapter;
 use App\Http\Requests\Formateur\Formation\Chapter\UpdateChapter;
@@ -8,7 +8,7 @@ use App\Models\Chapter;
 use App\Models\Formation;
 use App\Services\FormationService;
 
-class FormateurFormationChapterController
+class FormationChapterController
 {
     public function createChapter(Formation $formation, FormationService $formationService)
     {

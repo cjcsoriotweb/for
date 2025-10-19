@@ -7,7 +7,7 @@ use App\Models\Formation;
 use App\Models\Lesson;
 use App\Services\FormationService;
 
-class FormateurLessonController
+class FormationLessonController
 {
 
 
