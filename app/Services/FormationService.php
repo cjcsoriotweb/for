@@ -7,32 +7,39 @@ use App\Models\Team;
 use App\Services\Formation\AdminFormationService;
 use App\Services\Formation\ChapterFormationService;
 use App\Services\Formation\StudentFormationService;
-use App\Services\Formation\SuperAdminFormationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class FormationService
 {
     public function __construct(
-        private readonly SuperAdminFormationService $superAdminService,
         private readonly AdminFormationService $adminService,
         private readonly StudentFormationService $studentService,
         private readonly ChapterFormationService $chapterService
-    ) {
-    }
+    ) {}
 
-    public function superAdmin(): SuperAdminFormationService
-    {
-        return $this->superAdminService;
-    }
 
     public function admin(): AdminFormationService
     {
         return $this->adminService;
     }
 
-    public function chapters(){
+    public function chapters()
+    {
         return $this->chapterService;
+    }
+
+
+    public function createFormation(array $attributes = []): Formation
+    {
+        $payload = array_replace([
+            'title' => 'Titre par defaut',
+            'description' => 'Description par defaut',
+            'level' => 'debutant',
+            'money_amount' => 0,
+        ], $attributes);
+
+        return Formation::create($payload);
     }
 
     /**
@@ -48,6 +55,8 @@ class FormationService
         return $this->studentService;
     }
 
+    /* 
+
     public function makeFormationVisibleForTeam(Formation $formation, Team $team)
     {
         return $this->adminService->makeFormationVisibleForTeam($formation, $team);
@@ -57,6 +66,8 @@ class FormationService
     {
         return $this->adminService->makeFormationInvisibleForTeam($formation, $team);
     }
+
+    
 
     public function listWithTeamFlags(Team $team): Collection
     {
@@ -73,17 +84,5 @@ class FormationService
         return $this->adminService->paginateWithTeamFlags($team, $perPage, $search, $orderBy, $direction);
     }
 
-    public function createFormation(
-        $title = 'Titre par defaut',
-        $description = 'Description par defaut',
-        $level = 'debutant',
-        $moneyAmount = 0
-    ) {
-        return $this->superAdminService->createFormation([
-            'title' => $title,
-            'description' => $description,
-            'level' => $level,
-            'money_amount' => $moneyAmount,
-        ]);
-    }
+    */
 }

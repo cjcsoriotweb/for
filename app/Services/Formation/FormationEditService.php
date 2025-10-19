@@ -4,7 +4,7 @@ namespace App\Services\Formation;
 
 use App\Models\Formation;
 
-class SuperAdminFormationService extends BaseFormationService
+class FormationEditService extends BaseFormationService
 {
     /**
      * Create a formation with default values suitable for a super admin.
