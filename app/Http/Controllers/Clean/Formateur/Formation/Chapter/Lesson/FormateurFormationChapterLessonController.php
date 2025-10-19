@@ -170,4 +170,146 @@ class FormateurFormationChapterLessonController
             return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du contenu: ' . $e->getMessage()]);
         }
     }
+
+    public function editQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $quiz = $lesson->lessonable;
+        if (!$quiz || !($quiz instanceof \App\Models\Quiz)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
+        }
+
+        return view('clean.formateur.Formation.Chapter.Lesson.EditQuiz', compact('formation', 'chapter', 'lesson', 'quiz'));
+    }
+
+    public function updateQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $quiz = $lesson->lessonable;
+        if (!$quiz || !($quiz instanceof \App\Models\Quiz)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
+        }
+
+        // Validate the quiz data
+        $validated = request()->validate([
+            'quiz_title' => 'required|string|max:255',
+            'quiz_description' => 'nullable|string',
+            'passing_score' => 'required|integer|min:0|max:100',
+            'max_attempts' => 'nullable|integer|min:1|max:10',
+        ]);
+
+        try {
+            // Update the quiz
+            $quiz->update([
+                'title' => $validated['quiz_title'],
+                'description' => $validated['quiz_description'],
+                'passing_score' => $validated['passing_score'],
+                'max_attempts' => $validated['max_attempts'],
+            ]);
+
+            return redirect()->route('formateur.formation.edit', $formation)
+                ->with('success', 'Quiz modifié avec succès!');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du quiz: ' . $e->getMessage()]);
+        }
+    }
+
+    public function editVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $videoContent = $lesson->lessonable;
+        if (!$videoContent || !($videoContent instanceof \App\Models\VideoContent)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Vidéo non trouvée pour cette leçon.']);
+        }
+
+        return view('clean.formateur.Formation.Chapter.Lesson.EditVideo', compact('formation', 'chapter', 'lesson', 'videoContent'));
+    }
+
+    public function updateVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $videoContent = $lesson->lessonable;
+        if (!$videoContent || !($videoContent instanceof \App\Models\VideoContent)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Vidéo non trouvée pour cette leçon.']);
+        }
+
+        // Validate the video data
+        $validated = request()->validate([
+            'video_title' => 'required|string|max:255',
+            'video_description' => 'nullable|string',
+            'video_source' => 'required|in:upload,url',
+            'video_file' => 'nullable|file|mimes:mp4,avi,mov,webm|max:512000', // 500MB max
+            'video_url' => 'nullable|url|required_if:video_source,url',
+            'video_duration' => 'nullable|integer|min:1|max:300',
+        ]);
+
+        try {
+            // Handle file upload or URL
+            $videoPath = $videoContent->video_path; // Keep existing path by default
+            if ($validated['video_source'] === 'upload' && request()->hasFile('video_file')) {
+                $videoPath = request()->file('video_file')->store('videos', 'public');
+            }
+
+            // Update the video content
+            $videoContent->update([
+                'title' => $validated['video_title'],
+                'description' => $validated['video_description'],
+                'video_url' => $validated['video_source'] === 'url' ? $validated['video_url'] : null,
+                'video_path' => $videoPath,
+                'duration_minutes' => $validated['video_duration'],
+            ]);
+
+            return redirect()->route('formateur.formation.edit', $formation)
+                ->with('success', 'Vidéo modifiée avec succès!');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la vidéo: ' . $e->getMessage()]);
+        }
+    }
+
+    public function editText(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $textContent = $lesson->lessonable;
+        if (!$textContent || !($textContent instanceof \App\Models\TextContent)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Contenu textuel non trouvé pour cette leçon.']);
+        }
+
+        return view('clean.formateur.Formation.Chapter.Lesson.EditText', compact('formation', 'chapter', 'lesson', 'textContent'));
+    }
+
+    public function updateText(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $textContent = $lesson->lessonable;
+        if (!$textContent || !($textContent instanceof \App\Models\TextContent)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Contenu textuel non trouvé pour cette leçon.']);
+        }
+
+        // Validate the text content data
+        $validated = request()->validate([
+            'content_title' => 'required|string|max:255',
+            'content_description' => 'nullable|string',
+            'content_text' => 'required|string',
+            'estimated_read_time' => 'nullable|integer|min:1|max:120',
+            'allow_download' => 'nullable|boolean',
+            'show_progress' => 'nullable|boolean',
+        ]);
+
+        try {
+            // Update the text content
+            $textContent->update([
+                'title' => $validated['content_title'],
+                'description' => $validated['content_description'],
+                'content' => $validated['content_text'],
+                'estimated_read_time' => $validated['estimated_read_time'],
+                'allow_download' => $validated['allow_download'] ?? false,
+                'show_progress' => $validated['show_progress'] ?? true,
+            ]);
+
+            return redirect()->route('formateur.formation.edit', $formation)
+                ->with('success', 'Contenu textuel modifié avec succès!');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du contenu: ' . $e->getMessage()]);
+        }
+    }
 }

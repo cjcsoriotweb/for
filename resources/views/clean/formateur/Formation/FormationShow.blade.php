@@ -84,20 +84,106 @@
                                 <div
                                     class="flex items-center justify-between bg-gray-50 p-3 rounded"
                                 >
-                                    <div>
+                                    <div class="flex items-center space-x-3">
                                         <span
                                             class="text-sm font-medium text-gray-700"
                                         >
                                             Leçon {{ $lesson->position }}:
                                             {{ $lesson->title }}
                                         </span>
+
+                                        @if($lesson->lessonable)
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @if($lesson->lessonable_type === 'App\Models\Quiz') bg-blue-100 text-blue-800 @elseif($lesson->lessonable_type === 'App\Models\VideoContent') bg-green-100 text-green-800 @elseif($lesson->lessonable_type === 'App\Models\TextContent') bg-purple-100 text-purple-800 @else bg-gray-100 text-gray-800 @endif"
+                                        >
+                                            @if($lesson->lessonable_type ===
+                                            'App\Models\Quiz') Quiz
+                                            @elseif($lesson->lessonable_type ===
+                                            'App\Models\VideoContent') Vidéo
+                                            @elseif($lesson->lessonable_type ===
+                                            'App\Models\TextContent') Texte
+                                            @else
+                                            {{ class_basename($lesson->lessonable_type) }}
+                                            @endif
+                                        </span>
+                                        @else
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                                        >
+                                            Non défini
+                                        </span>
+                                        @endif
                                     </div>
                                     <div class="flex space-x-2">
-                                        <button
-                                            class="text-blue-600 hover:text-blue-800 text-sm"
+                                        @if($lesson->lessonable)
+                                        @if($lesson->lessonable_type ===
+                                        'App\Models\Quiz')
+                                        <a
+                                            href="{{
+                                                route(
+                                                    'formateur.formation.chapter.lesson.quiz.edit',
+                                                    [
+                                                        $formation,
+                                                        $chapter,
+                                                        $lesson
+                                                    ]
+                                                )
+                                            }}"
+                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium"
                                         >
-                                            Modifier
-                                        </button>
+                                            Modifier Quiz
+                                        </a>
+                                        @elseif($lesson->lessonable_type ===
+                                        'App\Models\VideoContent')
+                                        <a
+                                            href="{{
+                                                route(
+                                                    'formateur.formation.chapter.lesson.video.edit',
+                                                    [
+                                                        $formation,
+                                                        $chapter,
+                                                        $lesson
+                                                    ]
+                                                )
+                                            }}"
+                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                        >
+                                            Modifier Vidéo
+                                        </a>
+                                        @elseif($lesson->lessonable_type ===
+                                        'App\Models\TextContent')
+                                        <a
+                                            href="{{
+                                                route(
+                                                    'formateur.formation.chapter.lesson.text.edit',
+                                                    [
+                                                        $formation,
+                                                        $chapter,
+                                                        $lesson
+                                                    ]
+                                                )
+                                            }}"
+                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                        >
+                                            Modifier Texte
+                                        </a>
+                                        @endif @else
+                                        <a
+                                            href="{{
+                                                route(
+                                                    'formateur.formation.chapter.lesson.define',
+                                                    [
+                                                        $formation,
+                                                        $chapter,
+                                                        $lesson
+                                                    ]
+                                                )
+                                            }}"
+                                            class="text-green-600 hover:text-green-800 text-sm font-medium"
+                                        >
+                                            Définir le type
+                                        </a>
+                                        @endif
                                     </div>
                                 </div>
                                 @endforeach
