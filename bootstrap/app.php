@@ -13,9 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         // On peut passer un ARRAY de fichiers pour "web"
         web: [
-            __DIR__.'/../routes/clean/GuestRoute.php',
-            __DIR__.'/../routes/clean/UserRoute.php',
-            __DIR__.'/../routes/clean/AdminRoute.php',
+            __DIR__ . '/../routes/clean/GuestRoute.php',
+            __DIR__ . '/../routes/clean/UserRoute.php',
+            __DIR__ . '/../routes/clean/AdminRoute.php',
+            __DIR__ . '/../routes/clean/FormateurRoute.php',
             /*
             __DIR__.'/../routes/web.php',
             __DIR__.'/../routes/account.php',
@@ -25,8 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             __DIR__.'/../routes/superadmin.php',
             */
         ],
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             /*
@@ -43,7 +44,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return (bool) $user->superadmin;
             });
             */
-
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
