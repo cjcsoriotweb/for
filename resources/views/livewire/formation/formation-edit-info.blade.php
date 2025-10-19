@@ -8,7 +8,15 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">
+                    @if($editing)
+                    <input
+                        type="text"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        wire:model="data.title"
+                    />
+                    @else
                     {{ $formation->title }}
+                    @endif
                 </h1>
                 <div class="flex items-center space-x-2 mt-1">
                     <span
@@ -32,12 +40,23 @@
         </p>
     </div>
     <div class="flex items-center space-x-2 ml-6">
+        @if($editing)
+        <button
+            wire:click="save"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+        >
+            <span class="material-symbols-outlined text-sm mr-2">edit</span>
+            Sauvegarder
+        </button>
+        @else
         <button
             class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+            wire:click="$set('editing', true)"
         >
             <span class="material-symbols-outlined text-sm mr-2">edit</span>
             Modifier
         </button>
+        @endif
         <button
             class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
         >

@@ -8,15 +8,14 @@ use Livewire\Component;
 
 class FormationEdit extends Component
 {
+    /** La formation éditée (via route model binding idéalement) */
     public Formation $formation;
-   
+
     public function mount(Formation $formation): void
     {
         $this->formation = $formation->load(['chapters.lessons']);
-
     }
 
-    
 
     public function render()
     {
