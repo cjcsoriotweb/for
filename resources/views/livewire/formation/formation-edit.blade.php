@@ -106,7 +106,17 @@
                         </div>
                         <div class="flex-1">
                             <h4 class="font-medium text-gray-900">
+                                @if($chapterEdition == $chapter->id)
+                                <input
+                                    type="text"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    wire:model="chapter.title"
+                                />
+                                @else
+
                                 {{ $chapter->title }}
+
+                                @endif
                             </h4>
                             <div class="flex items-center space-x-4 mt-1">
                                 <span class="text-sm text-gray-500">
@@ -131,10 +141,11 @@
                     </div>
                     <div class="flex items-center space-x-2">
                         <button
-                            wire:click="editChapter({{ $chapter->id }})"
+                            wire:click="editChapter('{{ $chapter->id }}')"
                             class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                             title="Modifier le chapitre"
                         >
+                            {{ $chapterEdition == $chapter->id ? 'Édition...' : '' }}
                             <span class="material-symbols-outlined text-sm"
                                 >edit</span
                             >
@@ -262,6 +273,31 @@
                     </p>
                     <p class="text-2xl font-bold text-gray-900">
                         {{ $formation->learners->where('pivot.completed_at', '!=', null)->count() > 0 ? round(($formation->learners->where('pivot.completed_at', '!=', null)->count() / $formation->learners->count()) * 100) : 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

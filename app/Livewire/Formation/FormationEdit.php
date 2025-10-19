@@ -2,23 +2,32 @@
 
 namespace App\Livewire\Formation;
 
+use App\Providers\FormationServiceProvider;
 use Livewire\Component;
 
 class FormationEdit extends Component
 {
+    public $formationService;
     public $formation;
+
+    public $chapterEdition = false;
+    
     public function mount($formation)
     {
+        dd(new FormationServiceProvider());
         $this->formation = $formation;
     }
 
+    public function editChapter($chapterId)
+    {
+        $this->chapterEdition = $chapterId;
+    }
+    
     public function addChapter()
     {
-        $this->formation->chapters()->create([
+        $this->formation->superadmin()->addChapter($this->formation, [
             'title' => 'Nouveau Chapitre',
-            'position' => $this->formation->chapters()->count() + 1,
         ]);
-        $this->formation->load('chapters');
     }
     
     public function render()
