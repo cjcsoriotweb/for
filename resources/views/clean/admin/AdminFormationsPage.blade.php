@@ -19,7 +19,7 @@
         </div>
     </x-slot>
 
-    @if(Auth::user()->superadmin)
+    @if(Auth::user()->superadmin())
 
     <a
         href="{{ route('application.admin.index', ['team' => $team]) }}"

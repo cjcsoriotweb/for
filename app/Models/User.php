@@ -82,5 +82,10 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function superadmin(): bool
+    {
+        return $this->superadmin;
+    }
+
 
 }
