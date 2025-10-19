@@ -120,7 +120,7 @@
                 <div class="flex items-center justify-between">
                     <a
                         href="{{
-                            url('formateur.formations.show', $formation)
+                            route('formateur.formation.edit', $formation)
                         }}"
                         class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group/btn"
                     >

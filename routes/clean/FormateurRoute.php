@@ -9,4 +9,5 @@ Route::prefix('formateur')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [FormateurPageController::class, 'home'])->name('home');
+        Route::get('/formation-edit/{formation}', [FormateurPageController::class, 'edit'])->name('formation.edit');
     });
