@@ -57,14 +57,6 @@
                 </div>
                 @endforeach
             </div>
-
-            <!-- Empty State (si aucune formation) -->
-            <div class="text-center py-12 text-gray-500 hidden">
-                <p class="text-lg">Aucune formation trouvée</p>
-                <p class="text-sm mt-2">
-                    Créez votre première formation pour commencer
-                </p>
-            </div>
         </div>
     </div>
 </div>
