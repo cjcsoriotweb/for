@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Clean\Formateur;
 use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Formation;
+use App\Models\Lesson;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
 use App\Services\FormationService;
@@ -25,7 +26,10 @@ class FormateurPageController extends Controller
     {
         return view('clean.formateur.Formation.FormationShow', compact('formation'));
     }
-
+    public function editLessonDefine(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        return view('clean.formateur.Formation.Chapter.Lesson.Define', compact('formation'));
+    }
     public function editChapter(Formation $formation, Chapter $chapter)
     {
         // Logic to edit a chapter of the formation

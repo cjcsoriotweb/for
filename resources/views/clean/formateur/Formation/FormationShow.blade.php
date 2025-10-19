@@ -54,11 +54,23 @@
                                         }}"
                                         >Modifier</a
                                     >
-                                    <button
-                                        class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200"
+                                    <form
+                                        method="post"
+                                        action="{{
+                                            route(
+                                                'formateur.formation.chapter.lesson.add.post',
+                                                [$formation, $chapter]
+                                            )
+                                        }}"
                                     >
-                                        + Ajouter une leçon
-                                    </button>
+                                        @csrf
+
+                                        <button
+                                            class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200"
+                                        >
+                                            + Ajouter une leçon
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 

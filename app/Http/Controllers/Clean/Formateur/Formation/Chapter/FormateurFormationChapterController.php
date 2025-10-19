@@ -21,7 +21,7 @@ class FormateurFormationChapterController
         //
         $validated = $request->validated();
         $formationService->chapters()->updateChapter($chapter, $validated);
-        return redirect()->route('formateur.formation.edit', [$formation, $chapter])->with('success', 'Chapitre mis à jour avec succès.');
+        return redirect()->route('formateur.formation.edit', [$formation])->with('success', 'Chapitre mis à jour avec succès.');
     }
 
     public function deleteChapter(DeleteChapter $request, Formation $formation, Chapter $chapter, FormationService $formationService)
