@@ -23,7 +23,7 @@ Route::prefix('administrateur')
         Route::get('/configuration/{team}', [AdminPageController::class, 'configuration'])->name('configuration.index');
         Route::post('/configuration/{team}/credit', [AdminConfigurationController::class, 'addCredit'])->name('configuration.credit');
 
-        Route::put('/photo', [AdminConfigurationController::class, 'updatePhoto'])->name('configuration.photo.update');
-        Route::delete('/photo', [AdminConfigurationController::class, 'destroy'])->name('configuration.photo.destroy');
-    
+        Route::put('/photo/{team}', [AdminConfigurationController::class, 'updatePhoto'])->name('configuration.photo.update');
+        Route::delete('/photo/{team}', [AdminConfigurationController::class, 'destroy'])->name('configuration.photo.destroy');
+
     });

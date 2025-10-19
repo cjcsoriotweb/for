@@ -53,6 +53,12 @@
                     >
                         @csrf @method('PUT')
 
+                        <input
+                            type="hidden"
+                            name="team_id"
+                            value="{{ $team->id }}"
+                        />
+
                         <div class="flex items-center gap-3">
                             <div class="relative">
                                 <input
