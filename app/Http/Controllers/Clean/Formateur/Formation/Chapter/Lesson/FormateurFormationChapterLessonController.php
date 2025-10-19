@@ -58,4 +58,116 @@ class FormateurFormationChapterLessonController
     {
         return view('clean.formateur.Formation.Chapter.Lesson.CreateText', compact('formation', 'chapter', 'lesson'));
     }
+
+    public function storeQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        // Validate the quiz data
+        $validated = request()->validate([
+            'quiz_title' => 'required|string|max:255',
+            'quiz_description' => 'nullable|string',
+            'passing_score' => 'required|integer|min:0|max:100',
+            'max_attempts' => 'nullable|integer|min:1|max:10',
+        ]);
+
+        try {
+            // Create the quiz
+            $quiz = \App\Models\Quiz::create([
+                'lesson_id' => $lesson->id,
+                'title' => $validated['quiz_title'],
+                'description' => $validated['quiz_description'],
+                'passing_score' => $validated['passing_score'],
+                'max_attempts' => $validated['max_attempts'],
+            ]);
+
+            // Update lesson with polymorphic relationship
+            $lesson->update([
+                'lessonable_type' => \App\Models\Quiz::class,
+                'lessonable_id' => $quiz->id,
+            ]);
+
+            return redirect()->route('formateur.formation.chapter.edit', [$formation, $chapter])
+                ->with('success', 'Quiz créé avec succès! Vous pouvez maintenant ajouter des questions.');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du quiz: ' . $e->getMessage()]);
+        }
+    }
+
+    public function storeVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        // Validate the video data
+        $validated = request()->validate([
+            'video_title' => 'required|string|max:255',
+            'video_description' => 'nullable|string',
+            'video_source' => 'required|in:upload,url',
+            'video_file' => 'nullable|file|mimes:mp4,avi,mov,webm|max:512000', // 500MB max
+            'video_url' => 'nullable|url|required_if:video_source,url',
+            'video_duration' => 'nullable|integer|min:1|max:300',
+        ]);
+
+        try {
+            // Handle file upload or URL
+            $videoPath = null;
+            if ($validated['video_source'] === 'upload' && request()->hasFile('video_file')) {
+                $videoPath = request()->file('video_file')->store('videos', 'public');
+            }
+
+            // Create the video content
+            $videoContent = \App\Models\VideoContent::create([
+                'lesson_id' => $lesson->id,
+                'title' => $validated['video_title'],
+                'description' => $validated['video_description'],
+                'video_url' => $validated['video_source'] === 'url' ? $validated['video_url'] : null,
+                'video_path' => $videoPath,
+                'duration_minutes' => $validated['video_duration'],
+            ]);
+
+            // Update lesson with polymorphic relationship
+            $lesson->update([
+                'lessonable_type' => \App\Models\VideoContent::class,
+                'lessonable_id' => $videoContent->id,
+            ]);
+
+            return redirect()->route('formateur.formation.chapter.edit', [$formation, $chapter])
+                ->with('success', 'Vidéo ajoutée avec succès!');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la vidéo: ' . $e->getMessage()]);
+        }
+    }
+
+    public function storeText(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        // Validate the text content data
+        $validated = request()->validate([
+            'content_title' => 'required|string|max:255',
+            'content_description' => 'nullable|string',
+            'content_text' => 'required|string',
+            'estimated_read_time' => 'nullable|integer|min:1|max:120',
+            'allow_download' => 'nullable|boolean',
+            'show_progress' => 'nullable|boolean',
+        ]);
+
+        try {
+            // Create the text content
+            $textContent = \App\Models\TextContent::create([
+                'lesson_id' => $lesson->id,
+                'title' => $validated['content_title'],
+                'description' => $validated['content_description'],
+                'content' => $validated['content_text'],
+                'estimated_read_time' => $validated['estimated_read_time'],
+                'allow_download' => $validated['allow_download'] ?? false,
+                'show_progress' => $validated['show_progress'] ?? true,
+            ]);
+
+            // Update lesson with polymorphic relationship
+            $lesson->update([
+                'lessonable_type' => \App\Models\TextContent::class,
+                'lessonable_id' => $textContent->id,
+            ]);
+
+            return redirect()->route('formateur.formation.chapter.edit', [$formation, $chapter])
+                ->with('success', 'Contenu textuel créé avec succès!');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du contenu: ' . $e->getMessage()]);
+        }
+    }
 }

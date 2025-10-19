@@ -35,6 +35,9 @@ Route::prefix('formateur')
 
         // Lesson type specific routes
         Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/create', [FormateurFormationChapterLessonController::class, 'createQuiz'])->name('formation.chapter.lesson.quiz.create');
+        Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/create', [FormateurFormationChapterLessonController::class, 'storeQuiz'])->name('formation.chapter.lesson.quiz.store');
         Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/video/create', [FormateurFormationChapterLessonController::class, 'createVideo'])->name('formation.chapter.lesson.video.create');
+        Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/video/create', [FormateurFormationChapterLessonController::class, 'storeVideo'])->name('formation.chapter.lesson.video.store');
         Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/text/create', [FormateurFormationChapterLessonController::class, 'createText'])->name('formation.chapter.lesson.text.create');
+        Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/text/create', [FormateurFormationChapterLessonController::class, 'storeText'])->name('formation.chapter.lesson.text.store');
     });

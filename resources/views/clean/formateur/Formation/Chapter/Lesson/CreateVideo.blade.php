@@ -115,7 +115,12 @@
 
                     <form
                         method="POST"
-                        action="#"
+                        action="{{
+                            route(
+                                'formateur.formation.chapter.lesson.video.store',
+                                [$formation, $chapter, $lesson]
+                            )
+                        }}"
                         enctype="multipart/form-data"
                         class="space-y-6"
                     >

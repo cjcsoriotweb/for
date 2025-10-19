@@ -113,7 +113,16 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="#" class="space-y-6">
+                    <form
+                        method="POST"
+                        action="{{
+                            route(
+                                'formateur.formation.chapter.lesson.quiz.store',
+                                [$formation, $chapter, $lesson]
+                            )
+                        }}"
+                        class="space-y-6"
+                    >
                         @csrf
 
                         <!-- Quiz Title -->

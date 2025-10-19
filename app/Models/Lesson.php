@@ -14,6 +14,8 @@ class Lesson extends Model
         'chapter_id',
         'title',
         'position',
+        'lessonable_type',
+        'lessonable_id',
     ];
 
     protected function casts(): array
@@ -21,6 +23,7 @@ class Lesson extends Model
         return [
             'chapter_id' => 'integer',
             'position' => 'integer',
+            'lessonable_id' => 'integer',
         ];
     }
     public function chapter()
@@ -47,5 +50,13 @@ class Lesson extends Model
     public function quizzes()
     {
         return $this->hasMany(Quiz::class);
+    }
+
+    /**
+     * Get the lessonable content (Quiz, VideoContent, or TextContent)
+     */
+    public function lessonable()
+    {
+        return $this->morphTo();
     }
 }

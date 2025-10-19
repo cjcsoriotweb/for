@@ -9,7 +9,7 @@ class Quiz extends Model
 {
     /** @use HasFactory<\Database\Factories\QuizFactory> */
     use HasFactory;
-    
+
     protected function casts(): array
     {
         return [
@@ -25,5 +25,13 @@ class Quiz extends Model
     public function quizQuestions()
     {
         return $this->hasMany(QuizQuestion::class);
+    }
+
+    /**
+     * Get the lesson that owns the quiz (polymorphic)
+     */
+    public function lessonable()
+    {
+        return $this->morphOne(Lesson::class, 'lessonable');
     }
 }
