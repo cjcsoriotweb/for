@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Clean\Formateur;
 
 use App\Http\Controllers\Controller;
+use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
@@ -20,10 +21,14 @@ class FormateurPageController extends Controller
         return view('clean.formateur.FormateurHomePage');
     }
 
-    public function edit(Formation $formation)
+    public function showFormation(Formation $formation)
     {
-        $formation->load(['chapters.lessons']);
+        return view('clean.formateur.Formation.FormationShow', compact('formation'));
+    }
 
-        return view('clean.formateur.FormationEditPage', compact('formation'));
+    public function editChapter(Formation $formation, Chapter $chapter)
+    {
+        // Logic to edit a chapter of the formation
+        return view('clean.formateur.Formation.Chapter.ChapterEdit', compact('formation', 'chapter'));
     }
 }

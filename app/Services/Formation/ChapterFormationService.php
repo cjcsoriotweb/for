@@ -19,4 +19,10 @@ class ChapterFormationService extends BaseFormationService
 
         return $formation->chapters()->create($payload);
     }
+
+    public function updateChapter($chapter, array $attributes = [])
+    {
+        $chapter->update($attributes);
+        return $chapter;
+    }
 }

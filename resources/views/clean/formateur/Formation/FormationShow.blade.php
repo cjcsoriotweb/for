@@ -13,11 +13,22 @@
 
                     <!-- Create Chapter Button -->
                     <div class="mb-6">
-                        <button
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                        <form
+                            action="{{
+                                route(
+                                    'formateur.formation.chapter.add',
+                                    $formation
+                                )
+                            }}"
+                            method="POST"
                         >
-                            + Créer un chapitre
-                        </button>
+                            @csrf
+                            <button
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                            >
+                                + Créer un chapitre
+                            </button>
+                        </form>
                     </div>
 
                     @if($formation->chapters->isEmpty())
@@ -33,11 +44,22 @@
                                     Chapitre {{ $chapter->position }}:
                                     {{ $chapter->title }}
                                 </h3>
-                                <button
-                                    class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200"
-                                >
-                                    + Ajouter une leçon
-                                </button>
+                                <div>
+                                    <a
+                                        href="{{
+                                            route(
+                                                'formateur.formation.chapter.edit',
+                                                [$formation, $chapter]
+                                            )
+                                        }}"
+                                        >Modifier</a
+                                    >
+                                    <button
+                                        class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200"
+                                    >
+                                        + Ajouter une leçon
+                                    </button>
+                                </div>
                             </div>
 
                             @if($chapter->lessons->isEmpty())
