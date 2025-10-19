@@ -46,5 +46,10 @@ class AdminPageController extends Controller
         return view('clean.admin.AdminConfigurationPage', compact(['organisations', 'team']));
     }
 
+    public function formationCreate(Team $team)
+    {
+        return view('clean.admin.formation.create', compact(['team']));
+    }
+
 
 }

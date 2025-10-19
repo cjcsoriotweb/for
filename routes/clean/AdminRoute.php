@@ -11,19 +11,20 @@ Route::prefix('administrateur')
     ->middleware(['auth'])
     ->scopeBindings()
     ->group(function () {
-        Route::get('/home/{team}', [AdminPageController::class, 'home'])->name('index');
-        Route::get('/users/{team}', [AdminPageController::class, 'users'])->name('users.index');
+        Route::get('{team}/home', [AdminPageController::class, 'home'])->name('index');
+        Route::get('{team}/users', [AdminPageController::class, 'users'])->name('users.index');
 
 
-        Route::get('/formations/{team}', [AdminPageController::class, 'formations'])->name('formations.index');
-        Route::post('/formations/{team}/enable/{formation}', [AdminFormationController::class, 'update'])->name('formations.editVisibility');
+        Route::get('{team}/formations', [AdminPageController::class, 'formations'])->name('formations.index');
+        Route::get('{team}/formations/create', [AdminPageController::class, 'formationCreate'])->name('formation.create');
+        Route::post('{team}/formations/enable/{formation}', [AdminFormationController::class, 'update'])->name('formations.editVisibility');
 
 
         
-        Route::get('/configuration/{team}', [AdminPageController::class, 'configuration'])->name('configuration.index');
-        Route::post('/configuration/{team}/credit', [AdminConfigurationController::class, 'addCredit'])->name('configuration.credit');
+        Route::get('{team}/configuration', [AdminPageController::class, 'configuration'])->name('configuration.index');
+        Route::post('{team}/configuration/credit', [AdminConfigurationController::class, 'addCredit'])->name('configuration.credit');
 
-        Route::put('/photo/{team}', [AdminConfigurationController::class, 'updatePhoto'])->name('configuration.photo.update');
-        Route::delete('/photo/{team}', [AdminConfigurationController::class, 'destroy'])->name('configuration.photo.destroy');
+        Route::put('{team}/photo', [AdminConfigurationController::class, 'updatePhoto'])->name('configuration.photo.update');
+        Route::delete('{team}/photo', [AdminConfigurationController::class, 'destroy'])->name('configuration.photo.destroy');
 
     });
