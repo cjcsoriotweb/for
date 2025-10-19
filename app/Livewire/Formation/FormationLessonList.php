@@ -4,7 +4,6 @@ namespace App\Livewire\Formation;
 
 use App\Models\Chapter;
 use App\Models\Formation;
-use App\Services\FormationService;
 use Livewire\Component;
 
 class FormationLessonList extends Component
@@ -12,6 +11,7 @@ class FormationLessonList extends Component
     public Formation $formation;
 
     public Chapter $chapter;
+
     /** [lesson_id => title] pour binder proprement */
     public array $lessonsById = [];
 
@@ -24,9 +24,9 @@ class FormationLessonList extends Component
         $this->formation = $formation;
         $this->chapter = $chapter;
 
-        // Précharger les titres des leçons (clé = id, valeur = title)
-        $this->formation->loadMissing('lessons'); // si pas déjà chargé
-        $this->lessonsById = $this->formation->lessons->pluck('title', 'id')->toArray();
+        // Précharger les titres des leçons du chapitre spécifique (clé = id, valeur = title)
+        $this->chapter->loadMissing('lessons');
+        $this->lessonsById = $this->chapter->lessons->pluck('title', 'id')->toArray();
     }
 
     /** Règles de validation des titres */
@@ -44,7 +44,7 @@ class FormationLessonList extends Component
 
         // S'assure que le champ d'édition a la valeur actuelle
         if (! array_key_exists($lessonId, $this->lessonsById)) {
-            $current = $this->formation->lessons()->whereKey($lessonId)->value('title');
+            $current = $this->chapter->lessons()->whereKey($lessonId)->value('title');
             if ($current !== null) {
                 $this->lessonsById[$lessonId] = $current;
             }
@@ -57,7 +57,7 @@ class FormationLessonList extends Component
         // Valide uniquement le champ modifié
         $this->validateOnly("lessonsById.$lessonId");
 
-        $lesson = $this->formation->lessons()->whereKey($lessonId)->firstOrFail();
+        $lesson = $this->chapter->lessons()->whereKey($lessonId)->firstOrFail();
 
         $lesson->update([
             'title' => $this->lessonsById[$lessonId] ?? $lesson->title,
@@ -65,9 +65,9 @@ class FormationLessonList extends Component
 
         // Sort du mode édition et rafraîchit la liste
         $this->lessonEdition = null;
-        $this->formation->refresh();
-        $this->formation->loadMissing('lessons'); // si pas déjà chargé
-        $this->lessonsById = $this->formation->lessons->pluck('title', 'id')->toArray();
+        $this->chapter->refresh();
+        $this->chapter->loadMissing('lessons');
+        $this->lessonsById = $this->chapter->lessons->pluck('title', 'id')->toArray();
 
         // Événement front (optionnel)
         $this->dispatch('lesson-saved', id: $lessonId);
@@ -76,18 +76,20 @@ class FormationLessonList extends Component
     /** Crée une nouvelle leçon */
     public function addLesson(): void
     {
-        // Via ton service (si c'est ton design actuel)
-        app(FormationService::class)
-            ->lessons()
-            ->createLesson($this->formation);
+        // Create lesson directly in the specific chapter
+        $lesson = $this->chapter->lessons()->create([
+            'title' => 'Nouvelle leçon',
+            'position' => $this->chapter->lessons()->count() + 1,
+        ]);
 
-        // Si tu veux un fallback simple, dé-commente ci-dessous :
-        // $this->formation->lessons()->create(['title' => 'Nouvelle leçon']);
+        // Refresh chapter data
+        $this->chapter->refresh();
+        $this->chapter->loadMissing('lessons');
 
-        $this->formation->refresh();
-        $this->lessonsById = $this->formation->lessons->pluck('title', 'id')->toArray();
+        // Update lessonsById array with chapter-specific lessons
+        $this->lessonsById = $this->chapter->lessons->pluck('title', 'id')->toArray();
 
-        $this->dispatch('lesson-added');
+        $this->dispatch('lesson-added', lessonId: $lesson->id);
     }
 
     /** Annule l’édition en cours */
@@ -96,10 +98,32 @@ class FormationLessonList extends Component
         $this->lessonEdition = null;
     }
 
+    /** Confirme la suppression d’une leçon */
+    public function confirmDeleteLesson(int $lessonId): void
+    {
+        $this->dispatch('confirm-delete-lesson', lessonId: $lessonId);
+    }
+
+    /** Supprime une leçon */
+    public function deleteLesson(int $lessonId): void
+    {
+        $lesson = $this->chapter->lessons()->whereKey($lessonId)->firstOrFail();
+        $lesson->delete();
+
+        // Refresh chapter data
+        $this->chapter->refresh();
+        $this->chapter->loadMissing('lessons');
+
+        // Update lessonsById array with chapter-specific lessons
+        $this->lessonsById = $this->chapter->lessons->pluck('title', 'id')->toArray();
+
+        $this->dispatch('lesson-deleted', lessonId: $lessonId);
+    }
+
     public function render()
     {
         return view('livewire.formation.formation-lesson-list', [
-            'lessons' => $this->formation->lessons,
+            'lessons' => $this->chapter->lessons,
         ]);
     }
 }
