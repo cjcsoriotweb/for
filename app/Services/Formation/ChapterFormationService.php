@@ -9,7 +9,10 @@ class ChapterFormationService extends BaseFormationService
     /**
      * Create a formation with default values suitable for a super admin.
      */
-
+    public function deleteChapter($chapter)
+    {
+        $chapter->delete();
+    }
     public function createChapter(Formation $formation, array $attributes = [])
     {
         $payload = array_replace([

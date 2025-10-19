@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Clean\Formateur\Formation\Chapter;
 
+use App\Http\Requests\Formateur\Formation\Chapter\DeleteChapter;
 use App\Http\Requests\Formateur\Formation\Chapter\UpdateChapter;
 use App\Models\Chapter;
 use App\Models\Formation;
@@ -20,6 +21,14 @@ class FormateurFormationChapterController
         //
         $validated = $request->validated();
         $formationService->chapters()->updateChapter($chapter, $validated);
-        return back()->with('success', 'Chapitre mis à jour avec succès.');
+        return redirect()->route('formateur.formation.edit', [$formation, $chapter])->with('success', 'Chapitre mis à jour avec succès.');
+    }
+
+    public function deleteChapter(DeleteChapter $request, Formation $formation, Chapter $chapter, FormationService $formationService)
+    {
+        //
+        $validated = $request->validated();
+        $formationService->chapters()->deleteChapter($chapter);
+        return redirect()->route('formateur.formation.edit', [$formation, $chapter])->with('success', 'Chapitre supprimé avec succès.');
     }
 }

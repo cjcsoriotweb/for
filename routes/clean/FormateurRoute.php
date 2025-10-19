@@ -23,4 +23,5 @@ Route::prefix('formateur')
     ->group(function () {
         Route::put('/formation/{formation}/chapitre/{chapter}/put', [FormateurFormationChapterController::class, 'updateChapter'])->name('formation.chapter.update.put');
         Route::post('/formation-edit/{formation}/chapitre/add', [FormateurFormationChapterController::class, 'createChapter'])->name('formation.chapter.add.post');
+        Route::post('/formation-edit/{formation}/chapitre/{chapter}/delete', [FormateurFormationChapterController::class, 'deleteChapter'])->name('formation.chapter.delete.post');
     });
