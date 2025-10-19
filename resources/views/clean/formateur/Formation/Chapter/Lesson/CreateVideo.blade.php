@@ -289,6 +289,39 @@
                             </div>
                         </div>
 
+                        <!-- Video Preview Section -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-gray-900 mb-3">
+                                Aperçu de la Vidéo
+                            </h3>
+                            <div id="video-preview-container" class="space-y-3">
+                                <div
+                                    class="aspect-video bg-gray-200 rounded-lg flex items-center justify-center"
+                                >
+                                    <div class="text-center text-gray-500">
+                                        <svg
+                                            class="w-12 h-12 mx-auto mb-2"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                        <p class="text-sm">
+                                            Aucun aperçu disponible
+                                        </p>
+                                        <p class="text-xs mt-1">
+                                            Sélectionnez une source vidéo pour
+                                            voir l'aperçu
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- File Upload Area (shown when upload is selected) -->
                         <div id="upload-area" class="space-y-4">
                             <div
@@ -439,6 +472,93 @@
                         urlArea.classList.remove("hidden");
                     }
                 });
+            });
+
+        // Video preview functionality
+        document
+            .getElementById("video_url")
+            .addEventListener("input", function () {
+                const videoUrl = this.value;
+                const previewContainer = document.getElementById(
+                    "video-preview-container"
+                );
+
+                if (videoUrl.trim() === "") {
+                    // Show default preview when URL is empty
+                    previewContainer.innerHTML = `
+                    <div class="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
+                        <div class="text-center text-gray-500">
+                            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="text-sm">Aucun aperçu disponible</p>
+                            <p class="text-xs mt-1">Sélectionnez une source vidéo pour voir l'aperçu</p>
+                        </div>
+                    </div>
+                `;
+                    return;
+                }
+
+                // Extract video ID and platform
+                let videoId = null;
+                let platform = null;
+
+                // YouTube detection
+                if (
+                    videoUrl.match(
+                        /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+                    )
+                ) {
+                    videoId = videoUrl.match(
+                        /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+                    )[1];
+                    platform = "youtube";
+                }
+                // Vimeo detection
+                else if (
+                    videoUrl.match(
+                        /(?:vimeo\.com\/(?:.*\/)?|player\.vimeo\.com\/video\/)([0-9]+)(?:\/.*)?$/i
+                    )
+                ) {
+                    videoId = videoUrl.match(
+                        /(?:vimeo\.com\/(?:.*\/)?|player\.vimeo\.com\/video\/)([0-9]+)(?:\/.*)?$/i
+                    )[1];
+                    platform = "vimeo";
+                }
+
+                if (videoId && platform) {
+                    let embedUrl = "";
+                    if (platform === "youtube") {
+                        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                    } else if (platform === "vimeo") {
+                        embedUrl = `https://player.vimeo.com/video/${videoId}`;
+                    }
+
+                    previewContainer.innerHTML = `
+                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
+                        <iframe
+                            class="w-full h-full"
+                            src="${embedUrl}"
+                            title="Aperçu vidéo"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                `;
+                } else {
+                    previewContainer.innerHTML = `
+                    <div class="aspect-video bg-gray-800 rounded-lg flex items-center justify-center text-white">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="text-sm">Aperçu non disponible pour cette plateforme</p>
+                        </div>
+                    </div>
+                `;
+                }
             });
     </script>
 </x-app-layout>
