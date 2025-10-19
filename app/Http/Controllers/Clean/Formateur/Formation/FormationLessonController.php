@@ -55,6 +55,11 @@ class FormationLessonController
         }
     }
 
+    public function showDefineLesson(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        return view('clean.formateur.Formation.Chapter.Lesson.Define', compact('formation', 'chapter', 'lesson'));
+    }
+
     public function createQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         return view('clean.formateur.Formation.Chapter.Lesson.CreateQuiz', compact('formation', 'chapter', 'lesson'));

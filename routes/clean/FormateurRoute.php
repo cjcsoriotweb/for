@@ -21,7 +21,7 @@ Route::prefix('formateur')
         Route::get('/formation/{formation}/chapitre/{chapter}/show', [FormationChapterController::class, 'editChapter'])->name('formation.chapter.edit');
 
         // Lesson routes
-        Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/define', [FormationLessonController::class, 'defineLesson'])->name('formation.chapter.lesson.define');
+        Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/define', [FormationLessonController::class, 'showDefineLesson'])->name('formation.chapter.lesson.define');
         Route::post('/formation-edit/{formation}/chapitre/{chapter}/lesson/add', [FormationLessonController::class, 'createLesson'])->name('formation.chapter.lesson.add.post');
         Route::post('/formation-edit/{formation}/chapitre/{chapter}/lesson/{lesson}/delete', [FormationLessonController::class, 'deleteLesson'])->name('formation.chapter.lesson.delete.post');
         Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/define', [FormationLessonController::class, 'defineLesson'])->name('formation.chapter.lesson.define.post');
