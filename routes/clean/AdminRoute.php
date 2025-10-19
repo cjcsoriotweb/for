@@ -16,8 +16,11 @@ Route::prefix('administrateur')
 
 
         Route::get('{team}/formations', [AdminPageController::class, 'formations'])->name('formations.index');
-        Route::get('{team}/formations/create', [AdminPageController::class, 'formationCreate'])->name('formation.create');
-        Route::post('{team}/formations/enable/{formation}', [AdminFormationController::class, 'update'])->name('formations.editVisibility');
+        
+        Route::get('{team}/formation/create/name', [AdminPageController::class, 'formationCreate'])->name('formation.create');
+        Route::post('{team}/formation/create/name', [AdminFormationController::class, 'storeNewFormationByTitle'])->name('formations.store');
+
+        Route::post('{team}/formations/enable/{formation}', [AdminFormationController::class, 'updateVisibilityByTeam'])->name('formations.editVisibility');
 
 
         

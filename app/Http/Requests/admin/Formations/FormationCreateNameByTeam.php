@@ -5,10 +5,9 @@ namespace App\Http\Requests\Admin\Formations;
 use App\Models\Team;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rules\File;
 
-class FormationUpdate extends FormRequest
+
+class FormationCreateNameByTeam extends FormRequest
 {
     /**
      * Détermine si l'utilisateur est autorisé à faire cette requête.
@@ -16,9 +15,8 @@ class FormationUpdate extends FormRequest
     public function authorize(): bool
     {
 
-        $team = Team::findOrFail(request()->get('team_id'));
 
-        if (Auth::user()->belongsToTeam($team) && Auth::user()->hasTeamRole($team, 'admin')) {
+        if (Auth::user()->superadmin()) {
             return true;
         }
         return false;
@@ -31,18 +29,12 @@ class FormationUpdate extends FormRequest
     public function rules(): array
     {
         return [
-            'team_id' => [
-                'required', 'exists:teams,id'
-            ],
-            'formation_id' => [
+            'formation.title' => [
                 'required'
             ],
-
-            'enabled' => [
-                'required', 'boolean'
+            'formation.description' => [
+                'required',
             ],
         ];
     }
-
-
 }

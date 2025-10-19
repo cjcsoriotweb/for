@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Clean\Admin\Formations;
 use App\Http\Controllers\Controller;
-
+use App\Http\Requests\Admin\Formations\FormationCreateNameByTeam;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
-use App\Http\Requests\Admin\Formations\FormationUpdate;
+use App\Http\Requests\Admin\Formations\FormationUpdateVisibilityByTeam;
 use App\Models\Formation;
 use App\Services\FormationService;
 
@@ -16,7 +16,19 @@ class AdminFormationController extends Controller
     ) {
     }
 
-    public function update(FormationUpdate $request, Team $team, FormationService $formationService)
+    public function storeNewFormationByTitle(FormationCreateNameByTeam $request)   
+    {
+        $validated = $request->validated();
+        $title = $validated['formation']['title'];
+
+        $formation = Formation::create([
+            'title' => $title,
+            'description' => '',
+        ]);
+        
+        return redirect()->back()->with('status', __("Formation créée avec succès!"));
+    }
+    public function updateVisibilityByTeam(FormationUpdateVisibilityByTeam $request, Team $team, FormationService $formationService)
     {
         $validated = $request->validated();
         $formation = Formation::findorfail($validated['formation_id']);
