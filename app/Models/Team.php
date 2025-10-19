@@ -56,9 +56,7 @@ class Team extends JetstreamTeam
     public function formationsByTeam()
     {
         return $this->belongsToMany(\App\Models\Formation::class, 'formation_in_teams')
-            ->withPivot(['visible','approved_at','approved_by'])
+            ->withPivot(['visible', 'approved_at', 'approved_by'])
             ->withTimestamps();
     }
-
-
 }

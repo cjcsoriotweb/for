@@ -3,22 +3,20 @@
 namespace App\Http\Controllers\Clean\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Formation;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
 use App\Services\FormationService;
-use App\Services\FormationVisibilityService;
 use Illuminate\Support\Facades\Auth;
 
 class AdminPageController extends Controller
 {
     public function __construct(
         private readonly AccountService $accountService,
-    ) {
-    }
+    ) {}
 
     public function home(Team $team, FormationService $formations)
     {
-
 
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
@@ -51,5 +49,10 @@ class AdminPageController extends Controller
         return view('clean.admin.formation.create', compact(['team']));
     }
 
+    public function formationEdit(Team $team, $formation_id)
+    {
+        $formation = Formation::findOrFail($formation_id);
 
+        return view('clean.admin.formation.editFormation', compact(['team', 'formation']));
+    }
 }

@@ -9,6 +9,12 @@ class Chapter extends Model
 {
     /** @use HasFactory<\Database\Factories\ChapterFactory> */
     use HasFactory;
+
+    public $fillable = [
+        'formation_id',
+        'title',
+        'position',
+    ];
     
     protected function casts(): array
     {

@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\VisibleScope;
 use Database\Factories\FormationFactory;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,10 +20,12 @@ use Illuminate\Support\Facades\DB;
 class Formation extends Model
 {
     use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
     protected static function newFactory()
     {
         return FormationFactory::new();
     }
+
     protected $fillable = [
         'title',
         'description',
@@ -44,24 +43,31 @@ class Formation extends Model
         ];
     }
 
-
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'formation_in_teams')
-            ->withPivot(['visible','approved_at','approved_by'])
+            ->withPivot(['visible', 'approved_at', 'approved_by'])
             ->withTimestamps();
-    }
-
-    /*
-    public function team()
-    {
-        return $this->belongsTo(Team::class);
     }
 
     public function chapters()
     {
         return $this->hasMany(Chapter::class)->orderBy('position');
     }
+    
+        public function learners() // utilisateurs inscrits
+    {
+        return $this->belongsToMany(User::class, 'formation_user')
+            ->withPivot(['status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
+            ->withTimestamps();
+    }
+    
+    /*
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
 
     public function lessons()
     {
@@ -94,12 +100,7 @@ class Formation extends Model
         return 80;
     }
 
-    public function learners() // utilisateurs inscrits
-    {
-        return $this->belongsToMany(User::class, 'formation_user')
-            ->withPivot(['status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
-            ->withTimestamps();
-    }
+
 
 
     public function teams(): BelongsToMany
