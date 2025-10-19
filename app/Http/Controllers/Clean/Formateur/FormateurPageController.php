@@ -28,7 +28,7 @@ class FormateurPageController extends Controller
     }
     public function editLessonDefine(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
-        return view('clean.formateur.Formation.Chapter.Lesson.Define', compact('formation'));
+        return view('clean.formateur.Formation.Chapter.Lesson.Define', compact('formation', 'chapter', 'lesson'));
     }
     public function editChapter(Formation $formation, Chapter $chapter)
     {
