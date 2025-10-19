@@ -15,8 +15,19 @@
     <button
         wire:click="addLesson"
         class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+        title="Créer la première leçon (Ctrl+N)"
+        x-data
+        x-init="
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                    e.preventDefault();
+                    $wire.call('addLesson');
+                }
+            });
+        "
     >
         <span class="material-symbols-outlined text-lg mr-2">add</span>
         Créer la première leçon
+        <span class="ml-2 text-xs opacity-75 hidden sm:inline">Ctrl+N</span>
     </button>
 </div>

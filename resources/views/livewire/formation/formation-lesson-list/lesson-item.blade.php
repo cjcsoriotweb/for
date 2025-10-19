@@ -88,8 +88,41 @@
         <!-- Action Buttons -->
         @unless($lessonEdition === $lesson->id)
         <div
-            class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         >
+            <!-- Move Up -->
+            @if($lesson->position > 1)
+            <button
+                wire:click="moveLessonUp({{ $lesson->id }})"
+                class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
+                title="Déplacer vers le haut"
+            >
+                <span class="material-symbols-outlined text-lg"
+                    >keyboard_arrow_up</span
+                >
+            </button>
+            @else
+            <div class="w-10"></div>
+            <!-- Spacer when no up button -->
+            @endif
+
+            <!-- Move Down -->
+            @if($lesson->position < $loop->count)
+            <button
+                wire:click="moveLessonDown({{ $lesson->id }})"
+                class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
+                title="Déplacer vers le bas"
+            >
+                <span class="material-symbols-outlined text-lg"
+                    >keyboard_arrow_down</span
+                >
+            </button>
+            @else
+            <div class="w-10"></div>
+            <!-- Spacer when no down button -->
+            @endif
+
+            <!-- Edit -->
             <button
                 wire:click="editLesson({{ $lesson->id }})"
                 class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
@@ -97,6 +130,8 @@
             >
                 <span class="material-symbols-outlined text-lg">edit</span>
             </button>
+
+            <!-- Delete -->
             <button
                 wire:click="confirmDeleteLesson({{ $lesson->id }})"
                 wire:confirm="Êtes-vous sûr de vouloir supprimer cette leçon ? Cette action est irréversible."
