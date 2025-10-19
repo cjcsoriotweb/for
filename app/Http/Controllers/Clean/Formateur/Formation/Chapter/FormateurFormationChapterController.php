@@ -11,8 +11,8 @@ class FormateurFormationChapterController
 {
     public function createChapter(Formation $formation, FormationService $formationService)
     {
-        $formationService->chapters()->createChapter($formation);
-        return back()->with('success', 'Chapitre créé avec succès.');
+        $chapter = $formationService->chapters()->createChapter($formation);
+        return redirect()->route('formateur.formation.chapter.edit', [$formation, $chapter])->with('success', 'Chapitre créé avec succès.');
     }
 
     public function updateChapter(UpdateChapter $request, Formation $formation, Chapter $chapter, FormationService $formationService)
