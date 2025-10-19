@@ -31,6 +31,7 @@ Route::prefix('formateur')
         Route::post('/formation-edit/{formation}/chapitre/add', [FormateurFormationChapterController::class, 'createChapter'])->name('formation.chapter.add.post');
         Route::post('/formation-edit/{formation}/chapitre/{chapter}/delete', [FormateurFormationChapterController::class, 'deleteChapter'])->name('formation.chapter.delete.post');
         Route::post('/formation-edit/{formation}/chapitre/{chapter}/lesson/add', [FormateurFormationChapterLessonController::class, 'createLesson'])->name('formation.chapter.lesson.add.post');
+        Route::post('/formation-edit/{formation}/chapitre/{chapter}/lesson/{lesson}/delete', [FormateurFormationChapterLessonController::class, 'deleteLesson'])->name('formation.chapter.lesson.delete.post');
         Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/define', [FormateurFormationChapterLessonController::class, 'defineLesson'])->name('formation.chapter.lesson.define.post');
 
         // Lesson type specific routes

@@ -184,6 +184,31 @@
                                             Définir le type
                                         </a>
                                         @endif
+
+                                        <!-- Delete Lesson Button -->
+                                        <form
+                                            method="POST"
+                                            action="{{
+                                                route(
+                                                    'formateur.formation.chapter.lesson.delete.post',
+                                                    [
+                                                        $formation,
+                                                        $chapter,
+                                                        $lesson
+                                                    ]
+                                                )
+                                            }}"
+                                            class="inline"
+                                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette leçon? Cette action est irréversible.')"
+                                        >
+                                            @csrf
+                                            <button
+                                                type="submit"
+                                                class="text-red-600 hover:text-red-800 text-sm font-medium"
+                                            >
+                                                Supprimer
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                                 @endforeach

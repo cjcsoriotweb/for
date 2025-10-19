@@ -17,6 +17,17 @@ class FormateurFormationChapterLessonController
         return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])->with('success', 'Leçon créée avec succès.');
     }
 
+    public function deleteLesson(Formation $formation, Chapter $chapter, Lesson $lesson, FormationService $formationService)
+    {
+        try {
+            $formationService->lessons()->deleteLesson($lesson);
+            return redirect()->route('formateur.formation.chapter.edit', [$formation, $chapter])
+                ->with('success', 'Leçon supprimée avec succès.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Erreur lors de la suppression de la leçon: ' . $e->getMessage()]);
+        }
+    }
+
     public function defineLesson(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $lessonType = request()->input('lesson_type');

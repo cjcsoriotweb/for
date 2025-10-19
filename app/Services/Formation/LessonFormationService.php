@@ -20,4 +20,12 @@ class LessonFormationService extends BaseFormationService
 
         return $lesson;
     }
+
+    /**
+     * Delete a lesson.
+     */
+    public function deleteLesson($lesson)
+    {
+        $lesson->delete();
+    }
 }
