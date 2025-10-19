@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Formation;
 
-use App\Providers\FormationServiceProvider;
+use App\Services\Formation\SuperAdminFormationService;
+use App\Services\FormationService;
 use Livewire\Component;
 
 class FormationEdit extends Component
@@ -14,7 +15,6 @@ class FormationEdit extends Component
     
     public function mount($formation)
     {
-        dd(new FormationServiceProvider());
         $this->formation = $formation;
     }
 
@@ -25,9 +25,7 @@ class FormationEdit extends Component
     
     public function addChapter()
     {
-        $this->formation->superadmin()->addChapter($this->formation, [
-            'title' => 'Nouveau Chapitre',
-        ]);
+        app(FormationService::class)->superAdmin()->createChapter($this->formation);
     }
     
     public function render()

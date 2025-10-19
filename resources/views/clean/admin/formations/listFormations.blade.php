@@ -18,7 +18,7 @@
                         <br />
                         @if(Auth::user()->superadmin())
                         <a
-                            href="{{ route('application.admin.formation.edit', ['team' => $team, 'formation' => $formation]) }}"
+                            href="{{ route('application.admin.formation.edit', ['team' => $team, 'formation_id' => $formation]) }}"
                             >Editer</a
                         >
                         @endif

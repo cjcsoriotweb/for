@@ -21,7 +21,7 @@ class SuperAdminFormationService extends BaseFormationService
         return Formation::create($payload);
     }
 
-    public function addChapter(Formation $formation, array $attributes = [])
+    public function createChapter(Formation $formation, array $attributes = [])
     {
         $payload = array_replace([
             'title' => 'Nouveau Chapitre',

@@ -20,11 +20,11 @@ class AdminFormationController extends Controller
     {
         $validated = $request->validated();
         $title = $validated['formation']['title'];
+        $description = $validated['formation']['description'];
 
-        $formation = Formation::create([
-            'title' => $title,
-            'description' => '',
-        ]);
+  
+        app(FormationService::class)->superAdmin()->createFormation(['title' => $title, 'description' => $description]);
+        
         
         return redirect()->back()->with('status', __("Formation créée avec succès!"));
     }
