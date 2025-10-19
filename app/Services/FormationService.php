@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Services\Formation\AdminFormationService;
+use App\Services\Formation\ChapterFormationService;
 use App\Services\Formation\StudentFormationService;
 use App\Services\Formation\SuperAdminFormationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -15,7 +16,8 @@ class FormationService
     public function __construct(
         private readonly SuperAdminFormationService $superAdminService,
         private readonly AdminFormationService $adminService,
-        private readonly StudentFormationService $studentService
+        private readonly StudentFormationService $studentService,
+        private readonly ChapterFormationService $chapterService
     ) {
     }
 
@@ -27,6 +29,10 @@ class FormationService
     public function admin(): AdminFormationService
     {
         return $this->adminService;
+    }
+
+    public function chapters(){
+        return $this->chapterService;
     }
 
     /**

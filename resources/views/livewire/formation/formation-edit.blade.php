@@ -92,148 +92,8 @@
             </div>
         </div>
 
-        <div class="divide-y divide-gray-200">
-            @forelse($formation->chapters as $index => $chapter)
-            <div
-                class="px-6 py-4 hover:bg-gray-50 transition-colors duration-200"
-            >
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold"
-                        >
-                            {{ $index + 1 }}
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-medium text-gray-900">
-                                @if($chapterEdition == $chapter->id)
-                                <input
-                                    type="text"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    wire:model="chapter.title"
-                                />
-                                @else
-
-                                {{ $chapter->title }}
-
-                                @endif
-                            </h4>
-                            <div class="flex items-center space-x-4 mt-1">
-                                <span class="text-sm text-gray-500">
-                                    {{ $chapter->lessons->count() }}
-                                    leçon{{ $chapter->lessons->count() > 1 ? 's' : '' }}
-                                </span>
-                                @if($chapter->lessons->where('type',
-                                'quiz')->count() > 0)
-                                <span
-                                    class="inline-flex items-center text-sm text-purple-600"
-                                >
-                                    <span
-                                        class="material-symbols-outlined text-sm mr-1"
-                                        >quiz</span
-                                    >
-                                    {{ $chapter->lessons->where('type', 'quiz')->count() }}
-                                    quiz
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button
-                            wire:click="editChapter('{{ $chapter->id }}')"
-                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                            title="Modifier le chapitre"
-                        >
-                            {{ $chapterEdition == $chapter->id ? 'Édition...' : '' }}
-                            <span class="material-symbols-outlined text-sm"
-                                >edit</span
-                            >
-                        </button>
-                        <button
-                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                            title="Supprimer le chapitre"
-                        >
-                            <span class="material-symbols-outlined text-sm"
-                                >delete</span
-                            >
-                        </button>
-                        <button
-                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                            title="Réorganiser"
-                        >
-                            <span class="material-symbols-outlined text-sm"
-                                >drag_handle</span
-                            >
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Lessons Preview -->
-                @if($chapter->lessons->count() > 0)
-                <div class="mt-4 ml-12">
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($chapter->lessons->take(3) as $lesson)
-                        <span
-                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
-                        >
-                            <span
-                                class="material-symbols-outlined text-xs mr-1"
-                            >
-                                {{ $lesson->type === 'video' ? 'play_circle' : ($lesson->type === 'quiz' ? 'quiz' : 'article') }}
-                            </span>
-                            {{ Str::limit($lesson->title, 20) }}
-                        </span>
-                        @endforeach @if($chapter->lessons->count() > 3)
-                        <span
-                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500"
-                        >
-                            +{{ $chapter->lessons->count() - 3 }} autres
-                        </span>
-                        @endif
-                    </div>
-                </div>
-                @else
-                <div class="mt-4 ml-12">
-                    <span
-                        class="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200"
-                    >
-                        <span class="material-symbols-outlined text-sm mr-2"
-                            >warning</span
-                        >
-                        Aucun contenu dans ce chapitre
-                    </span>
-                </div>
-                @endif
-            </div>
-            @empty
-            <div class="px-6 py-12 text-center">
-                <div
-                    class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-                >
-                    <span
-                        class="material-symbols-outlined text-gray-400 text-2xl"
-                        >menu_book</span
-                    >
-                </div>
-                <h4 class="text-lg font-medium text-gray-900 mb-2">
-                    Aucun chapitre
-                </h4>
-                <p class="text-gray-500 mb-4">
-                    Cette formation n'a pas encore de chapitres. Ajoutez le
-                    premier chapitre pour commencer.
-                </p>
-                <button
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
-                >
-                    <span class="material-symbols-outlined text-sm mr-2"
-                        >add</span
-                    >
-                    Créer le premier chapitre
-                </button>
-            </div>
-            @endforelse
-        </div>
+        @livewire('formation.formation-chapter-list', ['formation' =>
+        $formation])
     </div>
 
     <!-- Quick Stats -->
@@ -273,6 +133,42 @@
                     </p>
                     <p class="text-2xl font-bold text-gray-900">
                         {{ $formation->learners->where('pivot.completed_at', '!=', null)->count() > 0 ? round(($formation->learners->where('pivot.completed_at', '!=', null)->count() / $formation->learners->count()) * 100) : 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

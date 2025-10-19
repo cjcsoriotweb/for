@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Formation\AdminFormationService;
+use App\Services\Formation\ChapterFormationService;
 use App\Services\Formation\StudentFormationService;
 use App\Services\Formation\SuperAdminFormationService;
 use App\Services\FormationService;
@@ -20,6 +21,7 @@ class FormationServiceProvider extends ServiceProvider
                 $app->make(SuperAdminFormationService::class),
                 $app->make(AdminFormationService::class),
                 $app->make(StudentFormationService::class),
+                $app->make(ChapterFormationService::class),
             );
         });
     }

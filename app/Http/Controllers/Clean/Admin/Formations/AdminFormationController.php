@@ -47,8 +47,5 @@ class AdminFormationController extends Controller
 
 
     }
-    public function destroy(){
-
-    }
 
 }
