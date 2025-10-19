@@ -22,5 +22,5 @@ Route::prefix('formateur')
     ->scopeBindings()
     ->group(function () {
         Route::put('/formation/{formation}/chapitre/{chapter}/put', [FormateurFormationChapterController::class, 'updateChapter'])->name('formation.chapter.update.put');
-        Route::post('/formation-edit/{formation}/chapitre/add', [FormateurFormationChapterController::class, 'createChapter'])->name('formation.chapter.add');
+        Route::post('/formation-edit/{formation}/chapitre/add', [FormateurFormationChapterController::class, 'createChapter'])->name('formation.chapter.add.post');
     });

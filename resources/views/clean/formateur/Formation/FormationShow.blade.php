@@ -16,7 +16,7 @@
                         <form
                             action="{{
                                 route(
-                                    'formateur.formation.chapter.add',
+                                    'formateur.formation.chapter.add.post',
                                     $formation
                                 )
                             }}"
