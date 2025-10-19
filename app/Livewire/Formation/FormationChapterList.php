@@ -18,10 +18,6 @@ class FormationChapterList extends Component
 
     public function mount(Formation $formation): void
     {
-        // Charge les relations nécessaires pour l’affichage
-        $this->formation = $formation->load(['chapters.lessons']);
-
-        // Prépare le tableau id => titre pour wire:model
         $this->chaptersById = $this->formation->chapters
             ->pluck('title', 'id')
             ->toArray();

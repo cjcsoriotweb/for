@@ -9,7 +9,13 @@ class Lesson extends Model
 {
     /** @use HasFactory<\Database\Factories\LessonFactory> */
     use HasFactory;
-    
+
+    public $fillable = [
+        'chapter_id',
+        'title',
+        'position',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -24,7 +30,7 @@ class Lesson extends Model
     public function learners()
     {
         return $this->belongsToMany(User::class, 'lesson_user')
-            ->withPivot(['status','watched_seconds','best_score','max_score','attempts','read_percent','started_at','last_activity_at','completed_at'])
+            ->withPivot(['status', 'watched_seconds', 'best_score', 'max_score', 'attempts', 'read_percent', 'started_at', 'last_activity_at', 'completed_at'])
             ->withTimestamps();
     }
 
@@ -42,5 +48,4 @@ class Lesson extends Model
     {
         return $this->hasMany(Quiz::class);
     }
-
 }
