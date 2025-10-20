@@ -3,6 +3,7 @@
 use App\Http\Controllers\Clean\Admin\AdminPageController;
 use App\Http\Controllers\Clean\Admin\Configuration\AdminConfigurationController;
 use App\Http\Controllers\Clean\Admin\Formations\AdminFormationController;
+use App\Http\Controllers\Clean\Eleve\ElevePageController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('eleve')
@@ -10,6 +11,5 @@ Route::prefix('eleve')
     ->middleware(['auth'])
     ->scopeBindings()
     ->group(function () {
-        Route::get('/', [AdminPageController::class, 'home'])->name('index');
-        Route::get('{team}/home', [AdminPageController::class, 'home'])->name('index');
+        Route::get('/{team}', [ElevePageController::class, 'home'])->name('index');
     });

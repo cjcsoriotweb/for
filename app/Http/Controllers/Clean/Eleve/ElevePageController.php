@@ -1,22 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Clean\Admin;
+namespace App\Http\Controllers\Clean\Eleve;
 
 use App\Http\Controllers\Controller;
-use App\Models\Formation;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
-use App\Services\FormationService;
-use Illuminate\Support\Facades\Auth;
 
-class AdminPageController extends Controller
+class ElevePageController extends Controller
 {
     public function __construct(
         private readonly AccountService $accountService,
     ) {}
 
-    public function homeWithoutTeam()
+    public function home(Team $team)
     {
-        return view('clean.eleve.WithoutTeam', compact(['organisations', 'team']));
+        return view('clean.eleve.home', compact('team'));
     }
 }
