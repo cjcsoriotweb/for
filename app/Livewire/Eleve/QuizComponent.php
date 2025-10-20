@@ -42,6 +42,11 @@ class QuizComponent extends Component
 
     public $totalQuestions = 0;
 
+    // Tracking du temps
+    public $startTime = null;
+
+    public $elapsedTime = 0;
+
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
@@ -87,73 +92,7 @@ class QuizComponent extends Component
         }
     }
 
-    public function submitQuiz()
-    {
-        $user = Auth::user();
 
-        // Calculer le score
-        $this->totalQuestions = $this->quiz->quizQuestions()->count();
-        $this->correctAnswers = 0;
-        $maxScore = 0;
-
-        foreach ($this->quiz->quizQuestions as $question) {
-            $maxScore += $question->points;
-
-            if (isset($this->answers[$question->id])) {
-                $userAnswer = $this->answers[$question->id];
-                $correctChoice = $question->quizChoices()->where('is_correct', true)->first();
-
-                if ($correctChoice && $correctChoice->id == $userAnswer) {
-                    $this->correctAnswers++;
-                }
-            }
-        }
-
-        $this->score = $this->totalQuestions > 0 ? ($this->correctAnswers / $this->totalQuestions) * 100 : 0;
-        $this->passed = $this->score >= $this->quiz->passing_score;
-
-        // Enregistrer la tentative
-        $this->attempts++;
-
-        $this->lesson->learners()->syncWithoutDetaching([
-            $user->id => [
-                'attempts' => $this->attempts,
-                'best_score' => max($this->lesson->learners()->where('user_id', $user->id)->first()?->pivot?->best_score ?? 0, $this->score),
-                'max_score' => $maxScore,
-                'last_activity_at' => now(),
-                'completed_at' => $this->passed ? now() : null,
-                'status' => $this->passed ? 'completed' : 'in_progress',
-            ],
-        ]);
-
-        // Créer d'abord un QuizAttempt
-        $quizAttempt = \App\Models\QuizAttempt::create([
-            'user_id' => $user->id,
-            'quiz_id' => $this->quiz->id,
-            'score' => $this->score,
-            'max_score' => $maxScore,
-            'duration_seconds' => 0, // On pourrait calculer la durée réelle si nécessaire
-            'started_at' => now(),
-            'submitted_at' => now(),
-        ]);
-
-        // Enregistrer les réponses individuelles liées à cet attempt
-        foreach ($this->answers as $questionId => $choiceId) {
-            QuizAnswer::create([
-                'quiz_attempt_id' => $quizAttempt->id,
-                'question_id' => $questionId,
-                'choice_id' => $choiceId,
-                'is_correct' => $this->quiz->quizQuestions()->find($questionId)?->quizChoices()->find($choiceId)?->is_correct ?? false,
-            ]);
-        }
-
-        // Si le quiz est réussi, mettre à jour la progression globale
-        if ($this->passed) {
-            $this->updateFormationProgress($user, $this->formation);
-        }
-
-        $this->showResults = true;
-    }
 
     public function retryQuiz()
     {
@@ -163,6 +102,42 @@ class QuizComponent extends Component
         $this->passed = false;
         $this->correctAnswers = 0;
         $this->totalQuestions = 0;
+    }
+
+    public function startQuizTimer()
+    {
+        $this->startTime = time();
+        $this->elapsedTime = 0;
+    }
+
+    public function updateTimer()
+    {
+        if ($this->startTime) {
+            $this->elapsedTime = time() - $this->startTime;
+        }
+    }
+
+    public function submitQuiz()
+    {
+        $user = Auth::user();
+
+        // Utiliser le service de quiz pour traiter la soumission avec le temps de début
+        $quizService = app(\App\Services\Quiz\QuizService::class);
+        $result = $quizService->submitQuiz($user, $this->quiz, $this->lesson, $this->answers, $this->startTime);
+
+        // Mettre à jour les propriétés du composant
+        $this->score = $result['score'];
+        $this->passed = $result['passed'];
+        $this->correctAnswers = $result['correct_answers'];
+        $this->totalQuestions = $result['total_questions'];
+        $this->attempts++;
+
+        // Si le quiz est réussi, mettre à jour la progression globale
+        if ($this->passed) {
+            $this->updateFormationProgress($user, $this->formation);
+        }
+
+        $this->showResults = true;
     }
 
     private function studentFormationService()
