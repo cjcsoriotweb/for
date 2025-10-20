@@ -59,4 +59,12 @@ class Team extends JetstreamTeam
             ->withPivot(['visible', 'approved_at', 'approved_by'])
             ->withTimestamps();
     }
+
+    /**
+     * Alias for formationsByTeam() method for compatibility
+     */
+    public function formations()
+    {
+        return $this->formationsByTeam();
+    }
 }
