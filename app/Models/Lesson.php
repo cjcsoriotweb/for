@@ -26,10 +26,12 @@ class Lesson extends Model
             'lessonable_id' => 'integer',
         ];
     }
+
     public function chapter()
     {
         return $this->belongsTo(Chapter::class);
     }
+
     public function learners()
     {
         return $this->belongsToMany(User::class, 'lesson_user')
@@ -37,13 +39,19 @@ class Lesson extends Model
             ->withTimestamps();
     }
 
-
-
     /**
      * Get the lessonable content (Quiz, VideoContent, or TextContent)
      */
     public function lessonable()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the quiz associated with this lesson (if lessonable_type is Quiz)
+     */
+    public function quizzes()
+    {
+        return $this->hasOne(Quiz::class)->where('lesson_id', $this->id);
     }
 }

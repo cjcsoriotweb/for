@@ -9,11 +9,10 @@ use App\Services\FormationService;
 
 class FormationLessonController
 {
-
-
     public function createLesson(Formation $formation, Chapter $chapter, FormationService $formationService)
     {
         $lesson = $formationService->lessons()->createLesson($formation, $chapter);
+
         return redirect()->route('formateur.formation.edit', $formation)->with('success', 'Leçon créée avec succès.');
     }
 
@@ -21,10 +20,11 @@ class FormationLessonController
     {
         try {
             $formationService->lessons()->deleteLesson($lesson);
+
             return redirect()->route('formateur.formation.edit', $formation)
                 ->with('success', 'Leçon supprimée avec succès.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Erreur lors de la suppression de la leçon: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Erreur lors de la suppression de la leçon: '.$e->getMessage()]);
         }
     }
 
@@ -32,7 +32,7 @@ class FormationLessonController
     {
         $lessonType = request()->input('lesson_type');
 
-        if (!$lessonType) {
+        if (! $lessonType) {
             return back()->withErrors(['lesson_type' => 'Veuillez sélectionner un type de leçon.']);
         }
 
@@ -104,7 +104,7 @@ class FormationLessonController
             return redirect()->route('formateur.formation.edit', $formation)
                 ->with('success', 'Quiz créé avec succès! Vous pouvez maintenant ajouter des questions.');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du quiz: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du quiz: '.$e->getMessage()]);
         }
     }
 
@@ -146,7 +146,7 @@ class FormationLessonController
             return redirect()->route('formateur.formation.edit', $formation)
                 ->with('success', 'Vidéo ajoutée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la vidéo: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la vidéo: '.$e->getMessage()]);
         }
     }
 
@@ -183,14 +183,14 @@ class FormationLessonController
             return redirect()->route('formateur.formation.edit', $formation)
                 ->with('success', 'Contenu textuel créé avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du contenu: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du contenu: '.$e->getMessage()]);
         }
     }
 
     public function editQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $quiz = $lesson->lessonable;
-        if (!$quiz || !($quiz instanceof \App\Models\Quiz)) {
+        if (! $quiz || ! ($quiz instanceof \App\Models\Quiz)) {
             return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
                 ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
         }
@@ -201,7 +201,7 @@ class FormationLessonController
     public function updateQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $quiz = $lesson->lessonable;
-        if (!$quiz || !($quiz instanceof \App\Models\Quiz)) {
+        if (! $quiz || ! ($quiz instanceof \App\Models\Quiz)) {
             return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
                 ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
         }
@@ -226,7 +226,7 @@ class FormationLessonController
             return redirect()->route('formateur.formation.edit', $formation)
                 ->with('success', 'Quiz modifié avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du quiz: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du quiz: '.$e->getMessage()]);
         }
     }
 
@@ -255,12 +255,17 @@ class FormationLessonController
         $validated = request()->validate([
             'question_text' => 'required|string',
             'question_type' => 'required|in:multiple_choice,true_false',
-            'choices' => 'required|array|min:2',
-            'choices.*.text' => 'required|string',
-            'choices.*.is_correct' => 'required|boolean',
+            'choices' => 'required|string', // JSON string from frontend
         ]);
 
         try {
+            // Decode the choices JSON
+            $choices = json_decode($validated['choices'], true);
+
+            if (! $choices || ! is_array($choices)) {
+                return back()->withInput()->withErrors(['error' => 'Format des réponses invalide.']);
+            }
+
             // Create the question
             $question = \App\Models\QuizQuestion::create([
                 'quiz_id' => $quiz->id,
@@ -269,7 +274,7 @@ class FormationLessonController
             ]);
 
             // Create the choices
-            foreach ($validated['choices'] as $choiceData) {
+            foreach ($choices as $choiceData) {
                 \App\Models\QuizChoice::create([
                     'question_id' => $question->id,
                     'choice_text' => $choiceData['text'],
@@ -279,7 +284,7 @@ class FormationLessonController
 
             return back()->with('success', 'Question ajoutée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la question: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la question: '.$e->getMessage()]);
         }
     }
 
@@ -294,12 +299,17 @@ class FormationLessonController
         $validated = request()->validate([
             'question_text' => 'required|string',
             'question_type' => 'required|in:multiple_choice,true_false',
-            'choices' => 'required|array|min:2',
-            'choices.*.text' => 'required|string',
-            'choices.*.is_correct' => 'required|boolean',
+            'choices' => 'required|string', // JSON string from frontend
         ]);
 
         try {
+            // Decode the choices JSON
+            $choices = json_decode($validated['choices'], true);
+
+            if (! $choices || ! is_array($choices)) {
+                return back()->withInput()->withErrors(['error' => 'Format des réponses invalide.']);
+            }
+
             // Update the question
             $question->update([
                 'question' => $validated['question_text'],
@@ -308,7 +318,7 @@ class FormationLessonController
 
             // Delete existing choices and create new ones
             $question->quizChoices()->delete();
-            foreach ($validated['choices'] as $choiceData) {
+            foreach ($choices as $choiceData) {
                 \App\Models\QuizChoice::create([
                     'question_id' => $question->id,
                     'choice_text' => $choiceData['text'],
@@ -318,7 +328,7 @@ class FormationLessonController
 
             return back()->with('success', 'Question modifiée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la question: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la question: '.$e->getMessage()]);
         }
     }
 
@@ -335,14 +345,14 @@ class FormationLessonController
 
             return back()->with('success', 'Question supprimée avec succès!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Erreur lors de la suppression de la question: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Erreur lors de la suppression de la question: '.$e->getMessage()]);
         }
     }
 
     public function editVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $videoContent = $lesson->lessonable;
-        if (!$videoContent || !($videoContent instanceof \App\Models\VideoContent)) {
+        if (! $videoContent || ! ($videoContent instanceof \App\Models\VideoContent)) {
             return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
                 ->withErrors(['error' => 'Vidéo non trouvée pour cette leçon.']);
         }
@@ -353,7 +363,7 @@ class FormationLessonController
     public function updateVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $videoContent = $lesson->lessonable;
-        if (!$videoContent || !($videoContent instanceof \App\Models\VideoContent)) {
+        if (! $videoContent || ! ($videoContent instanceof \App\Models\VideoContent)) {
             return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
                 ->withErrors(['error' => 'Vidéo non trouvée pour cette leçon.']);
         }
@@ -387,14 +397,14 @@ class FormationLessonController
             return redirect()->route('formateur.formation.edit', $formation)
                 ->with('success', 'Vidéo modifiée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la vidéo: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la vidéo: '.$e->getMessage()]);
         }
     }
 
     public function editText(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $textContent = $lesson->lessonable;
-        if (!$textContent || !($textContent instanceof \App\Models\TextContent)) {
+        if (! $textContent || ! ($textContent instanceof \App\Models\TextContent)) {
             return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
                 ->withErrors(['error' => 'Contenu textuel non trouvé pour cette leçon.']);
         }
@@ -405,7 +415,7 @@ class FormationLessonController
     public function updateText(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $textContent = $lesson->lessonable;
-        if (!$textContent || !($textContent instanceof \App\Models\TextContent)) {
+        if (! $textContent || ! ($textContent instanceof \App\Models\TextContent)) {
             return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
                 ->withErrors(['error' => 'Contenu textuel non trouvé pour cette leçon.']);
         }
@@ -434,7 +444,7 @@ class FormationLessonController
             return redirect()->route('formateur.formation.edit', $formation)
                 ->with('success', 'Contenu textuel modifié avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du contenu: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du contenu: '.$e->getMessage()]);
         }
     }
 }

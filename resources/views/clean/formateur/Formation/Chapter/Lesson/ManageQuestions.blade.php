@@ -403,6 +403,9 @@
                     @csrf
                     <input type="hidden" id="questionId" name="question_id" />
 
+                    <!-- Hidden fields for form submission -->
+                    <input type="hidden" id="formattedChoices" name="choices" />
+
                     <!-- Question Text -->
                     <div class="mb-4">
                         <label
@@ -762,6 +765,79 @@
                 if (e.target === this) {
                     closeQuestionModal();
                 }
+            });
+
+        // Handle form submission
+        document
+            .getElementById("questionForm")
+            .addEventListener("submit", function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                const questionText = document
+                    .getElementById("question_text")
+                    .value.trim();
+                const questionType = document.querySelector(
+                    'input[name="question_type"]:checked'
+                ).value;
+                const choiceItems = document.querySelectorAll(".choice-item");
+
+                // Validate question text
+                if (!questionText) {
+                    alert("Veuillez saisir le texte de la question.");
+                    return;
+                }
+
+                // Validate choices
+                if (choiceItems.length < 2) {
+                    alert("Veuillez ajouter au moins 2 réponses.");
+                    return;
+                }
+
+                // Collect choices data
+                const choices = [];
+                let hasCorrectAnswer = false;
+
+                choiceItems.forEach((item, index) => {
+                    const textInput = item.querySelector('input[type="text"]');
+                    const radioInput = item.querySelector(
+                        'input[type="radio"]'
+                    );
+                    const choiceText = textInput.value.trim();
+
+                    if (!choiceText) {
+                        alert(
+                            `Veuillez saisir le texte de la réponse ${
+                                index + 1
+                            }.`
+                        );
+                        throw new Error("Validation failed");
+                    }
+
+                    const isCorrect = radioInput.checked;
+                    if (isCorrect) {
+                        hasCorrectAnswer = true;
+                    }
+
+                    choices.push({
+                        text: choiceText,
+                        is_correct: isCorrect,
+                    });
+                });
+
+                // Validate that at least one correct answer is selected
+                if (!hasCorrectAnswer) {
+                    alert(
+                        "Veuillez sélectionner au moins une réponse correcte."
+                    );
+                    return;
+                }
+
+                // Set the formatted choices in the hidden input
+                document.getElementById("formattedChoices").value =
+                    JSON.stringify(choices);
+
+                // Submit the form
+                this.submit();
             });
     </script>
 </x-app-layout>

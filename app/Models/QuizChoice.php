@@ -9,4 +9,10 @@ class QuizChoice extends Model
 {
     /** @use HasFactory<\Database\Factories\QuizChoiceFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'question_id',
+        'choice_text',
+        'is_correct',
+    ];
 }
