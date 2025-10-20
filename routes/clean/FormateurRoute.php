@@ -1,10 +1,9 @@
 <?php
 
-
 use App\Http\Controllers\Clean\Formateur\FormateurPageController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationController;
-use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
+use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('formateur')
@@ -16,7 +15,8 @@ Route::prefix('formateur')
 
         // Formation routes
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
-        Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.edit');
+        Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show');
+        Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
 
         // Chapter routes
         Route::get('/formation/{formation}/chapitre/{chapter}/show', [FormationChapterController::class, 'editChapter'])->name('formation.chapter.edit');
