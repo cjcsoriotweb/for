@@ -25,8 +25,9 @@ class FormateurFormationController extends Controller
         return back()->with('success', 'Formation mise à jour avec succès.');
     }
 
-    public function createFormation(Team $team, FormationService $formationService)
+    public function createFormation(FormationService $formationService)
     {
-        $formationService->createFormation();
+        $formation = $formationService->createFormation();
+        return redirect()->route('formateur.formation.show', [$formation]);
     }
 }

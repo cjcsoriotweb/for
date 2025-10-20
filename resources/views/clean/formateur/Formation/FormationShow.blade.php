@@ -551,7 +551,9 @@
                 </div>
 
                 <form
-                    action="{{ route('formation.update', $formation) }}"
+                    action="{{
+                        route('formateur.formation.update', $formation)
+                    }}"
                     method="POST"
                 >
                     @csrf @method('PUT')

@@ -27,7 +27,7 @@
                             <a
                                 href="{{
                                     route(
-                                        'formateur.formation.edit',
+                                        'formateur.formation.show',
                                         $formation
                                     )
                                 }}"

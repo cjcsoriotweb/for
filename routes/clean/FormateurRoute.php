@@ -15,7 +15,7 @@ Route::prefix('formateur')
 
         // Formation routes
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
-        Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show');
+        Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show', 'formation.edit');
         Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
 
         // Chapter routes

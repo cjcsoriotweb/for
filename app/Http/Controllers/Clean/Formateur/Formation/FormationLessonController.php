@@ -13,7 +13,7 @@ class FormationLessonController
     {
         $lesson = $formationService->lessons()->createLesson($formation, $chapter);
 
-        return redirect()->route('formateur.formation.edit', $formation)->with('success', 'Leçon créée avec succès.');
+        return redirect()->route('formateur.formation.show', $formation)->with('success', 'Leçon créée avec succès.');
     }
 
     public function deleteLesson(Formation $formation, Chapter $chapter, Lesson $lesson, FormationService $formationService)
@@ -21,10 +21,10 @@ class FormationLessonController
         try {
             $formationService->lessons()->deleteLesson($lesson);
 
-            return redirect()->route('formateur.formation.edit', $formation)
+            return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Leçon supprimée avec succès.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Erreur lors de la suppression de la leçon: '.$e->getMessage()]);
+            return back()->withErrors(['error' => 'Erreur lors de la suppression de la leçon: ' . $e->getMessage()]);
         }
     }
 
@@ -101,10 +101,10 @@ class FormationLessonController
                 'lessonable_id' => $quiz->id,
             ]);
 
-            return redirect()->route('formateur.formation.edit', $formation)
+            return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Quiz créé avec succès! Vous pouvez maintenant ajouter des questions.');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du quiz: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du quiz: ' . $e->getMessage()]);
         }
     }
 
@@ -143,10 +143,10 @@ class FormationLessonController
                 'lessonable_id' => $videoContent->id,
             ]);
 
-            return redirect()->route('formateur.formation.edit', $formation)
+            return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Vidéo ajoutée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la vidéo: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la vidéo: ' . $e->getMessage()]);
         }
     }
 
@@ -180,10 +180,10 @@ class FormationLessonController
                 'lessonable_id' => $textContent->id,
             ]);
 
-            return redirect()->route('formateur.formation.edit', $formation)
+            return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Contenu textuel créé avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du contenu: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du contenu: ' . $e->getMessage()]);
         }
     }
 
@@ -223,10 +223,10 @@ class FormationLessonController
                 'max_attempts' => $validated['max_attempts'],
             ]);
 
-            return redirect()->route('formateur.formation.edit', $formation)
+            return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Quiz modifié avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du quiz: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du quiz: ' . $e->getMessage()]);
         }
     }
 
@@ -284,7 +284,7 @@ class FormationLessonController
 
             return back()->with('success', 'Question ajoutée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la question: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la question: ' . $e->getMessage()]);
         }
     }
 
@@ -328,7 +328,7 @@ class FormationLessonController
 
             return back()->with('success', 'Question modifiée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la question: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la question: ' . $e->getMessage()]);
         }
     }
 
@@ -345,7 +345,7 @@ class FormationLessonController
 
             return back()->with('success', 'Question supprimée avec succès!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Erreur lors de la suppression de la question: '.$e->getMessage()]);
+            return back()->withErrors(['error' => 'Erreur lors de la suppression de la question: ' . $e->getMessage()]);
         }
     }
 
@@ -394,10 +394,10 @@ class FormationLessonController
                 'duration_minutes' => $validated['video_duration'],
             ]);
 
-            return redirect()->route('formateur.formation.edit', $formation)
+            return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Vidéo modifiée avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la vidéo: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la vidéo: ' . $e->getMessage()]);
         }
     }
 
@@ -441,10 +441,10 @@ class FormationLessonController
                 'show_progress' => $validated['show_progress'] ?? true,
             ]);
 
-            return redirect()->route('formateur.formation.edit', $formation)
+            return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Contenu textuel modifié avec succès!');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du contenu: '.$e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du contenu: ' . $e->getMessage()]);
         }
     }
 }
