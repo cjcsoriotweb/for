@@ -176,11 +176,19 @@
                                         ></path>
                                     </svg>
                                     @endif
-                                    <span
-                                        class="text-sm text-gray-600 dark:text-gray-400"
+                                    <a
+                                        href="{{
+                                            route('eleve.lesson.show', [
+                                                $team,
+                                                $formationWithProgress,
+                                                $chapter,
+                                                $lesson
+                                            ])
+                                        }}"
+                                        class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200"
                                     >
                                         {{ $lesson->title }}
-                                    </span>
+                                    </a>
                                 </div>
                                 @endforeach
                             </div>

@@ -229,18 +229,18 @@
                             <div class="space-y-3">
                                 @foreach($question->quizChoices as $choice)
                                 <label
-                                    class="flex items-start space-x-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                                    class="flex items-start space-x-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all duration-200 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:dark:bg-blue-900/20 has-[:checked]:dark:border-blue-400"
                                 >
                                     <input
                                         type="radio"
                                         name="answers[{{ $question->id }}]"
                                         value="{{ $choice->id }}"
-                                        class="mt-1 text-blue-600 focus:ring-blue-500"
+                                        class="mt-1 text-blue-600 focus:ring-blue-500 focus:ring-2"
                                         required
                                     />
                                     <span
-                                        class="flex-1"
-                                        >{{ $choice->choice }}</span
+                                        class="flex-1 has-[:checked]:text-blue-900 has-[:checked]:dark:text-blue-100"
+                                        >{{ $choice->choice_text }}</span
                                     >
                                 </label>
                                 @endforeach

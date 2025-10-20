@@ -18,7 +18,8 @@ Route::prefix('eleve')
         Route::get('/{team}/api/formations', [ElevePageController::class, 'apiFormations'])->name('api.formations');
 
         // Lesson viewing routes
-        Route::get('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}', [ElevePageController::class, 'showLesson'])->name('lesson.show');
+        Route::get('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}', [ElevePageController::class, 'showLesson'])
+            ->name('lesson.show');
         Route::post('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/start', [ElevePageController::class, 'startLesson'])->name('lesson.start');
         Route::post('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/complete', [ElevePageController::class, 'completeLesson'])->name('lesson.complete');
         Route::post('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/progress', [ElevePageController::class, 'updateProgress'])->name('lesson.progress');
