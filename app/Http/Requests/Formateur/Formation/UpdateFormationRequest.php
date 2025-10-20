@@ -12,14 +12,8 @@ class UpdateFormationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $formation = $this->route('formation');
-
         // Check if the user is associated with the formation through their teams
-        return $formation->teams()
-            ->whereHas('users', function ($query) {
-                $query->where('users.id', Auth::id());
-            })
-            ->exists();
+        return Auth::user()->superadmin;
     }
 
     /**
