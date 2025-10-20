@@ -210,14 +210,14 @@
             <form
                 method="POST"
                 action="{{
-                    route('eleve.formation.enroll', [
+                    route('eleve.formation.reset-progress', [
                         $team,
                         $formationWithProgress
                     ])
                 }}"
                 class="inline"
             >
-                @csrf
+                @csrf @method('POST')
                 <button
                     type="submit"
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

@@ -75,7 +75,7 @@
                 </div>
 
                 <a
-                    href="#"
+                    href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
                     class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors text-center block"
                 >
                     Continuer la formation

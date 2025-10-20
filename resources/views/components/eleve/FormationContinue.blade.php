@@ -93,7 +93,7 @@
                 @endif
 
                 <a
-                    href="#"
+                    href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
                     class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors text-center block"
                 >
                     Continuer
@@ -128,7 +128,7 @@
                 apprentissage.
             </p>
             <a
-                href="#"
+                href="{{ route('eleve.index', $team) }}"
                 class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
             >
                 Découvrir les formations

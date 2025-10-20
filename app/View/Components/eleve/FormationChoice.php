@@ -12,12 +12,14 @@ use Illuminate\View\Component;
 class FormationChoice extends Component
 {
     public $availableFormations;
+    public $team;
 
     /**
      * Create a new component instance.
      */
     public function __construct(StudentFormationService $studentFormationService, Team $team)
     {
+        $this->team = $team;
         $this->availableFormations = $studentFormationService->listAvailableFormationsForTeam($team);
     }
 
@@ -26,6 +28,8 @@ class FormationChoice extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.eleve.FormationChoice');
+        return view('components.eleve.FormationChoice', [
+            'team' => $this->team
+        ]);
     }
 }
