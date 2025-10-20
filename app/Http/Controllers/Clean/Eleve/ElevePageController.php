@@ -114,6 +114,32 @@ class ElevePageController extends Controller
     }
 
     /**
+     * Réinitialiser le progrès d'un étudiant dans une formation
+     */
+    public function resetProgress(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit à cette formation
+        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            return back()->with('error', 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        try {
+            // Réinitialiser le progrès à 0
+            $formation->learners()->updateExistingPivot($user->id, [
+                'progress_percent' => 0,
+                'status' => 'enrolled',
+                'enrolled_at' => now(),
+            ]);
+
+            return back()->with('success', 'Le progrès a été réinitialisé avec succès.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Une erreur est survenue lors de la réinitialisation du progrès.');
+        }
+    }
+
+    /**
      * API endpoint pour récupérer les formations d'un étudiant (pour AJAX)
      */
     public function apiFormations(Team $team, Request $request)

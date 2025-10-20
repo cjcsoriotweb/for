@@ -12,5 +12,8 @@ Route::prefix('eleve')
     ->scopeBindings()
     ->group(function () {
         Route::get('/{team}', [ElevePageController::class, 'home'])->name('index');
+        Route::get('/{team}/formation/{formation}', [ElevePageController::class, 'showFormation'])->name('formation.show');
         Route::post('/{team}/formation/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('formation.enroll');
+        Route::post('/{team}/formation/{formation}/reset-progress', [ElevePageController::class, 'resetProgress'])->name('formation.reset-progress');
+        Route::get('/{team}/api/formations', [ElevePageController::class, 'apiFormations'])->name('api.formations');
     });
