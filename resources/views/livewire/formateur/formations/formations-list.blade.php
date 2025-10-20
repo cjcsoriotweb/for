@@ -1,4 +1,33 @@
 <div>
+    <!-- Header with Create Button -->
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex-1">
+            <h2 class="text-2xl font-bold text-gray-900">Mes formations</h2>
+            <p class="text-gray-600 mt-1">
+                Gérez vos formations et contenus pédagogiques
+            </p>
+        </div>
+        <a
+            href="{{ route('formateur.formations.create') }}"
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+            <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                ></path>
+            </svg>
+            Créer une formation
+        </a>
+    </div>
+
     <!-- Search Section -->
     <div class="mb-8">
         <div class="relative max-w-md">
@@ -120,7 +149,7 @@
                 <div class="flex items-center justify-between">
                     <a
                         href="{{
-                            route('formateur.formation.edit', $formation)
+                            route('formateur.formation.show', $formation)
                         }}"
                         class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group/btn"
                     >
