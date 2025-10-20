@@ -78,6 +78,39 @@ class ElevePageController extends Controller
     }
 
     /**
+     * Inscrire un étudiant à une formation
+     */
+    public function enroll(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est déjà inscrit
+        if ($this->studentFormationService->isEnrolledInFormation($user, $formation)) {
+            return back()->with('warning', 'Vous êtes déjà inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation est disponible pour cette équipe
+        $availableFormations = $this->studentFormationService->listAvailableFormationsForTeam($team);
+        if (!$availableFormations->contains('id', $formation->id)) {
+            return back()->with('error', 'Cette formation n\'est pas disponible pour votre équipe.');
+        }
+
+        // Inscrire l'étudiant à la formation
+        try {
+            $formation->learners()->attach($user->id, [
+                'team_id' => $team->id,
+                'status' => 'enrolled',
+                'progress_percent' => 0,
+                'enrolled_at' => now(),
+            ]);
+
+            return back()->with('success', 'Vous avez été inscrit à la formation avec succès !');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Une erreur est survenue lors de l\'inscription.');
+        }
+    }
+
+    /**
      * API endpoint pour récupérer les formations d'un étudiant (pour AJAX)
      */
     public function apiFormations(Team $team, Request $request)

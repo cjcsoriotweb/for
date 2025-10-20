@@ -3,7 +3,7 @@
 namespace App\View\Components\Eleve;
 
 use App\Models\Team;
-use App\Services\FormationService;
+use App\Services\Formation\StudentFormationService;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -11,13 +11,14 @@ use Illuminate\View\Component;
 
 class FormationChoice extends Component
 {
-    public $currentFormation;
+    public $availableFormations;
+
     /**
      * Create a new component instance.
      */
-    public function __construct(FormationService $formations, Team $team)
+    public function __construct(StudentFormationService $studentFormationService, Team $team)
     {
-        $this->currentFormation = $formations->student()->listFormationCurrentByStudent($team, Auth::user());
+        $this->availableFormations = $studentFormationService->listAvailableFormationsForTeam($team);
     }
 
     /**

@@ -12,4 +12,5 @@ Route::prefix('eleve')
     ->scopeBindings()
     ->group(function () {
         Route::get('/{team}', [ElevePageController::class, 'home'])->name('index');
+        Route::post('/{team}/formation/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('formation.enroll');
     });

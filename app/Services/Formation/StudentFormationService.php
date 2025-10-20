@@ -24,6 +24,17 @@ class StudentFormationService extends BaseFormationService
     }
 
     /**
+     * List all formations available for a team that a student can enroll in.
+     * Returns formations visible to the team, regardless of student enrollment status.
+     */
+    public function listAvailableFormationsForTeam(Team $team): Collection
+    {
+        return $this->list([
+            'team' => $team,
+        ]);
+    }
+
+    /**
      * Paginate current formations for a specific student in a team.
      */
     public function paginateFormationCurrentByStudent(Team $team, User $user, int $perPage = 15): LengthAwarePaginator
