@@ -11,12 +11,13 @@ use Illuminate\View\Component;
 
 class Hello extends Component
 {
+    public $currentFormation;
     /**
      * Create a new component instance.
      */
     public function __construct(FormationService $formations, Team $team)
     {
-        dd($formations->student()->listFormationCurrentByStudent($team, Auth::user()));
+        $this->currentFormation = $formations->student()->listFormationCurrentByStudent($team, Auth::user());
     }
 
     /**

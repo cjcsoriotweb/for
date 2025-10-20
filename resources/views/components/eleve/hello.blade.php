@@ -13,22 +13,10 @@
                 <div class="flex items-center space-x-6">
                     <div class="text-center">
                         <div class="text-2xl font-bold">
-                            { $eleve->formationsCount }
+                            {{ count($currentFormation) }}
                         </div>
                         <div class="text-sm text-blue-200">
                             Formations en cours
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold">67%</div>
-                        <div class="text-sm text-blue-200">
-                            Progression globale
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold">12</div>
-                        <div class="text-sm text-blue-200">
-                            Certificats obtenus
                         </div>
                     </div>
                 </div>
