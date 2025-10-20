@@ -188,8 +188,7 @@
                                     focus:ring-indigo-500"
                                     onclick="toggleVideoSource('url')" />
                                     <span class="ml-2 text-sm text-gray-700"
-                                        >URL externe (YouTube, Vimeo,
-                                        etc.)</span
+                                        >URL externe (hébergement vidéo)</span
                                     >
                                 </label>
                                 <label class="flex items-center">
@@ -323,7 +322,7 @@
                                 name="video_url"
                                 value="{{ old('video_url', $videoContent->video_url) }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('video_url') border-red-500 @enderror"
-                                placeholder="https://www.youtube.com/watch?v=... ou https://vimeo.com/..."
+                                placeholder="https://exemple.com/video.mp4"
                             />
                             @error('video_url')
                             <p class="mt-1 text-sm text-red-600">
@@ -331,8 +330,7 @@
                             </p>
                             @enderror
                             <p class="text-xs text-gray-500 mt-1">
-                                Formats supportés: YouTube, Vimeo, Dailymotion,
-                                etc.
+                                URL externe (hébergement vidéo)
                             </p>
                         </div>
 
@@ -512,50 +510,18 @@
             let videoId = null;
             let platform = null;
 
-            // YouTube detection
-            if (videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i)) {
-                videoId = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i)[1];
-                platform = 'youtube';
-            }
-            // Vimeo detection
-            else if (videoUrl.match(/(?:vimeo\.com\/(?:.*\/)?|player\.vimeo\.com\/video\/)([0-9]+)(?:\/.*)?$/i)) {
-                videoId = videoUrl.match(/(?:vimeo\.com\/(?:.*\/)?|player\.vimeo\.com\/video\/)([0-9]+)(?:\/.*)?$/i)[1];
-                platform = 'vimeo';
-            }
-
-            if (videoId && platform) {
-                let embedUrl = '';
-                if (platform === 'youtube') {
-                    embedUrl = 'https://www.youtube.com/embed/' + videoId;
-                } else if (platform === 'vimeo') {
-                    embedUrl = 'https://player.vimeo.com/video/' + videoId;
-                }
-
-                previewContainer.innerHTML = `
-                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
-                        <iframe
-                            class="w-full h-full"
-                            src="${embedUrl}"
-                            title="Aperçu vidéo"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                `;
-            } else {
-                previewContainer.innerHTML = `
-                    <div class="aspect-video bg-gray-800 rounded-lg flex items-center justify-center text-white">
-                        <div class="text-center">
-                            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <p class="text-sm">Aperçu non disponible pour cette plateforme</p>
-                        </div>
-                    </div>
-                `;
-            }
+            // Generic video URL handling - just show a placeholder
+            previewContainer.innerHTML = `
+            <div class="aspect-video bg-gray-800 rounded-lg flex items-center justify-center text-white">
+                <div class="text-center">
+                    <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-sm">Aperçu disponible lors de la lecture</p>
+                </div>
+            </div>
+        `;
         });
     </script>
 </x-app-layout>
