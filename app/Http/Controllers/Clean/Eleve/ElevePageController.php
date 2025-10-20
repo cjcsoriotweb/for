@@ -7,7 +7,6 @@ use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\Lesson;
 use App\Models\Quiz;
-use App\Models\QuizAnswer;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Clean\Account\AccountService;
@@ -61,14 +60,14 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier si l'étudiant est inscrit
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
         // Récupérer la formation avec le progrès de l'étudiant
         $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
 
-        if (!$formationWithProgress) {
+        if (! $formationWithProgress) {
             abort(404, 'Formation non trouvée ou non accessible.');
         }
 
@@ -99,7 +98,7 @@ class ElevePageController extends Controller
             ->where('formation_in_teams.visible', true)
             ->pluck('formations.id');
 
-        if (!$availableFormations->contains($formation->id)) {
+        if (! $availableFormations->contains($formation->id)) {
             return back()->with('error', 'Cette formation n\'est pas disponible pour votre équipe.');
         }
 
@@ -126,7 +125,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier si l'étudiant est inscrit à cette formation
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             return back()->with('error', 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
@@ -169,7 +168,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier si l'étudiant est inscrit à la formation
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
@@ -193,7 +192,7 @@ class ElevePageController extends Controller
             $lessonType = 'quiz';
         }
 
-        if (!$lessonContent) {
+        if (! $lessonContent) {
             abort(404, 'Contenu de leçon non trouvé.');
         }
 
@@ -241,7 +240,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier les permissions
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
@@ -250,8 +249,8 @@ class ElevePageController extends Controller
             $user->id => [
                 'started_at' => now(),
                 'last_activity_at' => now(),
-                'status' => 'in_progress'
-            ]
+                'status' => 'in_progress',
+            ],
         ]);
 
         return response()->json(['success' => true]);
@@ -265,7 +264,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier les permissions
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
@@ -274,8 +273,8 @@ class ElevePageController extends Controller
             $user->id => [
                 'completed_at' => now(),
                 'last_activity_at' => now(),
-                'status' => 'completed'
-            ]
+                'status' => 'completed',
+            ],
         ]);
 
         // Mettre à jour la progression globale de la formation
@@ -292,7 +291,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier les permissions
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
@@ -302,8 +301,8 @@ class ElevePageController extends Controller
         $lesson->learners()->syncWithoutDetaching([
             $user->id => [
                 'read_percent' => $readPercent,
-                'last_activity_at' => now()
-            ]
+                'last_activity_at' => now(),
+            ],
         ]);
 
         return response()->json(['success' => true]);
@@ -317,7 +316,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier les permissions
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
@@ -359,7 +358,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier les permissions
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
@@ -402,8 +401,8 @@ class ElevePageController extends Controller
                 'max_score' => $maxScore,
                 'last_activity_at' => now(),
                 'completed_at' => $passed ? now() : null,
-                'status' => $passed ? 'completed' : 'in_progress'
-            ]
+                'status' => $passed ? 'completed' : 'in_progress',
+            ],
         ]);
 
         // Enregistrer les réponses individuelles
@@ -413,7 +412,7 @@ class ElevePageController extends Controller
                 'quiz_question_id' => $questionId,
                 'quiz_choice_id' => $choiceId,
                 'lesson_id' => $lesson->id,
-                'is_correct' => $quiz->quizQuestions()->find($questionId)?->quizChoices()->find($choiceId)?->is_correct ?? false
+                'is_correct' => $quiz->quizQuestions()->find($questionId)?->quizChoices()->find($choiceId)?->is_correct ?? false,
             ]);
         }
 
@@ -427,7 +426,7 @@ class ElevePageController extends Controller
             'score' => $score,
             'passed' => $passed,
             'correct_answers' => $correctAnswers,
-            'total_questions' => $totalQuestions
+            'total_questions' => $totalQuestions,
         ]);
     }
 
@@ -456,8 +455,8 @@ class ElevePageController extends Controller
             $user->id => [
                 'progress_percent' => $progressPercent,
                 'last_seen_at' => now(),
-                'status' => $progressPercent >= 100 ? 'completed' : 'in_progress'
-            ]
+                'status' => $progressPercent >= 100 ? 'completed' : 'in_progress',
+            ],
         ]);
     }
 }

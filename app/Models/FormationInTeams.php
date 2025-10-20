@@ -12,7 +12,7 @@ class FormationInTeams extends Model
         'team_id',
         'visible',
     ];
- 
+
     public function formation()
     {
         return $this->belongsTo(Formation::class);
@@ -27,6 +27,7 @@ class FormationInTeams extends Model
     public function scopeTeam(Builder $q, Team|int $team): Builder
     {
         $id = $team instanceof Team ? $team->id : $team;
+
         return $q->where('team_id', $id);
     }
 
@@ -34,5 +35,4 @@ class FormationInTeams extends Model
     {
         return $q->where('visible', $value);
     }
-  
 }

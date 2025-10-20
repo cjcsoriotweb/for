@@ -55,6 +55,7 @@ class TeamPolicy
         return $user->ownsTeam($team)
             || $user->hasTeamPermission($team, 'action:users_invite');
     }
+
     /**
      * Determine whether the user can delete the model.
      */
@@ -71,13 +72,9 @@ class TeamPolicy
         return $user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin');
     }
 
-
-
-
     /**
      * Determine whether the user is admin of the team.
      */
-
     public function admin(User $user, Team $team): bool
     {
         if ($user->ownsTeam($team) || $user->hasTeamPermission($team, 'admin')) {
@@ -90,14 +87,10 @@ class TeamPolicy
     /**
      * Determine whether the user can read the team.
      */
-
-
-
     public function eleve(User $user, Team $team): bool
     {
         // Pour l'instant, permettre à tous les membres de l'équipe d'accéder à l'espace élève
         // Plus tard, on pourra restreindre par rôle spécifique
         return $user->belongsToTeam($team);
     }
-    
 }

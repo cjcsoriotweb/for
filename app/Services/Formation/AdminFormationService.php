@@ -32,8 +32,6 @@ class AdminFormationService extends BaseFormationService
         ])->delete();
     }
 
-
-
     public function listWithTeamFlags(Team $team, array $options = []): Collection
     {
         return $this->list($options + ['team' => $team]);
@@ -64,7 +62,7 @@ class AdminFormationService extends BaseFormationService
 
         return $this->paginate(array_filter(
             $options,
-            static fn ($value) => !is_null($value)
+            static fn ($value) => ! is_null($value)
         ));
     }
 
@@ -73,7 +71,7 @@ class AdminFormationService extends BaseFormationService
         $team = $options['team'] ?? null;
         $onlyVisible = (bool) ($options['only_visible'] ?? false);
 
-        if (!$team instanceof Team) {
+        if (! $team instanceof Team) {
             return $query;
         }
 

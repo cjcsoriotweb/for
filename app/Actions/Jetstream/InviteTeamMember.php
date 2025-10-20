@@ -6,7 +6,6 @@ use App\Models\Team;
 use App\Models\User;
 use Closure;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
@@ -25,10 +24,9 @@ class InviteTeamMember implements InvitesTeamMembers
     public function invite(User $user, Team $team, string $email, ?string $role = null): void
     {
 
-        if(auth()->user()->hasTeamPermission($team, 'admiaan')){
+        if (auth()->user()->hasTeamPermission($team, 'admiaan')) {
             throw new \Exception('Unauthorized');
         }
-
 
         $this->validate($team, $email, $role);
 

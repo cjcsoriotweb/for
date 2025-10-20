@@ -3,18 +3,18 @@
 namespace App\Livewire\Formation;
 
 use App\Models\Formation;
-use App\Services\FormationService;
 use Livewire\Component;
 
 class FormationEditInfo extends Component
 {
     public Formation $formation;
+
     public $data = [
         'title' => '',
         'description' => '',
     ];
-    public $editing = false;
 
+    public $editing = false;
 
     public function mount(Formation $formation): void
     {
@@ -40,7 +40,6 @@ class FormationEditInfo extends Component
         $this->editing = false;
     }
 
-  
     public function render()
     {
         return view('livewire.formation.formation-edit-info', [

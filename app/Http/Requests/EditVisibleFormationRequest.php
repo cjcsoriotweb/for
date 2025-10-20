@@ -4,8 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Formation;
-use App\Models\Team;
 
 class EditVisibleFormationRequest extends FormRequest
 {
@@ -16,10 +14,10 @@ class EditVisibleFormationRequest extends FormRequest
     {
 
         return Auth::user()->hasTeamRole($this->route('team'), 'admin');
-  
+
     }
 
-    /**  
+    /**
      * Définit les règles de validation pour cette requête.
      */
     public function rules(): array
@@ -28,6 +26,4 @@ class EditVisibleFormationRequest extends FormRequest
             'formation_id' => ['required', 'integer', 'exists:formations,id'],
         ];
     }
-
-
 }

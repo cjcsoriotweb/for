@@ -12,24 +12,24 @@ class QuizAttempt extends Model
 
     public $fillable = [
         'user_id',
-        'lesson_id',
         'quiz_id',
         'score',
         'max_score',
-        'passed',
-        'completed_at',
+        'duration_seconds',
+        'started_at',
+        'submitted_at',
     ];
 
     protected function casts(): array
     {
         return [
             'user_id' => 'integer',
-            'lesson_id' => 'integer',
             'quiz_id' => 'integer',
-            'score' => 'decimal:2',
-            'max_score' => 'decimal:2',
-            'passed' => 'boolean',
-            'completed_at' => 'datetime',
+            'score' => 'integer',
+            'max_score' => 'integer',
+            'duration_seconds' => 'integer',
+            'started_at' => 'datetime',
+            'submitted_at' => 'datetime',
         ];
     }
 

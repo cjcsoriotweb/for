@@ -14,6 +14,7 @@ class QuizQuestion extends Model
         'quiz_id',
         'question',
         'type',
+        'points',
     ];
 
     public function quiz()

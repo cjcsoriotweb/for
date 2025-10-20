@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class FormationUser extends Model
 {
     protected $table = 'formation_user';
+
     protected $fillable = [
         'formation_id',
         'user_id',
@@ -16,7 +17,7 @@ class FormationUser extends Model
         'starts_at',
         'ends_at',
     ];
-    
+
     protected function casts(): array
     {
         return [
@@ -28,7 +29,6 @@ class FormationUser extends Model
             'ends_at' => 'datetime',
         ];
     }
-
 
     public function formation()
     {

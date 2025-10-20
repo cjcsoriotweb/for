@@ -3,7 +3,6 @@
 namespace App\Livewire\Formation;
 
 use App\Models\Formation;
-use App\Services\FormationService;
 use Livewire\Component;
 
 class FormationEdit extends Component
@@ -15,7 +14,6 @@ class FormationEdit extends Component
     {
         $this->formation = $formation->load(['chapters.lessons']);
     }
-
 
     public function render()
     {

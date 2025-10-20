@@ -3,12 +3,10 @@
 namespace App\Services;
 
 use App\Models\Formation;
-use App\Models\Team;
 use App\Services\Formation\AdminFormationService;
 use App\Services\Formation\ChapterFormationService;
 use App\Services\Formation\LessonFormationService;
 use App\Services\Formation\StudentFormationService;
-
 
 class FormationService
 {
@@ -18,7 +16,6 @@ class FormationService
         private readonly ChapterFormationService $chapterService,
         private readonly LessonFormationService $lessonService
     ) {}
-
 
     public function admin(): AdminFormationService
     {
@@ -35,7 +32,6 @@ class FormationService
         return $this->lessonService;
     }
 
-
     public function createFormation(array $attributes = []): Formation
     {
         $payload = array_replace([
@@ -47,7 +43,6 @@ class FormationService
 
         return Formation::create($payload);
     }
-
 
     public function student(): StudentFormationService
     {

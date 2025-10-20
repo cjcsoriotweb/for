@@ -92,7 +92,7 @@ class FormationLessonList extends Component
             // Événement front (optionnel)
             $this->dispatch('lesson-saved', id: $lessonId);
         } catch (\Exception $e) {
-            $this->showErrorMessage('Erreur lors de la sauvegarde : ' . $e->getMessage());
+            $this->showErrorMessage('Erreur lors de la sauvegarde : '.$e->getMessage());
         }
     }
 
@@ -120,7 +120,7 @@ class FormationLessonList extends Component
 
             $this->dispatch('lesson-added', lessonId: $lesson->id);
         } catch (\Exception $e) {
-            $this->showErrorMessage('Erreur lors de la création : ' . $e->getMessage());
+            $this->showErrorMessage('Erreur lors de la création : '.$e->getMessage());
         }
     }
 
@@ -152,7 +152,7 @@ class FormationLessonList extends Component
 
             $this->dispatch('lesson-deleted', lessonId: $lessonId);
         } catch (\Exception $e) {
-            $this->showErrorMessage('Erreur lors de la suppression : ' . $e->getMessage());
+            $this->showErrorMessage('Erreur lors de la suppression : '.$e->getMessage());
         }
     }
 
@@ -183,7 +183,7 @@ class FormationLessonList extends Component
 
             $this->showSuccessMessage("Leçon '{$lesson->title}' déplacée vers le haut.");
         } catch (\Exception $e) {
-            $this->showErrorMessage('Erreur lors du déplacement : ' . $e->getMessage());
+            $this->showErrorMessage('Erreur lors du déplacement : '.$e->getMessage());
         }
     }
 
@@ -215,7 +215,7 @@ class FormationLessonList extends Component
 
             $this->showSuccessMessage("Leçon '{$lesson->title}' déplacée vers le bas.");
         } catch (\Exception $e) {
-            $this->showErrorMessage('Erreur lors du déplacement : ' . $e->getMessage());
+            $this->showErrorMessage('Erreur lors du déplacement : '.$e->getMessage());
         }
     }
 
@@ -236,7 +236,7 @@ class FormationLessonList extends Component
             $this->chapter->refresh();
             $this->chapter->loadMissing('lessons');
         } catch (\Exception $e) {
-            $this->showErrorMessage('Erreur lors de la correction des positions : ' . $e->getMessage());
+            $this->showErrorMessage('Erreur lors de la correction des positions : '.$e->getMessage());
         }
     }
 

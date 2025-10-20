@@ -19,28 +19,27 @@ class FormationUpdateVisibilityByTeam extends FormRequest
         if (Auth::user()->belongsToTeam($team) && Auth::user()->hasTeamRole($team, 'admin')) {
             return true;
         }
+
         return false;
-  
+
     }
 
-    /**  
+    /**
      * Définit les règles de validation pour cette requête.
      */
     public function rules(): array
     {
         return [
             'team_id' => [
-                'required', 'exists:teams,id'
+                'required', 'exists:teams,id',
             ],
             'formation_id' => [
-                'required'
+                'required',
             ],
 
             'enabled' => [
-                'required', 'boolean'
+                'required', 'boolean',
             ],
         ];
     }
-
-
 }

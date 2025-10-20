@@ -12,9 +12,13 @@ class AdminMenuFast extends Component
      * Get the view / contents that represents the component.
      */
     public $team;
+
     public $activeCount;
+
     public $totalCount;
+
     public $catalog;
+
     public function __construct($team, FormationService $formations)
     {
         $this->team = $team;
@@ -23,6 +27,7 @@ class AdminMenuFast extends Component
         $this->activeCount = $this->catalog->where('is_visible', '>', 0)->count();
         $this->totalCount = $this->catalog->count();
     }
+
     public function render(): View
     {
         return view('clean.admin.partials.menu-fast.admin-menu-fast', [

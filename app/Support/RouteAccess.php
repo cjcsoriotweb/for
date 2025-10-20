@@ -1,4 +1,5 @@
 <?php
+
 // app/Support/RouteAccess.php
 
 namespace App\Support;
@@ -30,16 +31,16 @@ class RouteAccess
         bool $includeAuthLabel = false
     ): array {
 
-        $user  = $user ?: auth()->user();
+        $user = $user ?: auth()->user();
         $route = Route::getRoutes()->getByName($name);
 
-        if (!$route) {
+        if (! $route) {
             return ['allowed' => false, 'labels' => ['route:missing'], 'details' => []];
         }
 
         $middlewares = app('router')->gatherRouteMiddleware($route);
 
-        $labels  = [];
+        $labels = [];
         $details = [];
         $allowed = true;
 
@@ -60,15 +61,16 @@ class RouteAccess
                     $ok = false;
                 }
 
-                $allowed  = $allowed && $ok;
-                $labels[] = 'can:' . $ability . '(' . implode(', ', $argNames) . ')';
+                $allowed = $allowed && $ok;
+                $labels[] = 'can:'.$ability.'('.implode(', ', $argNames).')';
                 $details[] = [
-                    'type'      => 'can',
-                    'ability'   => $ability,
+                    'type' => 'can',
+                    'ability' => $ability,
                     'arg_names' => $argNames,
-                    'args'      => $resolved,
-                    'allowed'   => $ok,
+                    'args' => $resolved,
+                    'allowed' => $ok,
                 ];
+
                 continue;
             }
 
@@ -79,11 +81,16 @@ class RouteAccess
 
                 foreach ($perms as $perm) {
                     $ok = false;
-                    try { $ok = $user?->can($perm) ?? false; } catch (\Throwable $e) { $ok = false; }
-                    $allowed  = $allowed && $ok;
+                    try {
+                        $ok = $user?->can($perm) ?? false;
+                    } catch (\Throwable $e) {
+                        $ok = false;
+                    }
+                    $allowed = $allowed && $ok;
                     $labels[] = "permission:$perm";
                     $details[] = ['type' => 'permission', 'permission' => $perm, 'allowed' => $ok];
                 }
+
                 continue;
             }
 
@@ -93,19 +100,24 @@ class RouteAccess
                 $roles = array_map('trim', $roles);
 
                 $ok = false;
-                try { $ok = $user?->hasAnyRole($roles) ?? false; } catch (\Throwable $e) { $ok = false; }
+                try {
+                    $ok = $user?->hasAnyRole($roles) ?? false;
+                } catch (\Throwable $e) {
+                    $ok = false;
+                }
 
-                $allowed  = $allowed && $ok;
-                $labels[] = 'role:' . implode('|', $roles);
+                $allowed = $allowed && $ok;
+                $labels[] = 'role:'.implode('|', $roles);
                 $details[] = ['type' => 'role', 'roles' => $roles, 'allowed' => $ok];
+
                 continue;
             }
         }
 
         if ($includeAuthLabel && self::containsAuth($middlewares)) {
-            $labels[]  = 'auth';
+            $labels[] = 'auth';
             $details[] = ['type' => 'auth', 'allowed' => (bool) $user];
-            $allowed   = $allowed && (bool) $user;
+            $allowed = $allowed && (bool) $user;
         }
 
         return compact('allowed', 'labels', 'details');
@@ -122,11 +134,12 @@ class RouteAccess
                 [$id, $argStr] = explode(':', $mw, 2);
                 $args = array_map('trim', explode(',', $argStr));
             } else {
-                $id = is_string($mw) ? $mw : (string)$mw;
+                $id = is_string($mw) ? $mw : (string) $mw;
                 $args = [];
             }
             $out[] = [$id, $args];
         }
+
         return $out;
     }
 
@@ -152,21 +165,23 @@ class RouteAccess
     /** args → [ability, [paramNames...]] */
     protected static function parseAbilityArgs(array $args): array
     {
-        $ability  = $args[0] ?? '';
+        $ability = $args[0] ?? '';
         $argNames = array_slice($args, 1);
+
         return [$ability, $argNames];
     }
 
     protected static function containsAuth(array $middlewares): bool
     {
         foreach ($middlewares as $mw) {
-            $m = is_string($mw) ? $mw : (string)$mw;
+            $m = is_string($mw) ? $mw : (string) $mw;
             if ($m === 'auth'
                 || Str::endsWith($m, '\\Authenticate')
                 || $m === \Illuminate\Auth\Middleware\Authenticate::class) {
                 return true;
             }
         }
+
         return false;
     }
 }

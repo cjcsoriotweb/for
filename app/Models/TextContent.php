@@ -30,8 +30,6 @@ class TextContent extends Model
         ];
     }
 
-
-
     /**
      * Get the lesson that owns the text content (polymorphic)
      */

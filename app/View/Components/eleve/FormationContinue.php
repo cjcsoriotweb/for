@@ -12,6 +12,7 @@ use Illuminate\View\Component;
 class FormationContinue extends Component
 {
     public $currentFormation;
+
     public $team;
 
     /**
@@ -29,7 +30,7 @@ class FormationContinue extends Component
     public function render(): View|Closure|string
     {
         return view('components.eleve.FormationContinue', [
-            'team' => $this->team
+            'team' => $this->team,
         ]);
     }
 }

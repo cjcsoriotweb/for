@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class TeamService
 {
-
-    public function acceptInvitation($id){
+    public function acceptInvitation($id)
+    {
         $invitation = TeamInvitation::find($id);
 
-        if(!$invitation){
+        if (! $invitation) {
             throw new \Exception('Invitation not found');
         }
 
@@ -20,14 +20,19 @@ class TeamService
 
         $invitation->team->users()->attach(Auth::user()->id, ['role' => $invitation->role]);
     }
-    public function getUsersInTeam(Team $team){
+
+    public function getUsersInTeam(Team $team)
+    {
         return $team->users()->get();
     }
-    public function getUsersTeam(){
+
+    public function getUsersTeam()
+    {
         return Auth::user()->allTeams();
     }
 
-    public function getTeamInvitedMe(){
+    public function getTeamInvitedMe()
+    {
         $email = Auth::user()->email;
 
         return TeamInvitation::query()
@@ -37,7 +42,4 @@ class TeamService
             ->latest('id')
             ->get();
     }
- 
-
-
 }

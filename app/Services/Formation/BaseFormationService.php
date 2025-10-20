@@ -64,7 +64,7 @@ abstract class BaseFormationService
     {
         $query = $this->decorateQuery($this->baseQuery(), $options);
 
-        if (!empty($options['search'])) {
+        if (! empty($options['search'])) {
             $search = $options['search'];
             $query->where(function (Builder $builder) use ($search): void {
                 $builder
@@ -83,4 +83,3 @@ abstract class BaseFormationService
         return $query;
     }
 }
-

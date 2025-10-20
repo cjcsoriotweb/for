@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\Clean\Admin\AdminPageController;
-use App\Http\Controllers\Clean\Admin\Configuration\AdminConfigurationController;
-use App\Http\Controllers\Clean\Admin\Formations\AdminFormationController;
 use App\Http\Controllers\Clean\Eleve\ElevePageController;
 use Illuminate\Support\Facades\Route;
 

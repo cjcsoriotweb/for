@@ -25,7 +25,7 @@ class RemoveTeamMember implements RemovesTeamMembers
         $team->removeUser($teamMember);
 
         TeamMemberRemoved::dispatch($team, $teamMember);
-        
+
         $admins = $team->allUsers() // inclut le owner
             ->filter(fn (User $u) => $u->hasTeamPermission($team, 'admin') || $u->id === $team->owner_id)
             ->reject(fn (User $u) => $u->id === auth()->id()); // évite d’auto-notifier l’invitant

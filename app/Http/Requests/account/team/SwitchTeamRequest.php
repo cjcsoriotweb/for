@@ -19,11 +19,12 @@ class SwitchTeamRequest extends FormRequest
         if (Auth::user()->belongsToTeam($team)) {
             return true;
         }
+
         return false;
-  
+
     }
 
-    /**  
+    /**
      * Définit les règles de validation pour cette requête.
      */
     public function rules(): array
@@ -32,6 +33,4 @@ class SwitchTeamRequest extends FormRequest
             'team_id' => ['required'],
         ];
     }
-
-
 }

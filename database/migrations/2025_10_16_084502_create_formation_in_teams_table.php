@@ -21,11 +21,10 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
 
-
             $table->timestamps();
 
-            $table->unique(['formation_id','team_id']); // une ligne par (formation, team)
-            $table->index(['team_id','visible']);
+            $table->unique(['formation_id', 'team_id']); // une ligne par (formation, team)
+            $table->index(['team_id', 'visible']);
         });
     }
 

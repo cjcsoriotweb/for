@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use Illuminate\Support\Carbon;
 use Livewire\Component;
 
 class NotificationsBell extends Component
@@ -12,9 +11,9 @@ class NotificationsBell extends Component
     // état UI
     public bool $open = false;
 
-
     // liste matérialisée côté serveur
     public array $items = [];
+
     public ?string $next_before = null; // ISO8601 du dernier item chargé
 
     public function render()
@@ -36,7 +35,7 @@ class NotificationsBell extends Component
 
     public function refreshList(): void
     {
-        
+
         $this->items = [];
         $this->next_before = null;
         $this->load(); // première page
@@ -54,8 +53,8 @@ class NotificationsBell extends Component
         $user = auth()->user();
 
         $q = $user->unreadNotifications()
-            
-            ->select(['id','data','read_at','created_at'])   // ← évite type, updated_at…
+
+            ->select(['id', 'data', 'read_at', 'created_at'])   // ← évite type, updated_at…
             ->orderByDesc('created_at')
             ->orderByDesc('id');
 
@@ -66,7 +65,7 @@ class NotificationsBell extends Component
         $rows = $q->limit($this->pageSize + 1)->get();
 
         $hasMore = $rows->count() > $this->pageSize;
-        $slice   = $rows->take($this->pageSize)->values();
+        $slice = $rows->take($this->pageSize)->values();
 
         foreach ($slice as $n) {
             $this->items[] = [
@@ -83,7 +82,6 @@ class NotificationsBell extends Component
             ? optional($slice->last()?->created_at)->toIso8601String()
             : null;
     }
-
 
     public function markAllRead(): void
     {

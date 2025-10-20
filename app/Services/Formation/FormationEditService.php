@@ -20,6 +20,4 @@ class FormationEditService extends BaseFormationService
 
         return Formation::create($payload);
     }
-
-
 }

@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Notifications;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
+
 use App\Models\Team;
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 
 class TeamPhotoDeleted extends Notification
 {
@@ -25,14 +24,14 @@ class TeamPhotoDeleted extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title'   => 'Photo d’équipe supprimée',
+            'title' => 'Photo d’équipe supprimée',
             'message' => 'La photo de l’équipe « '.$this->team->name.' » a été supprimée.',
-            'by'      => [
-                'id'   => auth()->id(),
+            'by' => [
+                'id' => auth()->id(),
                 'name' => auth()->user()->name,
             ],
-            'team'    => [
-                'id'   => $this->team->id,
+            'team' => [
+                'id' => $this->team->id,
                 'name' => $this->team->name,
             ],
         ];

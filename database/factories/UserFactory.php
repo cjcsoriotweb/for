@@ -58,8 +58,6 @@ class UserFactory extends Factory
         if (! Features::hasTeamFeatures()) {
             return $this->state([]);
         }
-    
-
 
         return $this->has(
             Team::factory()

@@ -13,6 +13,7 @@ class ChapterFormationService extends BaseFormationService
     {
         $chapter->delete();
     }
+
     public function createChapter(Formation $formation, array $attributes = [])
     {
         $payload = array_replace([
@@ -26,6 +27,7 @@ class ChapterFormationService extends BaseFormationService
     public function updateChapter($chapter, array $attributes = [])
     {
         $chapter->update($attributes);
+
         return $chapter;
     }
 }

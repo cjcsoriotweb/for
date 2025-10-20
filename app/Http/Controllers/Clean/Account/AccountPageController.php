@@ -6,15 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\account\team\SwitchTeamRequest;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
-use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AccountPageController extends Controller
 {
     public function __construct(
         private readonly AccountService $accountService,
-    ) {
-    }
+    ) {}
 
     public function dashboard()
     {
@@ -28,7 +26,7 @@ class AccountPageController extends Controller
         $request = $request->validated();
 
         $team = Team::find($request['team_id']);
-        if (!$team) {
+        if (! $team) {
             abort(404);
         }
 

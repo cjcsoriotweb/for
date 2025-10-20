@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\View;
 class AuthDebugMiddleware
 {
     public function handle($request, Closure $next)
-    {   
-
-
+    {
 
         $collector = app(AuthDebug::class);
 
@@ -24,10 +22,10 @@ class AuthDebugMiddleware
                 ? basename($callerFrame['file']).':'.$callerFrame['line'] : null;
 
             $collector->addOrBump($ability, null, $arguments, $caller); // pending
+
             return null;
         });
 
-        
         Gate::after(function ($user, string $ability, ?bool $result, array $arguments = []) use ($collector) {
             $collector->resolve($ability, $result ?? false);
         });
@@ -35,7 +33,6 @@ class AuthDebugMiddleware
         // Partager à la vue AVANT rendu
         View::share('authDebug', $collector);
 
-        
         return $next($request);
     }
 }

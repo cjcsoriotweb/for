@@ -20,5 +20,4 @@ trait VisibleScope
         // Par ex. valeurs par défaut
         $this->attributes['visible'] = $this->attributes['visible'] ?? true;
     }
-
 }

@@ -13,6 +13,7 @@ class FormationChapterController
     public function createChapter(Formation $formation, FormationService $formationService)
     {
         $chapter = $formationService->chapters()->createChapter($formation);
+
         return redirect()->route('formateur.formation.chapter.edit', [$formation, $chapter])->with('success', 'Chapitre créé avec succès.');
     }
 
@@ -21,6 +22,7 @@ class FormationChapterController
         //
         $validated = $request->validated();
         $formationService->chapters()->updateChapter($chapter, $validated);
+
         return redirect()->route('formateur.formation.show', [$formation])->with('success', 'Chapitre mis à jour avec succès.');
     }
 
@@ -29,6 +31,7 @@ class FormationChapterController
         //
         $validated = $request->validated();
         $formationService->chapters()->deleteChapter($chapter);
+
         return redirect()->route('formateur.formation.show', [$formation])->with('success', 'Chapitre supprimé avec succès.');
     }
 

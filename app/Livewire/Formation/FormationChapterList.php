@@ -66,7 +66,6 @@ class FormationChapterList extends Component
         $this->dispatch('chapter-added');
     }
 
-
     public function render()
     {
         return view('livewire.formation.formation-chapter-list', [

@@ -9,10 +9,12 @@ use Illuminate\View\View;
 class EleveLayout extends Component
 {
     public $team;
+
     public function __construct(Team $team)
     {
         $this->team = $team;
     }
+
     public function render(): View
     {
         return view('components.eleve.layout', ['team' => $this->team]);

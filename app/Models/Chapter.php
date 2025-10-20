@@ -15,7 +15,7 @@ class Chapter extends Model
         'title',
         'position',
     ];
-    
+
     protected function casts(): array
     {
         return [
@@ -23,6 +23,7 @@ class Chapter extends Model
             'position' => 'integer',
         ];
     }
+
     public function formation()
     {
         return $this->belongsTo(Formation::class);
@@ -32,5 +33,4 @@ class Chapter extends Model
     {
         return $this->hasMany(Lesson::class)->orderBy('position');
     }
-
 }

@@ -2,16 +2,20 @@
 
 namespace App\View\Components;
 
-use Illuminate\View\Component;
 use App\Models\Formation;
 use App\Models\Team;
+use Illuminate\View\Component;
 
 class FormationCard extends Component
 {
     public Formation $formation;
+
     public bool $isEnrolled;
+
     public $formationUser;
+
     public bool $isAdminMode;
+
     public ?Team $team;
 
     /**

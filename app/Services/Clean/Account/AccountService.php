@@ -2,12 +2,11 @@
 
 namespace App\Services\Clean\Account;
 
-class AccountService 
+class AccountService
 {
     public function __construct(
         private readonly TeamService $teamService,
-    ) {
-    }
+    ) {}
 
     public function teams(): TeamService
     {

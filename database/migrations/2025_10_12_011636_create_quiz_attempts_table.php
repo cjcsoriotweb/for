@@ -21,8 +21,8 @@ return new class extends Migration
             $t->timestamp('started_at')->nullable();
             $t->timestamp('submitted_at')->nullable();
             $t->timestamps();
-            $t->index(['quiz_id','user_id']);
-            });
+            $t->index(['quiz_id', 'user_id']);
+        });
     }
 
     /**

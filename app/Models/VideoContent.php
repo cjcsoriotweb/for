@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class VideoContent extends Model
 {
-
     /** @use HasFactory<\Database\Factories\VideoContentFactory> */
     use HasFactory;
 
@@ -27,8 +26,6 @@ class VideoContent extends Model
             'duration_minutes' => 'integer',
         ];
     }
-
-
 
     /**
      * Get the lesson that owns the video content (polymorphic)

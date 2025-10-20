@@ -8,6 +8,7 @@ use Livewire\Component;
 class FormationsList extends Component
 {
     public $formations;
+
     public $search = '';
 
     public function mount()
@@ -25,8 +26,8 @@ class FormationsList extends Component
         $query = Formation::query();
 
         if ($this->search) {
-            $query->where('title', 'like', '%' . $this->search . '%')
-                ->orWhere('description', 'like', '%' . $this->search . '%');
+            $query->where('title', 'like', '%'.$this->search.'%')
+                ->orWhere('description', 'like', '%'.$this->search.'%');
         }
 
         $this->formations = $query->get();

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
 use App\Models\Formation;
-use App\Models\Team;
 use App\Services\FormationService;
 
 class FormateurFormationController extends Controller
@@ -28,6 +27,7 @@ class FormateurFormationController extends Controller
     public function createFormation(FormationService $formationService)
     {
         $formation = $formationService->createFormation();
+
         return redirect()->route('formateur.formation.show', [$formation]);
     }
 }

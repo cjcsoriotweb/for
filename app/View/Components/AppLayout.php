@@ -2,7 +2,6 @@
 
 namespace App\View\Components;
 
-use App\Models\Team;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 

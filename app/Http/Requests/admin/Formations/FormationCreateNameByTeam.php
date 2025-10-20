@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests\Admin\Formations;
 
-use App\Models\Team;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-
 
 class FormationCreateNameByTeam extends FormRequest
 {
@@ -15,22 +13,22 @@ class FormationCreateNameByTeam extends FormRequest
     public function authorize(): bool
     {
 
-
         if (Auth::user()->superadmin()) {
             return true;
         }
+
         return false;
-  
+
     }
 
-    /**  
+    /**
      * Définit les règles de validation pour cette requête.
      */
     public function rules(): array
     {
         return [
             'formation.title' => [
-                'required'
+                'required',
             ],
             'formation.description' => [
                 'required',

@@ -14,17 +14,17 @@ class CreditUpdate extends FormRequest
     public function authorize(): bool
     {
 
-
         $team = Team::findOrFail(request()->get('team_id'));
 
         if (Auth::user()->belongsToTeam($team) && Auth::user()->hasTeamRole($team, 'admin')) {
             return true;
         }
+
         return false;
-  
+
     }
 
-    /**  
+    /**
      * Définit les règles de validation pour cette requête.
      */
     public function rules(): array
@@ -41,6 +41,4 @@ class CreditUpdate extends FormRequest
             ],
         ];
     }
-
-
 }

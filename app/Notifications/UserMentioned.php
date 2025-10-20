@@ -3,13 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class UserMentioned extends Notification
 {
-use Queueable;
+    use Queueable;
 
     public function __construct(
         public int $mentionerId,          // id de l’auteur de la mention
@@ -28,11 +26,11 @@ use Queueable;
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title'   => 'Tu as été mentionné·e',
+            'title' => 'Tu as été mentionné·e',
             'message' => $this->mentionerName.' t’a mentionné·e. '.$this->context,
-            'url'     => $this->url,
-            'by'      => [
-                'id'   => $this->mentionerId,
+            'url' => $this->url,
+            'by' => [
+                'id' => $this->mentionerId,
                 'name' => $this->mentionerName,
             ],
         ];

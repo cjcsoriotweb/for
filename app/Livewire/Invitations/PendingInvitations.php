@@ -2,16 +2,17 @@
 
 namespace App\Livewire\Invitations;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Jetstream\TeamInvitation;
 use App\Actions\Jetstream\AddTeamMember;
 use App\Models\Team;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Jetstream\TeamInvitation;
+use Livewire\Component;
 
 class PendingInvitations extends Component
 {
     /**
      * Liste des invitations (Collection Eloquent)
+     *
      * @var \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Collection
      */
     public $invitations;
@@ -34,6 +35,7 @@ class PendingInvitations extends Component
     {
         if (! Auth::check()) {
             $this->invitations = collect();
+
             return;
         }
 
@@ -62,6 +64,7 @@ class PendingInvitations extends Component
             $inv->delete();
             $this->dispatch('toast', type: 'warning', message: "L'équipe n'existe plus.");
             $this->loadInvites();
+
             return;
         }
 

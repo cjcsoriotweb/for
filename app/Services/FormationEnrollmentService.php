@@ -18,12 +18,14 @@ class FormationEnrollmentService
     {
         return $team->money >= $formation->money_amount;
     }
+
     /**
      * Vérifie si un utilisateur est déjà inscrit à une formation
      */
     public function isUserEnrolled(Formation $formation, ?int $userId = null): bool
     {
         $userId = $userId ?? Auth::id();
+
         return $formation->learners()->where('users.id', $userId)->exists();
     }
 
@@ -35,7 +37,7 @@ class FormationEnrollmentService
         $userId = $userId ?? Auth::id();
 
         // Vérifier que l'équipe a les fonds nécessaires
-        if (!$this->canTeamAffordFormation($team, $formation)) {
+        if (! $this->canTeamAffordFormation($team, $formation)) {
             return false;
         }
 
@@ -60,6 +62,7 @@ class FormationEnrollmentService
     public function getUserEnrollment(Formation $formation, ?int $userId = null): ?\Illuminate\Database\Eloquent\Relations\Pivot
     {
         $userId = $userId ?? Auth::id();
+
         return $formation->learners()->where('users.id', $userId)->first()?->pivot;
     }
 }
