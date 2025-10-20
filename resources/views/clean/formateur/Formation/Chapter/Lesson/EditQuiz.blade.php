@@ -360,14 +360,14 @@
                         >
                             <a
                                 href="{{
-                                    route('formateur.formation.chapter.edit', [
+                                    route('formateur.formation.edit', [
                                         $formation,
                                         $chapter
                                     ])
                                 }}"
                                 class="text-gray-600 hover:text-gray-900 text-sm font-medium"
                             >
-                                ← Retour au chapitre
+                                ← Retour aux leçons
                             </a>
                             <div class="space-x-3">
                                 <button
