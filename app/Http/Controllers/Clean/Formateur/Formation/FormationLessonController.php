@@ -230,6 +230,115 @@ class FormationLessonController
         }
     }
 
+    public function manageQuestions(Formation $formation, Chapter $chapter, Lesson $lesson, \App\Models\Quiz $quiz)
+    {
+        // Ensure the quiz belongs to this lesson
+        if ($quiz->lesson_id !== $lesson->id) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
+        }
+
+        $questions = $quiz->quizQuestions()->with('quizChoices')->get();
+
+        return view('clean.formateur.Formation.Chapter.Lesson.ManageQuestions', compact('formation', 'chapter', 'lesson', 'quiz', 'questions'));
+    }
+
+    public function storeQuestion(Formation $formation, Chapter $chapter, Lesson $lesson, \App\Models\Quiz $quiz)
+    {
+        // Ensure the quiz belongs to this lesson
+        if ($quiz->lesson_id !== $lesson->id) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
+        }
+
+        // Validate the question data
+        $validated = request()->validate([
+            'question_text' => 'required|string',
+            'question_type' => 'required|in:multiple_choice,true_false',
+            'choices' => 'required|array|min:2',
+            'choices.*.text' => 'required|string',
+            'choices.*.is_correct' => 'required|boolean',
+        ]);
+
+        try {
+            // Create the question
+            $question = \App\Models\QuizQuestion::create([
+                'quiz_id' => $quiz->id,
+                'question' => $validated['question_text'],
+                'type' => $validated['question_type'],
+            ]);
+
+            // Create the choices
+            foreach ($validated['choices'] as $choiceData) {
+                \App\Models\QuizChoice::create([
+                    'question_id' => $question->id,
+                    'choice_text' => $choiceData['text'],
+                    'is_correct' => $choiceData['is_correct'],
+                ]);
+            }
+
+            return back()->with('success', 'Question ajoutée avec succès!');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de l\'ajout de la question: ' . $e->getMessage()]);
+        }
+    }
+
+    public function updateQuestion(Formation $formation, Chapter $chapter, Lesson $lesson, \App\Models\Quiz $quiz, \App\Models\QuizQuestion $question)
+    {
+        // Ensure the question belongs to this quiz
+        if ($question->quiz_id !== $quiz->id) {
+            return back()->withErrors(['error' => 'Question non trouvée pour ce quiz.']);
+        }
+
+        // Validate the question data
+        $validated = request()->validate([
+            'question_text' => 'required|string',
+            'question_type' => 'required|in:multiple_choice,true_false',
+            'choices' => 'required|array|min:2',
+            'choices.*.text' => 'required|string',
+            'choices.*.is_correct' => 'required|boolean',
+        ]);
+
+        try {
+            // Update the question
+            $question->update([
+                'question' => $validated['question_text'],
+                'type' => $validated['question_type'],
+            ]);
+
+            // Delete existing choices and create new ones
+            $question->quizChoices()->delete();
+            foreach ($validated['choices'] as $choiceData) {
+                \App\Models\QuizChoice::create([
+                    'question_id' => $question->id,
+                    'choice_text' => $choiceData['text'],
+                    'is_correct' => $choiceData['is_correct'],
+                ]);
+            }
+
+            return back()->with('success', 'Question modifiée avec succès!');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification de la question: ' . $e->getMessage()]);
+        }
+    }
+
+    public function deleteQuestion(Formation $formation, Chapter $chapter, Lesson $lesson, \App\Models\Quiz $quiz, \App\Models\QuizQuestion $question)
+    {
+        // Ensure the question belongs to this quiz
+        if ($question->quiz_id !== $quiz->id) {
+            return back()->withErrors(['error' => 'Question non trouvée pour ce quiz.']);
+        }
+
+        try {
+            // Delete the question (choices will be cascade deleted)
+            $question->delete();
+
+            return back()->with('success', 'Question supprimée avec succès!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Erreur lors de la suppression de la question: ' . $e->getMessage()]);
+        }
+    }
+
     public function editVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $videoContent = $lesson->lessonable;

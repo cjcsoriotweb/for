@@ -37,6 +37,12 @@ Route::prefix('formateur')
         Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/edit', [FormationLessonController::class, 'editQuiz'])->name('formation.chapter.lesson.quiz.edit');
         Route::put('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/edit', [FormationLessonController::class, 'updateQuiz'])->name('formation.chapter.lesson.quiz.update');
 
+        // Quiz Questions Management
+        Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions', [FormationLessonController::class, 'manageQuestions'])->name('formation.chapter.lesson.quiz.questions');
+        Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions', [FormationLessonController::class, 'storeQuestion'])->name('formation.chapter.lesson.quiz.questions.store');
+        Route::put('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions/{question}', [FormationLessonController::class, 'updateQuestion'])->name('formation.chapter.lesson.quiz.questions.update');
+        Route::delete('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions/{question}', [FormationLessonController::class, 'deleteQuestion'])->name('formation.chapter.lesson.quiz.questions.delete');
+
         // Lesson type specific routes (Video)
         Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/video/create', [FormationLessonController::class, 'createVideo'])->name('formation.chapter.lesson.video.create');
         Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/video/create', [FormationLessonController::class, 'storeVideo'])->name('formation.chapter.lesson.video.store');
