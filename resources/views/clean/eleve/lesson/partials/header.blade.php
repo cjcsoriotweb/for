@@ -81,7 +81,7 @@
                     Dernière activité
                 </div>
                 <div class="text-sm text-gray-900 dark:text-white">
-                    {{ $lessonProgress->pivot->last_activity_at->diffForHumans() }}
+                    {{ \Carbon\Carbon::parse($lessonProgress->pivot->last_activity_at)->diffForHumans() }}
                 </div>
             </div>
             @endif

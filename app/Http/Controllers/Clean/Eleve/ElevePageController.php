@@ -177,6 +177,9 @@ class ElevePageController extends Controller
             abort(404, 'Leçon non trouvée.');
         }
 
+        // Démarrer automatiquement la leçon lors de la visite
+        $this->startLessonAutomatically($team, $formation, $chapter, $lesson);
+
         // Récupérer le contenu de la leçon selon son type
         $lessonContent = null;
         $lessonType = null;
@@ -233,7 +236,24 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Démarrer une leçon (tracking du temps)
+     * Démarrer automatiquement une leçon lors de la visite
+     */
+    private function startLessonAutomatically(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $user = Auth::user();
+
+        // Créer ou mettre à jour la progression de l'étudiant pour cette leçon
+        $lesson->learners()->syncWithoutDetaching([
+            $user->id => [
+                'started_at' => now(),
+                'last_activity_at' => now(),
+                'status' => 'in_progress',
+            ],
+        ]);
+    }
+
+    /**
+     * Démarrer une leçon (tracking du temps) - API endpoint
      */
     public function startLesson(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
