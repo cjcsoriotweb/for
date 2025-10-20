@@ -30,7 +30,7 @@ class ElevePageController extends Controller
 
         // Exemple 3: Vérifier si l'étudiant est inscrit à une formation spécifique
         $formation = Formation::find(1); // Récupérer une formation spécifique
-        $isEnrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation);
+        $isEnrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation, $team);
 
         // Exemple 4: Récupérer le progrès d'un étudiant dans une formation
         $progress = $this->studentFormationService->getStudentProgress($user, $formation);
@@ -56,7 +56,7 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier si l'étudiant est inscrit
-        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation)) {
+        if (!$this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
@@ -85,13 +85,16 @@ class ElevePageController extends Controller
         $user = Auth::user();
 
         // Vérifier si l'étudiant est déjà inscrit
-        if ($this->studentFormationService->isEnrolledInFormation($user, $formation)) {
+        if ($this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             return back()->with('warning', 'Vous êtes déjà inscrit à cette formation.');
         }
 
         // Vérifier si la formation est disponible pour cette équipe
-        $availableFormations = $this->studentFormationService->listAvailableFormationsForTeam($team);
-        if (!$availableFormations->contains('id', $formation->id)) {
+        $availableFormations = $team->formationsByTeam()
+            ->where('formation_in_teams.visible', true)
+            ->pluck('formations.id');
+
+        if (!$availableFormations->contains($formation->id)) {
             return back()->with('error', 'Cette formation n\'est pas disponible pour votre équipe.');
         }
 

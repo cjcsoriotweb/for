@@ -14,7 +14,8 @@
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($availableFormations as $formation) @php $isEnrolled =
             app(\App\Services\Formation\StudentFormationService::class)
-            ->isEnrolledInFormation(auth()->user(), $formation); $progress =
+            ->isEnrolledInFormation(auth()->user(), $formation, $team ?? null);
+            $progress =
             app(\App\Services\Formation\StudentFormationService::class)
             ->getStudentProgress(auth()->user(), $formation); @endphp
 

@@ -29,9 +29,10 @@ class StudentFormationService extends BaseFormationService
      */
     public function listAvailableFormationsForTeam(Team $team): Collection
     {
-        return $this->list([
-            'team' => $team,
-        ]);
+        return Formation::whereHas('teams', function (Builder $query) use ($team): void {
+            $query->where('teams.id', $team->id)
+                ->where('formation_in_teams.visible', true);
+        })->get();
     }
 
     /**
@@ -65,11 +66,16 @@ class StudentFormationService extends BaseFormationService
     /**
      * Check if a student is enrolled in a specific formation.
      */
-    public function isEnrolledInFormation(User $user, Formation $formation): bool
+    public function isEnrolledInFormation(User $user, Formation $formation, ?Team $team = null): bool
     {
-        return $formation->learners()
-            ->where('user_id', $user->id)
-            ->exists();
+        $query = $formation->learners()
+            ->where('user_id', $user->id);
+
+        if ($team) {
+            $query->where('team_id', $team->id);
+        }
+
+        return $query->exists();
     }
 
     /**
