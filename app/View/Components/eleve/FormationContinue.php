@@ -31,6 +31,7 @@ class FormationContinue extends Component
     {
         return view('components.eleve.FormationContinue', [
             'team' => $this->team,
+            'formations' => $this->currentFormation,
         ]);
     }
 }

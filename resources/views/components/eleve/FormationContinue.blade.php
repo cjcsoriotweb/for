@@ -12,9 +12,9 @@
 
         @php $studentFormationService =
         app(\App\Services\Formation\StudentFormationService::class); @endphp
-        @if($currentFormation->count() > 0)
+        @if($formations->count() > 0)
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($currentFormation as $formation) @php $progress =
+            @foreach($formations as $formation) @php $progress =
             $studentFormationService->getStudentProgress(auth()->user(),
             $formation); $progressWidth = $progress['progress_percent'] ?? 0;
             @endphp
@@ -68,7 +68,6 @@
                             style="width: {{ $progressWidth }}%"
                         ></div>
                     </div>
-                    zda
                 </div>
 
                 @if($progress['last_seen_at'])
@@ -129,7 +128,7 @@
                 apprentissage.
             </p>
             <a
-                href="{{ route('eleve.index', $team) }}"
+                href="{{ route('eleve.formation.available', $team) }}"
                 class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
             >
                 Découvrir les formations

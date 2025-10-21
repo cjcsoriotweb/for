@@ -24,32 +24,18 @@ class ElevePageController extends Controller
 
     public function home(Team $team)
     {
-        // Récupérer l'utilisateur connecté
         $user = Auth::user();
 
-        // Exemple 1: Lister les formations actuelles de l'étudiant
+        // Récupérer les formations actuelles de l'étudiant
         $formations = $this->studentFormationService->listFormationCurrentByStudent($team, $user);
 
-        // Exemple 2: Paginer les formations (15 par page)
+        // Paginer les formations pour l'API
         $formationsPaginees = $this->studentFormationService->paginateFormationCurrentByStudent($team, $user, 10);
-
-        // Exemple 3: Vérifier si l'étudiant est inscrit à une formation spécifique
-        $formation = Formation::find(1); // Récupérer une formation spécifique
-        $isEnrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation, $team);
-
-        // Exemple 4: Récupérer le progrès d'un étudiant dans une formation
-        $progress = $this->studentFormationService->getStudentProgress($user, $formation);
-
-        // Exemple 5: Récupérer une formation avec les données de progrès
-        $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
 
         return view('clean.eleve.home', compact(
             'team',
             'formations',
-            'formationsPaginees',
-            'isEnrolled',
-            'progress',
-            'formationWithProgress'
+            'formationsPaginees'
         ));
     }
 
