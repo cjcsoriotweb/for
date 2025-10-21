@@ -46,6 +46,8 @@ class QuizComponentO extends Component
     // Affichage du composant
     public function render()
     {
+        return view('livewire.eleve.quiz.reponse');
+
         if ($this->quizzTime['timeLeft']) {
             return view('livewire.eleve.quiz.timeleft');
         }
