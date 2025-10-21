@@ -10,6 +10,9 @@
             preload="metadata"
             poster="{{ asset('images/video-poster.jpg') }}"
             oncontextmenu="return false;"
+            onended="handleVideoEnded()"
+            onplay="handleVideoPlay()"
+            onpause="handleVideoPause()"
         >
             <source
                 src="{{ asset('storage/' . $lessonContent->video_path) }}"
@@ -168,24 +171,263 @@
 
 {{-- Actions vidéo --}}
 <div class="flex justify-end items-center">
-    <form
-        method="POST"
-        action="{{
-            route('eleve.lesson.complete', [
-                $team,
-                $formation,
-                $chapter,
-                $lesson
-            ])
-        }}"
-        class="inline"
-    >
-        @csrf
-        <button
-            type="submit"
-            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+    {{-- Bouton automatique après la vidéo --}}
+    <div id="auto-complete-section" class="hidden mr-4">
+        <div
+            class="bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 rounded-lg p-4 mb-4"
         >
-            Marquer comme terminée
-        </button>
-    </form>
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg
+                        class="h-5 w-5 text-green-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3
+                        class="text-sm font-medium text-green-800 dark:text-green-200"
+                    >
+                        Leçon terminée automatiquement !
+                    </h3>
+                    <p class="mt-1 text-sm text-green-700 dark:text-green-300">
+                        Vous serez redirigé vers la formation dans quelques
+                        secondes...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Bouton manuel --}}
+    <div id="manual-complete-section" class="hidden">
+        <form
+            method="POST"
+            action="{{
+                route('eleve.lesson.complete', [
+                    $team,
+                    $formation,
+                    $chapter,
+                    $lesson
+                ])
+            }}"
+            class="inline"
+        >
+            @csrf
+            <button
+                type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            >
+                Marquer comme terminée
+            </button>
+        </form>
+    </div>
 </div>
+
+{{-- JavaScript pour gérer la fin de vidéo --}}
+@push('scripts')
+<script>
+    console.log("🚀 Script vidéo chargé");
+
+    let videoCompletionCheckInterval = null;
+    let hasCompleted = false;
+
+    function handleVideoEnded() {
+        console.log("🎬 Événement onended déclenché");
+        completeLesson();
+    }
+
+    function handleVideoPlay() {
+        console.log("▶️ Vidéo démarrée/relancée");
+
+        // Masquer les sections automatiques quand l'utilisateur relance la vidéo
+        const autoSection = document.getElementById("auto-complete-section");
+        const manualSection = document.getElementById(
+            "manual-complete-section"
+        );
+
+        if (autoSection) autoSection.classList.add("hidden");
+        if (manualSection) manualSection.classList.add("hidden");
+
+        // Réinitialiser l'état si l'utilisateur relance la vidéo après completion
+        if (hasCompleted) {
+            console.log("🔄 Réinitialisation après relecture");
+            hasCompleted = false;
+        }
+
+        // Démarrer la vérification périodique si pas déjà démarrée
+        if (!videoCompletionCheckInterval) {
+            startVideoCompletionCheck();
+        }
+    }
+
+    function handleVideoPause() {
+        console.log("⏸️ Vidéo mise en pause");
+        // Arrêter la vérification quand la vidéo est en pause
+        if (videoCompletionCheckInterval) {
+            clearInterval(videoCompletionCheckInterval);
+            videoCompletionCheckInterval = null;
+        }
+    }
+
+    function startVideoCompletionCheck() {
+        const video = document.getElementById("lesson-video");
+        if (!video) {
+            console.error("❌ Élément vidéo non trouvé");
+            return;
+        }
+
+        console.log("🔍 Démarrage de la vérification périodique");
+
+        // Vérifier toutes les secondes si la vidéo est proche de la fin
+        videoCompletionCheckInterval = setInterval(() => {
+            if (hasCompleted) {
+                console.log("✅ Déjà terminé, arrêt de la vérification");
+                clearInterval(videoCompletionCheckInterval);
+                return;
+            }
+
+            const currentTime = video.currentTime;
+            const duration = video.duration;
+
+            console.log(
+                `📊 État vidéo - Current: ${currentTime}, Duration: ${duration}`
+            );
+
+            // Si la vidéo est chargée et proche de la fin (3 dernières secondes pour plus de sensibilité)
+            if (duration > 0 && duration - currentTime <= 3) {
+                console.log("🎯 Vidéo proche de la fin détectée");
+                // Vérifier si la vidéo est vraiment à la fin (pas juste en pause)
+                if (currentTime > 0 && currentTime >= duration * 0.9) {
+                    console.log(
+                        "🏁 Fin de vidéo confirmée, déclenchement completion"
+                    );
+                    completeLesson();
+                }
+            }
+        }, 1000);
+    }
+
+    function completeLesson() {
+        if (hasCompleted) {
+            console.log("⚠️ Tentative de completion multiple ignorée");
+            return;
+        }
+        hasCompleted = true;
+        console.log("✅ Début de la procédure de completion");
+
+        // Arrêter la vérification périodique
+        if (videoCompletionCheckInterval) {
+            clearInterval(videoCompletionCheckInterval);
+            videoCompletionCheckInterval = null;
+        }
+
+        // Récupérer les informations de la route depuis les attributs data
+        const teamId = "{{ $team->id }}";
+        const formationId = "{{ $formation->id }}";
+        const chapterId = "{{ $chapter->id }}";
+        const lessonId = "{{ $lesson->id }}";
+
+        console.log("📋 Informations de route:", {
+            teamId,
+            formationId,
+            chapterId,
+            lessonId,
+        });
+
+        // Vérifier que les éléments existent avant de les manipuler
+        const autoSection = document.getElementById("auto-complete-section");
+        const manualSection = document.getElementById(
+            "manual-complete-section"
+        );
+
+        if (autoSection) {
+            console.log("✅ Section auto-complete trouvée, affichage...");
+            autoSection.classList.remove("hidden");
+        } else {
+            console.error("❌ Section auto-complete-section non trouvée");
+        }
+
+        // Vérifier le token CSRF
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+            console.error("❌ Token CSRF non trouvé");
+            if (manualSection) manualSection.classList.remove("hidden");
+            return;
+        }
+
+        console.log("🔗 Token CSRF trouvé:", csrfToken.getAttribute("content"));
+
+        // Marquer automatiquement la leçon comme terminée via AJAX
+        const url = `/clean/${teamId}/formations/${formationId}/chapters/${chapterId}/lessons/${lessonId}/complete`;
+        console.log("📡 Requête AJAX vers:", url);
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
+                Accept: "application/json",
+            },
+        })
+            .then((response) => {
+                console.log("📡 Réponse reçue:", response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("✅ Réponse JSON:", data);
+                if (data.success) {
+                    console.log("🎉 Completion réussie, redirection dans 3s");
+                    // Rediriger vers la formation après 3 secondes
+                    setTimeout(() => {
+                        window.location.href = `/clean/${teamId}/formations/${formationId}`;
+                    }, 3000);
+                } else {
+                    throw new Error("Réponse succès=false");
+                }
+            })
+            .catch((error) => {
+                console.error(
+                    "❌ Erreur lors de la finalisation automatique:",
+                    error
+                );
+                hasCompleted = false; // Permettre une nouvelle tentative
+
+                // En cas d'erreur, afficher le bouton manuel
+                if (manualSection) {
+                    console.log("🔄 Affichage du bouton manuel");
+                    manualSection.classList.remove("hidden");
+                }
+            });
+    }
+
+    // Initialiser la vérification quand la page se charge
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("📱 DOMContentLoaded déclenché");
+
+        const video = document.getElementById("lesson-video");
+        if (video) {
+            console.log("🎬 Élément vidéo trouvé, ajout des listeners");
+
+            // Ajouter tous les listeners d'événements
+            video.addEventListener("ended", handleVideoEnded);
+            video.addEventListener("play", handleVideoPlay);
+            video.addEventListener("pause", handleVideoPause);
+            video.addEventListener("loadedmetadata", startVideoCompletionCheck);
+
+            console.log("✅ Tous les listeners ajoutés");
+        } else {
+            console.error("❌ Élément vidéo non trouvé dans le DOM");
+        }
+    });
+</script>
+@endpush

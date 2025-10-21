@@ -404,8 +404,22 @@ class ElevePageController extends Controller
             ->first()?->pivot?->attempts ?? 0;
 
         if ($attempts >= $quiz->max_attempts && $quiz->max_attempts > 0) {
-            return redirect()->route('eleve.lesson.show', [$team, $formation, $chapter, $lesson])
-                ->with('error', 'Vous avez atteint le nombre maximum de tentatives pour ce quiz.');
+            // Marquer la leçon comme terminée même si le quiz n'est pas réussi
+            // pour permettre à l'étudiant de continuer la formation
+            $lesson->learners()->syncWithoutDetaching([
+                $user->id => [
+                    'completed_at' => now(),
+                    'last_activity_at' => now(),
+                    'status' => 'completed', // ✅ Marquer comme terminé pour débloquer la progression
+                    'attempts' => $attempts,
+                ],
+            ]);
+
+            // Mettre à jour la progression globale de la formation
+            $this->updateFormationProgress($user, $formation);
+
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('info', 'Vous avez atteint le nombre maximum de tentatives pour ce quiz. Vous pouvez continuer avec la formation.');
         }
 
         return view('clean.eleve.lesson.quiz', compact(
@@ -493,13 +507,12 @@ class ElevePageController extends Controller
                 ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de ' . round($score, 1) . '%.');
         }
 
-        // Retourner les résultats pour les quiz échoués (pour permettre une nouvelle tentative)
+        // Retourner seulement les données nécessaires pour les quiz échoués (pas de vue complète)
         return response()->json([
-            'success' => true,
-            'score' => $score,
-            'passed' => $passed,
-            'correct_answers' => $correctAnswers,
-            'total_questions' => $totalQuestions,
+            'success' => false,
+            'passed' => false,
+            'can_retry' => true,
+            'message' => 'Quiz échoué. Vous pouvez réessayer.',
         ]);
     }
 

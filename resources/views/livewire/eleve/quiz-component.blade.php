@@ -291,7 +291,7 @@
                         >
                             Retour à la leçon
                         </a>
-                        @if($quiz->max_attempts == 0 || $attempts <
+                        @if(!$passed && $quiz->max_attempts == 0 || $attempts <
                         $quiz->max_attempts)
                         <button
                             wire:click="retryQuiz"
