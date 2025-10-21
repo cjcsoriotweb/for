@@ -16,7 +16,10 @@ use Livewire\Component;
 class QuizComponentO extends Component
 {
     public $quizzTime = [
+        'loading' => true,
         'timeLeft' => false,
+        'search' => false,
+        'quiz' => false,
         'countdown' => 10,
     ];
 
@@ -27,6 +30,16 @@ class QuizComponentO extends Component
             $this->quizzTime['timeLeft'] = true;
         }
     }
+    public function searchNewQuiz()
+    {
+        $this->quizzTime['search'] = true;
+    }
+    public function getQuiz()
+    {
+        $this->quizzTime['search'] = false;
+        $this->quizzTime['loading'] = false;
+        $this->quizzTime['quiz'] = true;
+    }
 
 
 
@@ -36,6 +49,14 @@ class QuizComponentO extends Component
         if ($this->quizzTime['timeLeft']) {
             return view('livewire.eleve.quiz.timeleft');
         }
-        return view('livewire.eleve.quiz.quiz-component-o');
+        if ($this->quizzTime['loading']) {
+            return view('livewire.eleve.quiz.start');
+        }
+        if ($this->quizzTime['quiz']) {
+            return view('livewire.eleve.quiz.question');
+        }
+        if ($this->quizzTime['search']) {
+            return view('livewire.eleve.quiz.question');
+        }
     }
 }
