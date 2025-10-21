@@ -74,7 +74,7 @@
                 @if($progress['last_seen_at'])
                 <p class="text-xs text-gray-500 mb-3">
                     Dernière activité:
-                    {{ $progress['last_seen_at']->diffForHumans() }}
+                    {{ $progress["last_seen_at"] }}
                 </p>
                 @endif @else
                 <div class="mb-4">
