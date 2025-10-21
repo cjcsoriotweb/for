@@ -49,13 +49,8 @@
     </div>
 </div>
 
-{{-- Contrôles vidéo personnalisés --}}
-@include('clean.eleve.lesson.partials.video-controls') @endif
-@if($lessonContent->duration_minutes)
+@endif @if($lessonContent->duration_minutes)
 <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
     Durée: {{ $lessonContent->duration_minutes }} minutes
 </div>
 @endif
-
-{{-- Actions vidéo --}}
-@include('clean.eleve.lesson.partials.lesson-actions')
