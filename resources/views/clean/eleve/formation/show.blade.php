@@ -175,7 +175,12 @@
                                             clip-rule="evenodd"
                                         ></path>
                                     </svg>
-                                    @endif
+                                    @endif @php $lessonType =
+                                    $lesson->lessonable_type ===
+                                    \App\Models\Quiz::class ? 'Quiz' :
+                                    ($lesson->lessonable_type ===
+                                    \App\Models\VideoContent::class ? 'Vidéo' :
+                                    'Contenu'); @endphp
                                     <a
                                         href="{{
                                             route('eleve.lesson.show', [
@@ -187,6 +192,9 @@
                                         }}"
                                         class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200"
                                     >
+                                        <span class="font-medium"
+                                            >{{ $lessonType }}:</span
+                                        >
                                         {{ $lesson->title }}
                                     </a>
                                 </div>

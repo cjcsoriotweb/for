@@ -90,7 +90,7 @@ class QuizService
             'quiz_id' => $quiz->id,
             'score' => $result['score'],
             'max_score' => $result['max_score'],
-            'duration_seconds' => $duration,
+            'duration_seconds' => $duration ?? 0,
             'started_at' => now(),
             'submitted_at' => now(),
         ]);

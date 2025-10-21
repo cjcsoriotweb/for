@@ -177,7 +177,15 @@ class ElevePageController extends Controller
             abort(404, 'Leçon non trouvée.');
         }
 
-        // Démarrer automatiquement la leçon lors de la visite
+        // Vérifier si la leçon est déjà terminée (sauf si c'est la première visite)
+        $lessonProgress = $lesson->learners()->where('user_id', $user->id)->first();
+        if ($lessonProgress && $lessonProgress->pivot->status === 'completed') {
+            // Rediriger vers la formation avec un message d'information
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('info', 'Cette leçon est déjà terminée. Vous pouvez passer à la leçon suivante.');
+        }
+
+        // Démarrer automatiquement la leçon lors de la visite (seulement si pas déjà terminée)
         $this->startLessonAutomatically($team, $formation, $chapter, $lesson);
 
         // Récupérer le contenu de la leçon selon son type
