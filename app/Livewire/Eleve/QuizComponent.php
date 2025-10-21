@@ -56,6 +56,7 @@ class QuizComponent extends Component
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
+
         // Vérifier que la leçon est bien un quiz
         if ($lesson->lessonable_type !== Quiz::class) {
             abort(404, 'Quiz non trouvé.');
@@ -73,23 +74,6 @@ class QuizComponent extends Component
         // Récupérer le nombre de tentatives
         $lessonProgress = $lesson->learners()->where('user_id', $user->id)->first();
         $this->attempts = $lessonProgress?->pivot?->attempts ?? 0;
-
-        // Debug: Afficher les informations sur les tentatives
-        if (config('app.debug')) {
-            logger("Quiz Debug - User ID: {$user->id}, Lesson ID: {$lesson->id}, Attempts: {$this->attempts}, Max Attempts: {$this->quiz->max_attempts}");
-        }
-
-        // Vérifier si l'étudiant a déjà atteint le nombre maximum de tentatives
-        if ($this->quiz->max_attempts > 0 && $this->attempts >= $this->quiz->max_attempts) {
-            $this->showResults = true;
-            $this->passed = false;
-            $this->score = $lessonProgress?->pivot?->best_score ?? 0;
-
-            // Ajouter un message d'information pour l'utilisateur
-            if ($this->attempts > 0) {
-                session()->flash('warning', "Vous avez déjà utilisé toutes vos tentatives ({$this->attempts}/{$this->quiz->max_attempts}). Votre meilleur score est de {$this->score}%.");
-            }
-        }
     }
 
 
@@ -174,6 +158,13 @@ class QuizComponent extends Component
 
     public function render()
     {
+        if (
+            !$this->passed && $this->quiz->max_attempts == 0 || $this->attempts <
+            $this->quiz->max_attempts
+        ) {
+        } else {
+            $this->redirect(route('eleve.formation.show', [$this->team, $this->formation]));
+        }
         return view('livewire.eleve.quiz-component');
     }
 }

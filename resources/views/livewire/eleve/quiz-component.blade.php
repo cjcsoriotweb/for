@@ -206,19 +206,6 @@
                     </p>
 
                     <div class="flex justify-center space-x-4">
-                        <a
-                            href="{{
-                                route('eleve.lesson.show', [
-                                    $team,
-                                    $formation,
-                                    $chapter,
-                                    $lesson
-                                ])
-                            }}"
-                            class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded"
-                        >
-                            Retour à la leçon
-                        </a>
                         @if(!$passed && $quiz->max_attempts == 0 || $attempts <
                         $quiz->max_attempts)
                         <button
@@ -227,7 +214,7 @@
                         >
                             Réessayer
                         </button>
-                        @endif
+                        @else acaca @endif
                     </div>
                 </div>
             </div>
