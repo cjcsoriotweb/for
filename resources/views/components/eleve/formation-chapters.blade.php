@@ -35,6 +35,79 @@
         </div>
 
         @if($formation->chapters && $formation->chapters->count() > 0)
+        <!-- Continue Button Section -->
+        @php $studentFormationService =
+        app(\App\Services\Formation\StudentFormationService::class);
+        $currentLesson = $studentFormationService->getCurrentLesson($formation,
+        auth()->user()); @endphp @if($currentLesson)
+        <div class="mb-8">
+            <div
+                class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 text-center shadow-xl"
+            >
+                <div class="max-w-2xl mx-auto">
+                    <div class="mb-4">
+                        <svg
+                            class="w-16 h-16 text-white mx-auto mb-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 8a9 9 0 110-18 9 9 0 010 18z"
+                            ></path>
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white mb-2">
+                            Continuer votre apprentissage
+                        </h3>
+                        <p class="text-blue-100 text-lg">
+                            Reprendre là où vous vous êtes arrêté
+                        </p>
+                    </div>
+                    <a
+                        href="{{ route('eleve.lesson.show', [
+                        request()->route('team'),
+                        $formation,
+                        $currentLesson->chapter,
+                        $currentLesson
+                    ]) }}"
+                        class="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-bold text-lg rounded-xl hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 8a9 9 0 110-18 9 9 0 010 18z"
+                            ></path>
+                        </svg>
+                        Continuer: {{ $currentLesson->title }}
+                        <svg
+                            class="w-6 h-6 ml-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                            ></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="space-y-6">
             @foreach($formation->chapters as $index => $chapter)
             <div class="group relative">
