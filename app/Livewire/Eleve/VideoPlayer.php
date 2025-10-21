@@ -24,6 +24,11 @@ class VideoPlayer extends Component
     public $watchedPercentage = 0;
     public $videoCompleted = false;
 
+    // Notification properties
+    public $lastSavedTime = null;
+    public $showSaveNotification = false;
+    public $showCompletionNotification = false;
+
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, $lessonContent)
     {
         $this->team = $team;
@@ -92,17 +97,22 @@ class VideoPlayer extends Component
         }
     }
 
-    public function handleVideoTimeUpdate($currentTime, $duration, $percentage)
+    public function handleVideoTimeUpdate($currentTime)
     {
         $this->currentTime = $currentTime;
-        $this->duration = $duration;
-        $this->watchedPercentage = round($percentage, 2);
 
         // Ensure lesson is started when user begins watching
         $this->ensureLessonStarted();
 
         // Update watched_seconds in database (sent every 5 seconds from JavaScript)
         $this->saveProgress($currentTime, false); // Explicitly set to in_progress
+
+        // Show save notification
+        $this->lastSavedTime = $currentTime;
+        $this->showSaveNotification = true;
+
+        // Hide notification after 3 seconds
+        $this->dispatch('hide-save-notification');
     }
 
     public function handleVideoEnded($data)
@@ -111,6 +121,9 @@ class VideoPlayer extends Component
 
         // Update lesson_user record with completion data
         $this->markLessonAsCompleted($data);
+
+        // Show completion notification
+        $this->showCompletionNotification = true;
 
         // Example: Log completion
         Log::info('Video completed', [
@@ -135,6 +148,9 @@ class VideoPlayer extends Component
             return;
         }
 
+        list($minutes, $seconds) = explode(':', $watchedSeconds);
+        $totalSeconds = ((int)$minutes * 60) + (int)$seconds;
+
         $user = Auth::user();
 
         // Find or create lesson_user record
@@ -145,7 +161,7 @@ class VideoPlayer extends Component
         if (!$lessonUser) {
             // Create new record if it doesn't exist
             $this->lesson->learners()->attach($user->id, [
-                'watched_seconds' => $watchedSeconds,
+                'watched_seconds' => $totalSeconds,
                 'status' => $completed ? 'completed' : 'in_progress',
                 'started_at' => now(),
                 'last_activity_at' => now(),
@@ -153,8 +169,9 @@ class VideoPlayer extends Component
             ]);
         } else {
             // Update existing record
+
             $this->lesson->learners()->updateExistingPivot($user->id, [
-                'watched_seconds' => $watchedSeconds,
+                'watched_seconds' => $totalSeconds,
                 'status' => $completed ? 'completed' : 'in_progress',
                 'last_activity_at' => now(),
                 'completed_at' => $completed ? now() : null,
@@ -211,8 +228,14 @@ class VideoPlayer extends Component
 
     protected $listeners = [
         'videoTimeUpdate' => 'handleVideoTimeUpdate',
-        'videoEnded' => 'handleVideoEnded'
+        'videoEnded' => 'handleVideoEnded',
+        'hide-save-notification' => 'hideSaveNotification'
     ];
+
+    public function hideSaveNotification()
+    {
+        $this->showSaveNotification = false;
+    }
 
     public function render()
     {
