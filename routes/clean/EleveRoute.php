@@ -8,20 +8,37 @@ Route::prefix('eleve')
     ->middleware(['auth'])
     ->scopeBindings()
     ->group(function () {
+
+        // Main routes - ordered by specificity (most specific first)
         Route::get('/{team}', [ElevePageController::class, 'home'])->name('index');
-        Route::get('/{team}/formation/{formation}', [ElevePageController::class, 'showFormation'])->name('formation.show');
-        Route::post('/{team}/formation/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('formation.enroll');
-        Route::post('/{team}/formation/{formation}/reset-progress', [ElevePageController::class, 'resetProgress'])->name('formation.reset-progress');
-        Route::get('/{team}/api/formations', [ElevePageController::class, 'apiFormations'])->name('api.formations');
 
-        // Lesson viewing routes
-        Route::get('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}', [ElevePageController::class, 'showLesson'])
-            ->name('lesson.show');
-        Route::post('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/start', [ElevePageController::class, 'startLesson'])->name('lesson.start');
-        Route::post('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/complete', [ElevePageController::class, 'completeLesson'])->name('lesson.complete');
-        Route::post('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/progress', [ElevePageController::class, 'updateProgress'])->name('lesson.progress');
+        // Formation management routes
+        Route::prefix('formation')->name('formation.')->group(function () {
+            Route::get('/{team}/available', [ElevePageController::class, 'availableFormations'])->name('available');
+            Route::get('/{team}/{formation}', [ElevePageController::class, 'showFormation'])->name('show');
+            Route::post('/{team}/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('enroll');
+            Route::post('/{team}/{formation}/reset-progress', [ElevePageController::class, 'resetProgress'])->name('reset-progress');
+        });
 
-        // Quiz attempt routes
-        Route::get('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/quiz/attempt', [ElevePageController::class, 'attemptQuiz'])->name('lesson.quiz.attempt');
-        Route::post('/{team}/formation/{formation}/chapter/{chapter}/lesson/{lesson}/quiz/submit', [ElevePageController::class, 'submitQuiz'])->name('lesson.quiz.submit');
+        // API routes
+        Route::prefix('api')->name('api.')->group(function () {
+            Route::get('/{team}/formations', [ElevePageController::class, 'apiFormations'])->name('formations');
+            Route::get('/{team}/progress/{formation}', [ElevePageController::class, 'apiProgress'])->name('progress');
+        });
+
+        // Lesson routes - most specific first
+        Route::prefix('lesson')->name('lesson.')->group(function () {
+            // Quiz routes (most specific)
+            Route::prefix('quiz')->name('quiz.')->group(function () {
+                Route::get('/{team}/{formation}/{chapter}/{lesson}/attempt', [ElevePageController::class, 'attemptQuiz'])->name('attempt');
+                Route::post('/{team}/{formation}/{chapter}/{lesson}/submit', [ElevePageController::class, 'submitQuiz'])->name('submit');
+                Route::get('/{team}/{formation}/{chapter}/{lesson}/results/{attempt}', [ElevePageController::class, 'quizResults'])->name('results');
+            });
+
+            // General lesson routes
+            Route::get('/{team}/{formation}/{chapter}/{lesson}', [ElevePageController::class, 'showLesson'])->name('show');
+            Route::post('/{team}/{formation}/{chapter}/{lesson}/start', [ElevePageController::class, 'startLesson'])->name('start');
+            Route::post('/{team}/{formation}/{chapter}/{lesson}/complete', [ElevePageController::class, 'completeLesson'])->name('complete');
+            Route::post('/{team}/{formation}/{chapter}/{lesson}/progress', [ElevePageController::class, 'updateProgress'])->name('progress');
+        });
     });

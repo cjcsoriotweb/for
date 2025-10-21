@@ -7,6 +7,7 @@ use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\Lesson;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Clean\Account\AccountService;
@@ -144,6 +145,33 @@ class ElevePageController extends Controller
     }
 
     /**
+     * Afficher les formations disponibles pour une équipe
+     */
+    public function availableFormations(Team $team)
+    {
+        $user = Auth::user();
+
+        // Récupérer les formations disponibles pour cette équipe
+        $availableFormations = $team->formationsByTeam()
+            ->where('formation_in_teams.visible', true)
+            ->with(['chapters.lessons'])
+            ->get();
+
+        // Vérifier l'inscription de l'utilisateur à chaque formation
+        foreach ($availableFormations as $formation) {
+            $formation->is_enrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation, $team);
+            $formation->progress = $formation->is_enrolled
+                ? $this->studentFormationService->getStudentProgress($user, $formation)
+                : null;
+        }
+
+        return view('clean.eleve.formations.available', compact(
+            'team',
+            'availableFormations'
+        ));
+    }
+
+    /**
      * API endpoint pour récupérer les formations d'un étudiant (pour AJAX)
      */
     public function apiFormations(Team $team, Request $request)
@@ -158,6 +186,27 @@ class ElevePageController extends Controller
         );
 
         return response()->json($formations);
+    }
+
+    /**
+     * API endpoint pour récupérer la progression d'une formation
+     */
+    public function apiProgress(Team $team, Formation $formation, Request $request)
+    {
+        $user = Auth::user();
+
+        // Vérifier les permissions
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            return response()->json(['error' => 'Non autorisé'], 403);
+        }
+
+        $progress = $this->studentFormationService->getStudentProgress($user, $formation);
+        $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
+
+        return response()->json([
+            'progress' => $progress,
+            'formation' => $formationWithProgress,
+        ]);
     }
 
     /**
@@ -456,6 +505,48 @@ class ElevePageController extends Controller
             'correct_answers' => $correctAnswers,
             'total_questions' => $totalQuestions,
         ]);
+    }
+
+    /**
+     * Afficher les résultats d'une tentative de quiz
+     */
+    public function quizResults(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, QuizAttempt $attempt)
+    {
+        $user = Auth::user();
+
+        // Vérifier les permissions
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier que la leçon est bien un quiz
+        if ($lesson->lessonable_type !== \App\Models\Quiz::class) {
+            abort(404, 'Quiz non trouvé.');
+        }
+
+        // Vérifier que la tentative appartient à l'utilisateur connecté
+        if ($attempt->user_id !== $user->id || $attempt->lesson_id !== $lesson->id) {
+            abort(403, 'Tentative non autorisée.');
+        }
+
+        $quiz = $lesson->lessonable;
+
+        // Récupérer les réponses de cette tentative
+        $answers = $attempt->quizAnswers()->with(['quizQuestion', 'quizChoice'])->get();
+
+        // Récupérer les informations du quiz
+        $questions = $quiz->quizQuestions()->with('quizChoices')->get();
+
+        return view('clean.eleve.lesson.quiz-results', compact(
+            'team',
+            'formation',
+            'chapter',
+            'lesson',
+            'quiz',
+            'attempt',
+            'answers',
+            'questions'
+        ));
     }
 
     /**
