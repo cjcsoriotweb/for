@@ -58,12 +58,27 @@
                                 </div>
                                 <div>
                                     <h3
-                                        class="text-xl font-bold text-gray-900 dark:text-white mb-1"
+                                        class="text-xl font-bold {{ $chapter->is_accessible ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500' }} mb-1"
                                     >
                                         {{ $chapter->title }}
+                                        @if(!$chapter->is_accessible)
+                                        <svg
+                                            class="inline w-5 h-5 ml-2 text-gray-400"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                            ></path>
+                                        </svg>
+                                        @endif
                                     </h3>
                                     <div class="flex items-center space-x-2">
-                                        @if($chapter->pivot->completed ?? false)
+                                        @if($chapter->is_completed)
                                         <span
                                             class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm"
                                         >
@@ -80,9 +95,26 @@
                                             </svg>
                                             Terminé
                                         </span>
+                                        @elseif($chapter->is_current)
+                                        <span
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm"
+                                        >
+                                            <svg
+                                                class="w-4 h-4 mr-1"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fill-rule="evenodd"
+                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                                    clip-rule="evenodd"
+                                                ></path>
+                                            </svg>
+                                            En cours
+                                        </span>
                                         @else
                                         <span
-                                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm"
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-sm"
                                         >
                                             <svg
                                                 class="w-4 h-4 mr-1"
@@ -95,7 +127,7 @@
                                                     clip-rule="evenodd"
                                                 ></path>
                                             </svg>
-                                            En cours
+                                            Verrouillé
                                         </span>
                                         @endif
                                     </div>
@@ -144,23 +176,26 @@
                                 \App\Models\Quiz::class ? 'Quiz' :
                                 ($lesson->lessonable_type ===
                                 \App\Models\VideoContent::class ? 'Vidéo' :
-                                'Contenu'); $isCompleted =
-                                $lesson->pivot->completed ?? false; $typeColors
-                                = ['Quiz' => 'blue', 'Vidéo' => 'purple',
-                                'Contenu' => 'green']; $color =
-                                $typeColors[$lessonType] ?? 'gray'; $cardClasses
-                                = 'group/lesson relative rounded-lg p-4
-                                transition-all duration-200 border ';
-                                if($isCompleted) { $cardClasses .= 'bg-green-50
+                                'Contenu'); $typeColors = ['Quiz' => 'blue',
+                                'Vidéo' => 'purple', 'Contenu' => 'green'];
+                                $color = $typeColors[$lessonType] ?? 'gray';
+                                $cardClasses = 'group/lesson relative rounded-lg
+                                p-4 transition-all duration-200 border ';
+                                if($lesson->is_completed ?? false) {
+                                $cardClasses .= 'bg-green-50
                                 dark:bg-green-900/20 border-green-200
-                                dark:border-green-800'; } else { $cardClasses .=
-                                'bg-' . $color . '-50 dark:bg-' . $color .
-                                '-900/30 border-' . $color . '-200 dark:border-'
-                                . $color . '-800 hover:bg-' . $color . '-100
-                                dark:hover:bg-' . $color . '-900/50
-                                hover:border-' . $color . '-300
+                                dark:border-green-800'; }
+                                elseif($lesson->is_accessible ?? false) {
+                                $cardClasses .= 'bg-' . $color . '-50 dark:bg-'
+                                . $color . '-900/30 border-' . $color . '-200
+                                dark:border-' . $color . '-800 hover:bg-' .
+                                $color . '-100 dark:hover:bg-' . $color .
+                                '-900/50 hover:border-' . $color . '-300
                                 dark:hover:border-' . $color . '-600
-                                hover:shadow-md cursor-pointer'; } @endphp
+                                hover:shadow-md cursor-pointer'; } else {
+                                $cardClasses .= 'bg-gray-50 dark:bg-gray-700/50
+                                border-gray-200 dark:border-gray-600
+                                opacity-60'; } @endphp
 
                                 <div class="{{ $cardClasses }}">
                                     <div class="flex items-start space-x-3">
@@ -265,7 +300,8 @@
                                                 >
                                                     {{ $lessonType }}
                                                 </span>
-                                                @if($isCompleted)
+                                                @if($lesson->is_completed ??
+                                                false)
                                                 <svg
                                                     class="w-4 h-4 text-green-500"
                                                     fill="currentColor"
@@ -277,9 +313,10 @@
                                                         clip-rule="evenodd"
                                                     ></path>
                                                 </svg>
-                                                @else
+                                                @elseif($lesson->is_current ??
+                                                false)
                                                 <button
-                                                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
+                                                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
                                                 >
                                                     <svg
                                                         class="w-3 h-3 mr-1"
@@ -292,8 +329,14 @@
                                                             clip-rule="evenodd"
                                                         ></path>
                                                     </svg>
-                                                    Play
+                                                    Current
                                                 </button>
+                                                @else
+                                                <span
+                                                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                                                >
+                                                    Locked
+                                                </span>
                                                 @endif
                                             </div>
                                             <h5

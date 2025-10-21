@@ -2,7 +2,9 @@
 
 namespace App\Services\Formation;
 
+use App\Models\Chapter;
 use App\Models\Formation;
+use App\Models\Lesson;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -52,7 +54,7 @@ class StudentFormationService extends BaseFormationService
      */
     public function getFormationWithProgress(Formation $formation, User $user): ?Formation
     {
-        return Formation::where('id', $formation->id)
+        $formationData = Formation::where('id', $formation->id)
             ->whereHas('learners', function (Builder $query) use ($user): void {
                 $query->where('user_id', $user->id);
             })
@@ -61,9 +63,147 @@ class StudentFormationService extends BaseFormationService
                     $query->where('user_id', $user->id)
                         ->select(['formation_id', 'user_id', 'status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total']);
                 },
-                'chapters'
+                'chapters' => function ($query): void {
+                    $query->orderBy('position')
+                        ->with(['lessons' => function ($lessonQuery): void {
+                            $lessonQuery->orderBy('position');
+                        }]);
+                }
             ])
             ->first();
+
+        if ($formationData) {
+            $this->addProgressionData($formationData, $user);
+        }
+
+        return $formationData;
+    }
+
+    /**
+     * Add progression data to chapters and lessons
+     */
+    private function addProgressionData(Formation $formation, User $user): void
+    {
+        $previousChapterCompleted = true;
+        $currentChapter = null;
+        $currentLesson = null;
+
+        foreach ($formation->chapters as $index => $chapter) {
+            $chapterCompleted = $this->isChapterCompleted($chapter, $user);
+
+            // Determine chapter accessibility
+            $chapter->is_accessible = $previousChapterCompleted;
+            $chapter->is_completed = $chapterCompleted;
+            $chapter->is_current = false;
+
+            if (!$chapterCompleted && $previousChapterCompleted && !$currentChapter) {
+                $currentChapter = $chapter;
+                $chapter->is_current = true;
+            }
+
+            // Process lessons within the chapter
+            if ($chapter->is_accessible) {
+                $this->processChapterLessons($chapter, $user, $currentChapter === $chapter);
+            }
+
+            $previousChapterCompleted = $chapterCompleted;
+        }
+    }
+
+    /**
+     * Process lessons within a chapter to determine their state
+     */
+    private function processChapterLessons(Chapter $chapter, User $user, bool $isCurrentChapter): void
+    {
+        $previousLessonCompleted = true;
+
+        foreach ($chapter->lessons as $lessonIndex => $lesson) {
+            $lessonCompleted = $this->isLessonCompleted($lesson, $user);
+
+            // Determine lesson state
+            $lesson->is_accessible = $previousLessonCompleted;
+            $lesson->is_completed = $lessonCompleted;
+            $lesson->is_current = false;
+
+            // If this is the current chapter and lesson is not completed and previous is completed
+            if ($isCurrentChapter && !$lessonCompleted && $previousLessonCompleted) {
+                $lesson->is_current = true;
+            }
+
+            $previousLessonCompleted = $lessonCompleted;
+        }
+    }
+
+    /**
+     * Check if a chapter is completed by the user
+     */
+    private function isChapterCompleted(Chapter $chapter, User $user): bool
+    {
+        $totalLessons = $chapter->lessons->count();
+        if ($totalLessons === 0) {
+            return false;
+        }
+
+        $completedLessons = 0;
+        foreach ($chapter->lessons as $lesson) {
+            if ($this->isLessonCompleted($lesson, $user)) {
+                $completedLessons++;
+            }
+        }
+
+        return $completedLessons === $totalLessons;
+    }
+
+    /**
+     * Check if a lesson is completed by the user
+     */
+    private function isLessonCompleted(Lesson $lesson, User $user): bool
+    {
+        $pivot = $lesson->learners()
+            ->where('user_id', $user->id)
+            ->first()?->pivot;
+
+        return $pivot && $pivot->status === 'completed';
+    }
+
+    /**
+     * Get the current chapter the user should be working on
+     */
+    public function getCurrentChapter(Formation $formation, User $user): ?Chapter
+    {
+        $formationWithProgress = $this->getFormationWithProgress($formation, $user);
+
+        if (!$formationWithProgress) {
+            return null;
+        }
+
+        foreach ($formationWithProgress->chapters as $chapter) {
+            if ($chapter->is_current ?? false) {
+                return $chapter;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the current lesson the user should be working on
+     */
+    public function getCurrentLesson(Formation $formation, User $user): ?Lesson
+    {
+        $currentChapter = $this->getCurrentChapter($formation, $user);
+
+        if (!$currentChapter) {
+            return null;
+        }
+
+        foreach ($currentChapter->lessons as $lesson) {
+            if ($lesson->is_current ?? false) {
+                return $lesson;
+            }
+        }
+
+        return null;
     }
 
     /**
