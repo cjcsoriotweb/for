@@ -463,8 +463,8 @@ class ElevePageController extends Controller
                 'best_score' => max($lesson->learners()->where('user_id', $user->id)->first()?->pivot?->best_score ?? 0, $score),
                 'max_score' => $maxScore,
                 'last_activity_at' => now(),
-                'completed_at' => $passed ? now() : null,
-                'status' => $passed ? 'completed' : 'in_progress',
+                'completed_at' => now(), // ✅ Marquer comme terminé à chaque tentative
+                'status' => 'completed', // ✅ La leçon est terminée (quiz fait)
             ],
         ]);
 
@@ -479,10 +479,8 @@ class ElevePageController extends Controller
             ]);
         }
 
-        // Si le quiz est réussi, mettre à jour la progression globale
-        if ($passed) {
-            $this->updateFormationProgress($user, $formation);
-        }
+        // ✅ Mettre à jour la progression globale à chaque soumission de quiz
+        $this->updateFormationProgress($user, $formation);
 
         return response()->json([
             'success' => true,
@@ -540,13 +538,22 @@ class ElevePageController extends Controller
      */
     private function updateFormationProgress(User $user, Formation $formation)
     {
+        // Récupérer tous les chapitres avec leurs leçons et la progression de l'utilisateur
+        $chapters = $formation->chapters()
+            ->with(['lessons' => function ($query) use ($user) {
+                $query->with(['learners' => function ($learnerQuery) use ($user) {
+                    $learnerQuery->where('user_id', $user->id);
+                }]);
+            }])
+            ->get();
+
         // Calculer la progression basée sur les leçons terminées
-        $totalLessons = $formation->chapters()->with('lessons')->get()->pluck('lessons')->flatten()->count();
+        $totalLessons = $chapters->pluck('lessons')->flatten()->count();
         $completedLessons = 0;
 
-        foreach ($formation->chapters as $chapter) {
+        foreach ($chapters as $chapter) {
             foreach ($chapter->lessons as $lesson) {
-                $lessonProgress = $lesson->learners()->where('user_id', $user->id)->first();
+                $lessonProgress = $lesson->learners->first();
                 if ($lessonProgress && $lessonProgress->pivot->status === 'completed') {
                     $completedLessons++;
                 }
