@@ -16,80 +16,45 @@ use Livewire\Component;
 class QuizComponent extends Component
 {
     public Team $team;
-
     public Formation $formation;
-
     public Chapter $chapter;
-
     public Lesson $lesson;
-
     public Quiz $quiz;
 
     public $questions;
-
     public $answers = [];
-
     public $attempts = 0;
 
     // Résultats du quiz
     public $showResults = false;
-
     public $score = 0;
-
     public $passed = false;
-
     public $correctAnswers = 0;
-
     public $totalQuestions = 0;
 
     // Tracking du temps
     public $startTime = null;
-
     public $elapsedTime = 0;
 
+    public $countdownDefault = 10000;
+    public $start = 10000;
 
-
-
-    public $countdownDefault = 25;
-    public $start = 25;
-
-    public function begin()
-    {
-        while ($this->start >= 0) {
-            // Stream the current count to the browser...
-            $this->stream(
-                to: 'count',
-                content: $this->start,
-                replace: true,
-            );
-
-            // Pause for 1 second between numbers...
-            sleep(1);
-
-            // Decrement the counter...
-            $this->start = $this->start - 1;
-            if ($this->start == 0) {
-                $this->submitQuiz();
-            }
-        };
-    }
-
-
+    // Initialisation du composant
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
 
-        // Vérifier les permissions
-        if (! $this->studentFormationService()->isEnrolledInFormation($user, $formation, $team)) {
+        // Vérification des permissions
+        if (!$this->studentFormationService()->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
-
-        // Vérifier que la leçon est bien un quiz
+        // Vérification que la leçon est bien un quiz
         if ($lesson->lessonable_type !== Quiz::class) {
             abort(404, 'Quiz non trouvé.');
         }
 
+        // Initialisation des propriétés
         $this->team = $team;
         $this->formation = $formation;
         $this->chapter = $chapter;
@@ -104,8 +69,20 @@ class QuizComponent extends Component
         $this->attempts = $lessonProgress?->pivot?->attempts ?? 0;
     }
 
+    // Commencer le quiz
+    public function begin()
+    {
+        while ($this->start >= 0) {
+            $this->stream(to: 'count', content: $this->start, replace: true);
+            sleep(1);
+            $this->start = $this->start - 1;
+            if ($this->start == 0) {
+                $this->submitQuiz();
+            }
+        }
+    }
 
-
+    // Réinitialiser le quiz
     public function retryQuiz()
     {
         $this->start = $this->countdownDefault;
@@ -117,12 +94,14 @@ class QuizComponent extends Component
         $this->totalQuestions = 0;
     }
 
+    // Démarrer le timer du quiz
     public function startQuizTimer()
     {
         $this->startTime = time();
         $this->elapsedTime = 0;
     }
 
+    // Mettre à jour le timer
     public function updateTimer()
     {
         if ($this->startTime) {
@@ -130,22 +109,22 @@ class QuizComponent extends Component
         }
     }
 
+    // Soumettre le quiz
     public function submitQuiz()
     {
+        dd('ok');
         $user = Auth::user();
-
-        // Utiliser le service de quiz pour traiter la soumission avec le temps de début
         $quizService = app(\App\Services\Quiz\QuizService::class);
         $result = $quizService->submitQuiz($user, $this->quiz, $this->lesson, $this->answers, $this->startTime);
 
-        // Mettre à jour les propriétés du composant
+        // Mise à jour des résultats
         $this->score = $result['score'];
         $this->passed = $result['passed'];
         $this->correctAnswers = $result['correct_answers'];
         $this->totalQuestions = $result['total_questions'];
         $this->attempts++;
 
-        // Si le quiz est réussi, mettre à jour la progression globale
+        // Mise à jour de la progression si le quiz est réussi
         if ($this->passed) {
             $this->updateFormationProgress($user, $this->formation);
         }
@@ -153,14 +132,15 @@ class QuizComponent extends Component
         $this->showResults = true;
     }
 
+    // Service de gestion des formations d'élève
     private function studentFormationService()
     {
         return app(StudentFormationService::class);
     }
 
+    // Mettre à jour la progression dans la formation
     private function updateFormationProgress(User $user, Formation $formation)
     {
-        // Calculer la progression basée sur les leçons terminées
         $totalLessons = $formation->chapters()->with('lessons')->get()->pluck('lessons')->flatten()->count();
         $completedLessons = 0;
 
@@ -175,7 +155,7 @@ class QuizComponent extends Component
 
         $progressPercent = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
 
-        // Mettre à jour la progression de la formation
+        // Mise à jour de la progression de l'élève
         $formation->learners()->syncWithoutDetaching([
             $user->id => [
                 'progress_percent' => $progressPercent,
@@ -185,16 +165,14 @@ class QuizComponent extends Component
         ]);
     }
 
+    // Affichage du composant
     public function render()
     {
-
-        if (
-            !$this->passed && $this->quiz->max_attempts == 0 || $this->attempts <
-            $this->quiz->max_attempts
-        ) {
-        } else {
-            $this->redirect(route('eleve.formation.show', [$this->team, $this->formation]));
+        if ($this->passed || $this->quiz->max_attempts == 0 || $this->attempts < $this->quiz->max_attempts) {
+            return view('livewire.eleve.quiz-component');
         }
-        return view('livewire.eleve.quiz-component');
+
+        // Rediriger si le nombre d'essais est dépassé
+        $this->redirect(route('eleve.formation.show', [$this->team, $this->formation]));
     }
 }
