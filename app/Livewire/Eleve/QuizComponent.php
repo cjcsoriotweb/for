@@ -47,6 +47,34 @@ class QuizComponent extends Component
 
     public $elapsedTime = 0;
 
+
+
+
+    public $countdownDefault = 25;
+    public $start = 25;
+
+    public function begin()
+    {
+        while ($this->start >= 0) {
+            // Stream the current count to the browser...
+            $this->stream(
+                to: 'count',
+                content: $this->start,
+                replace: true,
+            );
+
+            // Pause for 1 second between numbers...
+            sleep(1);
+
+            // Decrement the counter...
+            $this->start = $this->start - 1;
+            if ($this->start == 0) {
+                $this->submitQuiz();
+            }
+        };
+    }
+
+
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
@@ -80,6 +108,7 @@ class QuizComponent extends Component
 
     public function retryQuiz()
     {
+        $this->start = $this->countdownDefault;
         $this->showResults = false;
         $this->answers = [];
         $this->score = 0;
@@ -158,6 +187,7 @@ class QuizComponent extends Component
 
     public function render()
     {
+
         if (
             !$this->passed && $this->quiz->max_attempts == 0 || $this->attempts <
             $this->quiz->max_attempts

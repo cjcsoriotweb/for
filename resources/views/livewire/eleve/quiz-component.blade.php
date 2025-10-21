@@ -118,6 +118,10 @@
             class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg"
         >
             <div class="p-6 text-gray-900 dark:text-gray-100">
+                <div x-init="$wire.begin()">
+                    Temps réstant :
+                    <span wire:stream="count">{{ $start }}</span>
+                </div>
                 <div id="quiz-questions">
                     @foreach($questions as $index => $question)
                     <div
@@ -209,12 +213,14 @@
                         @if(!$passed && $quiz->max_attempts == 0 || $attempts <
                         $quiz->max_attempts)
                         <button
+                            x-data
+                            x-init="setTimeout(() => $wire.retryQuiz(), 1000)"
                             wire:click="retryQuiz"
                             class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
                         >
                             Réessayer
                         </button>
-                        @else acaca @endif
+                        @endif
                     </div>
                 </div>
             </div>
