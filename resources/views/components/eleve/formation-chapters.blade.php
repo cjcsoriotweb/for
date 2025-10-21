@@ -389,7 +389,7 @@
                                                 @elseif($lesson->is_current ??
                                                 false)
                                                 <button
-                                                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                                                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors"
                                                 >
                                                     <svg
                                                         class="w-3 h-3 mr-1"
@@ -402,7 +402,7 @@
                                                             clip-rule="evenodd"
                                                         ></path>
                                                     </svg>
-                                                    Current
+                                                    En cours
                                                 </button>
                                                 @else
                                                 <span
