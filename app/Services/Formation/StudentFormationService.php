@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class StudentFormationService extends BaseFormationService
 {
@@ -35,6 +36,19 @@ class StudentFormationService extends BaseFormationService
             $query->where('teams.id', $team->id)
                 ->where('formation_in_teams.visible', true);
         })->get();
+    }
+
+    public function listAvailableFormationsForTeamExceptCurrentUseByMe(Team $team): Collection
+    {
+        return Formation::whereHas('teams', function (Builder $query) use ($team): void {
+            $query->where('teams.id', $team->id)
+                ->where('formation_in_teams.visible', true);
+        })
+            ->whereDoesntHave('learners', function (Builder $q) use ($team) {
+                $q->where('users.id', Auth::user()->id);
+                // Si tu n’as pas team_id sur ce pivot, supprime cette ligne.
+            })
+            ->get();
     }
 
     /**
@@ -229,6 +243,7 @@ class StudentFormationService extends BaseFormationService
         $pivot = $formation->learners()
             ->where('user_id', $user->id)
             ->first()?->pivot;
+
 
         if (! $pivot) {
             return null;

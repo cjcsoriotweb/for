@@ -20,7 +20,7 @@ class FormationChoice extends Component
     public function __construct(StudentFormationService $studentFormationService, Team $team)
     {
         $this->team = $team;
-        $this->availableFormations = $studentFormationService->listAvailableFormationsForTeam($team);
+        $this->availableFormations = $studentFormationService->listAvailableFormationsForTeamExceptCurrentUseByMe($team);
     }
 
     /**

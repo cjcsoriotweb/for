@@ -10,13 +10,17 @@
             </a>
         </div>
 
-        @php $studentFormationService =
-        app(\App\Services\Formation\StudentFormationService::class); @endphp
+        @php 
+        $studentFormationService = app(\App\Services\Formation\StudentFormationService::class); 
+        @endphp
+        
         @if($formations->count() > 0)
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($formations as $formation) @php $progress =
-            $studentFormationService->getStudentProgress(auth()->user(),
-            $formation); $progressWidth = $progress['progress_percent'] ?? 0;
+            @foreach($formations as $formation) @php 
+            
+            $progress = $studentFormationService->getStudentProgress(auth()->user(), $formation); 
+            $progressWidth = $progress['progress_percent'] ?? 0;
+
             @endphp
 
             <div
