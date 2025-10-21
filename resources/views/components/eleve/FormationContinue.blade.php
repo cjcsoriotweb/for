@@ -68,6 +68,7 @@
                             style="width: {{ $progressWidth }}%"
                         ></div>
                     </div>
+                    zda
                 </div>
 
                 @if($progress['last_seen_at'])
