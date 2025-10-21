@@ -3,29 +3,6 @@
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <h3 class="text-lg font-semibold mb-4">Navigation</h3>
         <div class="flex justify-between items-center">
-            <div>
-                @if($previousLesson) @php $prevLessonType =
-                $previousLesson->lessonable_type === \App\Models\Quiz::class ?
-                'Quiz' : ($previousLesson->lessonable_type ===
-                \App\Models\VideoContent::class ? 'Vidéo' : 'Contenu'); @endphp
-                <a
-                    href="{{
-                        route('eleve.lesson.show', [
-                            $team,
-                            $formation,
-                            $chapter,
-                            $previousLesson
-                        ])
-                    }}"
-                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    ← {{ $prevLessonType }} précédente
-                </a>
-                @else
-                <span class="text-gray-400">Première leçon</span>
-                @endif
-            </div>
-
             <div class="text-center">
                 <a
                     href="{{
