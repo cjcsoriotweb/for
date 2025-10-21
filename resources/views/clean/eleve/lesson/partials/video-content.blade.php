@@ -1,5 +1,6 @@
 {{-- Contenu vidéo --}}
-@if($lessonContent->video_url)
+
+@if($lessonContent->video_path)
 <div class="aspect-video mb-4 bg-black rounded-lg overflow-hidden relative">
     <video
         controls
