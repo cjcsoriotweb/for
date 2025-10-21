@@ -220,9 +220,6 @@ class ElevePageController extends Controller
                 ->with('info', 'Cette leçon est déjà terminée. Vous pouvez passer à la leçon suivante.');
         }
 
-        // Démarrer automatiquement la leçon lors de la visite (seulement si pas déjà terminée)
-        $this->startLessonAutomatically($team, $formation, $chapter, $lesson);
-
         // Récupérer le contenu de la leçon selon son type
         $lessonContent = null;
         $lessonType = null;
@@ -234,13 +231,21 @@ class ElevePageController extends Controller
             $lessonContent = $lesson->lessonable;
             $lessonType = 'text';
         } elseif ($lesson->lessonable_type === \App\Models\Quiz::class) {
-            $lessonContent = $lesson->lessonable;
-            $lessonType = 'quiz';
+            // Pour les quiz, rediriger directement vers la page de tentative
+            return redirect()->route('eleve.lesson.quiz.attempt', [
+                $team,
+                $formation,
+                $chapter,
+                $lesson
+            ]);
         }
 
         if (! $lessonContent) {
             abort(404, 'Contenu de leçon non trouvé.');
         }
+
+        // Démarrer automatiquement la leçon lors de la visite (seulement si pas déjà terminée)
+        $this->startLessonAutomatically($team, $formation, $chapter, $lesson);
 
         // Récupérer la progression de l'étudiant pour cette leçon
         $lessonProgress = $lesson->learners()
@@ -482,6 +487,13 @@ class ElevePageController extends Controller
         // ✅ Mettre à jour la progression globale à chaque soumission de quiz
         $this->updateFormationProgress($user, $formation);
 
+        // Rediriger vers la formation si le quiz est réussi
+        if ($passed) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de ' . round($score, 1) . '%.');
+        }
+
+        // Retourner les résultats pour les quiz échoués (pour permettre une nouvelle tentative)
         return response()->json([
             'success' => true,
             'score' => $score,
