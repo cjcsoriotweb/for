@@ -56,16 +56,13 @@ class Autoplay extends Component
         }
 
         if ($this->countdown <= 0) {
-            $this->proceedToLesson();
-        } else {
-            $this->dispatch('countdownTick', $this->countdown);
+            return $this->proceedToLesson();
         }
     }
 
     public function proceedToLesson()
     {
         $this->resetCountdown();
-        $this->dispatch('autoplayRedirect');
 
         // Get team from current user or formation
         $team = auth()->user()->currentTeam ?? $this->formation->teams()->first();
