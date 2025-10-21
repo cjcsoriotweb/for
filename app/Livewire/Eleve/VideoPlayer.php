@@ -80,10 +80,12 @@ class VideoPlayer extends Component
             'user_id' => auth()->check() ? auth()->id() : null
         ]);
 
-        // Optional: Dispatch browser event to show completion message
-        $this->dispatch('video-completed', [
-            'lesson_id' => $data['lessonId'],
-            'lesson_content_id' => $data['lessonContentId']
+        // Redirect to lesson page to update lesson status and show next content
+        return redirect()->route('eleve.lesson.show', [
+            'team' => $this->team->id,
+            'formation' => $this->formation->id,
+            'chapter' => $this->chapter->id,
+            'lesson' => $data['lessonId']
         ]);
     }
 
