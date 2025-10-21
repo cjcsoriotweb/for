@@ -20,7 +20,11 @@
 
     @if($autoplay && $showCountdown)
     <!-- Countdown Display -->
-    <div class="mb-6 text-center" id="countdown-container">
+    <div
+        class="mb-6 text-center"
+        id="countdown-container"
+        wire:poll.1s="decrementCountdown"
+    >
         <div
             class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full shadow-lg mb-4"
         >
@@ -93,41 +97,17 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Start countdown if autoplay is enabled and countdown is visible
-        @if($autoplay && $showCountdown)
-        startCountdownTimer();
-        @endif
-
-        function startCountdownTimer() {
-            let countdownValue = {{ $countdown }};
-            const countdownNumber = document.getElementById('countdown-number');
-            const countdownText = document.getElementById('countdown-text');
-            const continueButton = document.getElementById('continue-button');
-
-            if (!countdownNumber || !countdownText || !continueButton) {
-                return;
-            }
-
-            const countdownInterval = setInterval(function() {
-                countdownNumber.textContent = countdownValue;
-                countdownText.textContent =
-                    'Redirection automatique dans ' +
-                    countdownValue +
-                    ' seconde' +
-                    (countdownValue > 1 ? 's' : '') +
-                    '...';
-
-                if (countdownValue <= 0) {
-                    clearInterval(countdownInterval);
-                    // Real HTTP redirect instead of clicking button
-                    window.location.href = continueButton.href;
-                    return;
+    document.addEventListener("DOMContentLoaded", function () {
+        // Listen for Livewire events to handle countdown completion
+        document.addEventListener("livewire:init", function () {
+            Livewire.on("autoplayRedirect", function () {
+                const continueButton =
+                    document.getElementById("continue-button");
+                if (continueButton) {
+                    continueButton.click();
                 }
-
-                countdownValue--;
-            }, 1000);
-        }
+            });
+        });
     });
 </script>
 @endpush
