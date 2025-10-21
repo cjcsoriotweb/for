@@ -115,31 +115,16 @@ class VideoPlayer extends Component
         $this->dispatch('hide-save-notification');
     }
 
-    public function handleVideoEnded($data)
+    public function handleVideoEnded()
     {
         $this->videoCompleted = true;
 
         // Update lesson_user record with completion data
-        $this->markLessonAsCompleted($data);
+        $this->markLessonAsCompleted();
 
         // Show completion notification
         $this->showCompletionNotification = true;
-
-        // Example: Log completion
-        Log::info('Video completed', [
-            'lesson_id' => $data['lessonId'],
-            'lesson_content_id' => $data['lessonContentId'],
-            'total_time' => $data['totalTime'],
-            'user_id' => Auth::check() ? Auth::id() : null
-        ]);
-
-        // Emit event to parent component to handle redirect
-        $this->dispatch('videoCompleted', [
-            'lessonId' => $data['lessonId'],
-            'teamId' => $this->team->id,
-            'formationId' => $this->formation->id,
-            'chapterId' => $this->chapter->id
-        ]);
+        $this->dispatch('leave', true);
     }
 
     private function saveProgress($watchedSeconds, $completed = false)
@@ -161,7 +146,7 @@ class VideoPlayer extends Component
         if (!$lessonUser) {
             // Create new record if it doesn't exist
             $this->lesson->learners()->attach($user->id, [
-                'watched_seconds' => $totalSeconds,
+                'watched_seconds' => $watchedSeconds,
                 'status' => $completed ? 'completed' : 'in_progress',
                 'started_at' => now(),
                 'last_activity_at' => now(),
@@ -179,7 +164,7 @@ class VideoPlayer extends Component
         }
     }
 
-    private function markLessonAsCompleted($data)
+    private function markLessonAsCompleted()
     {
         if (!Auth::check()) {
             return;
@@ -192,36 +177,11 @@ class VideoPlayer extends Component
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$lessonUser) {
-            // Create completed record if it doesn't exist
-            $this->lesson->learners()->attach($user->id, [
-                'watched_seconds' => $data['totalTime'],
+        if ($lessonUser) {
+            $x = $this->lesson->learners()->updateExistingPivot($user->id, [
                 'status' => 'completed',
-                'started_at' => now(),
                 'last_activity_at' => now(),
                 'completed_at' => now(),
-            ]);
-
-            Log::info('Lesson completed - new record created', [
-                'lesson_id' => $data['lessonId'],
-                'user_id' => $user->id,
-                'status' => 'completed',
-                'watched_seconds' => $data['totalTime']
-            ]);
-        } else {
-            // Update existing record to completed
-            $this->lesson->learners()->updateExistingPivot($user->id, [
-                'status' => 'completed',
-                'watched_seconds' => $data['totalTime'],
-                'completed_at' => now(),
-                'last_activity_at' => now(),
-            ]);
-
-            Log::info('Lesson completed - existing record updated', [
-                'lesson_id' => $data['lessonId'],
-                'user_id' => $user->id,
-                'status' => 'completed',
-                'watched_seconds' => $data['totalTime']
             ]);
         }
     }

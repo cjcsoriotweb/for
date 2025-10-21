@@ -101,20 +101,17 @@
             }
         }
 
+        $wire.on("leave", (event) => {
+            window.location.reload();
+            console.log("ok");
+
+            // ...
+        });
         // Function to run when video ends
         function onVideoEnd() {
             console.log("Vidéo terminée");
 
-            // Dispatch custom event that Livewire can listen to
-            const endEvent = new CustomEvent("videoEnded", {
-                detail: {
-                    totalTime: video.duration || 0,
-                    lessonId: video.getAttribute("data-lesson-id") || "",
-                    lessonContentId:
-                        video.getAttribute("data-lesson-content-id") || "",
-                },
-            });
-            document.dispatchEvent(endEvent);
+            $wire.dispatch("videoEnded", { endEvent: true });
 
             // Add your custom logic here - could dispatch an event, make an API call, etc.
             // For example: mark lesson as completed, show next lesson button, etc.
