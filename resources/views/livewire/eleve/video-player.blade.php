@@ -9,6 +9,8 @@
             poster="{{ asset('images/video-poster.jpg') }}"
             oncontextmenu="return false;"
             data-resume-time="{{ $currentTime }}"
+            data-lesson-id="{{ $lesson->id ?? '' }}"
+            data-lesson-content-id="{{ $lessonContent->id ?? '' }}"
         >
             <source
                 src="{{ asset('storage/' . $lessonContent->video_path) }}"
@@ -40,30 +42,48 @@
                 return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
             }
 
+            let lastUpdateTime = 0;
+            const UPDATE_INTERVAL = 5000; // 5 seconds in milliseconds
+
             // Update current time display
             function updateCurrentTime() {
                 const currentTime = formatTime(video.currentTime);
                 const duration = formatTime(video.duration || 0);
                 currentTimeDisplay.textContent = `${currentTime} / ${duration}`;
 
-                // Send current time to Livewire
-                @this.call('handleVideoTimeUpdate', {
-                    currentTime: video.currentTime,
-                    duration: video.duration || 0,
-                    percentage: video.duration ? (video.currentTime / video.duration) * 100 : 0
-                });
+                // Send time update to Livewire every 5 seconds
+                const now = Date.now();
+                if (now - lastUpdateTime >= UPDATE_INTERVAL) {
+                    lastUpdateTime = now;
+
+                    // Dispatch custom event that Livewire can listen to
+                    const timeEvent = new CustomEvent("videoTimeUpdate", {
+                        detail: {
+                            currentTime: video.currentTime,
+                            duration: video.duration || 0,
+                            percentage: video.duration
+                                ? (video.currentTime / video.duration) * 100
+                                : 0,
+                        },
+                    });
+                    document.dispatchEvent(timeEvent);
+                }
             }
 
             // Function to run when video ends
             function onVideoEnd() {
                 console.log("Vidéo terminée");
 
-                // Send video end event to Livewire
-                @this.call('handleVideoEnded', {
-                    totalTime: video.duration || 0,
-                    lessonId: '{{ $lesson->id ?? '' }}',
-                    lessonContentId: '{{ $lessonContent->id ?? '' }}'
+                // Dispatch custom event that Livewire can listen to
+                const endEvent = new CustomEvent("videoEnded", {
+                    detail: {
+                        totalTime: video.duration || 0,
+                        lessonId: video.getAttribute("data-lesson-id") || "",
+                        lessonContentId:
+                            video.getAttribute("data-lesson-content-id") || "",
+                    },
                 });
+                document.dispatchEvent(endEvent);
 
                 // Add your custom logic here - could dispatch an event, make an API call, etc.
                 // For example: mark lesson as completed, show next lesson button, etc.
@@ -71,10 +91,11 @@
 
             // Event listeners
             video.addEventListener("timeupdate", updateCurrentTime);
-            video.addEventListener("loadedmetadata", function() {
+            video.addEventListener("loadedmetadata", function () {
                 updateCurrentTime();
                 // Resume from saved position if available
-                const resumeTime = parseFloat(video.getAttribute('data-resume-time')) || 0;
+                const resumeTime =
+                    parseFloat(video.getAttribute("data-resume-time")) || 0;
                 if (resumeTime > 0 && resumeTime < video.duration) {
                     video.currentTime = resumeTime;
                 }

@@ -52,40 +52,80 @@ class VideoPlayer extends Component
         if ($lessonUser) {
             $this->currentTime = $lessonUser->pivot->watched_seconds;
             $this->videoCompleted = $lessonUser->pivot->status === 'completed';
+
+            Log::info('Loaded existing lesson progress', [
+                'lesson_id' => $this->lesson->id,
+                'user_id' => $user->id,
+                'status' => $lessonUser->pivot->status,
+                'watched_seconds' => $lessonUser->pivot->watched_seconds
+            ]);
         }
     }
 
-    public function handleVideoTimeUpdate($data)
+    private function ensureLessonStarted()
     {
-        $this->currentTime = $data['currentTime'];
-        $this->duration = $data['duration'];
-        $this->watchedPercentage = round($data['percentage'], 2);
+        if (!Auth::check()) {
+            return;
+        }
 
-        // Save progress to database periodically
-        $this->saveProgress($data['currentTime']);
+        $user = Auth::user();
+
+        // Check if lesson_user record exists
+        $lessonUser = $this->lesson->learners()
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$lessonUser) {
+            // Create lesson_user record with in_progress status
+            $this->lesson->learners()->attach($user->id, [
+                'watched_seconds' => 0,
+                'status' => 'in_progress',
+                'started_at' => now(),
+                'last_activity_at' => now(),
+            ]);
+
+            Log::info('Lesson started for user', [
+                'lesson_id' => $this->lesson->id,
+                'user_id' => $user->id,
+                'status' => 'in_progress'
+            ]);
+        }
+    }
+
+    public function handleVideoTimeUpdate($currentTime, $duration, $percentage)
+    {
+        $this->currentTime = $currentTime;
+        $this->duration = $duration;
+        $this->watchedPercentage = round($percentage, 2);
+
+        // Ensure lesson is started when user begins watching
+        $this->ensureLessonStarted();
+
+        // Update watched_seconds in database (sent every 5 seconds from JavaScript)
+        $this->saveProgress($currentTime, false); // Explicitly set to in_progress
     }
 
     public function handleVideoEnded($data)
     {
         $this->videoCompleted = true;
 
-        // Save final progress and mark as completed
-        $this->saveProgress($data['totalTime'], true);
+        // Update lesson_user record with completion data
+        $this->markLessonAsCompleted($data);
 
         // Example: Log completion
         Log::info('Video completed', [
             'lesson_id' => $data['lessonId'],
             'lesson_content_id' => $data['lessonContentId'],
             'total_time' => $data['totalTime'],
-            'user_id' => auth()->check() ? auth()->id() : null
+            'user_id' => Auth::check() ? Auth::id() : null
         ]);
 
-        // Redirect to lesson page to update lesson status and show next content
-        return redirect()->route('eleve.lesson.show', [
-            'team' => $this->team->id,
-            'formation' => $this->formation->id,
-            'chapter' => $this->chapter->id,
-            'lesson' => $data['lessonId']
+        // Emit event to parent component to handle redirect
+        $this->dispatch('videoCompleted', [
+            'lessonId' => $data['lessonId'],
+            'teamId' => $this->team->id,
+            'formationId' => $this->formation->id,
+            'chapterId' => $this->chapter->id
         ]);
     }
 
@@ -121,6 +161,58 @@ class VideoPlayer extends Component
             ]);
         }
     }
+
+    private function markLessonAsCompleted($data)
+    {
+        if (!Auth::check()) {
+            return;
+        }
+
+        $user = Auth::user();
+
+        // Find or create lesson_user record and mark as completed
+        $lessonUser = $this->lesson->learners()
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$lessonUser) {
+            // Create completed record if it doesn't exist
+            $this->lesson->learners()->attach($user->id, [
+                'watched_seconds' => $data['totalTime'],
+                'status' => 'completed',
+                'started_at' => now(),
+                'last_activity_at' => now(),
+                'completed_at' => now(),
+            ]);
+
+            Log::info('Lesson completed - new record created', [
+                'lesson_id' => $data['lessonId'],
+                'user_id' => $user->id,
+                'status' => 'completed',
+                'watched_seconds' => $data['totalTime']
+            ]);
+        } else {
+            // Update existing record to completed
+            $this->lesson->learners()->updateExistingPivot($user->id, [
+                'status' => 'completed',
+                'watched_seconds' => $data['totalTime'],
+                'completed_at' => now(),
+                'last_activity_at' => now(),
+            ]);
+
+            Log::info('Lesson completed - existing record updated', [
+                'lesson_id' => $data['lessonId'],
+                'user_id' => $user->id,
+                'status' => 'completed',
+                'watched_seconds' => $data['totalTime']
+            ]);
+        }
+    }
+
+    protected $listeners = [
+        'videoTimeUpdate' => 'handleVideoTimeUpdate',
+        'videoEnded' => 'handleVideoEnded'
+    ];
 
     public function render()
     {
