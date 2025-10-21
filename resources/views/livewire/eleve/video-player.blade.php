@@ -2,9 +2,10 @@
     <div class="aspect-video mb-4 bg-black rounded-lg overflow-hidden">
         <video
             controls
+            autoplay
             class="w-full h-full"
             id="lesson-video"
-            preload="metadata"
+            preload="auto"
             poster="{{ asset('images/video-poster.jpg') }}"
             oncontextmenu="return false;"
             data-resume-time="{{ $currentTime }}"
