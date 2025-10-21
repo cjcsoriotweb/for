@@ -17,6 +17,7 @@ class Autoplay extends Component
     {
         session(['autoplay' => true]);
         $this->autoplay = true;
+        $this->startCountdown();
     }
 
     public function autoplayOff()
@@ -28,6 +29,9 @@ class Autoplay extends Component
 
     public function mount(Formation $formation, $currentLesson)
     {
+        $this->formation = $formation;
+        $this->currentLesson = $currentLesson;
+
         if (session()->has('autoplay')) {
             $this->autoplay = session()->get('autoplay');
             if ($this->autoplay) {
@@ -41,6 +45,7 @@ class Autoplay extends Component
         if ($this->autoplay) {
             $this->showCountdown = true;
             $this->countdown = 3;
+            $this->dispatch('countdownStarted');
         }
     }
 
@@ -52,14 +57,21 @@ class Autoplay extends Component
 
         if ($this->countdown <= 0) {
             $this->proceedToLesson();
+        } else {
+            $this->dispatch('countdownTick', $this->countdown);
         }
     }
 
     public function proceedToLesson()
     {
         $this->resetCountdown();
+        $this->dispatch('autoplayRedirect');
+
+        // Get team from current user or formation
+        $team = auth()->user()->currentTeam ?? $this->formation->teams()->first();
+
         return redirect()->route('eleve.lesson.show', [
-            request()->route('team'),
+            $team,
             $this->formation,
             $this->currentLesson->chapter,
             $this->currentLesson

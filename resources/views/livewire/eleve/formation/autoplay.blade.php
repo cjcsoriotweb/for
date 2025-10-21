@@ -20,15 +20,22 @@
 
     @if($autoplay && $showCountdown)
     <!-- Countdown Display -->
-    <div class="mb-6 text-center">
+    <div
+        class="mb-6 text-center"
+        id="countdown-container"
+        wire:poll.1s="decrementCountdown"
+    >
         <div
             class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full shadow-lg mb-4"
         >
-            <span class="text-3xl font-bold text-white countdown-number">
+            <span
+                class="text-3xl font-bold text-white countdown-number"
+                id="countdown-number"
+            >
                 {{ $countdown }}
             </span>
         </div>
-        <p class="text-gray-600 dark:text-gray-300">
+        <p class="text-gray-600 dark:text-gray-300" id="countdown-text">
             Redirection automatique dans {{ $countdown }} seconde{{
                 $countdown > 1 ? "s" : ""
             }}...
@@ -39,7 +46,7 @@
     <!-- Continue Button -->
     <a
         href="{{ route('eleve.lesson.show', [
-                        request()->route('team'),
+                        auth()->user()->currentTeam ?? $formation->teams()->first(),
                         $formation,
                         $currentLesson->chapter,
                         $currentLesson
@@ -90,29 +97,16 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('livewire:init', function () {
-        @if($autoplay)
-            // Start countdown when component loads if autoplay is enabled
-            setTimeout(function() {
-                @this.call('startCountdown');
-            }, 500); // Small delay to ensure component is ready
-        @endif
-    });
-
-    // Listen for Livewire events to handle countdown
-    document.addEventListener('livewire:init', function () {
-        Livewire.on('countdownTick', (countdownValue) => {
-            const countdownNumber = document.querySelector('.countdown-number');
-            if (countdownNumber) {
-                countdownNumber.textContent = countdownValue;
-
-                if (countdownValue > 0) {
-                    // Schedule next tick after 1 second
-                    setTimeout(() => {
-                        @this.call('decrementCountdown');
-                    }, 1000);
+    document.addEventListener("DOMContentLoaded", function () {
+        // Listen for Livewire events to handle countdown completion
+        document.addEventListener("livewire:init", function () {
+            Livewire.on("autoplayRedirect", function () {
+                const continueButton =
+                    document.getElementById("continue-button");
+                if (continueButton) {
+                    continueButton.click();
                 }
-            }
+            });
         });
     });
 </script>
