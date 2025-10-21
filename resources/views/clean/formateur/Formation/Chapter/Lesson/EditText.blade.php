@@ -179,24 +179,19 @@
                             >
                                 Contenu de la Leçon *
                             </label>
-                            <textarea
-                                id="content_text"
-                                name="content_text"
-                                rows="20"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('content_text') border-red-500 @enderror"
-                                placeholder="Rédigez votre contenu pédagogique ici... Vous pouvez utiliser le format Markdown pour la mise en forme."
-                                required
-                                >{{ old("content_text", $textContent->content) }}</textarea
-                            >
+                            <div class="w-full @error('content_text') border-red-500 @enderror rounded-lg border border-gray-300">
+                                @livewire('formateur.formation.tiptap-editor', [
+                                    'content' => old('content_text', $textContent->content),
+                                    'name' => 'content_text'
+                                ], key('tiptap-editor'))
+                            </div>
                             @error('content_text')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
                             @enderror
                             <p class="text-xs text-gray-500 mt-1">
-                                💡 Astuce: Vous pouvez utiliser le format
-                                Markdown pour ajouter des titres, listes, liens,
-                                etc.
+                                💡 Astuce: Utilisez la barre d'outils pour formater votre texte avec du gras, italique, des titres, listes, etc.
                             </p>
                         </div>
 
