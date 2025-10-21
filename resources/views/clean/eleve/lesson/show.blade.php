@@ -9,10 +9,8 @@
         {{-- En-tête de la leçon --}}
         @include('clean.eleve.lesson.partials.header')
 
-        {{-- Contenu de la leçon --}}
-        @if($lessonType === 'video')
-        @include('clean.eleve.lesson.partials.video') @else
-        @include('clean.eleve.lesson.partials.content') @endif
+        {{-- Contenu principal --}}
+        @include('clean.eleve.lesson.partials.main-content')
 
         {{-- Navigation de la leçon --}}
         @include('clean.eleve.lesson.partials.navigation')
