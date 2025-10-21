@@ -56,10 +56,13 @@ class StudentFormationService extends BaseFormationService
             ->whereHas('learners', function (Builder $query) use ($user): void {
                 $query->where('user_id', $user->id);
             })
-            ->with(['learners' => function ($query) use ($user): void {
-                $query->where('user_id', $user->id)
-                    ->select(['formation_id', 'user_id', 'status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total']);
-            }])
+            ->with([
+                'learners' => function ($query) use ($user): void {
+                    $query->where('user_id', $user->id)
+                        ->select(['formation_id', 'user_id', 'status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total']);
+                },
+                'chapters'
+            ])
             ->first();
     }
 
