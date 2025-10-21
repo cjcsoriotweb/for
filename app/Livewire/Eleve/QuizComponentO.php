@@ -15,19 +15,27 @@ use Livewire\Component;
 
 class QuizComponentO extends Component
 {
-    public $countdown = 10;
-    public $countdownEnd = false;
+    public $quizzTime = [
+        'timeLeft' => false,
+        'countdown' => 10,
+    ];
 
-    public function countdownPoll()
+    public function CountDownDInt()
     {
-        $this->countdown -= 1;
-        if ($this->countdown <= 0) {
-            $this->countdownEnd = true;
+        $this->quizzTime['countdown'] -= 1;
+        if (!$this->quizzTime['countdown']) {
+            $this->quizzTime['timeLeft'] = true;
         }
     }
+
+
+
     // Affichage du composant
     public function render()
     {
-        return view('livewire.eleve.quiz-component-o');
+        if ($this->quizzTime['timeLeft']) {
+            return view('livewire.eleve.quiz.timeleft');
+        }
+        return view('livewire.eleve.quiz.quiz-component-o');
     }
 }

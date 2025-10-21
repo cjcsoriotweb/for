@@ -1,28 +1,5 @@
 <div>
-  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-    <div class="layout-container flex h-full grow flex-col">
-      <div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
-        <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-          <div
-            class="flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center flex-1">
-            <span class="material-symbols-outlined text-red-500 text-8xl mb-4">arrow-down-left</span>
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Time's Up!</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-300">You did not provide an answer in time.</p>
-            <div class="mt-8 flex flex-col sm:flex-row gap-4">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-colors">
-                <span class="truncate">Try Again</span>
-              </button>
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-colors">
-                <span class="truncate">View Results</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+
   <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
     <div class="layout-container flex h-full grow flex-col">
       <div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
@@ -31,11 +8,11 @@
             <h1 class="text-[#111418] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">
               General Knowledge Quiz</h1>
             <div class="flex items-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm">
-              <span class="material-symbols-outlined text-primary text-3xl">timer</span>
+              <x-heroicon-o-clock class="w-10 h-10 text-gray-500" />
               <div class="flex flex-col items-start">
-                <span class="text-xs text-gray-500 dark:text-gray-400">Time Left</span>
-                <span class="text-2xl font-bold text-[#111418] dark:text-white" wire:poll.1s="countdownPoll">{{
-                  $countdown }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">Temps restant</span>
+                <span class="text-2xl font-bold text-[#111418] dark:text-white" wire:poll.1s="CountDownDInt">
+                  {{ $quizzTime['countdown'] }}</span>
               </div>
             </div>
           </div>
@@ -84,4 +61,5 @@
       </div>
     </div>
   </div>
+
 </div>
