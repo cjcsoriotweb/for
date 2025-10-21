@@ -8,7 +8,7 @@
         </h3>
         <div class="text-sm text-gray-600 dark:text-gray-400">
             <span>{{ $this->getRemainingTimeDisplayProperty() }}</span>
-            / {{ $requiredTime ?? 0 }}min
+            / {{ $this->formatTime($requiredTime ?? 0) }}
         </div>
     </div>
 
@@ -17,31 +17,17 @@
             class="h-2 rounded-full transition-all duration-1000 ease-out {{
                 $canProceed ? 'bg-green-500' : 'bg-blue-500'
             }}"
-            style="width: {{ min(max(($requiredTime - floor((now()->timestamp - $startTime) / 60)) / ($requiredTime ?: 1) * 100, 0), 100) }}%"
+            style="width: {{ $this->getProgressPercentageProperty() }}%"
         ></div>
     </div>
 
     <div class="text-center">
-        @if(!$canProceed)
-        <button
-            wire:click="startTimer"
-            @if($isActive)
-            disabled
-            @endif
-            class="px-6 py-2 {{
-                $isActive
-                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }} rounded-lg transition-colors duration-200"
-        >
-            @if($isActive) Compte à rebours en cours... @else Commencer le
-            compte à rebours @endif
-        </button>
-        @else
+        @if($canProceed)
+
         <button
             class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
         >
-            Continuer au cours suivant
+            ✅ Continuer au cours suivant
         </button>
         @endif
     </div>
