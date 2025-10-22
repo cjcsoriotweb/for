@@ -91,7 +91,7 @@ class QuizComponentO extends Component
         };
     }
 
-    public function launchQuiz(int $initialSeconds = 100): void
+    public function launchQuiz(int $initialSeconds = 30): void
     {
         $this->countdown = max(1, $initialSeconds);
         $this->countdownPast = 0;
@@ -182,7 +182,7 @@ class QuizComponentO extends Component
     {
         if ($this->hasNextQuestion()) {
             $this->currentQuestionStep++;
-            // $this->countdown = 30; // optionnel
+            $this->countdown = 30; // optionnel
         } else {
             $this->validateQuiz();
         }
