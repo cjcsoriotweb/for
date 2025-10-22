@@ -29,7 +29,7 @@ class FormationContinue extends Component
 
         if ($formations) {
             // Use formations passed from controller with progress data
-            $this->formationsWithProgress = $formations->map(function ($formation) use ($studentFormationService) {
+            $this->formationsWithProgress = $formations->map(function ($formation) {
                 // Ensure chapters and lessons are loaded for progress calculation
                 $formation->load(['chapters.lessons']);
 
@@ -53,6 +53,18 @@ class FormationContinue extends Component
                     $progressData = $formation->progress_data;
                     $progressData['progress_percent'] = $calculatedProgressPercent;
                     $formation->progress_data = $progressData;
+                } else {
+                    // If no progress data exists, create it
+                    $formation->progress_data = [
+                        'status' => 'enrolled',
+                        'progress_percent' => $calculatedProgressPercent,
+                        'current_lesson_id' => null,
+                        'enrolled_at' => now(),
+                        'last_seen_at' => now(),
+                        'completed_at' => null,
+                        'score_total' => 0,
+                        'max_score_total' => 0,
+                    ];
                 }
 
                 return $formation;
