@@ -18,14 +18,9 @@ Route::prefix('eleve')
             Route::get('/{team}/{formation}', [ElevePageController::class, 'showFormation'])->name('show');
             Route::get('/{team}/{formation}/congratulation', [ElevePageController::class, 'formationCongratulation'])->name('congratulation');
             Route::post('/{team}/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('enroll');
-            Route::post('/{team}/{formation}/reset-progress', [ElevePageController::class, 'resetProgress'])->name('reset-progress');
         });
 
-        // API routes
-        Route::prefix('api')->name('api.')->group(function () {
-            Route::get('/{team}/formations', [ElevePageController::class, 'apiFormations'])->name('formations');
-            Route::get('/{team}/progress/{formation}', [ElevePageController::class, 'apiProgress'])->name('progress');
-        });
+
 
         // Lesson routes - most specific first
         Route::prefix('lesson')->name('lesson.')->group(function () {

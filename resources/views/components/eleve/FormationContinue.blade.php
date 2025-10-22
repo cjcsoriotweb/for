@@ -59,7 +59,7 @@
         @endif
 
         @if($studentFormationService->isFormationCompleted(Auth::user(), $formation))
-
+        <a>Cette formation est terminé. rendez-vous dans vos documents.</a>
         @else
         <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
           class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors text-center block">
