@@ -9,7 +9,7 @@ $isMulti = $q ? in_array(strtolower($q->type), ['multiple_choice','multiple_choi
     <div class="flex flex-col max-w-[960px] flex-1">
       <div class="flex flex-wrap justify-between items-center gap-4 p-4">
         <h1 class="text-[#111418] dark:text-white text-3xl md:text-4xl font-black tracking-[-0.03em]">
-          General Knowledge Quiz
+
         </h1>
         <div class="flex items-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm">
           <x-heroicon-o-clock class="w-8 h-8 text-gray-500" />

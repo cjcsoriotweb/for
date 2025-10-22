@@ -5,7 +5,7 @@
       <div class="h-3 w-3 rounded-full bg-primary animate-pulse [animation-delay:0.15s]"></div>
       <div class="h-3 w-3 rounded-full bg-primary animate-bounce [animation-delay:0.3s]"></div>
     </div>
-    <p class="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300">
+    <p wire:poll.5s="launchQuiz" class="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300">
       Préparation du quiz…
     </p>
     <p class="mt-2 text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -14,9 +14,5 @@
       </span>
     </p>
 
-    <button wire:click="launchQuiz"
-      class="mt-6 inline-flex items-center rounded-lg bg-primary px-5 h-11 text-white font-semibold hover:bg-primary/90">
-      Commencer maintenant
-    </button>
   </div>
 </div>

@@ -84,7 +84,7 @@
 
     </div>
 
-    <div class="flex items-center justify-center gap-3 pt-8">
+    <div wire:poll.5s="leave" class="flex items-center justify-center gap-3 pt-8">
 
       <button wire:click="setStep({{\App\Livewire\Eleve\QuizComponentO::STEP_LOADING}})"
         class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-200 dark:hover:bg-gray-600">

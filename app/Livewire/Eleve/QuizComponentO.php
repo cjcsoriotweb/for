@@ -45,7 +45,10 @@ class QuizComponentO extends Component
     public array $reponse = [];
 
 
-    public function endQuiz() {}
+    public function leave()
+    {
+        $this->redirectRoute('eleve.formation.show', [$this->team, $this->formation]);
+    }
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson): void
     {
         $this->team      = $team;
