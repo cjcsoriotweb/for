@@ -50,7 +50,9 @@ class FormationContinue extends Component
 
                 // Update the progress data with calculated value
                 if ($formation->progress_data) {
-                    $formation->progress_data['progress_percent'] = $calculatedProgressPercent;
+                    $progressData = $formation->progress_data;
+                    $progressData['progress_percent'] = $calculatedProgressPercent;
+                    $formation->progress_data = $progressData;
                 }
 
                 return $formation;

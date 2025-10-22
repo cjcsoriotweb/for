@@ -141,10 +141,20 @@ class ElevePageController extends Controller
 
         // Inscrire l'étudiant à la formation
         try {
+            // Récupérer la première leçon de la formation pour initialiser current_lesson_id
+            $firstLesson = $formation->chapters()
+                ->orderBy('position')
+                ->first()
+                ?->lessons()
+                ->orderBy('position')
+                ->first();
+
             $formation->learners()->attach($user->id, [
                 'team_id' => $team->id,
                 'status' => 'enrolled',
                 'enrolled_at' => now(),
+                'current_lesson_id' => $firstLesson?->id,
+                'last_seen_at' => now(),
             ]);
 
             return back()->with('success', 'Vous avez été inscrit à la formation avec succès !');
@@ -166,10 +176,20 @@ class ElevePageController extends Controller
         }
 
         try {
+            // Récupérer la première leçon de la formation pour remettre current_lesson_id
+            $firstLesson = $formation->chapters()
+                ->orderBy('position')
+                ->first()
+                ?->lessons()
+                ->orderBy('position')
+                ->first();
+
             // Réinitialiser le progrès à 0
             $formation->learners()->updateExistingPivot($user->id, [
                 'status' => 'enrolled',
                 'enrolled_at' => now(),
+                'current_lesson_id' => $firstLesson?->id,
+                'last_seen_at' => now(),
             ]);
 
             return back()->with('success', 'Le progrès a été réinitialisé avec succès.');
@@ -635,11 +655,56 @@ class ElevePageController extends Controller
 
         $progressPercent = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
 
+        // Mettre à jour la progression de la formation et le current_lesson_id
+        $this->updateCurrentLessonId($user, $formation);
+
         // Mettre à jour la progression de la formation
         $formation->learners()->syncWithoutDetaching([
             $user->id => [
                 'last_seen_at' => now(),
                 'status' => $progressPercent >= 100 ? 'completed' : 'in_progress',
+            ],
+        ]);
+    }
+
+    /**
+     * Mettre à jour le current_lesson_id pour pointer vers la prochaine leçon non terminée
+     */
+    private function updateCurrentLessonId(User $user, Formation $formation): void
+    {
+        // Récupérer la formation avec tous les chapitres et leçons ordonnés
+        $formationWithLessons = $formation->load([
+            'chapters' => function ($query) {
+                $query->orderBy('position')
+                    ->with(['lessons' => function ($lessonQuery) {
+                        $lessonQuery->orderBy('position');
+                    }]);
+            }
+        ]);
+
+        $nextLessonId = null;
+
+        // Parcourir tous les chapitres et leçons pour trouver la première non terminée
+        foreach ($formationWithLessons->chapters as $chapter) {
+            foreach ($chapter->lessons as $lesson) {
+                // Vérifier si cette leçon est terminée
+                $lessonProgress = $lesson->learners()
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if (!$lessonProgress || $lessonProgress->pivot->status !== 'completed') {
+                    // Cette leçon n'est pas terminée, c'est la suivante
+                    $nextLessonId = $lesson->id;
+                    break 2; // Sortir des deux boucles
+                }
+            }
+        }
+
+        // Mettre à jour le current_lesson_id dans formation_user
+        $formation->learners()->syncWithoutDetaching([
+            $user->id => [
+                'current_lesson_id' => $nextLessonId,
+                'last_seen_at' => now(),
             ],
         ]);
     }

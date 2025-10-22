@@ -41,12 +41,20 @@ class FormationEnrollmentService
             return false;
         }
 
+        // Récupérer la première leçon de la formation pour initialiser current_lesson_id
+        $firstLesson = $formation->chapters()
+            ->orderBy('position')
+            ->first()
+            ?->lessons()
+            ->orderBy('position')
+            ->first();
+
         $formation->learners()->attach($userId, [
             'team_id' => $team->id,
             'status' => 'in_progress',
             'enrolled_at' => now(),
             'last_seen_at' => now(),
-            'current_lesson_id' => null,
+            'current_lesson_id' => $firstLesson?->id,
         ]);
 
         // Débiter les fonds de l'équipe

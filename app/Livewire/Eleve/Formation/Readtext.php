@@ -155,10 +155,96 @@ class Readtext extends Component
             'watched_seconds' => $this->elapsedTime,
         ]);
 
+        // Mettre à jour la progression globale de la formation
+        $this->updateFormationProgress($user, $this->formation);
+
         Log::info('Lesson reading completed', [
             'lesson_id' => $this->lesson->id,
             'user_id' => $user->id,
             'total_watched_seconds' => $this->elapsedTime
+        ]);
+    }
+
+    /**
+     * Mettre à jour la progression globale d'une formation
+     */
+    private function updateFormationProgress($user, $formation): void
+    {
+        // Récupérer tous les chapitres avec leurs leçons et la progression de l'utilisateur
+        $chapters = $formation->chapters()
+            ->with(['lessons' => function ($query) use ($user) {
+                $query->with(['learners' => function ($learnerQuery) use ($user) {
+                    $learnerQuery->where('user_id', $user->id);
+                }]);
+            }])
+            ->get();
+
+        // Calculer la progression basée sur les leçons terminées
+        $totalLessons = $chapters->pluck('lessons')->flatten()->count();
+        $completedLessons = 0;
+
+        foreach ($chapters as $chapter) {
+            foreach ($chapter->lessons as $lesson) {
+                $lessonProgress = $lesson->learners->first();
+                if ($lessonProgress && $lessonProgress->pivot->status === 'completed') {
+                    $completedLessons++;
+                }
+            }
+        }
+
+        $progressPercent = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
+
+        // Mettre à jour le current_lesson_id
+        $this->updateCurrentLessonId($user, $formation);
+
+        // Mettre à jour la progression de la formation
+        $formation->learners()->syncWithoutDetaching([
+            $user->id => [
+                'last_seen_at' => now(),
+                'status' => $progressPercent >= 100 ? 'completed' : 'in_progress',
+            ],
+        ]);
+    }
+
+    /**
+     * Mettre à jour le current_lesson_id pour pointer vers la prochaine leçon non terminée
+     */
+    private function updateCurrentLessonId($user, $formation): void
+    {
+        // Récupérer la formation avec tous les chapitres et leçons ordonnés
+        $formationWithLessons = $formation->load([
+            'chapters' => function ($query) {
+                $query->orderBy('position')
+                    ->with(['lessons' => function ($lessonQuery) {
+                        $lessonQuery->orderBy('position');
+                    }]);
+            }
+        ]);
+
+        $nextLessonId = null;
+
+        // Parcourir tous les chapitres et leçons pour trouver la première non terminée
+        foreach ($formationWithLessons->chapters as $chapter) {
+            foreach ($chapter->lessons as $lesson) {
+                // Vérifier si cette leçon est terminée
+                $lessonProgress = $lesson->learners()
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if (!$lessonProgress || $lessonProgress->pivot->status !== 'completed') {
+                    // Cette leçon n'est pas terminée, c'est la suivante
+                    $nextLessonId = $lesson->id;
+                    break 2; // Sortir des deux boucles
+                }
+            }
+        }
+
+        // Mettre à jour le current_lesson_id dans formation_user
+        $formation->learners()->syncWithoutDetaching([
+            $user->id => [
+                'current_lesson_id' => $nextLessonId,
+                'last_seen_at' => now(),
+            ],
         ]);
     }
 
