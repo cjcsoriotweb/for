@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Auth;
 
 class StudentFormationService extends BaseFormationService
 {
+
+
+
     /**
      * List current formations for a specific student in a team.
      * Only returns formations where the student is enrolled and visible to their team.
@@ -26,7 +29,7 @@ class StudentFormationService extends BaseFormationService
         ]);
     }
 
-    public function endQuiz(Team $team, Formation $formation, User $user) {}
+
     /**
      * List all formations available for a team that a student can enroll in.
      * Returns formations visible to the team, regardless of student enrollment status.

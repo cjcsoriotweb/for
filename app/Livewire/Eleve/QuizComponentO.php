@@ -61,6 +61,8 @@ class QuizComponentO extends Component
             abort(404, 'Quiz non trouvé.');
         }
 
+        $this->ensureLessonStarted();
+
         $this->quiz = $lesson->lessonable;
 
         $this->questions = $this->quiz
@@ -258,6 +260,12 @@ class QuizComponentO extends Component
             'started_at'       => now()->subSeconds($this->countdownPast),
         ]);
 
+        $this->lesson->learners()->updateExistingPivot(Auth::id(), [
+            'status' => 'completed',
+            'completed_at' => now(),
+            'last_activity_at' => now(),
+        ]);
+
         $this->step = self::STEP_REVIEW;
     }
 
@@ -291,6 +299,25 @@ class QuizComponentO extends Component
         if ($t === 'true_false' || $t === 'true-false' || $t === 'boolean' || $t === 'single_choice') return 'true_false';
         // défaut : single
         return 'true_false';
+    }
+
+    private function ensureLessonStarted(): void
+    {
+        $user = Auth::user();
+
+        // Check if lesson_user record exists
+        $lessonUser = $this->lesson->learners()
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$lessonUser) {
+            // Create lesson_user record with in_progress status
+            $this->lesson->learners()->attach($user->id, [
+                'status' => 'in_progress',
+                'started_at' => now(),
+                'last_activity_at' => now(),
+            ]);
+        }
     }
 
     private function studentFormationService()
