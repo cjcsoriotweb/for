@@ -40,7 +40,8 @@
       @endforeach
 
       <div class="flex flex-col items-center justify-center pt-6 text-center">
-        <p class="mb-4 text-lg font-medium text-gray-600 dark:text-gray-400" wire:poll.10s="setStep(1)">Redemarre en
+        <p class="mb-4 text-lg font-medium text-gray-600 dark:text-gray-400" wire:poll.10s="setStep(4)">Redemarre
+          en
           cours</p>
         <div class="relative flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
           <div class="absolute inset-0 rounded-full border-4 border-primary animate-pulse"></div>

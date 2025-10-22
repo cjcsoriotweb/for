@@ -22,7 +22,7 @@
                 $questions[$currentQuestionStep]->question }}</p>
               <div class="flex flex-col gap-3">
 
-                @foreach($questions[0]->quizChoices as $choice)
+                @foreach($questions[$currentQuestionStep]->quizChoices as $choice)
                 @if(isset($this->reponse[$choice->id]))
                 <label wire:click="unSelectReponse('{{$choice->id}}')"
                   class="flex items-center gap-4 rounded-lg border border-solid border-blue-700 p-[15px] hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer transition-colors">
