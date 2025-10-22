@@ -111,10 +111,11 @@ class QuizComponentO extends Component
     public function selectReponse(int $choiceId): void
     {
         $choice = QuizChoice::query()
-            ->select(['id', 'quiz_question_id'])
+            ->select(['id', 'question_id'])
             ->findOrFail($choiceId);
 
-        $this->reponse[$choice->quiz_question_id] = $choice->id;
+
+        $this->reponse[$choice->question_id] = $choice->id;
     }
 
     /** Désélection pour une question donnée */
@@ -222,7 +223,7 @@ class QuizComponentO extends Component
     /** Le choix est-il sélectionné pour sa question ? (helper pratique pour la vue) */
     public function isSelected(int $choiceId, int $questionId): bool
     {
-        return isset($this->reponse[$questionId]) && (int) $this->reponse[$questionId] === $choiceId;
+        return isset($this->reponse[$questionId]) && $this->reponse[$questionId] === $choiceId;
     }
 
     private function studentFormationService()
