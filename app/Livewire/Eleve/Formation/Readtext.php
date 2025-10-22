@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Eleve\Formation;
 
+use App\Models\Formation;
 use App\Models\Lesson;
+use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -14,13 +16,18 @@ class Readtext extends Component
     public $canProceed = false;
     public $startTime;
     public $isActive = false;
-    public $lesson;
     public $watchedSeconds = 0;
 
-    public function mount($requiredTime = 0, Lesson $lesson = null)
+    public Team $team;
+    public Lesson $lesson;
+    public Formation $formation;
+
+    public function mount($requiredTime = 0, Team $team, Formation $formation, Lesson $lesson,)
     {
         // Convert estimated_read_time from minutes to seconds
         $this->requiredTime = $requiredTime * 60;
+        $this->team = $team;
+        $this->formation = $formation;
         $this->lesson = $lesson;
 
         // Load existing progress if lesson and user are available
