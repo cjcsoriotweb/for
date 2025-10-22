@@ -76,7 +76,8 @@
         </div>
       </div>
       <div class="flex flex-col items-center justify-center pt-6 text-center">
-        <p class="mb-4 text-lg font-medium text-gray-600 dark:text-gray-400">Redémarrage du quiz dans :</p>
+        <p class="mb-4 text-lg font-medium text-gray-600 dark:text-gray-400" wire:poll.1s="setStep(1)">Redemarre en
+          cours</p>
         <div class="relative flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
           <div class="absolute inset-0 rounded-full border-4 border-primary animate-pulse"></div>
           <span class="text-5xl font-bold text-primary countdown"></span>
@@ -87,30 +88,6 @@
   <style>
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-
-    .countdown::after {
-      content: "3";
-      animation: countdown 3s steps(1, end) forwards;
-    }
-
-    @keyframes countdown {
-      25% {
-        content: "2";
-      }
-
-      50% {
-        content: "1";
-      }
-
-      75% {
-        content: "0";
-      }
-
-      100% {
-        content: "";
-        animation-timing-function: ease-out;
-      }
     }
   </style>
 </div>

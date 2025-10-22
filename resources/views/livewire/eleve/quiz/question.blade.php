@@ -11,8 +11,8 @@
               <x-heroicon-o-clock class="w-10 h-10 text-gray-500" />
               <div class="flex flex-col items-start">
                 <span class="text-xs text-gray-500 dark:text-gray-400">Temps restant</span>
-                <span class="text-2xl font-bold text-[#111418] dark:text-white" wire:poll.1s="CountDownDInt">
-                  {{ $quizzTime['countdown'] }}</span>
+                <span class="text-2xl font-bold text-[#111418] dark:text-white" wire:poll.1s="dIntCountdown">
+                  {{ $countdown }}</span>
               </div>
             </div>
           </div>
@@ -52,7 +52,7 @@
             </div>
           </div>
           <div class="flex px-4 py-3 mt-6">
-            <button
+            <button wire:click="validateQuiz"
               class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-colors">
               <span class="truncate">Submit</span>
             </button>

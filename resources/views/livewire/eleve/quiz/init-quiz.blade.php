@@ -1,4 +1,4 @@
-<div wire:poll.3s="getQuiz"
+<div wire:poll.3s="setStep(2)"
   class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
   <div class="layout-container flex h-full grow flex-col">
     <div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
