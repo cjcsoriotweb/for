@@ -64,7 +64,7 @@ class QuizComponentO extends Component
         }
 
         if ($this->isLessonCompleted($lesson, Auth::user())) {
-            dd('ok');
+            $this->redirectRoute('eleve.formation.show', [$team, $formation]);
         }
 
         $this->ensureLessonStarted();
