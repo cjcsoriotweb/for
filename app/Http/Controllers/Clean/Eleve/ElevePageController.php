@@ -144,7 +144,6 @@ class ElevePageController extends Controller
             $formation->learners()->attach($user->id, [
                 'team_id' => $team->id,
                 'status' => 'enrolled',
-                'progress_percent' => 0,
                 'enrolled_at' => now(),
             ]);
 
@@ -169,7 +168,6 @@ class ElevePageController extends Controller
         try {
             // Réinitialiser le progrès à 0
             $formation->learners()->updateExistingPivot($user->id, [
-                'progress_percent' => 0,
                 'status' => 'enrolled',
                 'enrolled_at' => now(),
             ]);
@@ -640,7 +638,6 @@ class ElevePageController extends Controller
         // Mettre à jour la progression de la formation
         $formation->learners()->syncWithoutDetaching([
             $user->id => [
-                'progress_percent' => $progressPercent,
                 'last_seen_at' => now(),
                 'status' => $progressPercent >= 100 ? 'completed' : 'in_progress',
             ],

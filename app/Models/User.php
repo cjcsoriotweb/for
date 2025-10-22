@@ -71,7 +71,7 @@ class User extends Authenticatable
     public function formations()
     {
         return $this->belongsToMany(Formation::class, 'formation_user')
-            ->withPivot(['status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
+            ->withPivot(['status', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
             ->withTimestamps();
     }
 

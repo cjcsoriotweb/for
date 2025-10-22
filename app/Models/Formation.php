@@ -70,7 +70,7 @@ class Formation extends Model
     public function learners() // utilisateurs inscrits
     {
         return $this->belongsToMany(User::class, 'formation_user')
-            ->withPivot(['status', 'progress_percent', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
+            ->withPivot(['status', 'current_lesson_id', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
             ->withTimestamps();
     }
 

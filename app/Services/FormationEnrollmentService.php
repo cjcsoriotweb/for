@@ -46,7 +46,6 @@ class FormationEnrollmentService
             'status' => 'in_progress',
             'enrolled_at' => now(),
             'last_seen_at' => now(),
-            'progress_percent' => 0,
             'current_lesson_id' => null,
         ]);
 
