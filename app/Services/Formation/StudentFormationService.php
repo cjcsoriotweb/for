@@ -272,9 +272,12 @@ class StudentFormationService extends BaseFormationService
             return null;
         }
 
+        // Calculate real progress based on completed lessons
+        $calculatedProgressPercent = $this->calculateFormationProgress($user, $formation);
+
         return [
             'status' => $pivot->status,
-            'progress_percent' => $pivot->progress_percent,
+            'progress_percent' => $calculatedProgressPercent,
             'current_lesson_id' => $pivot->current_lesson_id,
             'enrolled_at' => $pivot->enrolled_at,
             'last_seen_at' => $pivot->last_seen_at,
@@ -282,6 +285,39 @@ class StudentFormationService extends BaseFormationService
             'score_total' => $pivot->score_total,
             'max_score_total' => $pivot->max_score_total,
         ];
+    }
+
+    /**
+     * Calculate formation progress based on completed lessons
+     */
+    private function calculateFormationProgress(User $user, Formation $formation): float
+    {
+        $totalLessons = $formation->chapters()
+            ->with('lessons')
+            ->get()
+            ->pluck('lessons')
+            ->flatten()
+            ->count();
+
+        if ($totalLessons === 0) {
+            return 0.0;
+        }
+
+        $completedLessons = 0;
+
+        foreach ($formation->chapters as $chapter) {
+            foreach ($chapter->lessons as $lesson) {
+                $lessonProgress = $lesson->learners()
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if ($lessonProgress && $lessonProgress->pivot->status === 'completed') {
+                    $completedLessons++;
+                }
+            }
+        }
+
+        return $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0.0;
     }
 
     /**
