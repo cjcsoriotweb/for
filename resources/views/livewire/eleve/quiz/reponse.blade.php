@@ -1,58 +1,70 @@
+{{-- resources/views/livewire/eleve/quiz/reponse.blade.php --}}
 <div
-  class="relative flex min-h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden p-4 sm:p-6 lg:p-8">
-  <div class="layout-container flex h-full w-full max-w-4xl grow flex-col">
-    <div class="layout-content-container flex flex-col gap-8 py-10">
-      <div class="flex flex-col gap-2 text-center">
-        <p class="text-4xl font-black tracking-tighter text-[#111418] dark:text-white sm:text-5xl">Merci pour vos
-          réponses <br> regardons le résultat.</p>
-      </div>
+  class="relative flex min-h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-4 sm:p-6 lg:p-8">
+  <div class="w-full max-w-4xl">
+    <div class="text-center">
+      <p class="text-4xl font-black tracking-tighter text-[#111418] dark:text-white sm:text-5xl">
+        Merci pour vos réponses<br>regardons le résultat.
+      </p>
+    </div>
 
-      @foreach($reponse as $rep)
+    <div class="mt-8 flex flex-col gap-6">
+      @foreach($questions as $q)
+      @php
+      $selectedId = $reponse[$q->id] ?? null;
+      $selected = $q->quizChoices->firstWhere('id', $selectedId);
+      $isCorrect = $selected?->is_correct ?? false;
+      $good = $q->quizChoices->firstWhere('is_correct', true);
+      @endphp
 
       <div
         class="flex flex-col gap-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark p-4 sm:p-6">
-        <div class="flex items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
-
-          @if($rep->is_correct)
-          <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600">
-            <span class="material-symbols-outlined text-2xl">
-              <x-heroicon-o-check-circle class="w-6 h-6 text-green-500" />
-            </span>
-          </div>
-          @else
-          <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-red-100  text-red-600">
-            <span class="material-symbols-outlined text-2xl">
-              <x-heroicon-o-exclamation-circle class="w-6 h-6 text-red-500" />
-            </span>
+        <div class="flex items-start gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
+          <div class="flex size-12 shrink-0 items-center justify-center rounded-lg
+                        {{ $isCorrect ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
+            @if($isCorrect)
+            <x-heroicon-o-check-circle class="w-6 h-6" />
+            @else
+            <x-heroicon-o-exclamation-circle class="w-6 h-6" />
+            @endif
           </div>
 
-          @endif
-          <div class="flex flex-1 flex-col justify-center">
-            <p class="text-sm font-normal text-gray-600 dark:text-gray-400 line-clamp-2">{{ $rep->choice_text }}</p>
+          <div class="flex-1">
+            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
+              {{ $q->question }}
+            </p>
+
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+              Votre réponse :
+              <span class="font-medium">{{ $selected?->choice_text ?? '—' }}</span>
+            </p>
+
+            @if(!$isCorrect && $good)
+            <p class="mt-1 text-sm text-green-700 dark:text-green-300">
+              Bonne réponse : <span class="font-medium">{{ $good->choice_text }}</span>
+            </p>
+            @endif
           </div>
-          @if(!$rep->is_correct)
+
+          @unless($isCorrect)
           <div class="hidden shrink-0 sm:block">
-            <p class="text-sm font-medium text-red-600">Mauvaise reponse</p>
+            <p class="text-sm font-medium text-red-600">Mauvaise réponse</p>
           </div>
-          @endif
+          @endunless
         </div>
       </div>
       @endforeach
+    </div>
 
-      <div class="flex flex-col items-center justify-center pt-6 text-center">
-        <p class="mb-4 text-lg font-medium text-gray-600 dark:text-gray-400" wire:poll.10s="setStep(4)">Redemarre
-          en
-          cours</p>
-        <div class="relative flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-          <div class="absolute inset-0 rounded-full border-4 border-primary animate-pulse"></div>
-          <span class="text-5xl font-bold text-primary countdown"></span>
-        </div>
-      </div>
+    <div class="flex items-center justify-center gap-3 pt-8">
+      <button wire:click="launchQuiz"
+        class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-primary text-white font-bold hover:bg-primary/90">
+        Recommencer le quiz
+      </button>
+      <button wire:click="setStep({{\App\Livewire\Eleve\QuizComponentO::STEP_LOADING}})"
+        class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-200 dark:hover:bg-gray-600">
+        Retour à l’accueil
+      </button>
     </div>
   </div>
-  <style>
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-  </style>
 </div>
