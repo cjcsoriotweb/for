@@ -57,13 +57,6 @@ class VideoPlayer extends Component
         if ($lessonUser) {
             $this->currentTime = $lessonUser->pivot->watched_seconds;
             $this->videoCompleted = $lessonUser->pivot->status === 'completed';
-
-            Log::info('Loaded existing lesson progress', [
-                'lesson_id' => $this->lesson->id,
-                'user_id' => $user->id,
-                'status' => $lessonUser->pivot->status,
-                'watched_seconds' => $lessonUser->pivot->watched_seconds
-            ]);
         }
     }
 
@@ -87,12 +80,6 @@ class VideoPlayer extends Component
                 'status' => 'in_progress',
                 'started_at' => now(),
                 'last_activity_at' => now(),
-            ]);
-
-            Log::info('Lesson started for user', [
-                'lesson_id' => $this->lesson->id,
-                'user_id' => $user->id,
-                'status' => 'in_progress'
             ]);
         }
     }

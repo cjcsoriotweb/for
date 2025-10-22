@@ -128,6 +128,7 @@ class Readtext extends Component
 
                 // Mark lesson as completed when timer finishes
                 $this->markLessonAsCompleted();
+                $this->redirectRoute('eleve.formation.show', [$this->team, $this->formation]);
             }
         }
     }
