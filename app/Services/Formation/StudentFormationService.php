@@ -26,6 +26,7 @@ class StudentFormationService extends BaseFormationService
         ]);
     }
 
+    public function endQuiz(Team $team, Formation $formation, User $user) {}
     /**
      * List all formations available for a team that a student can enroll in.
      * Returns formations visible to the team, regardless of student enrollment status.

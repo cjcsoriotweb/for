@@ -89,6 +89,10 @@
         class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-primary text-white font-bold hover:bg-primary/90">
         Recommencer le quiz
       </button>
+      <button wire:click="endQuiz"
+        class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-primary text-white font-bold hover:bg-primary/90">
+        Je suis satisfait de mon score.
+      </button>
       <button wire:click="setStep({{\App\Livewire\Eleve\QuizComponentO::STEP_LOADING}})"
         class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-200 dark:hover:bg-gray-600">
         Retour à l’accueil

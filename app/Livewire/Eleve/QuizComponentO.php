@@ -43,6 +43,8 @@ class QuizComponentO extends Component
      */
     public array $reponse = [];
 
+
+    public function endQuiz() {}
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson): void
     {
         $this->team      = $team;
