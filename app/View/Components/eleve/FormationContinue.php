@@ -15,13 +15,25 @@ class FormationContinue extends Component
 
     public $team;
 
+    public $formationsWithProgress;
+
     /**
      * Create a new component instance.
      */
-    public function __construct(StudentFormationService $studentFormationService, Team $team)
-    {
+    public function __construct(
+        StudentFormationService $studentFormationService,
+        Team $team,
+        $formations = null
+    ) {
         $this->team = $team;
-        $this->currentFormation = $studentFormationService->listFormationCurrentByStudent($team, Auth::user());
+
+        if ($formations) {
+            // Use formations passed from controller with progress data
+            $this->formationsWithProgress = $formations;
+        } else {
+            // Fallback to service call if no formations provided
+            $this->formationsWithProgress = $studentFormationService->listFormationCurrentByStudent($team, Auth::user());
+        }
     }
 
     /**
@@ -31,7 +43,7 @@ class FormationContinue extends Component
     {
         return view('components.eleve.FormationContinue', [
             'team' => $this->team,
-            'formations' => $this->currentFormation,
+            'formationsWithProgress' => $this->formationsWithProgress,
         ]);
     }
 }

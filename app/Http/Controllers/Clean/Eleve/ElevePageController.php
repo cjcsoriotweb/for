@@ -29,12 +29,29 @@ class ElevePageController extends Controller
         // Récupérer les formations actuelles de l'étudiant
         $formations = $this->studentFormationService->listFormationCurrentByStudent($team, $user);
 
+        // Ajouter les données de progression pour chaque formation
+        $formationsWithProgress = $formations->map(function ($formation) use ($user) {
+            $progress = $this->studentFormationService->getStudentProgress($user, $formation);
+            $formation->progress_data = $progress ?? [
+                'status' => 'enrolled',
+                'progress_percent' => 0,
+                'current_lesson_id' => null,
+                'enrolled_at' => now(),
+                'last_seen_at' => now(),
+                'completed_at' => null,
+                'score_total' => 0,
+                'max_score_total' => 0,
+            ];
+            $formation->is_completed = $this->studentFormationService->isFormationCompleted($user, $formation);
+            return $formation;
+        });
+
         // Paginer les formations pour l'API
         $formationsPaginees = $this->studentFormationService->paginateFormationCurrentByStudent($team, $user, 10);
 
         return view('clean.eleve.home', compact(
             'team',
-            'formations',
+            'formationsWithProgress',
             'formationsPaginees'
         ));
     }
@@ -537,7 +554,7 @@ class ElevePageController extends Controller
         // Rediriger vers la formation si le quiz est réussi
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de '.round($score, 1).'%.');
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de ' . round($score, 1) . '%.');
         }
 
         // Retourner seulement les données nécessaires pour les quiz échoués (pas de vue complète)

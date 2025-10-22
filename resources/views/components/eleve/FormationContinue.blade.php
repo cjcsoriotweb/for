@@ -10,18 +10,9 @@
       </a>
     </div>
 
-    @php
-    $studentFormationService = app(\App\Services\Formation\StudentFormationService::class);
-    @endphp
-
-    @if($formations->count() > 0)
+    @if($formationsWithProgress->count() > 0)
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      @foreach($formations as $formation) @php
-
-      $progress = $studentFormationService->getStudentProgress(auth()->user(), $formation);
-      $progressWidth = $progress['progress_percent'] ?? 0;
-
-      @endphp
+      @foreach($formationsWithProgress as $formation)
 
       <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-start justify-between mb-4">
@@ -44,21 +35,19 @@
           {{ $formation->description ?? 'Formation en cours' }}
         </p>
 
-        @if($progress)
         <div class="mb-4">
           <div class="flex justify-between text-sm text-gray-600 mb-1">
             <span>Progression</span>
-            <span>{{ $progress["progress_percent"] ?? 0 }}%</span>
+            <span>{{ $formation->progress_data["progress_percent"] ?? 0 }}%</span>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-2">
-            <div class="bg-primary h-2 rounded-full transition-all duration-300" style="width: {{ $progressWidth }}%">
+            <div class="bg-primary h-2 rounded-full transition-all duration-300"
+              style="width: {{ $formation->progress_data['progress_percent'] ?? 0 }}%">
             </div>
           </div>
         </div>
 
-        @endif
-
-        @if($studentFormationService->isFormationCompleted(Auth::user(), $formation))
+        @if($formation->is_completed)
         <a>Cette formation est terminé. rendez-vous dans vos documents.</a>
         @else
         <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
