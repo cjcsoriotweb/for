@@ -14,8 +14,29 @@ use Illuminate\Support\Facades\Auth;
 
 class StudentFormationService extends BaseFormationService
 {
+    public function isFormationCompleted(User $user, Formation $formation): bool
+    {
+        // First check if student is enrolled in the formation
+        if (! $this->isEnrolledInFormation($user, $formation)) {
+            return false;
+        }
 
+        // Get formation with progress data
+        $formationWithProgress = $this->getFormationWithProgress($formation, $user);
 
+        if (! $formationWithProgress) {
+            return false;
+        }
+
+        // Check if all chapters are completed
+        foreach ($formationWithProgress->chapters as $chapter) {
+            if (! $this->isChapterCompleted($chapter, $user)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * List current formations for a specific student in a team.
@@ -28,7 +49,6 @@ class StudentFormationService extends BaseFormationService
             'user' => $user,
         ]);
     }
-
 
     /**
      * List all formations available for a team that a student can enroll in.
@@ -48,7 +68,7 @@ class StudentFormationService extends BaseFormationService
             $query->where('teams.id', $team->id)
                 ->where('formation_in_teams.visible', true);
         })
-            ->whereDoesntHave('learners', function (Builder $q) use ($team) {
+            ->whereDoesntHave('learners', function (Builder $q) {
                 $q->where('users.id', Auth::user()->id);
                 // Si tu n’as pas team_id sur ce pivot, supprime cette ligne.
             })
@@ -86,7 +106,7 @@ class StudentFormationService extends BaseFormationService
                         ->with(['lessons' => function ($lessonQuery): void {
                             $lessonQuery->orderBy('position');
                         }]);
-                }
+                },
             ])
             ->first();
 
@@ -114,7 +134,7 @@ class StudentFormationService extends BaseFormationService
             $chapter->is_completed = $chapterCompleted;
             $chapter->is_current = false;
 
-            if (!$chapterCompleted && $previousChapterCompleted && !$currentChapter) {
+            if (! $chapterCompleted && $previousChapterCompleted && ! $currentChapter) {
                 $currentChapter = $chapter;
                 $chapter->is_current = true;
             }
@@ -144,7 +164,7 @@ class StudentFormationService extends BaseFormationService
             $lesson->is_current = false;
 
             // If this is the current chapter and lesson is not completed and previous is completed
-            if ($isCurrentChapter && !$lessonCompleted && $previousLessonCompleted) {
+            if ($isCurrentChapter && ! $lessonCompleted && $previousLessonCompleted) {
                 $lesson->is_current = true;
             }
 
@@ -191,7 +211,7 @@ class StudentFormationService extends BaseFormationService
     {
         $formationWithProgress = $this->getFormationWithProgress($formation, $user);
 
-        if (!$formationWithProgress) {
+        if (! $formationWithProgress) {
             return null;
         }
 
@@ -211,7 +231,7 @@ class StudentFormationService extends BaseFormationService
     {
         $currentChapter = $this->getCurrentChapter($formation, $user);
 
-        if (!$currentChapter) {
+        if (! $currentChapter) {
             return null;
         }
 
@@ -247,7 +267,6 @@ class StudentFormationService extends BaseFormationService
         $pivot = $formation->learners()
             ->where('user_id', $user->id)
             ->first()?->pivot;
-
 
         if (! $pivot) {
             return null;

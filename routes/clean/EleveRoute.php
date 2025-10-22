@@ -16,6 +16,7 @@ Route::prefix('eleve')
         Route::prefix('formation')->name('formation.')->group(function () {
             Route::get('/{team}/available', [ElevePageController::class, 'availableFormations'])->name('available');
             Route::get('/{team}/{formation}', [ElevePageController::class, 'showFormation'])->name('show');
+            Route::get('/{team}/{formation}/congratulation', [ElevePageController::class, 'formationCongratulation'])->name('congratulation');
             Route::post('/{team}/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('enroll');
             Route::post('/{team}/{formation}/reset-progress', [ElevePageController::class, 'resetProgress'])->name('reset-progress');
         });

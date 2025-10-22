@@ -50,6 +50,7 @@ class ElevePageController extends Controller
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
+        $studentFormationService = $this->studentFormationService;
 
         // Récupérer la formation avec le progrès de l'étudiant
         $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
@@ -63,8 +64,40 @@ class ElevePageController extends Controller
 
         return view('clean.eleve.formation.show', compact(
             'team',
+            'studentFormationService',
             'formationWithProgress',
             'progress'
+        ));
+    }
+
+    /**
+     * Afficher la page de félicitations pour une formation terminée
+     */
+    public function formationCongratulation(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation est terminée
+        if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('warning', 'La formation n\'est pas encore terminée.');
+        }
+
+        // Récupérer la formation avec le progrès de l'étudiant
+        $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
+
+        if (! $formationWithProgress) {
+            abort(404, 'Formation non trouvée ou non accessible.');
+        }
+
+        return view('clean.eleve.formation.congratulation', compact(
+            'team',
+            'formationWithProgress'
         ));
     }
 
@@ -236,7 +269,7 @@ class ElevePageController extends Controller
                 $team,
                 $formation,
                 $chapter,
-                $lesson
+                $lesson,
             ]);
         }
 
@@ -504,7 +537,7 @@ class ElevePageController extends Controller
         // Rediriger vers la formation si le quiz est réussi
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de ' . round($score, 1) . '%.');
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de '.round($score, 1).'%.');
         }
 
         // Retourner seulement les données nécessaires pour les quiz échoués (pas de vue complète)
