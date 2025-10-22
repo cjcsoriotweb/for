@@ -1,6 +1,7 @@
 {{-- resources/views/livewire/eleve/quiz/question.blade.php --}}
 @php
 $q = $questions[$currentQuestionStep] ?? null;
+$isMulti = $q ? in_array(strtolower($q->type), ['multiple_choice','multiple_choise','multiple-choice']) : false;
 @endphp
 
 <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
@@ -24,27 +25,41 @@ $q = $questions[$currentQuestionStep] ?? null;
       <div class="space-y-6 mt-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 md:p-8">
           @if($q)
-          <p class="text-[#111418] dark:text-white text-lg font-semibold mb-4">
-            {{ $currentQuestionStep + 1 }} / {{ $questions->count() }} — {{ $q->question }}
+          <p class="text-[#111418] dark:text-white text-lg font-semibold mb-1">
+            {{ $currentQuestionStep + 1 }} / {{ $questions->count() }}
+            — {{ $q->question }}
+          </p>
+          <p class="text-xs text-gray-500 mb-4">
+            Type : {{ $isMulti ? 'Choix multiples' : 'Vrai/Faux ou choix unique' }}
           </p>
 
-          <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-3" role="{{ $isMulti ? 'group' : 'radiogroup' }}">
             @foreach($q->quizChoices as $choice)
             @php $selected = $this->isSelected($choice->id, $q->id); @endphp
 
-            <label @if($selected) wire:click="unSelectReponse({{ $q->id }})" @else
-              wire:click="selectReponse({{ $choice->id }})" @endif class="flex items-center gap-4 rounded-lg border p-4 cursor-pointer transition-colors
-                        {{ $selected
-                            ? 'border-blue-700 bg-primary/10 dark:bg-primary/20'
-                            : 'border-gray-300 hover:bg-primary/10 dark:border-gray-700 dark:hover:bg-primary/20' }}">
+            <label @if($selected) wire:click="unSelectReponse({{ $q->id }}, {{ $choice->id }})" @else
+              wire:click="selectReponse({{ $choice->id }})" @endif role="{{ $isMulti ? 'checkbox' : 'radio' }}"
+              aria-checked="{{ $selected ? 'true' : 'false' }}"
+              @class([ 'flex items-center gap-4 rounded-lg border p-4 cursor-pointer transition' , $selected
+              ? 'border-blue-700 bg-blue-600 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-600'
+              : 'border-gray-300 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 text-[#111418] dark:text-gray-200'
+              ])>
               <div class="shrink-0">
                 @if($selected)
-                <x-heroicon-o-check-circle class="w-6 h-6 text-blue-600" />
+                @if($isMulti)
+                <x-heroicon-o-check-badge class="w-6 h-6 text-white" />
                 @else
-                <span class="inline-block w-6 h-6 rounded-full border border-gray-400"></span>
+                <x-heroicon-o-check-circle class="w-6 h-6 text-white" />
+                @endif
+                @else
+                @if($isMulti)
+                <span class="inline-block w-5 h-5 rounded-md border border-gray-400"></span>
+                @else
+                <span class="inline-block w-5 h-5 rounded-full border border-gray-400"></span>
+                @endif
                 @endif
               </div>
-              <span class="text-[#111418] dark:text-gray-200 text-sm font-medium">
+              <span class="text-sm font-medium">
                 {{ $choice->choice_text }}
               </span>
             </label>

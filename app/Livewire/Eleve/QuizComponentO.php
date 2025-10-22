@@ -15,40 +15,33 @@ use Livewire\Component;
 
 class QuizComponentO extends Component
 {
-    /** Étapes d’affichage */
-    private const STEP_INIT     = 0;
-    private const STEP_LOADING  = 1;
-    private const STEP_RUNNING  = 2; // question en cours / timer
-    private const STEP_REVIEW   = 3; // résultats
+    private const STEP_INIT    = 0;
+    private const STEP_LOADING = 1;
+    private const STEP_RUNNING = 2;
+    private const STEP_REVIEW  = 3;
 
-    /** Contexte */
     public Team $team;
     public Formation $formation;
     public Chapter $chapter;
     public Lesson $lesson;
     public Quiz $quiz;
 
-    /** Données du quiz */
     /** @var Collection<int,\App\Models\QuizQuestion> */
     public Collection $questions;
 
-    /** Index de la question courante (0-based) */
     public int $currentQuestionStep = 0;
 
-    /** UI/state */
     public int $step = self::STEP_INIT;
-    public int $countdown = 10;      // secondes restantes sur la question/phase
-    public int $countdownPast = 0;   // temps total écoulé (s)
-    public int $heartbeat = 0;       // ping UI
+    public int $countdown = 10;
+    public int $countdownPast = 0;
+    public int $heartbeat = 0;
 
     /**
-     * Réponses sélectionnées par l’utilisateur.
-     * On stocke uniquement les IDs pour éviter de sérialiser des modèles Eloquent.
-     * Format: [question_id => choice_id]
+     * Réponses utilisateur :
+     * - single : [question_id => choice_id]
+     * - multiple : [question_id => [choice_id, ...]]
      */
     public array $reponse = [];
-
-    /* ------------------------------ Lifecycle ------------------------------ */
 
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson): void
     {
@@ -57,34 +50,27 @@ class QuizComponentO extends Component
         $this->chapter   = $chapter;
         $this->lesson    = $lesson;
 
-        // Vérification inscription
         $user = Auth::user();
         if (!$this->studentFormationService()->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
-        // Vérifier que la leçon est un Quiz
         if ($lesson->lessonable_type !== Quiz::class) {
             abort(404, 'Quiz non trouvé.');
         }
 
         $this->quiz = $lesson->lessonable;
 
-        // Précharger les questions + choix
         $this->questions = $this->quiz
             ->quizQuestions()
-            ->with('quizChoices') // évite le N+1 dans la vue
+            ->with('quizChoices')
             ->get();
 
-        // Passage à l’étape de “pré-chargement”
         $this->step = self::STEP_LOADING;
     }
 
-    /* -------------------------------- Render -------------------------------- */
-
     public function render()
     {
-        // Router d’affichage léger et lisible
         return match ($this->step) {
             self::STEP_LOADING => view('livewire.eleve.quiz.loading-module'),
             self::STEP_RUNNING => $this->countdown >= 1
@@ -95,9 +81,6 @@ class QuizComponentO extends Component
         };
     }
 
-    /* ------------------------------ Actions UI ------------------------------ */
-
-    /** Démarre réellement le quiz (lance le timer) */
     public function launchQuiz(int $initialSeconds = 100): void
     {
         $this->countdown = max(1, $initialSeconds);
@@ -107,36 +90,94 @@ class QuizComponentO extends Component
         $this->step = self::STEP_RUNNING;
     }
 
-    /** Sélection d’un choix pour la question courante */
+    /** Toggle une réponse selon le type de la question */
     public function selectReponse(int $choiceId): void
     {
         $choice = QuizChoice::query()
-            ->select(['id', 'question_id'])
+            ->select(['id', 'question_id', 'question_id']) // on prend les deux au cas où
             ->findOrFail($choiceId);
 
+        // Détecter le bon question_id (selon ton schéma)
+        $questionId = $choice->question_id
+            ?? $choice->question_id
+            ?? null;
 
-        $this->reponse[$choice->question_id] = $choice->id;
+        // Fallback ultra-sûr via la relation, si elle existe
+        if (!$questionId && method_exists($choice, 'question')) {
+            $questionId = (int) optional($choice->question)->getAttribute('id');
+        }
+
+        if (!$questionId) {
+            // Rien à faire si on n’a pas pu retrouver la question
+            return;
+        }
+
+        // Retrouver la question côté collection
+        $q = $this->questions->firstWhere('id', (int) $questionId);
+        if (!$q) {
+            return;
+        }
+
+        $type = $this->normalizeType($q->type);
+
+        if ($type === 'multiple_choice') {
+            $bucket = $this->reponse[$questionId] ?? [];
+            if (!is_array($bucket)) $bucket = [];
+
+            // toggle
+            if (in_array($choiceId, $bucket, true)) {
+                $bucket = array_values(array_diff($bucket, [$choiceId]));
+                if (empty($bucket)) {
+                    unset($this->reponse[$questionId]);
+                } else {
+                    $this->reponse[$questionId] = $bucket;
+                }
+            } else {
+                $bucket[] = $choiceId;
+                $this->reponse[$questionId] = array_values(array_unique($bucket));
+            }
+        } else {
+            // single / true_false
+            $this->reponse[$questionId] = $choiceId;
+        }
     }
 
-    /** Désélection pour une question donnée */
-    public function unSelectReponse(int $questionId): void
+
+    /** Désélection : enlève un seul choix en multiple, ou vide en single */
+    public function unSelectReponse(int $questionId, ?int $choiceId = null): void
     {
-        unset($this->reponse[$questionId]);
+        $q = $this->questions->firstWhere('id', (int) $questionId);
+        if (!$q) return;
+
+        $type = $this->normalizeType($q->type);
+
+        if ($type === 'multiple_choice') {
+            if (!isset($this->reponse[$questionId]) || !is_array($this->reponse[$questionId])) return;
+
+            if ($choiceId !== null) {
+                $this->reponse[$questionId] = array_values(array_diff($this->reponse[$questionId], [$choiceId]));
+            } else {
+                $this->reponse[$questionId] = [];
+            }
+
+            if (empty($this->reponse[$questionId])) {
+                unset($this->reponse[$questionId]);
+            }
+        } else {
+            unset($this->reponse[$questionId]);
+        }
     }
 
-    /** Aller à la question suivante ou passer aux résultats si fini */
     public function nextQuestion(): void
     {
         if ($this->hasNextQuestion()) {
             $this->currentQuestionStep++;
-            // on peut remettre un petit compte à rebours question si besoin
-            // $this->countdown = 30;
+            // $this->countdown = 30; // optionnel
         } else {
             $this->validateQuiz();
         }
     }
 
-    /** Revenir à la question précédente */
     public function prevQuestion(): void
     {
         if ($this->currentQuestionStep > 0) {
@@ -144,7 +185,6 @@ class QuizComponentO extends Component
         }
     }
 
-    /** Tick de timer côté client (wire:poll / setInterval en JS) */
     public function dIntCountdown(): void
     {
         if ($this->countdown > 0) {
@@ -153,46 +193,60 @@ class QuizComponentO extends Component
         }
     }
 
-    /** Heartbeat pour forcer un léger refresh sans logique métier */
     public function heartBeat(): void
     {
         $this->heartbeat++;
     }
 
-    /** Changer d’étape explicitement (avec garde) */
     public function setStep(int $int): void
     {
-        // Si on demande de RUN directement, lancer le quiz avec un timer par défaut
         if ($int === self::STEP_RUNNING && $this->step !== self::STEP_RUNNING) {
             $this->launchQuiz(100);
             return;
         }
-
-        // Protection : pas de passage en REVIEW si pas de réponses/fin
         if ($int === self::STEP_REVIEW && $this->step !== self::STEP_REVIEW) {
             $this->validateQuiz();
             return;
         }
-
         $this->step = $int;
     }
 
-    /* ---------------------------- Validation/Score --------------------------- */
-
+    /** Score par question selon le type */
     public function validateQuiz(): void
     {
-        // Calcule le score à partir des IDs sélectionnés
-        $selectedChoiceIds = array_values($this->reponse);
-        if (empty($selectedChoiceIds)) {
-            $score = 0;
-        } else {
-            $score = QuizChoice::query()
-                ->whereIn('id', $selectedChoiceIds)
-                ->where('is_correct', true)
-                ->count();
+        $score = 0;
+
+        foreach ($this->questions as $q) {
+            $qid = (int) $q->id;
+            $type = $this->normalizeType($q->type);
+
+            $correctIds = $q->quizChoices->where('is_correct', true)->pluck('id')->map(fn($v) => (int)$v)->values()->all();
+
+            if ($type === 'multiple_choice') {
+                $selected = collect($this->reponse[$qid] ?? [])
+                    ->map(fn($v) => (int)$v)
+                    ->unique()
+                    ->values()
+                    ->all();
+
+                // exact match : mêmes éléments, même cardinalité
+                sort($selected);
+                $expected = $correctIds;
+                sort($expected);
+
+                if (!empty($expected) && $selected === $expected) {
+                    $score++;
+                }
+            } else {
+                $selected = isset($this->reponse[$qid]) ? (int)$this->reponse[$qid] : null;
+
+                // single : il faut exactement le seul bon id
+                if (count($correctIds) === 1 && $selected === (int)$correctIds[0]) {
+                    $score++;
+                }
+            }
         }
 
-        // Persistance de la tentative
         QuizAttempt::create([
             'quiz_id'          => $this->quiz->id,
             'user_id'          => Auth::id(),
@@ -202,33 +256,43 @@ class QuizComponentO extends Component
             'started_at'       => now()->subSeconds($this->countdownPast),
         ]);
 
-        // Passage en écran de résultats
         $this->step = self::STEP_REVIEW;
     }
 
-    /* -------------------------------- Helpers -------------------------------- */
-
-    /** Question courante (ou null si out-of-range) */
     public function currentQuestion()
     {
         return $this->questions[$this->currentQuestionStep] ?? null;
     }
 
-    /** Y a-t-il une question suivante ? */
     public function hasNextQuestion(): bool
     {
         return isset($this->questions[$this->currentQuestionStep + 1]);
     }
 
-    /** Le choix est-il sélectionné pour sa question ? (helper pratique pour la vue) */
     public function isSelected(int $choiceId, int $questionId): bool
     {
-        return isset($this->reponse[$questionId]) && $this->reponse[$questionId] === $choiceId;
+        if (!isset($this->reponse[$questionId])) return false;
+
+        $value = $this->reponse[$questionId];
+
+        return is_array($value)
+            ? in_array($choiceId, $value, true)
+            : ((int)$value === (int)$choiceId);
+    }
+
+    private function normalizeType(?string $type): string
+    {
+        // tolère la coquille "multiple_choise"
+        $t = strtolower(trim((string)$type));
+        if ($t === 'multiple_choise' || $t === 'multiple-choice') return 'multiple_choice';
+        if ($t === 'multiple_choice') return 'multiple_choice';
+        if ($t === 'true_false' || $t === 'true-false' || $t === 'boolean' || $t === 'single_choice') return 'true_false';
+        // défaut : single
+        return 'true_false';
     }
 
     private function studentFormationService()
     {
-        // résout App\Services\Formation\StudentFormationService via le container
         return app(\App\Services\Formation\StudentFormationService::class);
     }
 }
