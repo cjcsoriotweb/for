@@ -7,6 +7,7 @@ use App\Models\Formation;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizAnswer;
+use App\Models\QuizChoice;
 use App\Models\QuizQuestion;
 use App\Models\Team;
 use App\Models\User;
@@ -25,13 +26,15 @@ class QuizComponentO extends Component
     public $formation;
     public $chapter;
 
-    public $currentQuiz = 0;
+    public $currentQuestionStep = 0;
 
 
 
     public $heatbeat = 0;
     public $step = 0;
     public $countdown = 10;
+
+    public $reponse = [];
 
 
 
@@ -70,7 +73,7 @@ class QuizComponentO extends Component
 
             // Récupérer les questions du quiz
             $this->questions = $this->quiz->quizQuestions()->with('quizChoices')->get();
-            dd($this->quiz);
+
 
             return view('livewire.eleve.quiz.loading-module');
         }
@@ -96,6 +99,16 @@ class QuizComponentO extends Component
     {
         $this->step = 3;
     }
+
+    public function selectReponse($id)
+    {
+        $this->reponse[$id] = QuizChoice::find($id);
+    }
+
+    public function unSelectReponse($id)
+    {
+        unset($this->reponse[$id]);
+    }
     public function setStep($int)
     {
         if ($int == 2) { // Launch Quiz
@@ -116,8 +129,6 @@ class QuizComponentO extends Component
     {
         return app(StudentFormationService::class);
     }
-
-
     public function mount($team, $formation, $chapter, $lesson)
     {
         $this->team = $team;

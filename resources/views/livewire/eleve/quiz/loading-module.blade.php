@@ -8,7 +8,7 @@
     <p class="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300">Getting your quiz
       ready...</p>
     <p class="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300">
-      <span wire:poll.1s="heartBeat">{{ uniqid() }}</span>
+      <span wire:poll.1s="heartBeat">{{$currentQuestionStep+1}}/{{ count($this->questions)}}</span>
     </p>
   </div>
 </div>

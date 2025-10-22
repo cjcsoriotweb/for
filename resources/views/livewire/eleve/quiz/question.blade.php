@@ -18,36 +18,28 @@
           </div>
           <div class="space-y-6 mt-6">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 md:p-8">
-              <p class="text-[#111418] dark:text-white text-lg font-semibold mb-4">1. What is the capital of France?</p>
+              <p class="text-[#111418] dark:text-white text-lg font-semibold mb-4">{{$currentQuestionStep}}. {{
+                $questions[$currentQuestionStep]->question }}</p>
               <div class="flex flex-col gap-3">
-                <label
-                  class="flex items-center gap-4 rounded-lg border border-solid border-[#dbe0e6] dark:border-gray-700 p-[15px] hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer transition-colors">
-                  <input
-                    class="h-5 w-5 border-2 border-[#dbe0e6] dark:border-gray-600 bg-transparent text-transparent checked:border-primary checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
-                    name="question-1" type="radio" />
-                  <span class="text-[#111418] dark:text-gray-300 text-sm font-medium leading-normal">Paris</span>
+
+                @foreach($questions[0]->quizChoices as $choice)
+                @if(isset($this->reponse[$choice->id]))
+                <label wire:click="unSelectReponse('{{$choice->id}}')"
+                  class="flex items-center gap-4 rounded-lg border border-solid border-blue-700 p-[15px] hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer transition-colors">
+                  <span
+                    class="text-[#111418] dark:text-gray-300 text-sm font-medium leading-normal">{{$choice->choice_text}}
+                  </span>
                 </label>
-                <label
-                  class="flex items-center gap-4 rounded-lg border border-solid border-[#dbe0e6] dark:border-gray-700 p-[15px] hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer transition-colors">
-                  <input
-                    class="h-5 w-5 border-2 border-[#dbe0e6] dark:border-gray-600 bg-transparent text-transparent checked:border-primary checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
-                    name="question-1" type="radio" />
-                  <span class="text-[#111418] dark:text-gray-300 text-sm font-medium leading-normal">London</span>
+                @else
+                <label wire:click="selectReponse('{{$choice->id}}')"
+                  class="flex items-center gap-4 rounded-lg border border-solid border-grey-700 p-[15px] hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer transition-colors">
+                  <span
+                    class="text-[#111418] dark:text-gray-300 text-sm font-medium leading-normal">{{$choice->choice_text}}
+                  </span>
                 </label>
-                <label
-                  class="flex items-center gap-4 rounded-lg border border-solid border-[#dbe0e6] dark:border-gray-700 p-[15px] hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer transition-colors">
-                  <input
-                    class="h-5 w-5 border-2 border-[#dbe0e6] dark:border-gray-600 bg-transparent text-transparent checked:border-primary checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
-                    name="question-1" type="radio" />
-                  <span class="text-[#111418] dark:text-gray-300 text-sm font-medium leading-normal">Berlin</span>
-                </label>
-                <label
-                  class="flex items-center gap-4 rounded-lg border border-solid border-[#dbe0e6] dark:border-gray-700 p-[15px] hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer transition-colors">
-                  <input
-                    class="h-5 w-5 border-2 border-[#dbe0e6] dark:border-gray-600 bg-transparent text-transparent checked:border-primary checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
-                    name="question-1" type="radio" />
-                  <span class="text-[#111418] dark:text-gray-300 text-sm font-medium leading-normal">Madrid</span>
-                </label>
+                @endif
+                @endforeach
+
               </div>
             </div>
           </div>
