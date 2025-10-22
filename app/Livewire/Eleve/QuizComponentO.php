@@ -9,6 +9,7 @@ use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\QuizChoice;
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -57,8 +58,13 @@ class QuizComponentO extends Component
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
 
+
         if ($lesson->lessonable_type !== Quiz::class) {
             abort(404, 'Quiz non trouvé.');
+        }
+
+        if ($this->isLessonCompleted($lesson, Auth::user())) {
+            dd('ok');
         }
 
         $this->ensureLessonStarted();
@@ -299,6 +305,15 @@ class QuizComponentO extends Component
         if ($t === 'true_false' || $t === 'true-false' || $t === 'boolean' || $t === 'single_choice') return 'true_false';
         // défaut : single
         return 'true_false';
+    }
+
+    private function isLessonCompleted(Lesson $lesson, User $user): bool
+    {
+        $pivot = $lesson->learners()
+            ->where('user_id', $user->id)
+            ->first()?->pivot;
+
+        return $pivot && $pivot->status === 'completed';
     }
 
     private function ensureLessonStarted(): void
