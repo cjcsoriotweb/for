@@ -13,22 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         // On peut passer un ARRAY de fichiers pour "web"
         web: [
-            __DIR__.'/../routes/clean/GuestRoute.php',
-            __DIR__.'/../routes/clean/UserRoute.php',
-            __DIR__.'/../routes/clean/AdminRoute.php',
-            __DIR__.'/../routes/clean/EleveRoute.php',
-            __DIR__.'/../routes/clean/FormateurRoute.php',
-            /*
-            __DIR__.'/../routes/web.php',
-            __DIR__.'/../routes/account.php',
-            __DIR__.'/../routes/application.php',
-            __DIR__.'/../routes/eleve.php',
-            __DIR__.'/../routes/administration.php',
-            __DIR__.'/../routes/superadmin.php',
-            */
+            __DIR__ . '/../routes/GuestRoute.php',
+            __DIR__ . '/../routes/UserRoute.php',
+            __DIR__ . '/../routes/AdminRoute.php',
+            __DIR__ . '/../routes/EleveRoute.php',
+            __DIR__ . '/../routes/FormateurRoute.php',
         ],
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             /*
