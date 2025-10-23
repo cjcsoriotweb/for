@@ -8,7 +8,6 @@
     }}
   </title>
   <link rel="icon" href="{{ asset('favicon.ico') }}" />
-
   <x-header />
 </head>
 
