@@ -5,9 +5,6 @@
       <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
         Continuer mes formations
       </h2>
-      <a href="#" class="text-primary hover:text-blue-600 font-medium">
-        Voir tout →
-      </a>
     </div>
 
     @if($formationsWithProgress->count() > 0)
@@ -23,9 +20,15 @@
               </path>
             </svg>
           </div>
-          <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-            En cours
+          @if($formation->is_completed)
+          <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+            {{ __('Terminé') }}
           </span>
+          @else
+          <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+            {{ __('En cours') }}
+          </span>
+          @endif
         </div>
 
         <h3 class="font-semibold text-lg mb-2">
@@ -48,7 +51,11 @@
         </div>
 
         @if($formation->is_completed)
-        <a>Cette formation est terminé. rendez-vous dans vos documents.</a>
+        <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
+          style="display:flex;flex-direction: column;justify-content: center;text-align: center;">
+          <p><b>Cette formation est terminé.</b></p>
+          <p><U>Rendez-vous dans vos documents.</U></p>
+        </a>
         @else
         <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
           class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors text-center block">
