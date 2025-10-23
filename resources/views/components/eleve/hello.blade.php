@@ -10,10 +10,11 @@
         </p>
         <div class="flex items-center space-x-6">
           <div class="text-center">
-            <div class="text-2xl font-bold">
+            <div class="text-2xl font-bold ">
               {{ count($currentFormation) }}
             </div>
-            <div class="text-sm text-blue-200">
+            <div
+              class="text-sm text-blue-200 bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">
               Formations en cours
             </div>
           </div>
