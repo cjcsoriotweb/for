@@ -27,7 +27,7 @@
             <!-- Logo -->
             <div class="shrink-0 flex items-center">
               <a href="{{ route('eleve.index', $team) }}" class="text-xl font-bold text-gray-800 dark:text-gray-200">
-                {{ config("app.name", "Laravel") }} - Élève
+                {{ $team->name }} - Élève
               </a>
             </div>
 
