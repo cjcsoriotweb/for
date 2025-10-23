@@ -21,7 +21,6 @@ class SwitchTeamRequest extends FormRequest
         }
 
         return false;
-
     }
 
     /**
