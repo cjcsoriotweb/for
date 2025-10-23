@@ -83,10 +83,6 @@
         Inscrivez-vous à une formation pour commencer votre
         apprentissage.
       </p>
-      <a href="{{ route('eleve.formation.available', $team) }}"
-        class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
-        Découvrir les formations
-      </a>
     </div>
     @endif
   </div>
