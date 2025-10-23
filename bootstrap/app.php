@@ -1,12 +1,8 @@
 <?php
 
-use App\Models\Team;
-use App\Models\User;
-use App\Policies\TeamPolicy;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -22,26 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
-        then: function () {
-            /*
-            Gate::policy(Team::class, TeamPolicy::class);
-
-            // Gates
-            Gate::define('access-team', function (User $user, $team) {
-                $team = $team instanceof Team ? $team : Team::query()->findOrFail($team);
-
-                return $user->belongsToTeam($team);
-            });
-
-            Gate::define('isSuperAdmin', function (User $user) {
-                return (bool) $user->superadmin;
-            });
-            */
-        }
+        then: function () {}
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->appendToGroup('web', \App\Http\Middleware\AuthDebugMiddleware::class);
-    })
+    ->withMiddleware(function (Middleware $middleware): void {})
     ->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions) {
         // Policies / Gate::authorize() -> AuthorizationException (403)
         $exceptions->render(function (AuthorizationException $e, $request) {

@@ -4,10 +4,11 @@ use App\Http\Controllers\Clean\Admin\AdminPageController;
 use App\Http\Controllers\Clean\Admin\Configuration\AdminConfigurationController;
 use App\Http\Controllers\Clean\Admin\Formations\AdminFormationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AdminMiddleware;
 
 Route::prefix('administrateur')
     ->name('application.admin.')
-    ->middleware(['auth'])
+    ->middleware(['auth', AdminMiddleware::class])
     ->scopeBindings()
     ->group(function () {
         Route::get('{team}/home', [AdminPageController::class, 'home'])->name('index');

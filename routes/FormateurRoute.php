@@ -4,11 +4,12 @@ use App\Http\Controllers\Clean\Formateur\FormateurPageController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
+use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('formateur')
     ->name('formateur.')
-    ->middleware(['auth'])
+    ->middleware(['auth', AdminMiddleware::class])
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [FormateurPageController::class, 'home'])->name('home');
