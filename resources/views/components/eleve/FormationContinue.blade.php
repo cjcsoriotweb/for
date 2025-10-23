@@ -51,7 +51,8 @@
         </div>
 
         @if($formation->is_completed)
-        <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
+        <a class="bg-yellow-200 p-2 border-4 rounded-xl border-yellow-100"
+          href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
           style="display:flex;flex-direction: column;justify-content: center;text-align: center;">
           <p><b>Cette formation est terminé.</b></p>
           <p><U>Rendez-vous dans vos documents.</U></p>
