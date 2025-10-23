@@ -38,6 +38,7 @@
           {{ $formation->description ?? 'Formation en cours' }}
         </p>
 
+        @if(!$formation->is_completed)
         <div class="mb-4">
           <div class="flex justify-between text-sm text-gray-600 mb-1">
             <span>Progression</span>
@@ -49,12 +50,13 @@
             </div>
           </div>
         </div>
+        @endif
 
         @if($formation->is_completed)
         <a class="bg-yellow-200 p-2 border-4 rounded-xl border-yellow-100"
           href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
           style="display:flex;flex-direction: column;justify-content: center;text-align: center;">
-          <p><b>Cette formation est terminé.</b></p>
+          <p><b>🎊 Cette formation est terminée. 🎊</b></p>
           <p><U>Rendez-vous dans vos documents.</U></p>
         </a>
         @else
