@@ -41,14 +41,44 @@ class OrganisateurPageController extends Controller
                 ->with('error', 'Formation non accessible.');
         }
 
-        // Récupérer les étudiants inscrits à cette formation avec leurs données de pivot et leçons
+        // Récupérer les étudiants inscrits à cette formation avec leurs données de pivot
         $students = $formation->learners()
             ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
-            ->with(['lessons' => function ($query) {
-                $query->withPivot(['status', 'started_at', 'last_activity_at', 'completed_at', 'watched_seconds', 'read_percent', 'attempts']);
-            }])
             ->orderBy('formation_user.enrolled_at', 'desc')
             ->get();
+
+        // Ajouter les données de leçons pour chaque étudiant
+        foreach ($students as $student) {
+            $student->lessons = $formation->lessons()
+                ->with(['chapter' => function ($query) {
+                    $query->orderBy('position');
+                }])
+                ->orderBy('position')
+                ->get();
+
+            // Ajouter les données de progression pour chaque leçon
+            foreach ($student->lessons as $lesson) {
+                $lessonProgress = $lesson->learners()
+                    ->where('user_id', $student->id)
+                    ->first();
+
+                if ($lessonProgress) {
+                    $lesson->pivot = $lessonProgress->pivot;
+                } else {
+                    $lesson->pivot = (object) [
+                        'status' => 'enrolled',
+                        'started_at' => null,
+                        'last_activity_at' => null,
+                        'completed_at' => null,
+                        'watched_seconds' => 0,
+                        'read_percent' => 0,
+                        'attempts' => 0,
+                        'best_score' => 0,
+                        'max_score' => 0,
+                    ];
+                }
+            }
+        }
 
         return view('clean.organisateur.students', compact(
             'team',
@@ -86,15 +116,37 @@ class OrganisateurPageController extends Controller
             ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
             ->first();
 
-        // Récupérer toutes les leçons avec les données de progression
+        // Récupérer toutes les leçons de la formation
         $lessons = $formation->lessons()
-            ->with(['chapters' => function ($query) {
+            ->with(['chapter' => function ($query) {
                 $query->orderBy('position');
             }])
-            ->withPivot(['status', 'started_at', 'last_activity_at', 'completed_at', 'watched_seconds', 'read_percent', 'attempts', 'best_score', 'max_score'])
-            ->orderBy('chapters.position')
-            ->orderBy('lessons.position')
+            ->orderBy('position')
             ->get();
+
+        // Ajouter les données de progression pour l'étudiant spécifique
+        foreach ($lessons as $lesson) {
+            $lessonProgress = $lesson->learners()
+                ->where('user_id', $student->id)
+                ->first();
+
+            if ($lessonProgress) {
+                $lesson->pivot = $lessonProgress->pivot;
+            } else {
+                // Créer un objet pivot vide pour éviter les erreurs
+                $lesson->pivot = (object) [
+                    'status' => 'enrolled',
+                    'started_at' => null,
+                    'last_activity_at' => null,
+                    'completed_at' => null,
+                    'watched_seconds' => 0,
+                    'read_percent' => 0,
+                    'attempts' => 0,
+                    'best_score' => 0,
+                    'max_score' => 0,
+                ];
+            }
+        }
 
         // Récupérer les tentatives de quiz
         $quizAttempts = \App\Models\QuizAttempt::where('user_id', $student->id)
