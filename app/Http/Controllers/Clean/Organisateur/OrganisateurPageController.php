@@ -77,7 +77,7 @@ class OrganisateurPageController extends Controller
         }
 
         if (! $this->organisateurService->studentIsEnrolledInFormation($formation, $student)) {
-            return redirect()->route('organisateur.formations.students.index', [$team, $formation])
+            return redirect()->route('organisateur.formations.students', [$team, $formation])
                 ->with('error', 'Eleve non inscrit a cette formation.');
         }
 
@@ -110,7 +110,7 @@ class OrganisateurPageController extends Controller
         }
 
         if (! $this->organisateurService->studentIsEnrolledInFormation($formation, $student)) {
-            return redirect()->route('organisateur.formations.students.index', [$team, $formation])
+            return redirect()->route('organisateur.formations.students', [$team, $formation])
                 ->with('error', 'Eleve non inscrit a cette formation.');
         }
 
@@ -137,7 +137,7 @@ class OrganisateurPageController extends Controller
         }
 
         if (! $this->organisateurService->studentIsEnrolledInFormation($formation, $student)) {
-            return redirect()->route('organisateur.formations.students.index', [$team, $formation])
+            return redirect()->route('organisateur.formations.students', [$team, $formation])
                 ->with('error', 'Eleve non inscrit a cette formation.');
         }
 
