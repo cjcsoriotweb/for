@@ -73,20 +73,20 @@ class UserActivityLog extends Model
     public function getFormattedDurationAttribute(): string
     {
         if ($this->duration_seconds < 60) {
-            return $this->duration_seconds.'s';
+            return $this->duration_seconds . 's';
         }
 
         $minutes = floor($this->duration_seconds / 60);
         $seconds = $this->duration_seconds % 60;
 
         if ($minutes < 60) {
-            return $minutes.'min '.$seconds.'s';
+            return $minutes . 'min ' . $seconds . 's';
         }
 
         $hours = floor($minutes / 60);
         $remainingMinutes = $minutes % 60;
 
-        return $hours.'h '.$remainingMinutes.'min';
+        return $hours . 'h ' . $remainingMinutes . 'min';
     }
 
     /**
@@ -129,7 +129,7 @@ class UserActivityLog extends Model
      */
     public function getDeviceTypeAttribute(): string
     {
-        if (! $this->user_agent) {
+        if (!$this->user_agent) {
             return 'Unknown';
         }
 
@@ -140,5 +140,85 @@ class UserActivityLog extends Model
         }
 
         return 'Desktop';
+    }
+
+    /**
+     * Get formation name from URL
+     */
+    public function getFormationName(): ?string
+    {
+        if (!$this->url) {
+            return null;
+        }
+
+        // Extract formation ID from URL pattern: /organisateur/{team}/formations/{formation}/...
+        $pattern = '/\/organisateur\/\d+\/formations\/(\d+)/';
+        if (preg_match($pattern, $this->url, $matches)) {
+            try {
+                $formation = \App\Models\Formation::find($matches[1]);
+                return $formation ? $formation->title : null;
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get lesson name from URL
+     */
+    public function getLessonName(): ?string
+    {
+        if (!$this->url) {
+            return null;
+        }
+
+        // Extract lesson ID from URL pattern: /eleve/{team}/formations/{formation}/chapters/{chapter}/lessons/{lesson}
+        $pattern = '/\/eleve\/\d+\/formations\/\d+\/chapters\/\d+\/lessons\/(\d+)/';
+        if (preg_match($pattern, $this->url, $matches)) {
+            try {
+                $lesson = \App\Models\Lesson::find($matches[1]);
+                return $lesson ? $lesson->title : null;
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+
+        // Check if it's a quiz attempt page
+        if (str_contains($this->url, '/quiz/attempt')) {
+            return 'Quiz en cours';
+        }
+
+        // Check if it's a lesson view page
+        if (str_contains($this->url, '/lesson/')) {
+            return 'Consultation leçon';
+        }
+
+        return null;
+    }
+
+    /**
+     * Get page type/category
+     */
+    public function getPageTypeAttribute(): string
+    {
+        if (!$this->url) {
+            return 'Unknown';
+        }
+
+        if (str_contains($this->url, '/quiz/')) {
+            return 'Quiz';
+        } elseif (str_contains($this->url, '/lesson/')) {
+            return 'Leçon';
+        } elseif (str_contains($this->url, '/formation/')) {
+            return 'Formation';
+        } elseif (str_contains($this->url, '/organisateur/')) {
+            return 'Administration';
+        } elseif (str_contains($this->url, '/eleve/')) {
+            return 'Apprentissage';
+        }
+
+        return 'Autre';
     }
 }
