@@ -33,10 +33,10 @@ class Quiz extends Model
     }
 
     /**
-     * Get the lesson that owns the quiz (polymorphic)
+     * Get the lesson that owns the quiz
      */
-    public function lessonable()
+    public function lesson()
     {
-        return $this->morphOne(Lesson::class, 'lessonable');
+        return $this->belongsTo(Lesson::class);
     }
 }

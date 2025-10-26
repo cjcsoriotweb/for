@@ -347,22 +347,24 @@
 
               <div>
                 <span class="font-medium text-gray-500 dark:text-gray-400">Réponses:</span>
-                <span class="ml-2 text-gray-900 dark:text-white">{{ $attempt->quizAnswers->count() }}/{{
-                  $attempt->lesson->lessonable->quizQuestions->count() }}</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ $attempt->answers->count() }}/{{
+                  $attempt->lesson->lessonable && $attempt->lesson->lessonable->quizQuestions ?
+                  $attempt->lesson->lessonable->quizQuestions->count() : 0 }}</span>
               </div>
             </div>
 
-            @if($attempt->quizAnswers->count() > 0)
+            @if($attempt->answers->count() > 0)
             <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Réponses détaillées:</p>
               <div class="space-y-1">
-                @foreach($attempt->quizAnswers as $answer)
+                @foreach($attempt->answers as $answer)
                 <div class="flex items-center text-xs">
                   <span
                     class="w-6 h-6 rounded-full {{ $answer->is_correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} flex items-center justify-center mr-2">
                     {{ $answer->is_correct ? '✓' : '✗' }}
                   </span>
-                  <span class="text-gray-600 dark:text-gray-400">{{ $answer->quizQuestion->question }}</span>
+                  <span class="text-gray-600 dark:text-gray-400">{{ $answer->question ? $answer->question->question :
+                    'Question non trouvée' }}</span>
                 </div>
                 @endforeach
               </div>

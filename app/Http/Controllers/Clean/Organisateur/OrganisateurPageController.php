@@ -155,7 +155,7 @@ class OrganisateurPageController extends Controller
                     $chapterQuery->where('formation_id', $formation->id);
                 });
             })
-            ->with(['lesson', 'quizAnswers'])
+            ->with(['lesson.lessonable.quizQuestions', 'answers.question'])
             ->orderBy('created_at', 'desc')
             ->get();
 

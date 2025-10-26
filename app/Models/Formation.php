@@ -74,6 +74,14 @@ class Formation extends Model
             ->withTimestamps();
     }
 
+    /**
+     * Alias for learners() method for backward compatibility
+     */
+    public function students()
+    {
+        return $this->learners();
+    }
+
     /*
     public function team()
     {

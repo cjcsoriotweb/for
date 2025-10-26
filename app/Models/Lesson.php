@@ -48,10 +48,10 @@ class Lesson extends Model
     }
 
     /**
-     * Get the quiz associated with this lesson (if lessonable_type is Quiz)
+     * Get the quizzes associated with this lesson
      */
     public function quizzes()
     {
-        return $this->hasOne(Quiz::class)->where('lesson_id', $this->id);
+        return $this->hasMany(Quiz::class);
     }
 }

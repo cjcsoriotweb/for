@@ -40,7 +40,14 @@ class QuizAttempt extends Model
 
     public function lesson()
     {
-        return $this->belongsTo(Lesson::class);
+        return $this->hasOneThrough(
+            Lesson::class,
+            Quiz::class,
+            'id',        // Foreign key on quiz_attempts table (quiz_id)
+            'id',        // Foreign key on lessons table (lesson_id)
+            'quiz_id',   // Local key on quiz_attempts table
+            'lesson_id'  // Local key on quizzes table
+        );
     }
 
     public function quiz()
@@ -50,6 +57,6 @@ class QuizAttempt extends Model
 
     public function answers()
     {
-        return $this->hasMany(QuizAnswer::class);
+        return $this->hasMany(QuizAnswer::class, 'quiz_attempt_id');
     }
 }
