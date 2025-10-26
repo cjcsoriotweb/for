@@ -56,10 +56,10 @@
           </div>
         </div>
         <div class="mt-4">
-          <button
-            class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-emerald-600 hover:to-teal-700">
+          <a href="{{ route('organisateur.recharge.show', $team) }}"
+            class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-emerald-600 hover:to-teal-700 inline-block text-center">
             Recharger le solde
-          </button>
+          </a>
         </div>
       </div>
 
