@@ -121,7 +121,7 @@
           {{-- Submit Button --}}
           <div class="flex justify-end">
             <button type="submit" id="submit-btn" disabled
-              class="px-8 py-3 bg-gray-400 text-white rounded-lg font-medium cursor-not-allowed">
+              class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium cursor-not-allowed hover:from-emerald-600 hover:to-teal-700 transition-all">
               Sélectionnez un montant
             </button>
           </div>
@@ -234,7 +234,7 @@
         submitBtn.textContent = `Payer ${(selectedAmount / 100).toFixed(2)} €`;
       } else {
         submitBtn.disabled = true;
-        submitBtn.className = 'px-8 py-3 bg-gray-400 text-white rounded-lg font-medium cursor-not-allowed';
+        submitBtn.className = 'px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium cursor-not-allowed hover:from-emerald-600 hover:to-teal-700 transition-all';
         submitBtn.textContent = 'Sélectionnez un montant';
       }
     }
