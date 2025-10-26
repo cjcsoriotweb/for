@@ -232,7 +232,7 @@ class OrganisateurService
      *     availableMonths: \Illuminate\Support\Collection
      * }
      */
-    public function getStudentsCostSummary(Formation $formation, ?string $selectedMonth = null): array
+    public function getStudentsCostSummary(Formation $formation, Team $team, ?string $selectedMonth = null): array
     {
         $enrollments = $formation->learners()
             ->withPivot([
@@ -244,6 +244,7 @@ class OrganisateurService
                 'max_score_total',
                 'enrollment_cost',
             ])
+            ->wherePivot('team_id', $team->id)
             ->orderByDesc('formation_user.enrolled_at')
             ->get();
 

@@ -59,6 +59,7 @@ class OrganisateurPageController extends Controller
 
         $summary = $this->organisateurService->getStudentsCostSummary(
             $formation,
+            $team,
             $request->query('month')
         );
 
