@@ -15,110 +15,162 @@ $stats = array_merge($defaultStats, $stats);
 <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
   {{-- Total Students Card --}}
   <div
-    class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
+    class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-gray-100 p-6 shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 dark:from-gray-800 dark:to-gray-900">
     <div
-      class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 transition-opacity group-hover:opacity-100">
+      class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
     </div>
-    <div class="relative flex items-center">
-      <div class="flex-shrink-0">
-        <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-gray-500 to-gray-600 text-white shadow-lg">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-            </path>
-          </svg>
+    <div class="relative flex items-center justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-slate-500 to-gray-600 text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total étudiants</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['total']) }}</p>
+          </div>
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+          <div
+            class="bg-gradient-to-r from-slate-400 to-gray-500 h-1.5 rounded-full transition-all duration-500 w-full">
+          </div>
         </div>
       </div>
-      <div class="ml-5 flex-1">
-        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total élèves</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
-      </div>
     </div>
     <div
-      class="absolute -bottom-1 -right-1 h-16 w-16 rounded-full bg-gradient-to-br from-gray-200/50 to-gray-300/50 dark:from-gray-700/50 dark:to-gray-600/50">
+      class="absolute -bottom-2 -right-2 h-20 w-20 rounded-full bg-gradient-to-br from-slate-200/30 to-gray-300/30 dark:from-slate-700/30 dark:to-gray-600/30 transition-transform duration-300 group-hover:scale-110">
     </div>
   </div>
 
   {{-- Completed Students Card --}}
   <div
-    class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-green-50 to-emerald-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
+    class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 to-green-100 p-6 shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 dark:from-gray-800 dark:to-gray-900">
     <div
-      class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 transition-opacity group-hover:opacity-100">
+      class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
     </div>
-    <div class="relative flex items-center">
-      <div class="flex-shrink-0">
-        <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+    <div class="relative flex items-center justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Terminées</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['completed']) }}</p>
+          </div>
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+          <div
+            class="bg-gradient-to-r from-emerald-400 to-green-500 h-1.5 rounded-full transition-all duration-500 {{ $stats['total'] > 0 ? 'w-[' . round(($stats['completed'] / $stats['total']) * 100) . '%]' : 'w-0' }}">
+          </div>
         </div>
       </div>
-      <div class="ml-5 flex-1">
-        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Terminées</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['completed'] }}</p>
-      </div>
     </div>
     <div
-      class="absolute -bottom-1 -right-1 h-16 w-16 rounded-full bg-gradient-to-br from-green-200/50 to-emerald-300/50 dark:from-green-700/50 dark:to-emerald-600/50">
+      class="absolute -bottom-2 -right-2 h-20 w-20 rounded-full bg-gradient-to-br from-emerald-200/30 to-green-300/30 dark:from-emerald-700/30 dark:to-green-600/30 transition-transform duration-300 group-hover:scale-110">
     </div>
   </div>
 
   {{-- In Progress Students Card --}}
   <div
-    class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-cyan-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
+    class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-100 p-6 shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 dark:from-gray-800 dark:to-gray-900">
     <div
-      class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 opacity-0 transition-opacity group-hover:opacity-100">
+      class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
     </div>
-    <div class="relative flex items-center">
-      <div class="flex-shrink-0">
-        <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 text-white shadow-lg">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
+    <div class="relative flex items-center justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">En cours</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['in_progress']) }}</p>
+          </div>
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+          @php
+          $progressPercent = $stats['total'] > 0 ? round(($stats['in_progress'] / $stats['total']) * 100) : 0;
+          $progressClass = match(true) {
+          $progressPercent >= 75 => 'w-3/4',
+          $progressPercent >= 50 => 'w-1/2',
+          $progressPercent >= 25 => 'w-1/4',
+          default => 'w-0'
+          };
+          @endphp
+          <div
+            class="bg-gradient-to-r from-blue-400 to-cyan-500 h-1.5 rounded-full transition-all duration-500 {{ $progressClass }}">
+          </div>
         </div>
       </div>
-      <div class="ml-5 flex-1">
-        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">En cours</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['in_progress'] }}</p>
-      </div>
     </div>
     <div
-      class="absolute -bottom-1 -right-1 h-16 w-16 rounded-full bg-gradient-to-br from-blue-200/50 to-cyan-300/50 dark:from-blue-700/50 dark:to-cyan-600/50">
+      class="absolute -bottom-2 -right-2 h-20 w-20 rounded-full bg-gradient-to-br from-blue-200/30 to-cyan-300/30 dark:from-blue-700/30 dark:to-cyan-600/30 transition-transform duration-300 group-hover:scale-110">
     </div>
   </div>
 
   {{-- Monthly Cost Card --}}
   @if($type === 'students' && isset($stats['monthly_cost']))
   <a href="{{ route('organisateur.formations.students.cost', [$team, $formation]) }}"
-    class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-50 to-pink-100 p-6 shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 dark:from-gray-800 dark:to-gray-900 dark:focus:ring-offset-gray-900">
+    class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-50 to-purple-100 p-6 shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 dark:from-gray-800 dark:to-gray-900 dark:focus:ring-offset-gray-900">
     <div
-      class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 transition-opacity group-hover:opacity-100">
+      class="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-purple-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
     </div>
-    <div class="relative flex items-center">
-      <div class="flex-shrink-0">
-        <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-lg">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+    <div class="relative flex items-center justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Coût mensuel</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['monthly_cost'], 0, ',',
+              ' ') }} €</p>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>{{ $stats['monthly_enrollments'] }} inscription{{ $stats['monthly_enrollments'] > 1 ? 's' : ''
+              }}</span>
+            <span>Restant: {{ number_format($team->money, 0, ',', ' ') }} €</span>
+          </div>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+            @php
+            $remainingPercent = $team->money > 0 ? round((($team->money - $stats['monthly_cost']) / $team->money) * 100)
+            : 0;
+            $remainingClass = match(true) {
+            $remainingPercent >= 75 => 'w-3/4',
+            $remainingPercent >= 50 => 'w-1/2',
+            $remainingPercent >= 25 => 'w-1/4',
+            default => 'w-0'
+            };
+            @endphp
+            <div
+              class="bg-gradient-to-r from-violet-400 to-purple-500 h-1.5 rounded-full transition-all duration-500 {{ $remainingClass }}">
+            </div>
+          </div>
         </div>
       </div>
-      <div class="ml-5 flex-1">
-        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Coût ce mois-ci</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['monthly_cost'], 0, ',', '
-          ') }} €</p>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ $stats['monthly_enrollments'] }} inscription{{
-          $stats['monthly_enrollments'] > 1 ? 's' : '' }}.</p>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Restant {{ $team->money }}€.</p>
-      </div>
     </div>
     <div
-      class="absolute -bottom-1 -right-1 h-16 w-16 rounded-full bg-gradient-to-br from-purple-200/50 to-pink-300/50 transition-transform duration-200 group-hover:scale-110 dark:from-purple-700/50 dark:to-pink-600/50">
+      class="absolute -bottom-2 -right-2 h-20 w-20 rounded-full bg-gradient-to-br from-violet-200/30 to-purple-300/30 dark:from-violet-700/30 dark:to-purple-600/30 transition-transform duration-300 group-hover:scale-110">
     </div>
   </a>
   @endif
