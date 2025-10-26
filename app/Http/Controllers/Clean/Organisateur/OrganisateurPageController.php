@@ -222,6 +222,24 @@ class OrganisateurPageController extends Controller
             ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
             ->first();
 
+        if ($studentData) {
+            foreach (['enrolled_at', 'last_seen_at', 'completed_at'] as $field) {
+                $studentData->pivot->{$field} = Carbon::make($studentData->pivot->{$field});
+            }
+        }
+
+        if ($studentData) {
+            foreach (['enrolled_at', 'last_seen_at', 'completed_at'] as $field) {
+                $studentData->pivot->{$field} = Carbon::make($studentData->pivot->{$field});
+            }
+        }
+
+        if ($studentData) {
+            foreach (['enrolled_at', 'last_seen_at', 'completed_at'] as $field) {
+                $studentData->pivot->{$field} = Carbon::make($studentData->pivot->{$field});
+            }
+        }
+
         // Récupérer toutes les leçons de la formation
         $lessons = $formation->lessons()
             ->with(['chapter' => function ($query) {

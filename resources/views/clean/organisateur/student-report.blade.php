@@ -39,8 +39,17 @@
 
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Rapport détaillé</h1>
-          <p class="mt-2 text-gray-600 dark:text-gray-400">{{ $student->name }} — {{ $student->email }}</p>
+          @php
+          $studentDisplayName = $student->name ?? $student->email;
+          $showStudentEmail = $student->email && (! $student->name || strcasecmp($student->name, $student->email) !== 0);
+          @endphp
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Rapport detaille</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            {{ $studentDisplayName }}
+            @if($showStudentEmail)
+            <span class="block text-sm text-gray-500 dark:text-gray-400">{{ $student->email }}</span>
+            @endif
+          </p>
         </div>
 
         <div class="flex flex-wrap gap-3">
