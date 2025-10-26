@@ -15,4 +15,12 @@ class QuizChoice extends Model
         'choice_text',
         'is_correct',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'question_id' => 'integer',
+            'is_correct' => 'boolean',
+        ];
+    }
 }
