@@ -49,7 +49,8 @@ class CleanupQuizAttempts extends Command
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('Erreur lors du nettoyage : ' . $e->getMessage());
+            $this->error('Erreur lors du nettoyage : '.$e->getMessage());
+
             return self::FAILURE;
         }
     }

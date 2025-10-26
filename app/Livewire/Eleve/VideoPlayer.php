@@ -7,26 +7,34 @@ use App\Models\Formation;
 use App\Models\Lesson;
 use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class VideoPlayer extends Component
 {
     public $team;
+
     public $formation;
+
     public $chapter;
+
     public $lesson;
+
     public $lessonContent;
 
     // Video tracking properties
     public $currentTime = 0;
+
     public $duration = 0;
+
     public $watchedPercentage = 0;
+
     public $videoCompleted = false;
 
     // Notification properties
     public $lastSavedTime = null;
+
     public $showSaveNotification = false;
+
     public $showCompletionNotification = false;
 
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, $lessonContent)
@@ -43,7 +51,7 @@ class VideoPlayer extends Component
 
     private function loadExistingProgress()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 
@@ -62,7 +70,7 @@ class VideoPlayer extends Component
 
     private function ensureLessonStarted()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 
@@ -73,7 +81,7 @@ class VideoPlayer extends Component
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$lessonUser) {
+        if (! $lessonUser) {
             // Create lesson_user record with in_progress status
             $this->lesson->learners()->attach($user->id, [
                 'watched_seconds' => 0,
@@ -116,12 +124,12 @@ class VideoPlayer extends Component
 
     private function saveProgress($watchedSeconds, $completed = false)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 
-        list($minutes, $seconds) = explode(':', $watchedSeconds);
-        $totalSeconds = ((int)$minutes * 60) + (int)$seconds;
+        [$minutes, $seconds] = explode(':', $watchedSeconds);
+        $totalSeconds = ((int) $minutes * 60) + (int) $seconds;
 
         $user = Auth::user();
 
@@ -130,7 +138,7 @@ class VideoPlayer extends Component
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$lessonUser) {
+        if (! $lessonUser) {
             // Create new record if it doesn't exist
             $this->lesson->learners()->attach($user->id, [
                 'watched_seconds' => $watchedSeconds,
@@ -153,7 +161,7 @@ class VideoPlayer extends Component
 
     private function markLessonAsCompleted()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 
@@ -229,7 +237,7 @@ class VideoPlayer extends Component
                     ->with(['lessons' => function ($lessonQuery) {
                         $lessonQuery->orderBy('position');
                     }]);
-            }
+            },
         ]);
 
         $nextLessonId = null;
@@ -242,7 +250,7 @@ class VideoPlayer extends Component
                     ->where('user_id', $user->id)
                     ->first();
 
-                if (!$lessonProgress || $lessonProgress->pivot->status !== 'completed') {
+                if (! $lessonProgress || $lessonProgress->pivot->status !== 'completed') {
                     // Cette leçon n'est pas terminée, c'est la suivante
                     $nextLessonId = $lesson->id;
                     break 2; // Sortir des deux boucles
@@ -262,7 +270,7 @@ class VideoPlayer extends Component
     protected $listeners = [
         'videoTimeUpdate' => 'handleVideoTimeUpdate',
         'videoEnded' => 'handleVideoEnded',
-        'hide-save-notification' => 'hideSaveNotification'
+        'hide-save-notification' => 'hideSaveNotification',
     ];
 
     public function hideSaveNotification()

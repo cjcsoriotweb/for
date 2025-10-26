@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Clean\Account\AccountPageController;
 use App\Http\Controllers\Clean\Eleve\ElevePageController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +18,6 @@ Route::prefix('eleve')
             Route::get('/{team}/{formation}/congratulation', [ElevePageController::class, 'formationCongratulation'])->name('congratulation');
             Route::post('/{team}/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('enroll');
         });
-
-
 
         // Lesson routes - most specific first
         Route::prefix('lesson')->name('lesson.')->group(function () {

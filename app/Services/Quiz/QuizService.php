@@ -7,7 +7,6 @@ use App\Models\Quiz;
 use App\Models\QuizAnswer;
 use App\Models\QuizAttempt;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class QuizService
 {

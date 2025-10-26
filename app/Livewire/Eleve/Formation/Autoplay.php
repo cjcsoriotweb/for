@@ -3,15 +3,18 @@
 namespace App\Livewire\Eleve\Formation;
 
 use App\Models\Formation;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Autoplay extends Component
 {
     public $formation;
+
     public $currentLesson;
+
     public $autoplay = false;
+
     public $countdown = 0;
+
     public $showCountdown = false;
 
     public function autoplayOn()
@@ -75,7 +78,7 @@ class Autoplay extends Component
             $team,
             $this->formation,
             $this->currentLesson->chapter,
-            $this->currentLesson
+            $this->currentLesson,
         ]);
     }
 

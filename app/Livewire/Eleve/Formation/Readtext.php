@@ -12,17 +12,24 @@ use Livewire\Component;
 class Readtext extends Component
 {
     public $elapsedTime = 0;
+
     public $requiredTime = 0;
+
     public $canProceed = false;
+
     public $startTime;
+
     public $isActive = false;
+
     public $watchedSeconds = 0;
 
     public Team $team;
+
     public Lesson $lesson;
+
     public Formation $formation;
 
-    public function mount($requiredTime = 0, Team $team, Formation $formation, Lesson $lesson,)
+    public function mount($requiredTime, Team $team, Formation $formation, Lesson $lesson)
     {
         // Convert estimated_read_time from minutes to seconds
         $this->requiredTime = $requiredTime * 60;
@@ -47,7 +54,7 @@ class Readtext extends Component
 
     private function loadExistingProgress()
     {
-        if (!Auth::check() || !$this->lesson) {
+        if (! Auth::check() || ! $this->lesson) {
             return;
         }
 
@@ -65,14 +72,14 @@ class Readtext extends Component
             Log::info('Loaded existing lesson reading progress', [
                 'lesson_id' => $this->lesson->id,
                 'user_id' => $user->id,
-                'watched_seconds' => $this->watchedSeconds
+                'watched_seconds' => $this->watchedSeconds,
             ]);
         }
     }
 
     private function ensureLessonStarted()
     {
-        if (!Auth::check() || !$this->lesson) {
+        if (! Auth::check() || ! $this->lesson) {
             return;
         }
 
@@ -83,7 +90,7 @@ class Readtext extends Component
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$lessonUser) {
+        if (! $lessonUser) {
             // Create lesson_user record with in_progress status
             $this->lesson->learners()->attach($user->id, [
                 'watched_seconds' => 0,
@@ -94,14 +101,14 @@ class Readtext extends Component
             Log::info('Lesson reading started for user', [
                 'lesson_id' => $this->lesson->id,
                 'user_id' => $user->id,
-                'status' => 'in_progress'
+                'status' => 'in_progress',
             ]);
         }
     }
 
     public function saveProgress()
     {
-        if (!Auth::check() || !$this->lesson) {
+        if (! Auth::check() || ! $this->lesson) {
             return;
         }
 
@@ -142,7 +149,7 @@ class Readtext extends Component
 
     private function markLessonAsCompleted()
     {
-        if (!Auth::check() || !$this->lesson) {
+        if (! Auth::check() || ! $this->lesson) {
             return;
         }
 
@@ -161,7 +168,7 @@ class Readtext extends Component
         Log::info('Lesson reading completed', [
             'lesson_id' => $this->lesson->id,
             'user_id' => $user->id,
-            'total_watched_seconds' => $this->elapsedTime
+            'total_watched_seconds' => $this->elapsedTime,
         ]);
     }
 
@@ -218,7 +225,7 @@ class Readtext extends Component
                     ->with(['lessons' => function ($lessonQuery) {
                         $lessonQuery->orderBy('position');
                     }]);
-            }
+            },
         ]);
 
         $nextLessonId = null;
@@ -231,7 +238,7 @@ class Readtext extends Component
                     ->where('user_id', $user->id)
                     ->first();
 
-                if (!$lessonProgress || $lessonProgress->pivot->status !== 'completed') {
+                if (! $lessonProgress || $lessonProgress->pivot->status !== 'completed') {
                     // Cette leçon n'est pas terminée, c'est la suivante
                     $nextLessonId = $lesson->id;
                     break 2; // Sortir des deux boucles
@@ -271,7 +278,7 @@ class Readtext extends Component
 
     public function getProgressPercentageProperty()
     {
-        if (!$this->startTime || $this->requiredTime <= 0) {
+        if (! $this->startTime || $this->requiredTime <= 0) {
             return 0;
         }
 

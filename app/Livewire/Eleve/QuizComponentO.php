@@ -16,15 +16,22 @@ use Livewire\Component;
 
 class QuizComponentO extends Component
 {
-    private const STEP_INIT    = 0;
+    private const STEP_INIT = 0;
+
     private const STEP_LOADING = 1;
+
     private const STEP_RUNNING = 2;
-    private const STEP_REVIEW  = 3;
+
+    private const STEP_REVIEW = 3;
 
     public Team $team;
+
     public Formation $formation;
+
     public Chapter $chapter;
+
     public Lesson $lesson;
+
     public Quiz $quiz;
 
     /** @var Collection<int,\App\Models\QuizQuestion> */
@@ -33,8 +40,11 @@ class QuizComponentO extends Component
     public int $currentQuestionStep = 0;
 
     public int $step = self::STEP_INIT;
+
     public int $countdown = 10;
+
     public int $countdownPast = 0;
+
     public int $heartbeat = 0;
 
     /**
@@ -44,23 +54,22 @@ class QuizComponentO extends Component
      */
     public array $reponse = [];
 
-
     public function leave()
     {
         $this->redirectRoute('eleve.formation.show', [$this->team, $this->formation]);
     }
+
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson): void
     {
-        $this->team      = $team;
+        $this->team = $team;
         $this->formation = $formation;
-        $this->chapter   = $chapter;
-        $this->lesson    = $lesson;
+        $this->chapter = $chapter;
+        $this->lesson = $lesson;
 
         $user = Auth::user();
-        if (!$this->studentFormationService()->isEnrolledInFormation($user, $formation, $team)) {
+        if (! $this->studentFormationService()->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
-
 
         if ($lesson->lessonable_type !== Quiz::class) {
             abort(404, 'Quiz non trouvé.');
@@ -89,8 +98,8 @@ class QuizComponentO extends Component
             self::STEP_RUNNING => $this->countdown >= 1
                 ? view('livewire.eleve.quiz.question')
                 : view('livewire.eleve.quiz.timeleft'),
-            self::STEP_REVIEW  => view('livewire.eleve.quiz.reponse'),
-            default            => view('livewire.eleve.quiz.init-quiz'),
+            self::STEP_REVIEW => view('livewire.eleve.quiz.reponse'),
+            default => view('livewire.eleve.quiz.init-quiz'),
         };
     }
 
@@ -116,18 +125,18 @@ class QuizComponentO extends Component
             ?? null;
 
         // Fallback ultra-sûr via la relation, si elle existe
-        if (!$questionId && method_exists($choice, 'question')) {
+        if (! $questionId && method_exists($choice, 'question')) {
             $questionId = (int) optional($choice->question)->getAttribute('id');
         }
 
-        if (!$questionId) {
+        if (! $questionId) {
             // Rien à faire si on n’a pas pu retrouver la question
             return;
         }
 
         // Retrouver la question côté collection
         $q = $this->questions->firstWhere('id', (int) $questionId);
-        if (!$q) {
+        if (! $q) {
             return;
         }
 
@@ -135,7 +144,9 @@ class QuizComponentO extends Component
 
         if ($type === 'multiple_choice') {
             $bucket = $this->reponse[$questionId] ?? [];
-            if (!is_array($bucket)) $bucket = [];
+            if (! is_array($bucket)) {
+                $bucket = [];
+            }
 
             // toggle
             if (in_array($choiceId, $bucket, true)) {
@@ -155,17 +166,20 @@ class QuizComponentO extends Component
         }
     }
 
-
     /** Désélection : enlève un seul choix en multiple, ou vide en single */
     public function unSelectReponse(int $questionId, ?int $choiceId = null): void
     {
         $q = $this->questions->firstWhere('id', (int) $questionId);
-        if (!$q) return;
+        if (! $q) {
+            return;
+        }
 
         $type = $this->normalizeType($q->type);
 
         if ($type === 'multiple_choice') {
-            if (!isset($this->reponse[$questionId]) || !is_array($this->reponse[$questionId])) return;
+            if (! isset($this->reponse[$questionId]) || ! is_array($this->reponse[$questionId])) {
+                return;
+            }
 
             if ($choiceId !== null) {
                 $this->reponse[$questionId] = array_values(array_diff($this->reponse[$questionId], [$choiceId]));
@@ -215,10 +229,12 @@ class QuizComponentO extends Component
     {
         if ($int === self::STEP_RUNNING && $this->step !== self::STEP_RUNNING) {
             $this->launchQuiz(100);
+
             return;
         }
         if ($int === self::STEP_REVIEW && $this->step !== self::STEP_REVIEW) {
             $this->validateQuiz();
+
             return;
         }
         $this->step = $int;
@@ -233,11 +249,11 @@ class QuizComponentO extends Component
             $qid = (int) $q->id;
             $type = $this->normalizeType($q->type);
 
-            $correctIds = $q->quizChoices->where('is_correct', true)->pluck('id')->map(fn($v) => (int)$v)->values()->all();
+            $correctIds = $q->quizChoices->where('is_correct', true)->pluck('id')->map(fn ($v) => (int) $v)->values()->all();
 
             if ($type === 'multiple_choice') {
                 $selected = collect($this->reponse[$qid] ?? [])
-                    ->map(fn($v) => (int)$v)
+                    ->map(fn ($v) => (int) $v)
                     ->unique()
                     ->values()
                     ->all();
@@ -247,26 +263,26 @@ class QuizComponentO extends Component
                 $expected = $correctIds;
                 sort($expected);
 
-                if (!empty($expected) && $selected === $expected) {
+                if (! empty($expected) && $selected === $expected) {
                     $score++;
                 }
             } else {
-                $selected = isset($this->reponse[$qid]) ? (int)$this->reponse[$qid] : null;
+                $selected = isset($this->reponse[$qid]) ? (int) $this->reponse[$qid] : null;
 
                 // single : il faut exactement le seul bon id
-                if (count($correctIds) === 1 && $selected === (int)$correctIds[0]) {
+                if (count($correctIds) === 1 && $selected === (int) $correctIds[0]) {
                     $score++;
                 }
             }
         }
 
         QuizAttempt::create([
-            'quiz_id'          => $this->quiz->id,
-            'user_id'          => Auth::id(),
-            'score'            => $score,
+            'quiz_id' => $this->quiz->id,
+            'user_id' => Auth::id(),
+            'score' => $score,
             'duration_seconds' => $this->countdownPast,
-            'submitted_at'     => now(),
-            'started_at'       => now()->subSeconds($this->countdownPast),
+            'submitted_at' => now(),
+            'started_at' => now()->subSeconds($this->countdownPast),
         ]);
 
         $this->lesson->learners()->updateExistingPivot(Auth::id(), [
@@ -293,22 +309,31 @@ class QuizComponentO extends Component
 
     public function isSelected(int $choiceId, int $questionId): bool
     {
-        if (!isset($this->reponse[$questionId])) return false;
+        if (! isset($this->reponse[$questionId])) {
+            return false;
+        }
 
         $value = $this->reponse[$questionId];
 
         return is_array($value)
             ? in_array($choiceId, $value, true)
-            : ((int)$value === (int)$choiceId);
+            : ((int) $value === (int) $choiceId);
     }
 
     private function normalizeType(?string $type): string
     {
         // tolère la coquille "multiple_choise"
-        $t = strtolower(trim((string)$type));
-        if ($t === 'multiple_choise' || $t === 'multiple-choice') return 'multiple_choice';
-        if ($t === 'multiple_choice') return 'multiple_choice';
-        if ($t === 'true_false' || $t === 'true-false' || $t === 'boolean' || $t === 'single_choice') return 'true_false';
+        $t = strtolower(trim((string) $type));
+        if ($t === 'multiple_choise' || $t === 'multiple-choice') {
+            return 'multiple_choice';
+        }
+        if ($t === 'multiple_choice') {
+            return 'multiple_choice';
+        }
+        if ($t === 'true_false' || $t === 'true-false' || $t === 'boolean' || $t === 'single_choice') {
+            return 'true_false';
+        }
+
         // défaut : single
         return 'true_false';
     }
@@ -331,7 +356,7 @@ class QuizComponentO extends Component
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$lessonUser) {
+        if (! $lessonUser) {
             // Create lesson_user record with in_progress status
             $this->lesson->learners()->attach($user->id, [
                 'status' => 'in_progress',
@@ -399,7 +424,7 @@ class QuizComponentO extends Component
                     ->with(['lessons' => function ($lessonQuery) {
                         $lessonQuery->orderBy('position');
                     }]);
-            }
+            },
         ]);
 
         $nextLessonId = null;
@@ -412,7 +437,7 @@ class QuizComponentO extends Component
                     ->where('user_id', $user->id)
                     ->first();
 
-                if (!$lessonProgress || $lessonProgress->pivot->status !== 'completed') {
+                if (! $lessonProgress || $lessonProgress->pivot->status !== 'completed') {
                     // Cette leçon n'est pas terminée, c'est la suivante
                     $nextLessonId = $lesson->id;
                     break 2; // Sortir des deux boucles

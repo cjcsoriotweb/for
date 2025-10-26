@@ -3,8 +3,8 @@
 use App\Http\Controllers\Clean\Admin\AdminPageController;
 use App\Http\Controllers\Clean\Admin\Configuration\AdminConfigurationController;
 use App\Http\Controllers\Clean\Admin\Formations\AdminFormationController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('administrateur')
     ->name('application.admin.')

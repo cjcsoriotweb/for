@@ -22,7 +22,6 @@ class ElevePageController extends Controller
         private readonly StudentFormationService $studentFormationService,
     ) {}
 
-
     public function home(Team $team)
     {
         $user = Auth::user();
@@ -44,6 +43,7 @@ class ElevePageController extends Controller
                 'max_score_total' => 0,
             ];
             $formation->is_completed = $this->studentFormationService->isFormationCompleted($user, $formation);
+
             return $formation;
         });
 
@@ -573,7 +573,7 @@ class ElevePageController extends Controller
         // Rediriger vers la formation si le quiz est réussi
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de ' . round($score, 1) . '%.');
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de '.round($score, 1).'%.');
         }
 
         // Retourner seulement les données nécessaires pour les quiz échoués (pas de vue complète)
@@ -680,7 +680,7 @@ class ElevePageController extends Controller
                     ->with(['lessons' => function ($lessonQuery) {
                         $lessonQuery->orderBy('position');
                     }]);
-            }
+            },
         ]);
 
         $nextLessonId = null;
@@ -693,7 +693,7 @@ class ElevePageController extends Controller
                     ->where('user_id', $user->id)
                     ->first();
 
-                if (!$lessonProgress || $lessonProgress->pivot->status !== 'completed') {
+                if (! $lessonProgress || $lessonProgress->pivot->status !== 'completed') {
                     // Cette leçon n'est pas terminée, c'est la suivante
                     $nextLessonId = $lesson->id;
                     break 2; // Sortir des deux boucles
