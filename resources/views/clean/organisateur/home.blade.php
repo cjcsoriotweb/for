@@ -3,7 +3,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Formations</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Gerez les formations de votre equipe</p>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Gerez les formations de votre equipe.</p>
     </div>
     @if($formations->count() > 0)
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

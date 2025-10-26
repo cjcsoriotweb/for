@@ -7,7 +7,7 @@
     @else
     <x-eleve.formation-header :formation="$formationWithProgress" :progress="$progress" />
 
-    <x-eleve.formation-chapters :formation="$formationWithProgress" />
+    <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
 
     <x-eleve.formation-actions :team="$team" :formation="$formationWithProgress" :progress="$progress" />
     @endif

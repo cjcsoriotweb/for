@@ -172,6 +172,9 @@
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {{ $monthlyEnrollmentsCount }} inscription{{ $monthlyEnrollmentsCount > 1 ? 's' : '' }}.
             </p>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Restant {{ $team->money }}€.
+            </p>
           </div>
         </div>
         <div
@@ -378,4 +381,3 @@
     @endif
   </div>
 </x-organisateur-layout>
-

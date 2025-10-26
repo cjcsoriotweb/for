@@ -1,4 +1,4 @@
-@props(['formation'])
+@props(['formation', 'team' => null])
 
 <div
   class="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700">
@@ -31,10 +31,12 @@
     $currentLesson = $studentFormationService->getCurrentLesson($formation,
     auth()->user()); @endphp @if($currentLesson)
 
-    <div class="mb-5  ">
-
-      @livewire('eleve.formation.autoplay',
-      ['formation'=>$formation,'currentLesson'=>$currentLesson])
+    <div class="mb-5">
+      @livewire('eleve.formation.autoplay', [
+          'formation' => $formation,
+          'currentLesson' => $currentLesson,
+          'team' => $team ?? auth()->user()?->currentTeam,
+      ])
     </div>
 
     @endif

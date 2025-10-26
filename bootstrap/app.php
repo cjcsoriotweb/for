@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(\App\Http\Middleware\TrackUserActivity::class);
+        $middleware->alias([
+            'organisateur' => \App\Http\Middleware\EnsureOrganisateurAccess::class,
+        ]);
     })
     ->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions) {
         // Policies / Gate::authorize() -> AuthorizationException (403)

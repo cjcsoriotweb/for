@@ -9,7 +9,6 @@ use App\Actions\Jetstream\DeleteUser;
 use App\Actions\Jetstream\InviteTeamMember;
 use App\Actions\Jetstream\RemoveTeamMember;
 use App\Actions\Jetstream\UpdateTeamName;
-use Illuminate\Console\Application;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
 
@@ -47,18 +46,30 @@ class JetstreamServiceProvider extends ServiceProvider
         Jetstream::defaultApiTokenPermissions(['read']);
 
         Jetstream::role('admin', 'Admin', [
-            'read', 'create', 'update',
+            'read',
+            'create',
+            'update',
             'admin',
             'configuration',
             'addTeamMember',
-        ])->description('Accès complet à l’équipe.');
+            'organisateur:access',
+            'organisateur:students.view',
+            'organisateur:reports.view',
+            'organisateur:reports.download',
+        ])->description('Acces complet a l\'equipe.');
 
         Jetstream::role('manager', 'Organisateur', [
-            'read', 'create', 'update',
-        ])->description('Acceder aux suivis d\'éleve.');
+            'read',
+            'create',
+            'update',
+            'organisateur:access',
+            'organisateur:students.view',
+            'organisateur:reports.view',
+            'organisateur:reports.download',
+        ])->description('Acces aux suivis eleves et rapports.');
 
         Jetstream::role('eleve', 'Apprentis', [
             'read',
-        ])->description('Peut consulter les contenus de l’organisme.');
+        ])->description('Peut consulter les contenus de l\'organisme.');
     }
 }

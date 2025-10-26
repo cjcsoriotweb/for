@@ -1,7 +1,7 @@
 <div class="flex w-full items-center justify-between gap-3">
   {{-- Bouton Continuer vers la leçon --}}
   <a href="{{ route('eleve.lesson.show', [
-        auth()->user()->currentTeam ?? $formation->teams()->first(),
+        $team,
         $formation,
         $currentLesson->chapter,
         $currentLesson

@@ -3,6 +3,7 @@
 namespace App\Livewire\Eleve\Formation;
 
 use App\Models\Formation;
+use App\Models\Team;
 use Livewire\Component;
 
 class Autoplay extends Component
@@ -10,6 +11,8 @@ class Autoplay extends Component
     public $formation;
 
     public $currentLesson;
+
+    public $team;
 
     public $autoplay = false;
 
@@ -31,10 +34,11 @@ class Autoplay extends Component
         $this->resetCountdown();
     }
 
-    public function mount(Formation $formation, $currentLesson)
+    public function mount(Formation $formation, $currentLesson, ?Team $team = null)
     {
         $this->formation = $formation;
         $this->currentLesson = $currentLesson;
+        $this->team = $team ?? auth()->user()?->currentTeam ?? $this->formation->teams()->first();
 
         if (session()->has('autoplay')) {
             $this->autoplay = session()->get('autoplay');
@@ -71,8 +75,7 @@ class Autoplay extends Component
         $this->resetCountdown();
         $this->dispatch('autoplayRedirect');
 
-        // Get team from current user or formation
-        $team = Auth()->user()->currentTeam ?? $this->formation->teams()->first();
+        $team = $this->team ?? auth()->user()?->currentTeam ?? $this->formation->teams()->first();
 
         return redirect()->route('eleve.lesson.show', [
             $team,
