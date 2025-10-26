@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Stripe;
 
 class RechargeController extends Controller
 {
@@ -18,7 +18,7 @@ class RechargeController extends Controller
 
     public function show(Team $team)
     {
-        if (! Auth::user()->belongsToTeam($team) && !Auth::user()->superadmin) {
+        if (! Auth::user()->belongsToTeam($team) && ! Auth::user()->superadmin) {
             return redirect()->route('organisateur.index', $team)
                 ->with('error', 'Accès non autorisé.');
         }
@@ -28,7 +28,7 @@ class RechargeController extends Controller
 
     public function createCheckoutSession(Request $request, Team $team)
     {
-        if (! Auth::user()->belongsToTeam($team)) {
+        if (! Auth::user()->belongsToTeam($team) && ! Auth::user()->superadmin) {
             return response()->json(['error' => 'Accès non autorisé.'], 403);
         }
 
@@ -43,15 +43,15 @@ class RechargeController extends Controller
                     'price_data' => [
                         'currency' => 'eur',
                         'product_data' => [
-                            'name' => 'Recharge solde - ' . $team->name,
-                            'description' => 'Recharge du solde de l\'équipe ' . $team->name,
+                            'name' => 'Recharge solde - '.$team->name,
+                            'description' => 'Recharge du solde de l\'équipe '.$team->name,
                         ],
                         'unit_amount' => $request->amount,
                     ],
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('organisateur.recharge.success', $team) . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => route('organisateur.recharge.success', $team).'?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('organisateur.recharge.show', $team),
                 'metadata' => [
                     'team_id' => $team->id,
@@ -60,8 +60,16 @@ class RechargeController extends Controller
             ]);
 
             return response()->json(['url' => $session->url]);
+        } catch (\Stripe\Exception\AuthenticationException $e) {
+            return response()->json(['error' => 'Erreur d\'authentification Stripe. Vérifiez vos clés API.'], 500);
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            return response()->json(['error' => 'Requête Stripe invalide: '.$e->getError()->message], 400);
+        } catch (\Stripe\Exception\ApiConnectionException $e) {
+            return response()->json(['error' => 'Erreur de connexion à Stripe. Vérifiez votre connexion internet.'], 500);
+        } catch (\Stripe\Exception\RateLimitException $e) {
+            return response()->json(['error' => 'Trop de requêtes vers Stripe. Veuillez réessayer dans quelques minutes.'], 429);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Erreur lors de la création de la session de paiement.'], 500);
+            return response()->json(['error' => 'Erreur lors de la création de la session de paiement: '.$e->getMessage()], 500);
         }
     }
 

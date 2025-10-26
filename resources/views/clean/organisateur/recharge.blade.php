@@ -184,6 +184,8 @@
 
   @push('scripts')
   <script>
+    // Stripe public key for frontend usage
+    const stripePublicKey = '{{ config("services.stripe.public_key") }}';
     let selectedAmount = null;
 
     // Amount button handlers
