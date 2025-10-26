@@ -27,7 +27,7 @@ class TeamService
         if (Auth::user()->superadmin) {
             return redirect()->route('application.admin.index', ['team' => $team, 'team_name' => $this->str_slug($team->name)]);
         } else {
-            return redirect()->route('eleve.index', ['team' => $team, 'team_name' => $this->str_slug($team->name)]);
+            return redirect()->route('eleve.index', ['team' => $team]);
         }
 
 

@@ -22,6 +22,7 @@ class ElevePageController extends Controller
         private readonly StudentFormationService $studentFormationService,
     ) {}
 
+
     public function home(Team $team)
     {
         $user = Auth::user();

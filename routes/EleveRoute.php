@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Clean\Account\AccountPageController;
 use App\Http\Controllers\Clean\Eleve\ElevePageController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,7 +9,6 @@ Route::prefix('eleve')
     ->middleware(['auth'])
     ->scopeBindings()
     ->group(function () {
-
         // Main routes - ordered by specificity (most specific first)
         Route::get('/{team}', [ElevePageController::class, 'home'])->name('index');
 
