@@ -43,144 +43,78 @@
             </p>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <!-- Add Organization Card - Premium Design -->
-            <div class="group">
-              <div
-                class="w-full relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-50 via-white to-blue-50 p-8 shadow-lg ring-2 ring-slate-200/60 dark:from-slate-800/50 dark:via-slate-700/50 dark:to-slate-600/50 dark:ring-slate-600/40 transition-all duration-700 hover:shadow-2xl hover:ring-blue-300/50 dark:hover:ring-blue-400/50 hover:scale-[1.02] cursor-pointer">
-                <!-- Multiple animated background layers -->
-                <div
-                  class="absolute inset-0 bg-gradient-to-br from-blue-100/80 via-indigo-100/60 to-purple-100/80 opacity-0 transition-all duration-700 group-hover:opacity-100 dark:from-blue-900/30 dark:via-indigo-900/20 dark:to-purple-900/30">
-                </div>
-                <div
-                  class="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-50/30 to-purple-50/40 opacity-0 transition-all duration-500 group-hover:opacity-100 dark:via-blue-900/10 dark:to-purple-900/15">
-                </div>
 
-                <!-- Animated particles effect -->
-                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                  <div class="absolute top-4 left-4 h-2 w-2 bg-blue-400 rounded-full animate-pulse"></div>
-                  <div
-                    class="absolute top-8 right-6 h-1.5 w-1.5 bg-purple-400 rounded-full animate-pulse animation-delay-300">
-                  </div>
-                  <div
-                    class="absolute bottom-6 left-8 h-1 w-1 bg-indigo-400 rounded-full animate-pulse animation-delay-600">
-                  </div>
-                  <div
-                    class="absolute bottom-4 right-4 h-2.5 w-2.5 bg-blue-300 rounded-full animate-pulse animation-delay-900">
-                  </div>
-                </div>
-
-                <div class="relative z-10 flex flex-col items-center justify-center h-full min-h-[200px]">
-                  <!-- Premium Plus icon container -->
-                  <div class="mb-6 relative">
-                    <!-- Main icon with multiple layers -->
-                    <div
-                      class="relative flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 shadow-2xl ring-4 ring-white/30 dark:ring-slate-800/40 transition-all duration-700 group-hover:scale-110 group-hover:shadow-2xl group-hover:ring-blue-200/50 dark:group-hover:ring-blue-700/50">
-                      <!-- Inner glow effect -->
-                      <div
-                        class="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                      </div>
-                      <!-- Main icon -->
-                      <span
-                        class="material-symbols-outlined text-5xl text-white drop-shadow-lg relative z-10">add</span>
-                    </div>
-
-                    <!-- Orbiting ring effect -->
-                    <div
-                      class="absolute inset-0 rounded-3xl ring-2 ring-blue-400/30 scale-100 group-hover:scale-125 opacity-0 group-hover:opacity-100 transition-all duration-700">
-                    </div>
-                    <div
-                      class="absolute inset-0 rounded-3xl ring-1 ring-purple-400/20 scale-100 group-hover:scale-150 opacity-0 group-hover:opacity-100 transition-all duration-1000">
-                    </div>
-
-                    <!-- Corner sparkles -->
-                    <div
-                      class="absolute -top-1 -right-1 h-3 w-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse">
-                    </div>
-                    <div
-                      class="absolute -bottom-1 -left-1 h-2 w-2 bg-blue-300 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse animation-delay-200">
-                    </div>
-                  </div>
-
-                  <!-- Enhanced bottom accent line -->
-                  <div
-                    class="absolute bottom-0 left-0 h-1.5 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 transform scale-x-0 transition-transform duration-700 group-hover:scale-x-100 origin-left">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            @foreach ($organisations as $application)
-            <x-account.application.switch :application="$application" />
-            @endforeach
-          </div>
+          @foreach ($organisations as $application)
+          <x-account.application.switch :application="$application" />
+          @endforeach
         </div>
-        @else
-        <!-- Empty State -->
-        <div class="mb-16">
+      </div>
+      @else
+      <!-- Empty State -->
+      <div class="mb-16">
+        <div
+          class="mx-auto max-w-md rounded-2xl bg-white p-12 text-center shadow-lg ring-1 ring-slate-200 dark:bg-slate-800/50 dark:ring-slate-700">
           <div
-            class="mx-auto max-w-md rounded-2xl bg-white p-12 text-center shadow-lg ring-1 ring-slate-200 dark:bg-slate-800/50 dark:ring-slate-700">
-            <div
-              class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20">
-              <span class="material-symbols-outlined text-2xl text-amber-600 dark:text-amber-400">school</span>
+            class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20">
+            <span class="material-symbols-outlined text-2xl text-amber-600 dark:text-amber-400">school</span>
+          </div>
+          <h3 class="mb-4 text-xl font-semibold text-slate-900 dark:text-white">
+            {{ __("Aucun organisme") }}
+          </h3>
+          <p class="mb-6 text-slate-600 dark:text-slate-300">
+            {{
+            __(
+            "Vous n'êtes actuellement rattaché à aucun organisme de formation."
+            )
+            }}
+          </p>
+
+          <!-- Email sharing section -->
+          <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-700/50">
+            <p class="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+              {{ __("Votre adresse e-mail de connexion :") }}
+            </p>
+            <div class="flex items-center justify-between rounded-md bg-white px-3 py-2 dark:bg-slate-800">
+              <span class="text-sm font-mono text-slate-900 dark:text-slate-100">{{ auth()->user()->email }}</span>
+              <button onclick="navigator.clipboard.writeText('{{ auth()->user()->email }}')"
+                class="flex h-6 w-6 items-center justify-center rounded text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-600 dark:hover:text-slate-300">
+                <span class="material-symbols-outlined text-sm">content_copy</span>
+              </button>
             </div>
-            <h3 class="mb-4 text-xl font-semibold text-slate-900 dark:text-white">
-              {{ __("Aucun organisme") }}
-            </h3>
-            <p class="mb-6 text-slate-600 dark:text-slate-300">
+            <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
               {{
               __(
-              "Vous n'êtes actuellement rattaché à aucun organisme de formation."
+              "Partagez cette adresse avec un organisme pour rejoindre leur équipe"
               )
               }}
             </p>
-
-            <!-- Email sharing section -->
-            <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-700/50">
-              <p class="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                {{ __("Votre adresse e-mail de connexion :") }}
-              </p>
-              <div class="flex items-center justify-between rounded-md bg-white px-3 py-2 dark:bg-slate-800">
-                <span class="text-sm font-mono text-slate-900 dark:text-slate-100">{{ auth()->user()->email }}</span>
-                <button onclick="navigator.clipboard.writeText('{{ auth()->user()->email }}')"
-                  class="flex h-6 w-6 items-center justify-center rounded text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-600 dark:hover:text-slate-300">
-                  <span class="material-symbols-outlined text-sm">content_copy</span>
-                </button>
-              </div>
-              <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
-                {{
-                __(
-                "Partagez cette adresse avec un organisme pour rejoindre leur équipe"
-                )
-                }}
-              </p>
-            </div>
           </div>
         </div>
-        @endif
-        <!-- Superadmin -->
-        @if(Auth::user()->superadmin)
-        <div class="mb-8 text-center">
-          <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
-            {{ __("Organisations") }}
-          </h2>
-          <p class="text-slate-600 dark:text-slate-300">
-            {{ __("Gérez les organismes de formation") }}
-          </p>
-
-          <!-- Button to create team -->
-          <div class="mt-6 flex justify-center">
-            <a href="{{ route('teams.create') }}"
-              class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
-              {{ __("Créer une application") }}
-            </a>
-          </div>
-        </div>
-        @endif
-
-        <!-- Invitation Component -->
-        <x-account.application.invitation />
       </div>
-    </main>
+      @endif
+      <!-- Superadmin -->
+      @if(Auth::user()->superadmin)
+      <div class="mb-8 text-center">
+        <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
+          {{ __("Organisations") }}
+        </h2>
+        <p class="text-slate-600 dark:text-slate-300">
+          {{ __("Gérez les organismes de formation") }}
+        </p>
+
+        <!-- Button to create team -->
+        <div class="mt-6 flex justify-center">
+          <a href="{{ route('teams.create') }}"
+            class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+            {{ __("Créer une application") }}
+          </a>
+        </div>
+      </div>
+      @endif
+
+      <!-- Invitation Component -->
+      <x-account.application.invitation />
+  </div>
+  </main>
   </div>
 </x-app-layout>
