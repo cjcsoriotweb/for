@@ -37,11 +37,11 @@
           <nav class="flex flex-wrap gap-2" aria-label="Sections du rapport">
             @php
             $tabs = [
-            'overview' => 'Vue d'ensemble',
-            'progress' => 'Progression détaillée',
-            'quizzes' => 'Quiz',
-            'activity' => 'Activité',
-            'documents' => 'Documents'
+            'overview' => "Vue d'ensemble",
+            'progress' => "Progression détaillée",
+            'quizzes' => "Quiz",
+            'activity' => "Activité",
+            'documents' => "Documents"
             ];
             @endphp
             @foreach($tabs as $tabKey => $tabLabel)
