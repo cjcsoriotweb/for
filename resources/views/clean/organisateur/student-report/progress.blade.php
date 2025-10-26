@@ -1,15 +1,14 @@
 <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
   <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Progression détaillée par leçon</h3>
-    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-      Suivi granularisé de chaque chapitre et leçon suivis par l’étudiant.
-    </p>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Suivi granularisé de chaque chapitre et leçon suivis par
+      l'étudiant.</p>
   </div>
   <div class="px-4 py-5 sm:px-6">
     @if($lessons->count() > 0)
     @php
     $groupedLessons = $lessons->groupBy(function ($lesson) {
-        return optional($lesson->chapter)->title ?? 'Leçons sans chapitre';
+    return optional($lesson->chapter)->title ?? 'Leçons sans chapitre';
     });
     @endphp
     <div class="space-y-4">
@@ -48,17 +47,10 @@
                   <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $lesson->title }}</p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">
                     @switch($lesson->lessonable_type)
-                      @case('App\\Models\\VideoContent')
-                        Vidéo
-                        @break
-                      @case('App\\Models\\TextContent')
-                        Texte
-                        @break
-                      @case('App\\Models\\Quiz')
-                        Quiz
-                        @break
-                      @default
-                        Contenu
+                    @case('App\\Models\\VideoContent') Vidéo @break
+                    @case('App\\Models\\TextContent') Texte @break
+                    @case('App\\Models\\Quiz') Quiz @break
+                    @default Contenu
                     @endswitch
                   </p>
                 </div>
@@ -74,7 +66,8 @@
                 @endif
 
                 @if($lesson->pivot->watched_seconds)
-                <div>{{ floor($lesson->pivot->watched_seconds / 60) }}min {{ $lesson->pivot->watched_seconds % 60 }}s</div>
+                <div>{{ floor($lesson->pivot->watched_seconds / 60) }}min {{ $lesson->pivot->watched_seconds % 60 }}s
+                </div>
                 @endif
 
                 @if($lesson->pivot->read_percent)

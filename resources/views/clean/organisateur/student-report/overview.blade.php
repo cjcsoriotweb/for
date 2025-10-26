@@ -1,4 +1,5 @@
 ﻿<div class="space-y-8">
+  {{-- Overview Stats Cards --}}
   <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
     <div class="rounded-lg bg-white shadow dark:bg-gray-800">
       <div class="p-5">
@@ -12,8 +13,7 @@
           </div>
           <div class="ml-5 flex-1">
             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Lecons terminees</dt>
-            <dd class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $completedLessons }}/{{ $totalLessons }}
+            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $completedLessons }}/{{ $totalLessons }}
             </dd>
           </div>
         </div>
@@ -31,8 +31,7 @@
           </div>
           <div class="ml-5 flex-1">
             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Temps passe</dt>
-            <dd class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $totalHours }}h {{ $totalMinutes }}min
+            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $totalHours }}h {{ $totalMinutes }}min
             </dd>
           </div>
         </div>
@@ -50,9 +49,7 @@
           </div>
           <div class="ml-5 flex-1">
             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Score moyen aux quiz</dt>
-            <dd class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $averageQuizScore }}%
-            </dd>
+            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $averageQuizScore }}%</dd>
           </div>
         </div>
       </div>
@@ -69,15 +66,14 @@
           </div>
           <div class="ml-5 flex-1">
             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Tentatives de quiz</dt>
-            <dd class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $quizAttempts->count() }}
-            </dd>
+            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $quizAttempts->count() }}</dd>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  {{-- General Information --}}
   <div class="rounded-lg bg-white shadow dark:bg-gray-800">
     <div class="border-b border-gray-200 px-4 py-5 dark:border-gray-700 sm:px-6">
       <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Informations generales</h3>
@@ -88,17 +84,15 @@
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Statut</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-white">
             @if($studentData->pivot->status === 'completed')
-            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
-              Terminee
-            </span>
+            <span
+              class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">Terminee</span>
             @elseif($studentData->pivot->status === 'in_progress')
-            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-              En cours
-            </span>
+            <span
+              class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">En
+              cours</span>
             @else
-            <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-              Inscrit
-            </span>
+            <span
+              class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-200">Inscrit</span>
             @endif
           </dd>
         </div>
@@ -116,32 +110,29 @@
 
         <div>
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Date d'inscription</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-            {{ optional($studentData->pivot->enrolled_at)->format('d/m/Y @ H:i:s') ?: 'Non renseigne' }}
-          </dd>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{
+            optional($studentData->pivot->enrolled_at)->format('d/m/Y @ H:i:s') ?: 'Non renseigne' }}</dd>
         </div>
 
         <div>
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Derniere activite</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-            {{ optional($studentData->pivot->last_seen_at)->format('d/m/Y @ H:i:s') ?: 'Non renseigne' }}
-          </dd>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{
+            optional($studentData->pivot->last_seen_at)->format('d/m/Y @ H:i:s') ?: 'Non renseigne' }}</dd>
         </div>
 
         @if($studentData->pivot->completed_at)
         <div>
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Date de completion</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-            {{ optional($studentData->pivot->completed_at)->format('d/m/Y @ H:i:s') ?: 'Non renseigne' }}
-          </dd>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{
+            optional($studentData->pivot->completed_at)->format('d/m/Y @ H:i:s') ?: 'Non renseigne' }}</dd>
         </div>
         @endif
 
         <div>
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Progression</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-            {{ $completedLessons }} lecons terminees sur {{ $totalLessons }}
-            ({{ $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100, 1) : 0 }}%)
+            {{ $completedLessons }} lecons terminees sur {{ $totalLessons }} ({{ $totalLessons > 0 ?
+            round(($completedLessons / $totalLessons) * 100, 1) : 0 }}%)
           </dd>
         </div>
       </dl>

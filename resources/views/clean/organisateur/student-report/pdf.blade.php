@@ -3,9 +3,8 @@
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div>
         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Rapport PDF</h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Visualisez ou exportez une version imprimable du rapport de l’élève.
-        </p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Visualisez ou exportez une version imprimable du
+          rapport de l'élève.</p>
       </div>
       <div class="flex flex-wrap gap-2">
         <a href="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
@@ -31,18 +30,16 @@
     </div>
   </div>
   <div class="px-4 py-5 sm:px-6">
-    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-      Si l’aperçu ne s’affiche pas, téléchargez le fichier ou ouvrez-le dans un nouvel onglet.
-    </p>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Si l'aperçu ne s'affiche pas, téléchargez le fichier ou
+      ouvrez-le dans un nouvel onglet.</p>
     <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
       <iframe src="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
         class="w-full h-96 border-0" title="Rapport PDF - {{ $student->name }}">
         <p class="p-4 text-gray-600 dark:text-gray-400">
           Votre navigateur ne supporte pas les iframes.
           <a href="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
-            target="_blank" class="text-blue-600 hover:text-blue-800 underline">
-            Cliquez ici pour voir le PDF dans un nouvel onglet
-          </a>.
+            target="_blank" class="text-blue-600 hover:text-blue-800 underline">Cliquez ici pour voir le PDF dans un
+            nouvel onglet</a>.
         </p>
       </iframe>
     </div>

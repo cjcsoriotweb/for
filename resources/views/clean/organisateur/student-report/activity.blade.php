@@ -3,9 +3,8 @@
     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Activité & connexions</h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Analyse des connexions, appareils et pages consultées par l’élève.
-        </p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Analyse des connexions, appareils et pages consultées
+          par l'élève.</p>
       </div>
       @if(isset($activitySummary))
       <div class="flex flex-wrap gap-3 text-sm text-gray-500 dark:text-gray-400">
