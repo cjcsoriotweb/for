@@ -13,6 +13,7 @@
 
 @php use App\Support\RouteAccess; @endphp
 
+<<<<<<< Updated upstream
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 py-2">
 @foreach($navigation as $nav)
     @php
@@ -45,6 +46,13 @@
             :disabled="$disabledProp"
             :tooltip="$tooltipProp"
         />
+=======
+    @if(isset($nav['hasTeamRoleOrPermission']))
+        {{ $nav['hasTeamRoleOrPermission'] }}
+        @if(!Auth::user()->hasTeamRole($team, $nav['hasTeamRoleOrPermission']) || !Auth::user()->hasTeamPermission($team, $nav['hasTeamRoleOrPermission']))
+            {{ $visible = false }}
+        @endif
+>>>>>>> Stashed changes
     @endif
 @endforeach
 </section>
