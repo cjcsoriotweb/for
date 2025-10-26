@@ -90,9 +90,16 @@ class ActivityLogsTable extends Component
 
     private function loadAvailableLessons()
     {
-        // This will be populated from the parent component
-        // For now, we'll leave it empty and populate it from the parent
-        $this->availableLessons = [];
+        $lessons = $this->lessons instanceof \Illuminate\Support\Collection
+            ? $this->lessons
+            : collect($this->lessons);
+
+        $this->availableLessons = $lessons->map(function ($lesson) {
+            return [
+                'id' => $lesson->id,
+                'title' => $lesson->title,
+            ];
+        })->values();
     }
 
     public function render()

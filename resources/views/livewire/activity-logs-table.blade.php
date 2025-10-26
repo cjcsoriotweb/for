@@ -17,7 +17,9 @@
         <select wire:model.live="lessonFilter"
           class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
           <option value="">Toutes les leçons</option>
-          {{-- This will be populated from the parent component with available lessons --}}
+          @foreach($availableLessons as $lesson)
+          <option value="{{ $lesson['id'] }}">{{ $lesson['title'] }}</option>
+          @endforeach
         </select>
       </div>
 
