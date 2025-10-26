@@ -56,10 +56,12 @@ class StudentFormationService extends BaseFormationService
      */
     public function listAvailableFormationsForTeam(Team $team): Collection
     {
-        return Formation::whereHas('teams', function (Builder $query) use ($team): void {
-            $query->where('teams.id', $team->id)
-                ->where('formation_in_teams.visible', true);
-        })->get();
+        return Formation::withCount('learners')
+            ->whereHas('teams', function (Builder $query) use ($team): void {
+                $query->where('teams.id', $team->id)
+                    ->where('formation_in_teams.visible', true);
+            })
+            ->get();
     }
 
     public function listAvailableFormationsForTeamExceptCurrentUseByMe(Team $team): Collection

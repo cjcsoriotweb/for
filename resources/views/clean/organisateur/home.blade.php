@@ -3,7 +3,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Formations</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Gérez les formations de votre équipe</p>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Gerez les formations de votre equipe</p>
     </div>
     @if($formations->count() > 0)
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -17,7 +17,7 @@
             <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <span
                 class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
-                {{ $formation->level ?? 'Débutant' }}
+                {{ $formation->level ?? 'Debutant' }}
               </span>
             </div>
           </div>
@@ -26,9 +26,9 @@
         <div class="flex items-center justify-between">
           <div class="text-sm text-gray-500 dark:text-gray-400">
             @php
-            $enrolledCount = $formation->learners()->count();
+            $enrolledCount = $formation->learners_count ?? 0;
             @endphp
-            {{ $enrolledCount }} élève{{ $enrolledCount > 1 ? 's' : '' }} inscrit{{ $enrolledCount > 1 ? 's' : '' }}
+            {{ $enrolledCount }} eleve{{ $enrolledCount > 1 ? 's' : '' }} inscrit{{ $enrolledCount > 1 ? 's' : '' }}
           </div>
 
           <a href="{{ route('organisateur.formations.students', [$team, $formation]) }}"
@@ -38,7 +38,7 @@
                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
               </path>
             </svg>
-            Voir élèves
+            Voir eleves
           </a>
         </div>
       </div>
