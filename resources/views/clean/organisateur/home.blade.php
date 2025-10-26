@@ -5,7 +5,6 @@
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Formations</h1>
       <p class="mt-2 text-gray-600 dark:text-gray-400">Gérez les formations de votre équipe</p>
     </div>
-
     @if($formations->count() > 0)
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @foreach($formations as $formation)
