@@ -27,7 +27,7 @@
             <!-- Logo -->
             <div class="shrink-0 flex items-center">
               <a href="{{ route('eleve.index', $team) }}" class="text-xl font-bold text-gray-800 dark:text-gray-200">
-                <b>{{ $team->name }}</b> <small class="text-blue-500 ml-5">Élève</small>
+                <b>{{ $team->name }}</b>
               </a>
             </div>
 
