@@ -149,8 +149,8 @@
         </div>
       </div>
 
-      <div
-        class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-50 to-pink-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
+      <a href="{{ route('organisateur.formations.students.cost', [$team, $formation]) }}"
+        class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-50 to-pink-100 p-6 shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 dark:from-gray-800 dark:to-gray-900 dark:focus:ring-offset-gray-900">
         <div
           class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 transition-opacity group-hover:opacity-100">
         </div>
@@ -165,14 +165,19 @@
             </div>
           </div>
           <div class="ml-5 flex-1">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Cout ce mois-ci</p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">?€</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Coût ce mois-ci</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+              {{ number_format($monthlyCost, 0, ',', ' ') }} €
+            </p>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {{ $monthlyEnrollmentsCount }} inscription{{ $monthlyEnrollmentsCount > 1 ? 's' : '' }}.
+            </p>
           </div>
         </div>
         <div
-          class="absolute -bottom-1 -right-1 h-16 w-16 rounded-full bg-gradient-to-br from-purple-200/50 to-pink-300/50 dark:from-purple-700/50 dark:to-pink-600/50">
+          class="absolute -bottom-1 -right-1 h-16 w-16 rounded-full bg-gradient-to-br from-purple-200/50 to-pink-300/50 transition-transform duration-200 group-hover:scale-110 dark:from-purple-700/50 dark:to-pink-600/50">
         </div>
-      </div>
+      </a>
     </div>
 
     {{-- Filtres --}}
@@ -373,3 +378,4 @@
     @endif
   </div>
 </x-organisateur-layout>
+

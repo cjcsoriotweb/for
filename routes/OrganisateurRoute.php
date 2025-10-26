@@ -10,6 +10,7 @@ Route::prefix('organisateur')
     ->group(function () {
         // Main routes - ordered by specificity (most specific first)
         Route::get('/{team}/formations/{formation}/students', [OrganisateurPageController::class, 'students'])->name('formations.students');
+        Route::get('/{team}/formations/{formation}/students/costs', [OrganisateurPageController::class, 'studentsCost'])->name('formations.students.cost');
         Route::get('/{team}/formations/{formation}/students/{student}/report', [OrganisateurPageController::class, 'studentReport'])->name('formations.students.report');
         Route::get('/{team}', [OrganisateurPageController::class, 'home'])->name('index');
 

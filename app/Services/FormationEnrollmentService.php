@@ -49,16 +49,21 @@ class FormationEnrollmentService
             ->orderBy('position')
             ->first();
 
+        $enrollmentCost = $formation->money_amount;
+
         $formation->learners()->attach($userId, [
             'team_id' => $team->id,
             'status' => 'in_progress',
             'enrolled_at' => now(),
             'last_seen_at' => now(),
             'current_lesson_id' => $firstLesson?->id,
+            'enrollment_cost' => $enrollmentCost ?: null,
         ]);
 
         // Débiter les fonds de l'équipe
-        $team->decrement('money', $formation->money_amount);
+        if ($enrollmentCost) {
+            $team->decrement('money', $enrollmentCost);
+        }
 
         return true;
     }

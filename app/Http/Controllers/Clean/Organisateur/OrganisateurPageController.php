@@ -25,7 +25,7 @@ class OrganisateurPageController extends Controller
     {
         $user = Auth::user();
 
-        // Récupérer toutes les formations visibles pour cette équipe
+        // R├®cup├®rer toutes les formations visibles pour cette ├®quipe
         $formations = $this->studentFormationService->listAvailableFormationsForTeam($team);
 
         return view('clean.organisateur.home', compact(
@@ -36,7 +36,7 @@ class OrganisateurPageController extends Controller
 
     public function students(Request $request, Team $team, \App\Models\Formation $formation)
     {
-        // Vérifier que la formation est bien accessible à cette équipe
+        // V├®rifier que la formation est bien accessible ├á cette ├®quipe
         $isFormationVisible = $formation->teams()
             ->where('teams.id', $team->id)
             ->where('formation_in_teams.visible', true)
@@ -47,13 +47,13 @@ class OrganisateurPageController extends Controller
                 ->with('error', 'Formation non accessible.');
         }
 
-        // Récupérer les étudiants inscrits à cette formation avec leurs données de pivot
+        // R├®cup├®rer les ├®tudiants inscrits ├á cette formation avec leurs donn├®es de pivot
         $students = $formation->learners()
-            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
+            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total', 'enrollment_cost'])
             ->orderBy('formation_user.enrolled_at', 'desc')
             ->get();
 
-        // Ajouter les données de leçons pour chaque étudiant
+        // Ajouter les donn├®es de le├ºons pour chaque ├®tudiant
         foreach ($students as $student) {
             $student->lessons = $formation->lessons()
                 ->with(['chapter' => function ($query) {
@@ -62,7 +62,7 @@ class OrganisateurPageController extends Controller
                 ->orderBy('position')
                 ->get();
 
-            // Ajouter les données de progression pour chaque leçon
+            // Ajouter les donn├®es de progression pour chaque le├ºon
             foreach ($student->lessons as $lesson) {
                 $lessonProgress = $lesson->learners()
                     ->where('user_id', $student->id)
@@ -174,6 +174,21 @@ class OrganisateurPageController extends Controller
             return $carry + $student->lessons->sum(fn ($lesson) => $lesson->pivot->watched_seconds ?? 0);
         }, 0);
 
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->endOfMonth();
+
+        $monthlyEnrollments = $students->filter(function ($student) use ($currentMonthStart, $currentMonthEnd) {
+            $enrolledAt = Carbon::make($student->pivot->enrolled_at);
+
+            return $enrolledAt && $enrolledAt->between($currentMonthStart, $currentMonthEnd);
+        });
+
+        $monthlyCost = $monthlyEnrollments->reduce(function ($carry, $student) use ($formation) {
+            $enrollmentCost = $student->pivot->enrollment_cost ?? $formation->money_amount ?? 0;
+
+            return $carry + (int) $enrollmentCost;
+        }, 0);
+
         $stats = [
             'total' => $students->count(),
             'completed' => $students->where('pivot.status', 'completed')->count(),
@@ -190,12 +205,14 @@ class OrganisateurPageController extends Controller
             'search' => $search,
             'statusFilter' => $statusFilter,
             'stats' => $stats,
+            'monthlyCost' => $monthlyCost,
+            'monthlyEnrollmentsCount' => $monthlyEnrollments->count(),
         ]);
     }
 
-    public function studentReport(Request $request, Team $team, \App\Models\Formation $formation, \App\Models\User $student)
+
+    public function studentsCost(Request $request, Team $team, \App\Models\Formation $formation)
     {
-        // Vérifier que la formation est bien accessible à cette équipe
         $isFormationVisible = $formation->teams()
             ->where('teams.id', $team->id)
             ->where('formation_in_teams.visible', true)
@@ -206,20 +223,94 @@ class OrganisateurPageController extends Controller
                 ->with('error', 'Formation non accessible.');
         }
 
-        // Vérifier que l'étudiant est bien inscrit à cette formation
+        $availableEnrollments = $formation->learners()
+            ->withPivot([
+                'status',
+                'enrolled_at',
+                'last_seen_at',
+                'completed_at',
+                'score_total',
+                'max_score_total',
+                'enrollment_cost',
+            ])
+            ->orderByDesc('formation_user.enrolled_at')
+            ->get();
+
+        $availableMonths = $availableEnrollments
+            ->pluck('pivot.enrolled_at')
+            ->filter()
+            ->map(fn ($date) => Carbon::make($date)?->format('Y-m'))
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values();
+
+        $selectedMonth = $request->query('month', Carbon::now()->format('Y-m'));
+
+        try {
+            $periodStart = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
+        } catch (\Exception $exception) {
+            $periodStart = Carbon::now()->startOfMonth();
+            $selectedMonth = $periodStart->format('Y-m');
+        }
+
+        $periodEnd = $periodStart->copy()->endOfMonth();
+
+        $monthlyEnrollments = $availableEnrollments->filter(function ($student) use ($periodStart, $periodEnd) {
+            $enrolledAt = Carbon::make($student->pivot->enrolled_at);
+
+            return $enrolledAt && $enrolledAt->between($periodStart, $periodEnd);
+        });
+
+        $monthlyCost = $monthlyEnrollments->reduce(function ($carry, $student) use ($formation) {
+            $enrollmentCost = $student->pivot->enrollment_cost ?? $formation->money_amount ?? 0;
+
+            return $carry + (int) $enrollmentCost;
+        }, 0);
+
+        if ($availableMonths->doesntContain($selectedMonth)) {
+            $availableMonths = $availableMonths->prepend($selectedMonth)->unique()->sortDesc()->values();
+        }
+
+        return view('clean.organisateur.students-cost', [
+            'team' => $team,
+            'formation' => $formation,
+            'enrollments' => $monthlyEnrollments,
+            'selectedMonth' => $selectedMonth,
+            'periodStart' => $periodStart,
+            'periodEnd' => $periodEnd,
+            'monthlyCost' => $monthlyCost,
+            'availableMonths' => $availableMonths,
+        ]);
+    }
+
+    public function studentReport(Request $request, Team $team, \App\Models\Formation $formation, \App\Models\User $student)
+    {
+        // V├®rifier que la formation est bien accessible ├á cette ├®quipe
+        $isFormationVisible = $formation->teams()
+            ->where('teams.id', $team->id)
+            ->where('formation_in_teams.visible', true)
+            ->exists();
+
+        if (! $isFormationVisible) {
+            return redirect()->route('organisateur.index', $team)
+                ->with('error', 'Formation non accessible.');
+        }
+
+        // V├®rifier que l'├®tudiant est bien inscrit ├á cette formation
         $isEnrolled = $formation->learners()
             ->where('user_id', $student->id)
             ->exists();
 
         if (! $isEnrolled) {
             return redirect()->route('organisateur.formations.students', [$team, $formation])
-                ->with('error', 'Étudiant non inscrit à cette formation.');
+                ->with('error', '├ëtudiant non inscrit ├á cette formation.');
         }
 
-        // Récupérer les données détaillées de l'étudiant
+        // R├®cup├®rer les donn├®es d├®taill├®es de l'├®tudiant
         $studentData = $formation->learners()
             ->where('user_id', $student->id)
-            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
+            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total', 'enrollment_cost'])
             ->first();
 
         if ($studentData) {
@@ -240,7 +331,7 @@ class OrganisateurPageController extends Controller
             }
         }
 
-        // Récupérer toutes les leçons de la formation
+        // R├®cup├®rer toutes les le├ºons de la formation
         $lessons = $formation->lessons()
             ->with(['chapter' => function ($query) {
                 $query->orderBy('position');
@@ -248,7 +339,7 @@ class OrganisateurPageController extends Controller
             ->orderBy('position')
             ->get();
 
-        // Ajouter les données de progression pour l'étudiant spécifique
+        // Ajouter les donn├®es de progression pour l'├®tudiant sp├®cifique
         foreach ($lessons as $lesson) {
             $lessonProgress = $lesson->learners()
                 ->where('user_id', $student->id)
@@ -257,7 +348,7 @@ class OrganisateurPageController extends Controller
             if ($lessonProgress) {
                 $lesson->pivot = $lessonProgress->pivot;
             } else {
-                // Créer un objet pivot vide pour éviter les erreurs
+                // Cr├®er un objet pivot vide pour ├®viter les erreurs
                 $lesson->pivot = (object) [
                     'status' => 'enrolled',
                     'started_at' => null,
@@ -272,7 +363,7 @@ class OrganisateurPageController extends Controller
             }
         }
 
-        // Récupérer les tentatives de quiz
+        // R├®cup├®rer les tentatives de quiz
         $quizAttempts = \App\Models\QuizAttempt::where('user_id', $student->id)
             ->whereHas('lesson', function ($query) use ($formation) {
                 $query->whereHas('chapter', function ($chapterQuery) use ($formation) {
@@ -293,7 +384,7 @@ class OrganisateurPageController extends Controller
         $inProgressLessons = $lessons->where('pivot.status', 'in_progress')->count();
         $notStartedLessons = $lessons->where('pivot.status', 'enrolled')->count();
 
-        // Calculer le temps total passé
+        // Calculer le temps total pass├®
         $totalTimeSeconds = $lessons->sum('pivot.watched_seconds') ?? 0;
         $totalHours = floor($totalTimeSeconds / 3600);
         $totalMinutes = floor(($totalTimeSeconds % 3600) / 60);
@@ -308,7 +399,7 @@ class OrganisateurPageController extends Controller
             $averageQuizScore = round($totalQuizScore / $quizAttempts->count(), 1);
         }
 
-        // Récupérer les données d'activité de l'étudiant avec filtres
+        // R├®cup├®rer les donn├®es d'activit├® de l'├®tudiant avec filtres
         $search = $request->get('activity_search');
         $lessonFilter = $request->get('lesson_filter');
         $startDate = $request->get('start_date');
@@ -347,7 +438,7 @@ class OrganisateurPageController extends Controller
 
     public function studentReportPdf(Team $team, \App\Models\Formation $formation, \App\Models\User $student)
     {
-        // Vérifier que la formation est bien accessible à cette équipe
+        // V├®rifier que la formation est bien accessible ├á cette ├®quipe
         $isFormationVisible = $formation->teams()
             ->where('teams.id', $team->id)
             ->where('formation_in_teams.visible', true)
@@ -358,23 +449,23 @@ class OrganisateurPageController extends Controller
                 ->with('error', 'Formation non accessible.');
         }
 
-        // Vérifier que l'étudiant est bien inscrit à cette formation
+        // V├®rifier que l'├®tudiant est bien inscrit ├á cette formation
         $isEnrolled = $formation->learners()
             ->where('user_id', $student->id)
             ->exists();
 
         if (! $isEnrolled) {
             return redirect()->route('organisateur.formations.students', [$team, $formation])
-                ->with('error', 'Étudiant non inscrit à cette formation.');
+                ->with('error', '├ëtudiant non inscrit ├á cette formation.');
         }
 
-        // Récupérer les données détaillées de l'étudiant
+        // R├®cup├®rer les donn├®es d├®taill├®es de l'├®tudiant
         $studentData = $formation->learners()
             ->where('user_id', $student->id)
-            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
+            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total', 'enrollment_cost'])
             ->first();
 
-        // Récupérer toutes les leçons de la formation
+        // R├®cup├®rer toutes les le├ºons de la formation
         $lessons = $formation->lessons()
             ->with(['chapter' => function ($query) {
                 $query->orderBy('position');
@@ -382,7 +473,7 @@ class OrganisateurPageController extends Controller
             ->orderBy('position')
             ->get();
 
-        // Ajouter les données de progression pour l'étudiant spécifique
+        // Ajouter les donn├®es de progression pour l'├®tudiant sp├®cifique
         foreach ($lessons as $lesson) {
             $lessonProgress = $lesson->learners()
                 ->where('user_id', $student->id)
@@ -391,7 +482,7 @@ class OrganisateurPageController extends Controller
             if ($lessonProgress) {
                 $lesson->pivot = $lessonProgress->pivot;
             } else {
-                // Créer un objet pivot vide pour éviter les erreurs
+                // Cr├®er un objet pivot vide pour ├®viter les erreurs
                 $lesson->pivot = (object) [
                     'status' => 'enrolled',
                     'started_at' => null,
@@ -406,7 +497,7 @@ class OrganisateurPageController extends Controller
             }
         }
 
-        // Récupérer les tentatives de quiz
+        // R├®cup├®rer les tentatives de quiz
         $quizAttempts = \App\Models\QuizAttempt::where('user_id', $student->id)
             ->whereHas('lesson', function ($query) use ($formation) {
                 $query->whereHas('chapter', function ($chapterQuery) use ($formation) {
@@ -427,7 +518,7 @@ class OrganisateurPageController extends Controller
         $inProgressLessons = $lessons->where('pivot.status', 'in_progress')->count();
         $notStartedLessons = $lessons->where('pivot.status', 'enrolled')->count();
 
-        // Calculer le temps total passé
+        // Calculer le temps total pass├®
         $totalTimeSeconds = $lessons->sum('pivot.watched_seconds') ?? 0;
         $totalHours = floor($totalTimeSeconds / 3600);
         $totalMinutes = floor(($totalTimeSeconds % 3600) / 60);
@@ -442,7 +533,7 @@ class OrganisateurPageController extends Controller
             $averageQuizScore = round($totalQuizScore / $quizAttempts->count(), 1);
         }
 
-        // Générer le PDF
+        // G├®n├®rer le PDF
         $pdf = Pdf::loadView('clean.organisateur.student-report-pdf', compact(
             'team',
             'formation',
@@ -467,7 +558,7 @@ class OrganisateurPageController extends Controller
 
     public function studentReportPdfDownload(Team $team, \App\Models\Formation $formation, \App\Models\User $student)
     {
-        // Vérifier que la formation est bien accessible à cette équipe
+        // V├®rifier que la formation est bien accessible ├á cette ├®quipe
         $isFormationVisible = $formation->teams()
             ->where('teams.id', $team->id)
             ->where('formation_in_teams.visible', true)
@@ -478,23 +569,23 @@ class OrganisateurPageController extends Controller
                 ->with('error', 'Formation non accessible.');
         }
 
-        // Vérifier que l'étudiant est bien inscrit à cette formation
+        // V├®rifier que l'├®tudiant est bien inscrit ├á cette formation
         $isEnrolled = $formation->learners()
             ->where('user_id', $student->id)
             ->exists();
 
         if (! $isEnrolled) {
             return redirect()->route('organisateur.formations.students', [$team, $formation])
-                ->with('error', 'Étudiant non inscrit à cette formation.');
+                ->with('error', '├ëtudiant non inscrit ├á cette formation.');
         }
 
-        // Récupérer les données détaillées de l'étudiant
+        // R├®cup├®rer les donn├®es d├®taill├®es de l'├®tudiant
         $studentData = $formation->learners()
             ->where('user_id', $student->id)
-            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total'])
+            ->withPivot(['status', 'enrolled_at', 'last_seen_at', 'completed_at', 'score_total', 'max_score_total', 'enrollment_cost'])
             ->first();
 
-        // Récupérer toutes les leçons de la formation
+        // R├®cup├®rer toutes les le├ºons de la formation
         $lessons = $formation->lessons()
             ->with(['chapter' => function ($query) {
                 $query->orderBy('position');
@@ -502,7 +593,7 @@ class OrganisateurPageController extends Controller
             ->orderBy('position')
             ->get();
 
-        // Ajouter les données de progression pour l'étudiant spécifique
+        // Ajouter les donn├®es de progression pour l'├®tudiant sp├®cifique
         foreach ($lessons as $lesson) {
             $lessonProgress = $lesson->learners()
                 ->where('user_id', $student->id)
@@ -511,7 +602,7 @@ class OrganisateurPageController extends Controller
             if ($lessonProgress) {
                 $lesson->pivot = $lessonProgress->pivot;
             } else {
-                // Créer un objet pivot vide pour éviter les erreurs
+                // Cr├®er un objet pivot vide pour ├®viter les erreurs
                 $lesson->pivot = (object) [
                     'status' => 'enrolled',
                     'started_at' => null,
@@ -526,7 +617,7 @@ class OrganisateurPageController extends Controller
             }
         }
 
-        // Récupérer les tentatives de quiz
+        // R├®cup├®rer les tentatives de quiz
         $quizAttempts = \App\Models\QuizAttempt::where('user_id', $student->id)
             ->whereHas('lesson', function ($query) use ($formation) {
                 $query->whereHas('chapter', function ($chapterQuery) use ($formation) {
@@ -547,7 +638,7 @@ class OrganisateurPageController extends Controller
         $inProgressLessons = $lessons->where('pivot.status', 'in_progress')->count();
         $notStartedLessons = $lessons->where('pivot.status', 'enrolled')->count();
 
-        // Calculer le temps total passé
+        // Calculer le temps total pass├®
         $totalTimeSeconds = $lessons->sum('pivot.watched_seconds') ?? 0;
         $totalHours = floor($totalTimeSeconds / 3600);
         $totalMinutes = floor(($totalTimeSeconds % 3600) / 60);
@@ -562,7 +653,7 @@ class OrganisateurPageController extends Controller
             $averageQuizScore = round($totalQuizScore / $quizAttempts->count(), 1);
         }
 
-        // Générer le PDF
+        // G├®n├®rer le PDF
         $pdf = Pdf::loadView('clean.organisateur.student-report-pdf', compact(
             'team',
             'formation',
@@ -581,7 +672,7 @@ class OrganisateurPageController extends Controller
             'averageQuizScore'
         ));
 
-        // Télécharger le PDF
+        // T├®l├®charger le PDF
         return $pdf->download('rapport-'.$student->name.'-'.now()->format('Y-m-d').'.pdf');
     }
 }
