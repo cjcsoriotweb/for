@@ -23,9 +23,10 @@ class ActivityLogsTable extends Component
     public $availableLessons = [];
     public $lessons = [];
 
-    public function mount($userId)
+    public function mount($userId, $lessons = null)
     {
         $this->userId = $userId;
+        $this->lessons = $lessons ?? collect();
         $this->loadActivityData();
     }
 
