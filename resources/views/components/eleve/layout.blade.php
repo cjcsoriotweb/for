@@ -26,15 +26,10 @@
           <div class="flex">
             <!-- Logo -->
             <div class="shrink-0 flex items-center">
-              <a href="{{ route('eleve.index', $team) }}" class="text-xl font-bold text-gray-800 dark:text-gray-200">
-                <b>{{ $team->name }}</b>
-              </a>
-            </div>
 
-            <!-- Navigation Links -->
-            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-              <x-nav-link :href="route('eleve.index', $team)" :active="request()->routeIs('eleve.index')">
-                {{ __("Accueil") }}
+              <x-nav-link :href="route('eleve.index', $team)" :active="request()->routeIs('eleve.index')"
+                class="text-xl font-bold text-gray-800 dark:text-gray-200">
+                {{ $team->name }}
               </x-nav-link>
             </div>
           </div>
