@@ -43,7 +43,7 @@
             <!-- Logo -->
             <div class="shrink-0 flex items-center">
 
-              <x-nav-link :href="route('eleve.index', $team)" :active="request()->routeIs('eleve.index')"
+              <x-nav-link :href="route('organisateur.index', $team)" :active="request()->routeIs('eleve.index')"
                 class="text-xl font-bold text-gray-800 dark:text-gray-200">
                 {{ $team->name }}
               </x-nav-link>

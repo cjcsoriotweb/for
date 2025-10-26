@@ -2,6 +2,25 @@
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Montant</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Votre application as {{ $team->money }}€</p>
+      <p>
+        <a href="#" class="btn bg-blue-500 p-2  text-white rounded-xl hover:bg-blue-800">Cliquez
+          ici
+          pour recharger</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Utilisateurs</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Gerez les utilisateurs de votre organisation.</p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Formations</h1>
       <p class="mt-2 text-gray-600 dark:text-gray-400">Gerez les formations de votre equipe.</p>
     </div>
