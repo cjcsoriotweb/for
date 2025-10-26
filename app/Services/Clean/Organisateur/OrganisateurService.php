@@ -50,7 +50,7 @@ class OrganisateurService
      *     monthlyEnrollmentsCount: int
      * }
      */
-    public function getStudentsOverview(Formation $formation, array $filters = []): array
+    public function getStudentsOverview(Formation $formation, Team $team, array $filters = []): array
     {
         $search = trim((string) ($filters['search'] ?? ''));
         $statusFilter = $filters['status'] ?? null;
@@ -65,15 +65,15 @@ class OrganisateurService
                 'max_score_total',
                 'enrollment_cost',
             ])
+            ->wherePivot('team_id', $team->id)
             ->orderByDesc('formation_user.enrolled_at')
             ->get();
-
         $studentIds = $students->pluck('id');
 
         $lessons = $formation->lessons()
             ->with([
-                'chapter' => fn ($query) => $query->orderBy('position'),
-                'learners' => fn ($query) => $query->whereIn('user_id', $studentIds),
+                'chapter' => fn($query) => $query->orderBy('position'),
+                'learners' => fn($query) => $query->whereIn('user_id', $studentIds),
             ])
             ->orderBy('position')
             ->get();
@@ -112,7 +112,7 @@ class OrganisateurService
                 });
             })
             ->when($statusFilter, function (Collection $collection) use ($statusFilter) {
-                return $collection->filter(fn ($student) => $student->pivot->status === $statusFilter);
+                return $collection->filter(fn($student) => $student->pivot->status === $statusFilter);
             })
             ->values();
 
@@ -184,7 +184,7 @@ class OrganisateurService
 
         $totalSeconds = $students->reduce(function ($carry, $student) {
             return $carry + $student->lessons->sum(
-                fn ($lesson) => (int) ($lesson->pivot->watched_seconds ?? 0)
+                fn($lesson) => (int) ($lesson->pivot->watched_seconds ?? 0)
             );
         }, 0);
 
@@ -250,7 +250,7 @@ class OrganisateurService
         $availableMonths = $enrollments
             ->pluck('pivot.enrolled_at')
             ->filter()
-            ->map(fn ($date) => Carbon::make($date)?->format('Y-m'))
+            ->map(fn($date) => Carbon::make($date)?->format('Y-m'))
             ->filter()
             ->unique()
             ->sortDesc()
@@ -336,8 +336,8 @@ class OrganisateurService
 
         $lessons = $formation->lessons()
             ->with([
-                'chapter' => fn ($query) => $query->orderBy('position'),
-                'learners' => fn ($query) => $query->where('user_id', $student->id),
+                'chapter' => fn($query) => $query->orderBy('position'),
+                'learners' => fn($query) => $query->where('user_id', $student->id),
             ])
             ->orderBy('position')
             ->get()
@@ -370,14 +370,14 @@ class OrganisateurService
         $inProgressLessons = $lessons->where('pivot.status', 'in_progress')->count();
         $notStartedLessons = $lessons->where('pivot.status', 'enrolled')->count();
 
-        $totalTimeSeconds = $lessons->sum(fn ($lesson) => (int) ($lesson->pivot->watched_seconds ?? 0));
+        $totalTimeSeconds = $lessons->sum(fn($lesson) => (int) ($lesson->pivot->watched_seconds ?? 0));
         $totalHours = (int) floor($totalTimeSeconds / 3600);
         $totalMinutes = (int) floor(($totalTimeSeconds % 3600) / 60);
         $totalSeconds = $totalTimeSeconds % 60;
 
         $averageQuizScore = 0;
         if ($quizAttempts->count() > 0) {
-            $totalQuizScore = $quizAttempts->sum(fn ($attempt) => $attempt->score ?? 0);
+            $totalQuizScore = $quizAttempts->sum(fn($attempt) => $attempt->score ?? 0);
             $averageQuizScore = round($totalQuizScore / $quizAttempts->count(), 1);
         }
 

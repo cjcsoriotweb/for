@@ -35,7 +35,7 @@ class OrganisateurPageController extends Controller
             'status' => $request->query('status'),
         ];
 
-        $overview = $this->organisateurService->getStudentsOverview($formation, $filters);
+        $overview = $this->organisateurService->getStudentsOverview($formation, $team, $filters);
 
         return view('clean.organisateur.students', [
             'team' => $team,
@@ -125,7 +125,7 @@ class OrganisateurPageController extends Controller
             'student' => $student,
         ], $reportData));
 
-        return $pdf->stream('rapport-'.$student->name.'.pdf');
+        return $pdf->stream('rapport-' . $student->name . '.pdf');
     }
 
     public function studentReportPdfDownload(Team $team, Formation $formation, User $student)
@@ -152,6 +152,6 @@ class OrganisateurPageController extends Controller
             'student' => $student,
         ], $reportData));
 
-        return $pdf->download('rapport-'.$student->name.'-'.now()->format('Y-m-d').'.pdf');
+        return $pdf->download('rapport-' . $student->name . '-' . now()->format('Y-m-d') . '.pdf');
     }
 }
