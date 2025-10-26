@@ -1,5 +1,5 @@
 {{-- Formation Card Component --}}
-@props(['formation'])
+@props(['formation', 'team'])
 
 <div
   class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow">
@@ -24,7 +24,7 @@
       {{ $enrolledCount }} eleve{{ $enrolledCount > 1 ? 's' : '' }} inscrit{{ $enrolledCount > 1 ? 's' : '' }}
     </div>
 
-    <a href="{{ route('organisateur.formations.students', [request()->route('team'), $formation]) }}"
+    <a href="{{ route('organisateur.formations.students', [$team, $formation]) }}"
       class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
