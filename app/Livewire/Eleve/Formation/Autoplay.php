@@ -3,6 +3,7 @@
 namespace App\Livewire\Eleve\Formation;
 
 use App\Models\Formation;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Autoplay extends Component
@@ -44,7 +45,7 @@ class Autoplay extends Component
     {
         if ($this->autoplay) {
             $this->showCountdown = true;
-            $this->countdown = 3;
+            $this->countdown = 5;
             $this->dispatch('countdownStarted');
         }
     }
@@ -68,7 +69,7 @@ class Autoplay extends Component
         $this->dispatch('autoplayRedirect');
 
         // Get team from current user or formation
-        $team = auth()->user()->currentTeam ?? $this->formation->teams()->first();
+        $team = Auth()->user()->currentTeam ?? $this->formation->teams()->first();
 
         return redirect()->route('eleve.lesson.show', [
             $team,
