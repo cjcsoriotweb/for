@@ -14,7 +14,7 @@ class StatsCards extends Component
     public ?Team $team;
     public ?Formation $formation;
     public ?int $monthlyCost;
-    public ?int $monthlyEnrollmentsCount;
+    public int $monthlyEnrollmentsCount;
 
     public function __construct(
         array $stats = [],
@@ -22,7 +22,7 @@ class StatsCards extends Component
         ?Team $team = null,
         ?Formation $formation = null,
         ?int $monthlyCost = null,
-        ?int $monthlyEnrollmentsCount = null
+        int $monthlyEnrollmentsCount = 0
     ) {
         $this->stats = $stats;
         $this->type = $type;

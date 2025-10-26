@@ -52,8 +52,9 @@
     </div>
 
     {{-- Filters --}}
-    <x-organisateur.parts.filters :selectedMonth="$selectedMonth" :availableMonths="$availableMonths"
-      routeName="organisateur.formations.students.cost" :routeParams="[$team, $formation]" />
+    <x-organisateur.parts.filters :selectedMonth="isset($selectedMonth) ? $selectedMonth : null"
+      :availableMonths="$availableMonths" routeName="organisateur.formations.students.cost"
+      :routeParams="[$team, $formation]" />
 
     {{-- Table --}}
     <div class="overflow-hidden rounded-xl border border-gray-200 shadow-lg dark:border-gray-700">

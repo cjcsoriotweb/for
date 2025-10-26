@@ -3,7 +3,8 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     {{-- Header --}}
     <div class="mb-8">
-      <x-organisateur.parts.breadcrumb :team="$team" :formation="$formation" :student="$student" />
+      <x-organisateur.parts.breadcrumb :team="$team" :formation="$formation"
+        :student="isset($student) ? $student : null" />
 
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>

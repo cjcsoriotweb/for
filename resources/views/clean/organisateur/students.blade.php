@@ -42,10 +42,11 @@
 
     {{-- Statistiques --}}
     <x-organisateur.parts.stats-cards :stats="$stats" type="students" :team="$team" :formation="$formation"
-      :monthlyCost="$monthlyCost" :monthlyEnrollmentsCount="$monthlyEnrollmentsCount" />
+      :monthlyCost="isset($monthlyCost) ? $monthlyCost : null"
+      :monthlyEnrollmentsCount="isset($monthlyEnrollmentsCount) ? $monthlyEnrollmentsCount : 0" />
 
     {{-- Filtres --}}
-    <x-organisateur.parts.filters :search="$search" :statusFilter="$statusFilter"
+    <x-organisateur.parts.filters :search="$search" :statusFilter="isset($statusFilter) ? $statusFilter : null"
       routeName="organisateur.formations.students" :routeParams="[$team, $formation]" />
 
     {{-- Liste des élèves --}}

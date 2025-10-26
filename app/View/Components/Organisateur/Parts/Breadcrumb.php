@@ -19,7 +19,7 @@ class Breadcrumb extends Component
         Team $team,
         ?Formation $formation = null,
         ?User $student = null,
-        ?string $currentPage = null
+        string $currentPage = ''
     ) {
         $this->team = $team;
         $this->formation = $formation;
