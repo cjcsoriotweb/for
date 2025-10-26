@@ -1,67 +1,18 @@
 <x-organisateur-layout :team="$team">
-  {{-- Notification banners --}}
-  @if(session('success'))
-  <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-    {{ session('success') }}
-  </div>
-  @endif
-
-  @if(session('warning'))
-  <div class="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
-    {{ session('warning') }}
-  </div>
-  @endif
-
-  @if(session('error'))
-  <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-    {{ session('error') }}
-  </div>
-  @endif
-
-  @php
-  $search = trim(request('search', ''));
-  $statusFilter = request('status');
-
-  $sortedStudents = $students->sortByDesc(function ($student) {
-      return match ($student->pivot->status) {
-          'completed' => 3,
-          'in_progress' => 2,
-          default => 1,
-      };
-  });
-
-  $filteredStudents = $sortedStudents
-      ->when($search, function ($collection) use ($search) {
-          $needle = strtolower($search);
-
-          return $collection->filter(function ($student) use ($needle) {
-              return str_contains(strtolower($student->name), $needle)
-                  || str_contains(strtolower($student->email), $needle);
-          });
-      })
-      ->when($statusFilter, function ($collection) use ($statusFilter) {
-          return $collection->filter(fn ($student) => $student->pivot->status === $statusFilter);
-      });
-
-  $totalFormationLessons = max($formation->lessons->count(), 1);
-  @endphp
-
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     {{-- Header --}}
     <div class="mb-8">
-      <nav class="flex mb-4" aria-label="Fil d'Ariane">
+      <nav class="mb-4 flex" aria-label="Fil d'Ariane">
         <ol class="flex items-center space-x-4">
           <li>
-            <div>
-              <a href="{{ route('organisateur.index', $team) }}"
-                class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                Formations
-              </a>
-            </div>
+            <a href="{{ route('organisateur.index', $team) }}"
+              class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+              Formations
+            </a>
           </li>
           <li>
             <div class="flex items-center">
-              <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                 viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
               </svg>
@@ -77,121 +28,93 @@
           <p class="mt-2 text-gray-600 dark:text-gray-400">{{ $formation->title }} - {{ $formation->description }}</p>
         </div>
 
-        <div class="flex items-center gap-3">
-          <a href="{{ route('organisateur.index', $team) }}"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        <a href="{{ route('organisateur.index', $team) }}"
+          class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Retour aux formations
+        </a>
+      </div>
+    </div>
+
+    {{-- Statistiques --}}
+    <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
+      <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+              </path>
             </svg>
-            Retour aux formations
-          </a>
-        </div>
-      </div>
-    </div>
-
-    {{-- Quick stats --}}
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                </path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total eleves</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ $students->count() }}</dd>
-              </dl>
-            </div>
+          </div>
+          <div class="ml-5 flex-1">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total eleves</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Terminees</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ $students->where('pivot.status', 'completed')->count() }}</dd>
-              </dl>
-            </div>
+      <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="ml-5 flex-1">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Terminees</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['completed'] }}</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">En cours</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ $students->where('pivot.status', 'in_progress')->count() }}</dd>
-              </dl>
-            </div>
+      <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <div class="ml-5 flex-1">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">En cours</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['in_progress'] }}</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Temps cumule</dt>
-                @php
-                $totalSeconds = 0;
-                foreach ($students as $student) {
-                    foreach ($student->lessons as $lesson) {
-                        $totalSeconds += $lesson->pivot->watched_seconds ?? 0;
-                    }
-                }
-                $statHours = floor($totalSeconds / 3600);
-                $statMinutes = floor(($totalSeconds % 3600) / 60);
-                @endphp
-                <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ $statHours }}h {{ $statMinutes }}min</dd>
-              </dl>
-            </div>
+      <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 6v6h4"></path>
+            </svg>
+          </div>
+          <div class="ml-5 flex-1">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Temps cumule</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['time_hours'] }}h {{ $stats['time_minutes'] }}min</p>
           </div>
         </div>
       </div>
     </div>
 
-    {{-- Filters --}}
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-8">
+    {{-- Filtres --}}
+    <div class="mb-8 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
       <form method="GET" class="grid gap-4 md:grid-cols-3">
         <div>
-          <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recherche</label>
+          <label for="search" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Recherche</label>
           <input id="search" name="search" value="{{ $search }}"
-            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+            class="block w-full rounded-md border-gray-300 bg-white text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
             placeholder="Nom ou email">
         </div>
 
         <div>
-          <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
+          <label for="status" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Statut</label>
           <select id="status" name="status"
-            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+            class="block w-full rounded-md border-gray-300 bg-white text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
             <option value="">Tous les statuts</option>
             <option value="completed" @selected($statusFilter === 'completed')>Terminee</option>
             <option value="in_progress" @selected($statusFilter === 'in_progress')>En cours</option>
@@ -201,12 +124,12 @@
 
         <div class="flex items-end gap-3">
           <button type="submit"
-            class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            class="inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 md:w-auto">
             Appliquer
           </button>
           @if($search || $statusFilter)
           <a href="{{ route('organisateur.formations.students', [$team, $formation]) }}"
-            class="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+            class="inline-flex w-full items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 md:w-auto">
             Reinitialiser
           </a>
           @endif
@@ -214,137 +137,104 @@
       </form>
     </div>
 
-    {{-- Students --}}
-    @if($filteredStudents->count() > 0)
+    {{-- Liste des élèves --}}
+    @if($studentSummaries->count() > 0)
     <div class="space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Liste des eleves ({{ $filteredStudents->count() }})</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Progression, temps passe et acces rapide au rapport detaille.</p>
-        </div>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Liste des eleves ({{ $studentSummaries->count() }})</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Progression, temps passe et acces rapide au rapport detaille.</p>
       </div>
 
       <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        @foreach($filteredStudents as $student)
-        @php
-        $totalTime = 0;
-        $lessonCount = 0;
-        $completedLessons = 0;
-        foreach ($student->lessons as $lesson) {
-            if ($lesson->pivot->watched_seconds) {
-                $totalTime += $lesson->pivot->watched_seconds;
-                $lessonCount++;
-            }
-            if ($lesson->pivot->status === 'completed') {
-                $completedLessons++;
-            }
-        }
-        $totalHours = floor($totalTime / 3600);
-        $totalMinutes = floor(($totalTime % 3600) / 60);
-
-        $progressBase = max($totalFormationLessons, $student->lessons->count(), 1);
-        $progressPercent = min(100, round(($completedLessons / $progressBase) * 100));
-
-        $enrolledAt = \Carbon\Carbon::make($student->pivot->enrolled_at);
-        $lastSeenAt = \Carbon\Carbon::make($student->pivot->last_seen_at);
-        $completedAt = \Carbon\Carbon::make($student->pivot->completed_at);
-        @endphp
-
-        <article class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex flex-col justify-between">
+        @foreach($studentSummaries as $summary)
+        <article class="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div class="space-y-4">
             <div class="flex items-start gap-3">
-              <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200 text-lg font-semibold uppercase">
-                {{ \Illuminate\Support\Str::of($student->name)->substr(0, 2)->upper() }}
+              <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-semibold uppercase text-blue-600 dark:bg-blue-900 dark:text-blue-200">
+                {{ $summary->initials }}
               </span>
+
               <div>
-                <h4 class="text-base font-semibold text-gray-900 dark:text-white">{{ $student->name }}</h4>
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $student->email }}</p>
+                <h4 class="text-base font-semibold text-gray-900 dark:text-white">{{ $summary->student->name }}</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $summary->student->email }}</p>
               </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-              @php
-              $statusMap = [
-                  'completed' => ['label' => 'Terminee', 'classes' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'],
-                  'in_progress' => ['label' => 'En cours', 'classes' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'],
-                  'enrolled' => ['label' => 'Inscrit', 'classes' => 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'],
-              ];
-              $status = $statusMap[$student->pivot->status] ?? $statusMap['enrolled'];
-              @endphp
-              <span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium {{ $status['classes'] }}">
+              <span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium {{ $summary->status_classes }}">
                 <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd"></path>
                 </svg>
-                {{ $status['label'] }}
+                {{ $summary->status_label }}
               </span>
 
-              @if($student->pivot->score_total && $student->pivot->max_score_total)
-              <span class="inline-flex items-center gap-1 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-3 py-1 text-xs font-medium">
+              @if($summary->score_percent)
+              <span class="inline-flex items-center gap-1 rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                 <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M4 3a2 2 0 00-2 2v9.586A2 2 0 003.414 17L7 13.414a2 2 0 012.828 0L13.414 17A2 2 0 0015 17V5a2 2 0 00-2-2H4z" />
                 </svg>
-                {{ round(($student->pivot->score_total / $student->pivot->max_score_total) * 100, 1) }}%
+                {{ $summary->score_percent }}%
               </span>
               @endif
             </div>
 
             <div class="space-y-3">
               <div>
-                <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div class="mb-1 flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400">
                   <span>Progression</span>
-                  <span>{{ $progressPercent }}%</span>
+                  <span>{{ $summary->progress_percent }}%</span>
                 </div>
-                <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                  <div class="h-2 bg-blue-500 dark:bg-blue-400" style="width: {{ $progressPercent }}%"></div>
+                <div class="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div class="h-2 bg-blue-500 dark:bg-blue-400" style="width: {{ $summary->progress_percent }}%"></div>
                 </div>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {{ $completedLessons }} / {{ $progressBase }} lecons terminees
+                  {{ $summary->completed_lessons }} / {{ $summary->progress_base }} lecons terminees
                 </p>
               </div>
 
               <dl class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <div class="flex items-center justify-between">
                   <dt class="font-medium text-gray-500 dark:text-gray-400">Inscrit</dt>
-                  <dd>
-                    {{ $enrolledAt ? $enrolledAt->format('d/m/Y @ H:i') : 'Non renseigne' }}
-                  </dd>
+                  <dd>{{ $summary->enrolled_at ? $summary->enrolled_at->format('d/m/Y @ H:i') : 'Non renseigne' }}</dd>
                 </div>
-                @if($lastSeenAt)
+
+                @if($summary->last_seen_at)
                 <div class="flex items-center justify-between">
                   <dt class="font-medium text-gray-500 dark:text-gray-400">Derniere connexion</dt>
-                  <dd>{{ $lastSeenAt->format('d/m/Y @ H:i') }}</dd>
+                  <dd>{{ $summary->last_seen_at->format('d/m/Y @ H:i') }}</dd>
                 </div>
                 @endif
-                @if($completedAt)
+
+                @if($summary->completed_at)
                 <div class="flex items-center justify-between">
                   <dt class="font-medium text-gray-500 dark:text-gray-400">Terminee</dt>
-                  <dd>{{ $completedAt->format('d/m/Y @ H:i') }}</dd>
+                  <dd>{{ $summary->completed_at->format('d/m/Y @ H:i') }}</dd>
                 </div>
                 @endif
               </dl>
             </div>
           </div>
 
-          <div class="mt-4 border-t border-dashed border-gray-200 dark:border-gray-700 pt-4">
-            @if($totalTime > 0)
+          <div class="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-700">
+            @if($summary->has_time)
             <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
               <div>
                 <p class="font-medium text-gray-500 dark:text-gray-400">Temps passe</p>
-                <p>{{ $totalHours }}h {{ $totalMinutes }}min</p>
+                <p>{{ $summary->total_hours }}h {{ $summary->total_minutes }}min</p>
               </div>
               <div class="text-right">
                 <p class="font-medium text-gray-500 dark:text-gray-400">Lecons consultees</p>
-                <p>{{ $lessonCount }}</p>
+                <p>{{ $summary->lesson_count }}</p>
               </div>
             </div>
             @else
             <p class="text-sm text-gray-500 dark:text-gray-400">Aucune activite enregistree pour le moment.</p>
             @endif
 
-            <a href="{{ route('organisateur.formations.students.report', [$team, $formation, $student]) }}"
-              class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition">
+            <a href="{{ route('organisateur.formations.students.report', [$team, $formation, $summary->student]) }}"
+              class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -357,7 +247,7 @@
       </div>
     </div>
     @else
-    <div class="text-center py-12">
+    <div class="py-12 text-center">
       <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">

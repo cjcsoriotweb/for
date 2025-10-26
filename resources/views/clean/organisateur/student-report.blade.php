@@ -1,20 +1,4 @@
 <x-organisateur-layout :team="$team">
-  {{-- Messages de notification --}}
-  @if(session('success'))
-  <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-    {{ session('success') }}
-  </div>
-  @endif
-  @if(session('warning'))
-  <div class="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
-    {{ session('warning') }}
-  </div>
-  @endif
-  @if(session('error'))
-  <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-    {{ session('error') }}
-  </div>
-  @endif
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     {{-- Header --}}
@@ -63,8 +47,8 @@
           <a href="{{ route('organisateur.formations.students', [$team, $formation]) }}"
             class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+              </path>
             </svg>
             Retour aux élèves
           </a>
@@ -102,17 +86,15 @@
           <nav class="flex flex-wrap gap-2" aria-label="Sections du rapport">
             @php
             $tabs = [
-              'overview' => 'Vue d’ensemble',
-              'progress' => 'Progression détaillée',
-              'quizzes' => 'Quiz',
-              'activity' => 'Activité',
-              'documents' => 'Documents'
+            'overview' => 'Vue d’ensemble',
+            'progress' => 'Progression détaillée',
+            'quizzes' => 'Quiz',
+            'activity' => 'Activité',
+            'documents' => 'Documents'
             ];
             @endphp
             @foreach($tabs as $tabKey => $tabLabel)
-            <button type="button"
-              class="px-4 py-2 text-sm font-medium rounded-md transition"
-              :class="activeTab === '{{ $tabKey }}'
+            <button type="button" class="px-4 py-2 text-sm font-medium rounded-md transition" :class="activeTab === '{{ $tabKey }}'
                 ? 'bg-blue-600 text-white shadow'
                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
               @click="activeTab = '{{ $tabKey }}'">
