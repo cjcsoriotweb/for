@@ -6,6 +6,7 @@ use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\Lesson;
 use App\Models\Quiz;
+use App\Models\QuizAnswer;
 use App\Models\QuizAttempt;
 use App\Models\QuizChoice;
 use App\Models\Team;
@@ -243,47 +244,105 @@ class QuizComponentO extends Component
     /** Score par question selon le type */
     public function validateQuiz(): void
     {
-        $score = 0;
+        $questionSummaries = [];
+        $totalPoints = 0;
+        $earnedPoints = 0;
 
-        foreach ($this->questions as $q) {
-            $qid = (int) $q->id;
-            $type = $this->normalizeType($q->type);
+        foreach ($this->questions as $question) {
+            $questionId = (int) $question->id;
+            $type = $this->normalizeType($question->type);
+            $points = (int) ($question->points ?? 1);
+            $totalPoints += max(1, $points);
 
-            $correctIds = $q->quizChoices->where('is_correct', true)->pluck('id')->map(fn ($v) => (int) $v)->values()->all();
+            $correctIds = $question->quizChoices
+                ->where('is_correct', true)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->values();
 
-            if ($type === 'multiple_choice') {
-                $selected = collect($this->reponse[$qid] ?? [])
-                    ->map(fn ($v) => (int) $v)
+            $selectedIds = $type === 'multiple_choice'
+                ? collect($this->reponse[$questionId] ?? [])
+                    ->map(fn ($value) => (int) $value)
                     ->unique()
                     ->values()
-                    ->all();
+                : collect(isset($this->reponse[$questionId]) ? [(int) $this->reponse[$questionId]] : []);
 
-                // exact match : mêmes éléments, même cardinalité
-                sort($selected);
-                $expected = $correctIds;
-                sort($expected);
+            $sortedSelected = $selectedIds->sort()->values();
+            $sortedCorrect = $correctIds->sort()->values();
 
-                if (! empty($expected) && $selected === $expected) {
-                    $score++;
-                }
-            } else {
-                $selected = isset($this->reponse[$qid]) ? (int) $this->reponse[$qid] : null;
+            $isQuestionCorrect = $sortedSelected->isNotEmpty()
+                && $sortedSelected->count() === $sortedCorrect->count()
+                && $sortedSelected->every(fn ($value, $index) => $value === ($sortedCorrect[$index] ?? null));
 
-                // single : il faut exactement le seul bon id
-                if (count($correctIds) === 1 && $selected === (int) $correctIds[0]) {
-                    $score++;
-                }
+            if ($type !== 'multiple_choice') {
+                $isQuestionCorrect = $selectedIds->isNotEmpty() && $correctIds->contains($selectedIds->first());
+            }
+
+            if ($isQuestionCorrect) {
+                $earnedPoints += max(1, $points);
+            }
+
+            $questionSummaries[] = [
+                'question' => $question,
+                'selected_ids' => $selectedIds,
+                'correct_ids' => $correctIds,
+                'has_selection' => $selectedIds->isNotEmpty(),
+            ];
+        }
+
+        $scorePercent = $totalPoints > 0
+            ? (int) round(($earnedPoints / $totalPoints) * 100)
+            : 0;
+
+        $timestamp = now();
+
+        $attempt = QuizAttempt::create([
+            'quiz_id' => $this->quiz->id,
+            'user_id' => Auth::id(),
+            'score' => max(0, min(100, $scorePercent)),
+            'max_score' => max(1, $totalPoints),
+            'duration_seconds' => $this->countdownPast,
+            'submitted_at' => $timestamp,
+            'started_at' => $timestamp->copy()->subSeconds($this->countdownPast),
+        ]);
+
+        $answerRows = [];
+
+        foreach ($questionSummaries as $summary) {
+            /** @var \App\Models\QuizQuestion $question */
+            $question = $summary['question'];
+            $selectedIds = $summary['selected_ids'];
+            $correctIds = $summary['correct_ids'];
+
+            if ($selectedIds->isEmpty()) {
+                $answerRows[] = [
+                    'quiz_attempt_id' => $attempt->id,
+                    'question_id' => $question->id,
+                    'choice_id' => null,
+                    'text_answer' => null,
+                    'is_correct' => false,
+                    'created_at' => $timestamp,
+                    'updated_at' => $timestamp,
+                ];
+                continue;
+            }
+
+            foreach ($selectedIds as $choiceId) {
+                $answerRows[] = [
+                    'quiz_attempt_id' => $attempt->id,
+                    'question_id' => $question->id,
+                    'choice_id' => $choiceId,
+                    'text_answer' => null,
+                    'is_correct' => $correctIds->contains($choiceId),
+                    'created_at' => $timestamp,
+                    'updated_at' => $timestamp,
+                ];
             }
         }
 
-        QuizAttempt::create([
-            'quiz_id' => $this->quiz->id,
-            'user_id' => Auth::id(),
-            'score' => $score,
-            'duration_seconds' => $this->countdownPast,
-            'submitted_at' => now(),
-            'started_at' => now()->subSeconds($this->countdownPast),
-        ]);
+        if (! empty($answerRows)) {
+            QuizAnswer::insert($answerRows);
+        }
 
         $this->lesson->learners()->updateExistingPivot(Auth::id(), [
             'status' => 'completed',

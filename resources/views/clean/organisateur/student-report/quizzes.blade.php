@@ -45,9 +45,10 @@
           </div>
         </div>
 
-        @if ($attempt->answers->count() > 0)
         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <p class="text-sm font-medium text-gray-900 dark:text-white mb-3">R&eacute;ponses d&eacute;taill&eacute;es</p>
+
+          @if ($attempt->answers->count() > 0)
           <div class="space-y-3">
             @foreach ($attempt->answers as $answer)
             <div
@@ -65,6 +66,10 @@
                       class="ml-1 inline-flex items-center px-2 py-0.5 rounded {{ $answer->is_correct ? 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-100' : 'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-100' }}">
                       {{ $answer->choice->choice_text }}
                     </span>
+                  </p>
+                  @else
+                  <p class="mt-2 text-xs italic text-gray-500 dark:text-gray-400">
+                    Aucune r&eacute;ponse n'a &eacute;t&eacute; s&eacute;lectionn&eacute;e pour cette question.
                   </p>
                   @endif
                 </div>
@@ -92,8 +97,12 @@
             </div>
             @endforeach
           </div>
+          @else
+          <p class="text-sm italic text-gray-500 dark:text-gray-400">
+            Aucune r&eacute;ponse n'a &eacute;t&eacute; enregistr&eacute;e pour cette tentative.
+          </p>
+          @endif
         </div>
-        @endif
       </div>
       @endforeach
     </div>
