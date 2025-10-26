@@ -10,6 +10,8 @@ use App\Services\UserActivityService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class OrganisateurPageController extends Controller
 {
@@ -32,7 +34,7 @@ class OrganisateurPageController extends Controller
         ));
     }
 
-    public function students(Team $team, \App\Models\Formation $formation)
+    public function students(Request $request, Team $team, \App\Models\Formation $formation)
     {
         // Vérifier que la formation est bien accessible à cette équipe
         $isFormationVisible = $formation->teams()
@@ -84,11 +86,111 @@ class OrganisateurPageController extends Controller
             }
         }
 
-        return view('clean.organisateur.students', compact(
-            'team',
-            'formation',
-            'students'
-        ));
+        $search = trim($request->query('search', ''));
+        $statusFilter = $request->query('status');
+
+        $statusPriority = [
+            'completed' => 3,
+            'in_progress' => 2,
+            'enrolled' => 1,
+        ];
+
+        $sortedStudents = $students->sortByDesc(function ($student) use ($statusPriority) {
+            return $statusPriority[$student->pivot->status] ?? 0;
+        })->values();
+
+        $filteredStudents = $sortedStudents
+            ->when($search, function ($collection) use ($search) {
+                $needle = mb_strtolower($search);
+
+                return $collection->filter(function ($student) use ($needle) {
+                    return str_contains(mb_strtolower($student->name), $needle)
+                        || str_contains(mb_strtolower($student->email), $needle);
+                });
+            })
+            ->when($statusFilter, function ($collection) use ($statusFilter) {
+                return $collection->filter(fn ($student) => $student->pivot->status === $statusFilter);
+            })
+            ->values();
+
+        $totalFormationLessons = max($formation->lessons->count(), 1);
+
+        $studentSummaries = $filteredStudents->map(function ($student) use ($totalFormationLessons) {
+            $totalTime = 0;
+            $lessonCount = 0;
+            $completedLessons = 0;
+
+            foreach ($student->lessons as $lesson) {
+                $watchedSeconds = $lesson->pivot->watched_seconds ?? 0;
+
+                if ($watchedSeconds > 0) {
+                    $totalTime += $watchedSeconds;
+                    $lessonCount++;
+                }
+
+                if (($lesson->pivot->status ?? '') === 'completed') {
+                    $completedLessons++;
+                }
+            }
+
+            $totalHours = (int) floor($totalTime / 3600);
+            $totalMinutes = (int) floor(($totalTime % 3600) / 60);
+            $progressBase = max($totalFormationLessons, $student->lessons->count(), 1);
+            $progressPercent = min(100, (int) round(($completedLessons / $progressBase) * 100));
+
+            $statusMap = [
+                'completed' => ['label' => 'Terminee', 'classes' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'],
+                'in_progress' => ['label' => 'En cours', 'classes' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'],
+                'enrolled' => ['label' => 'Inscrit', 'classes' => 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'],
+            ];
+
+            $status = $statusMap[$student->pivot->status] ?? $statusMap['enrolled'];
+
+            $scorePercent = null;
+            if ($student->pivot->score_total && $student->pivot->max_score_total) {
+                $scorePercent = round(($student->pivot->score_total / $student->pivot->max_score_total) * 100, 1);
+            }
+
+            return (object) [
+                'student' => $student,
+                'initials' => Str::upper(Str::substr($student->name, 0, 2)),
+                'status_label' => $status['label'],
+                'status_classes' => $status['classes'],
+                'score_percent' => $scorePercent,
+                'progress_percent' => $progressPercent,
+                'completed_lessons' => $completedLessons,
+                'progress_base' => $progressBase,
+                'enrolled_at' => Carbon::make($student->pivot->enrolled_at),
+                'last_seen_at' => Carbon::make($student->pivot->last_seen_at),
+                'completed_at' => Carbon::make($student->pivot->completed_at),
+                'has_time' => $totalTime > 0,
+                'total_hours' => $totalHours,
+                'total_minutes' => $totalMinutes,
+                'lesson_count' => $lessonCount,
+            ];
+        });
+
+        $totalSeconds = $students->reduce(function ($carry, $student) {
+            return $carry + $student->lessons->sum(fn ($lesson) => $lesson->pivot->watched_seconds ?? 0);
+        }, 0);
+
+        $stats = [
+            'total' => $students->count(),
+            'completed' => $students->where('pivot.status', 'completed')->count(),
+            'in_progress' => $students->where('pivot.status', 'in_progress')->count(),
+            'time_hours' => (int) floor($totalSeconds / 3600),
+            'time_minutes' => (int) floor(($totalSeconds % 3600) / 60),
+        ];
+
+        return view('clean.organisateur.students', [
+            'team' => $team,
+            'formation' => $formation,
+            'students' => $students,
+            'studentSummaries' => $studentSummaries,
+            'search' => $search,
+            'statusFilter' => $statusFilter,
+            'stats' => $stats,
+        ]);
     }
 
     public function studentReport(Request $request, Team $team, \App\Models\Formation $formation, \App\Models\User $student)

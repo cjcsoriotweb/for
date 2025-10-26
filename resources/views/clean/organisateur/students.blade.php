@@ -1,20 +1,50 @@
 <x-organisateur-layout :team="$team">
-  {{-- Messages de notification --}}
+  {{-- Notification banners --}}
   @if(session('success'))
   <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
     {{ session('success') }}
   </div>
   @endif
+
   @if(session('warning'))
   <div class="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
     {{ session('warning') }}
   </div>
   @endif
+
   @if(session('error'))
   <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
     {{ session('error') }}
   </div>
   @endif
+
+  @php
+  $search = trim(request('search', ''));
+  $statusFilter = request('status');
+
+  $sortedStudents = $students->sortByDesc(function ($student) {
+      return match ($student->pivot->status) {
+          'completed' => 3,
+          'in_progress' => 2,
+          default => 1,
+      };
+  });
+
+  $filteredStudents = $sortedStudents
+      ->when($search, function ($collection) use ($search) {
+          $needle = strtolower($search);
+
+          return $collection->filter(function ($student) use ($needle) {
+              return str_contains(strtolower($student->name), $needle)
+                  || str_contains(strtolower($student->email), $needle);
+          });
+      })
+      ->when($statusFilter, function ($collection) use ($statusFilter) {
+          return $collection->filter(fn ($student) => $student->pivot->status === $statusFilter);
+      });
+
+  $totalFormationLessons = max($formation->lessons->count(), 1);
+  @endphp
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     {{-- Header --}}
@@ -59,7 +89,7 @@
       </div>
     </div>
 
-    {{-- Statistiques --}}
+    {{-- Quick stats --}}
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-5">
@@ -124,25 +154,23 @@
             <div class="flex-shrink-0">
               <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 6v6h4"></path>
+                  d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
               </svg>
             </div>
             <div class="ml-5 w-0 flex-1">
               <dl>
                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Temps cumule</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white">
-                  @php
-                  $totalSeconds = 0;
-                  foreach ($students as $student) {
-                      foreach ($student->lessons as $lesson) {
-                          $totalSeconds += $lesson->pivot->watched_seconds ?? 0;
-                      }
-                  }
-                  $hours = floor($totalSeconds / 3600);
-                  $minutes = floor(($totalSeconds % 3600) / 60);
-                  @endphp
-                  {{ $hours }}h {{ $minutes }}min
-                </dd>
+                @php
+                $totalSeconds = 0;
+                foreach ($students as $student) {
+                    foreach ($student->lessons as $lesson) {
+                        $totalSeconds += $lesson->pivot->watched_seconds ?? 0;
+                    }
+                }
+                $statHours = floor($totalSeconds / 3600);
+                $statMinutes = floor(($totalSeconds % 3600) / 60);
+                @endphp
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ $statHours }}h {{ $statMinutes }}min</dd>
               </dl>
             </div>
           </div>
@@ -150,29 +178,76 @@
       </div>
     </div>
 
-    {{-- Liste des eleves --}}
-    @if($students->count() > 0)
+    {{-- Filters --}}
+    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-8">
+      <form method="GET" class="grid gap-4 md:grid-cols-3">
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recherche</label>
+          <input id="search" name="search" value="{{ $search }}"
+            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+            placeholder="Nom ou email">
+        </div>
+
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
+          <select id="status" name="status"
+            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+            <option value="">Tous les statuts</option>
+            <option value="completed" @selected($statusFilter === 'completed')>Terminee</option>
+            <option value="in_progress" @selected($statusFilter === 'in_progress')>En cours</option>
+            <option value="enrolled" @selected($statusFilter === 'enrolled')>Inscrit</option>
+          </select>
+        </div>
+
+        <div class="flex items-end gap-3">
+          <button type="submit"
+            class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            Appliquer
+          </button>
+          @if($search || $statusFilter)
+          <a href="{{ route('organisateur.formations.students', [$team, $formation]) }}"
+            class="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+            Reinitialiser
+          </a>
+          @endif
+        </div>
+      </form>
+    </div>
+
+    {{-- Students --}}
+    @if($filteredStudents->count() > 0)
     <div class="space-y-6">
       <div class="flex items-center justify-between">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Liste des eleves ({{ $students->count() }})</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Statut, temps passe et acces rapide au rapport detaille.</p>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Liste des eleves ({{ $filteredStudents->count() }})</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Progression, temps passe et acces rapide au rapport detaille.</p>
         </div>
       </div>
 
       <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        @foreach($students as $student)
+        @foreach($filteredStudents as $student)
         @php
         $totalTime = 0;
         $lessonCount = 0;
+        $completedLessons = 0;
         foreach ($student->lessons as $lesson) {
             if ($lesson->pivot->watched_seconds) {
                 $totalTime += $lesson->pivot->watched_seconds;
                 $lessonCount++;
             }
+            if ($lesson->pivot->status === 'completed') {
+                $completedLessons++;
+            }
         }
         $totalHours = floor($totalTime / 3600);
         $totalMinutes = floor(($totalTime % 3600) / 60);
+
+        $progressBase = max($totalFormationLessons, $student->lessons->count(), 1);
+        $progressPercent = min(100, round(($completedLessons / $progressBase) * 100));
+
+        $enrolledAt = \Carbon\Carbon::make($student->pivot->enrolled_at);
+        $lastSeenAt = \Carbon\Carbon::make($student->pivot->last_seen_at);
+        $completedAt = \Carbon\Carbon::make($student->pivot->completed_at);
         @endphp
 
         <article class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex flex-col justify-between">
@@ -215,26 +290,41 @@
               @endif
             </div>
 
-            <dl class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <div class="flex items-center justify-between">
-                <dt class="font-medium text-gray-500 dark:text-gray-400">Inscrit</dt>
-                <dd>
-                  {{ $student->pivot->enrolled_at instanceof \Carbon\Carbon ? $student->pivot->enrolled_at->format('d/m/Y @ H:i') : 'N/A' }}
-                </dd>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  <span>Progression</span>
+                  <span>{{ $progressPercent }}%</span>
+                </div>
+                <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div class="h-2 bg-blue-500 dark:bg-blue-400" style="width: {{ $progressPercent }}%"></div>
+                </div>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {{ $completedLessons }} / {{ $progressBase }} lecons terminees
+                </p>
               </div>
-              @if($student->pivot->last_seen_at instanceof \Carbon\Carbon)
-              <div class="flex items-center justify-between">
-                <dt class="font-medium text-gray-500 dark:text-gray-400">Derniere connexion</dt>
-                <dd>{{ $student->pivot->last_seen_at->format('d/m/Y @ H:i') }}</dd>
-              </div>
-              @endif
-              @if($student->pivot->completed_at instanceof \Carbon\Carbon)
-              <div class="flex items-center justify-between">
-                <dt class="font-medium text-gray-500 dark:text-gray-400">Terminee</dt>
-                <dd>{{ $student->pivot->completed_at->format('d/m/Y @ H:i') }}</dd>
-              </div>
-              @endif
-            </dl>
+
+              <dl class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <div class="flex items-center justify-between">
+                  <dt class="font-medium text-gray-500 dark:text-gray-400">Inscrit</dt>
+                  <dd>
+                    {{ $enrolledAt ? $enrolledAt->format('d/m/Y @ H:i') : 'Non renseigne' }}
+                  </dd>
+                </div>
+                @if($lastSeenAt)
+                <div class="flex items-center justify-between">
+                  <dt class="font-medium text-gray-500 dark:text-gray-400">Derniere connexion</dt>
+                  <dd>{{ $lastSeenAt->format('d/m/Y @ H:i') }}</dd>
+                </div>
+                @endif
+                @if($completedAt)
+                <div class="flex items-center justify-between">
+                  <dt class="font-medium text-gray-500 dark:text-gray-400">Terminee</dt>
+                  <dd>{{ $completedAt->format('d/m/Y @ H:i') }}</dd>
+                </div>
+                @endif
+              </dl>
+            </div>
           </div>
 
           <div class="mt-4 border-t border-dashed border-gray-200 dark:border-gray-700 pt-4">
