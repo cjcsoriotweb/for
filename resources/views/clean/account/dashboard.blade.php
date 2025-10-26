@@ -102,16 +102,6 @@
                     </div>
                   </div>
 
-                  <!-- Enhanced Content -->
-                  <div class="text-center">
-                    <div
-                      class="flex items-center justify-center text-base font-semibold text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 bg-blue-50/50 dark:bg-blue-900/20 px-4 py-2 rounded-full transition-all duration-300 group-hover:bg-blue-100/70 dark:group-hover:bg-blue-800/30">
-                      <span
-                        class="material-symbols-outlined text-xl mr-2 transition-transform duration-300 group-hover:scale-110">search</span>
-                      <span>{{ __("Découvrir") }}</span>
-                    </div>
-                  </div>
-
                   <!-- Enhanced bottom accent line -->
                   <div
                     class="absolute bottom-0 left-0 h-1.5 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 transform scale-x-0 transition-transform duration-700 group-hover:scale-x-100 origin-left">
