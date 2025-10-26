@@ -542,7 +542,18 @@ class ElevePageController extends Controller
         $score = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
         $passed = $score >= $quiz->passing_score;
 
-        // Enregistrer la tentative
+        // Créer la tentative de quiz
+        $attempt = \App\Models\QuizAttempt::create([
+            'user_id' => $user->id,
+            'quiz_id' => $quiz->id,
+            'score' => $score,
+            'max_score' => $maxScore,
+            'duration_seconds' => 0, // TODO: calculer la durée réelle si nécessaire
+            'started_at' => now(),
+            'submitted_at' => now(),
+        ]);
+
+        // Enregistrer la tentative dans la progression de la leçon
         $attempts = ($lesson->learners()->where('user_id', $user->id)->first()?->pivot?->attempts ?? 0) + 1;
 
         $lesson->learners()->syncWithoutDetaching([
@@ -559,10 +570,9 @@ class ElevePageController extends Controller
         // Enregistrer les réponses individuelles
         foreach ($answers as $questionId => $choiceId) {
             \App\Models\QuizAnswer::create([
-                'user_id' => $user->id,
-                'quiz_question_id' => $questionId,
-                'quiz_choice_id' => $choiceId,
-                'lesson_id' => $lesson->id,
+                'quiz_attempt_id' => $attempt->id,
+                'question_id' => $questionId,
+                'choice_id' => $choiceId,
                 'is_correct' => $quiz->quizQuestions()->find($questionId)?->quizChoices()->find($choiceId)?->is_correct ?? false,
             ]);
         }
@@ -610,7 +620,7 @@ class ElevePageController extends Controller
         $quiz = $lesson->lessonable;
 
         // Récupérer les réponses de cette tentative
-        $answers = $attempt->quizAnswers()->with(['quizQuestion', 'quizChoice'])->get();
+        $answers = $attempt->answers()->with(['question', 'choice'])->get();
 
         // Récupérer les informations du quiz
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();

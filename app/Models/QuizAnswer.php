@@ -30,7 +30,7 @@ class QuizAnswer extends Model
 
     public function quizAttempt()
     {
-        return $this->belongsTo(QuizAttempt::class);
+        return $this->belongsTo(QuizAttempt::class, 'quiz_attempt_id');
     }
 
     public function question()

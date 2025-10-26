@@ -1,0 +1,230 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\UserActivityLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+
+class UserActivityService
+{
+    /**
+     * Log user activity
+     */
+    public function logActivity(Request $request, ?int $userId = null): UserActivityLog
+    {
+        $userId = $userId ?? Auth::id();
+
+        if (!$userId) {
+            throw new \Exception('User ID is required for activity logging');
+        }
+
+        // Get client IP address
+        $ipAddress = $this->getClientIp($request);
+
+        // Get session ID
+        $sessionId = Session::getId();
+
+        // Prepare activity data
+        $activityData = [
+            'user_id' => $userId,
+            'session_id' => $sessionId,
+            'ip_address' => $ipAddress,
+            'user_agent' => $request->userAgent(),
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'referrer' => $request->header('referer'),
+            'started_at' => now(),
+            'request_data' => $this->getRequestData($request),
+        ];
+
+        return UserActivityLog::create($activityData);
+    }
+
+    /**
+     * Update activity end time and duration
+     */
+    public function endActivity(UserActivityLog $activityLog): UserActivityLog
+    {
+        $endedAt = now();
+        $duration = $activityLog->started_at ? $endedAt->diffInSeconds($activityLog->started_at) : 0;
+
+        $activityLog->update([
+            'ended_at' => $endedAt,
+            'duration_seconds' => $duration,
+        ]);
+
+        return $activityLog;
+    }
+
+    /**
+     * Get activity logs for a user
+     */
+    public function getUserActivityLogs(int $userId, ?int $limit = null, ?string $startDate = null, ?string $endDate = null)
+    {
+        $query = UserActivityLog::forUser($userId)
+            ->with('user')
+            ->orderBy('created_at', 'desc');
+
+        if ($startDate && $endDate) {
+            $query->dateRange($startDate, $endDate);
+        }
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Get activity summary for a user
+     */
+    public function getUserActivitySummary(int $userId, ?string $startDate = null, ?string $endDate = null): array
+    {
+        $query = UserActivityLog::forUser($userId);
+
+        if ($startDate && $endDate) {
+            $query->dateRange($startDate, $endDate);
+        }
+
+        $logs = $query->get();
+
+        if ($logs->isEmpty()) {
+            return [
+                'total_sessions' => 0,
+                'total_time_seconds' => 0,
+                'total_page_views' => 0,
+                'unique_ips' => 0,
+                'average_session_duration' => 0,
+                'most_visited_pages' => [],
+                'activity_by_hour' => [],
+                'activity_by_day' => [],
+            ];
+        }
+
+        // Calculate summary statistics
+        $totalSessions = $logs->pluck('session_id')->unique()->count();
+        $totalTimeSeconds = $logs->sum('duration_seconds');
+        $totalPageViews = $logs->count();
+        $uniqueIps = $logs->pluck('ip_address')->unique()->count();
+
+        // Average session duration
+        $averageSessionDuration = $totalSessions > 0 ? $totalTimeSeconds / $totalSessions : 0;
+
+        // Most visited pages
+        $mostVisitedPages = $logs->groupBy('url')
+            ->map(function ($pageLogs) {
+                return [
+                    'url' => $pageLogs->first()->url,
+                    'count' => $pageLogs->count(),
+                    'total_time' => $pageLogs->sum('duration_seconds'),
+                ];
+            })
+            ->sortByDesc('count')
+            ->take(10)
+            ->values()
+            ->toArray();
+
+        // Activity by hour
+        $activityByHour = $logs->groupBy(function ($log) {
+            return $log->created_at->format('H');
+        })->map(function ($hourLogs) {
+            return $hourLogs->count();
+        })->sortKeys()->toArray();
+
+        // Activity by day
+        $activityByDay = $logs->groupBy(function ($log) {
+            return $log->created_at->format('Y-m-d');
+        })->map(function ($dayLogs) {
+            return [
+                'count' => $dayLogs->count(),
+                'total_time' => $dayLogs->sum('duration_seconds'),
+            ];
+        })->sortKeys()->toArray();
+
+        return [
+            'total_sessions' => $totalSessions,
+            'total_time_seconds' => $totalTimeSeconds,
+            'total_page_views' => $totalPageViews,
+            'unique_ips' => $uniqueIps,
+            'average_session_duration' => round($averageSessionDuration, 0),
+            'most_visited_pages' => $mostVisitedPages,
+            'activity_by_hour' => $activityByHour,
+            'activity_by_day' => $activityByDay,
+        ];
+    }
+
+    /**
+     * Get client IP address
+     */
+    private function getClientIp(Request $request): ?string
+    {
+        // Check for IP in various headers (in order of preference)
+        $ipHeaders = [
+            'HTTP_CF_CONNECTING_IP', // Cloudflare
+            'HTTP_X_FORWARDED_FOR',  // Standard proxy header
+            'HTTP_X_REAL_IP',        // Nginx proxy header
+            'REMOTE_ADDR',           // Direct connection
+        ];
+
+        foreach ($ipHeaders as $header) {
+            if ($request->hasHeader($header)) {
+                $ip = $request->header($header);
+
+                // Handle comma-separated IPs (take the first one)
+                if (str_contains($ip, ',')) {
+                    $ip = trim(explode(',', $ip)[0]);
+                }
+
+                // Validate IP address
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $ip;
+                }
+            }
+        }
+
+        return $request->ip();
+    }
+
+    /**
+     * Get relevant request data for logging
+     */
+    private function getRequestData(Request $request): array
+    {
+        return [
+            'query_params' => $request->query(),
+            'route_name' => $request->route() ? $request->route()->getName() : null,
+            'route_action' => $request->route() ? $request->route()->getActionName() : null,
+            'content_length' => $request->header('Content-Length'),
+            'content_type' => $request->header('Content-Type'),
+        ];
+    }
+
+    /**
+     * Clean up old activity logs
+     */
+    public function cleanupOldLogs(int $daysToKeep = 90): int
+    {
+        return UserActivityLog::where('created_at', '<', now()->subDays($daysToKeep))
+            ->delete();
+    }
+
+    /**
+     * Get unique sessions for a user
+     */
+    public function getUserSessions(int $userId, ?string $startDate = null, ?string $endDate = null)
+    {
+        $query = UserActivityLog::forUser($userId)
+            ->whereNotNull('session_id')
+            ->select('session_id', 'ip_address', 'user_agent')
+            ->distinct();
+
+        if ($startDate && $endDate) {
+            $query->dateRange($startDate, $endDate);
+        }
+
+        return $query->get();
+    }
+}

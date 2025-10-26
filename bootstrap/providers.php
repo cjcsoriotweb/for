@@ -5,4 +5,5 @@ return [
     App\Providers\FormationServiceProvider::class,
     App\Providers\FortifyServiceProvider::class,
     App\Providers\JetstreamServiceProvider::class,
+    Barryvdh\DomPDF\ServiceProvider::class,
 ];

@@ -12,4 +12,8 @@ Route::prefix('organisateur')
         Route::get('/{team}', [OrganisateurPageController::class, 'home'])->name('index');
         Route::get('/{team}/formations/{formation}/students', [OrganisateurPageController::class, 'students'])->name('formations.students');
         Route::get('/{team}/formations/{formation}/students/{student}/report', [OrganisateurPageController::class, 'studentReport'])->name('formations.students.report');
+
+        // PDF routes
+        Route::get('/{team}/formations/{formation}/students/{student}/report/pdf', [OrganisateurPageController::class, 'studentReportPdf'])->name('formations.students.report.pdf');
+        Route::get('/{team}/formations/{formation}/students/{student}/report/pdf/download', [OrganisateurPageController::class, 'studentReportPdfDownload'])->name('formations.students.report.pdf.download');
     });
