@@ -18,7 +18,7 @@ class RechargeController extends Controller
 
     public function show(Team $team)
     {
-        if (! Auth::user()->belongsToTeam($team)) {
+        if (! Auth::user()->belongsToTeam($team) && !Auth::user()->superadmin) {
             return redirect()->route('organisateur.index', $team)
                 ->with('error', 'Accès non autorisé.');
         }
