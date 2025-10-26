@@ -73,20 +73,20 @@ class UserActivityLog extends Model
     public function getFormattedDurationAttribute(): string
     {
         if ($this->duration_seconds < 60) {
-            return $this->duration_seconds . 's';
+            return $this->duration_seconds.'s';
         }
 
         $minutes = floor($this->duration_seconds / 60);
         $seconds = $this->duration_seconds % 60;
 
         if ($minutes < 60) {
-            return $minutes . 'min ' . $seconds . 's';
+            return $minutes.'min '.$seconds.'s';
         }
 
         $hours = floor($minutes / 60);
         $remainingMinutes = $minutes % 60;
 
-        return $hours . 'h ' . $remainingMinutes . 'min';
+        return $hours.'h '.$remainingMinutes.'min';
     }
 
     /**
@@ -94,7 +94,7 @@ class UserActivityLog extends Model
      */
     public function getFormattedIpAttribute(): string
     {
-        if (!$this->ip_address) {
+        if (! $this->ip_address) {
             return 'N/A';
         }
 
@@ -106,7 +106,7 @@ class UserActivityLog extends Model
      */
     public function getBrowserInfoAttribute(): ?string
     {
-        if (!$this->user_agent) {
+        if (! $this->user_agent) {
             return null;
         }
 
@@ -129,7 +129,7 @@ class UserActivityLog extends Model
      */
     public function getDeviceTypeAttribute(): string
     {
-        if (!$this->user_agent) {
+        if (! $this->user_agent) {
             return 'Unknown';
         }
 

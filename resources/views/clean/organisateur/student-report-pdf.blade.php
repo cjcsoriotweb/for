@@ -596,6 +596,87 @@
   </div>
   @endif
 
+  {{-- Rapport de connexion et activité --}}
+  @php
+  $activityLogs = isset($activityLogs) ? $activityLogs : collect();
+  $activitySummary = isset($activitySummary) ? $activitySummary : [];
+  @endphp
+
+  @if($activityLogs->count() > 0)
+  <div class="section">
+    <h2 class="section-title">Rapport de connexion</h2>
+
+    {{-- Résumé d'activité --}}
+    @if(isset($activitySummary) && $activitySummary['total_sessions'] > 0)
+    <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+      <div class="stat-card">
+        <h3>Sessions</h3>
+        <p class="value">{{ $activitySummary['total_sessions'] }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Pages vues</h3>
+        <p class="value">{{ $activitySummary['total_page_views'] }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>IPs uniques</h3>
+        <p class="value">{{ $activitySummary['unique_ips'] }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Temps moyen</h3>
+        <p class="value">
+          @if($activitySummary['average_session_duration'] > 0)
+          {{ floor($activitySummary['average_session_duration'] / 60) }}min
+          @else
+          N/A
+          @endif
+        </p>
+      </div>
+    </div>
+    @endif
+
+    {{-- Tableau des connexions --}}
+    <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+      <thead>
+        <tr style="background-color: #f1f5f9;">
+          <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-weight: bold;">Date/Heure</th>
+          <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-weight: bold;">IP</th>
+          <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-weight: bold;">Navigateur</th>
+          <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-weight: bold;">Appareil</th>
+          <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-weight: bold;">Page</th>
+          <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-weight: bold;">Durée</th>
+          <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-weight: bold;">Méthode</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($activityLogs as $activity)
+        <tr>
+          <td style="border: 1px solid #e2e8f0; padding: 6px;">{{ $activity->created_at->format('d/m/Y H:i:s') }}</td>
+          <td style="border: 1px solid #e2e8f0; padding: 6px;">{{ $activity->formatted_ip }}</td>
+          <td style="border: 1px solid #e2e8f0; padding: 6px;">{{ $activity->browser_info ?? 'N/A' }}</td>
+          <td style="border: 1px solid #e2e8f0; padding: 6px;">{{ $activity->device_type }}</td>
+          <td
+            style="border: 1px solid #e2e8f0; padding: 6px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {{ $activity->url ? parse_url($activity->url, PHP_URL_PATH) : 'N/A' }}
+          </td>
+          <td style="border: 1px solid #e2e8f0; padding: 6px;">{{ $activity->formatted_duration }}</td>
+          <td style="border: 1px solid #e2e8f0; padding: 6px;">
+            <span
+              style="background: {{ $activity->method === 'GET' ? '#dcfce7' : '#dbeafe' }}; color: {{ $activity->method === 'GET' ? '#166534' : '#1e40af' }}; padding: 2px 6px; border-radius: 10px; font-size: 9px;">
+              {{ $activity->method }}
+            </span>
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+
+    <p style="font-size: 10px; color: #64748b; margin-top: 10px; text-align: right;">
+      Affichage des {{ $activityLogs->count() }} dernières activités sur {{ $activitySummary['total_page_views'] ?? 0 }}
+      totales
+    </p>
+  </div>
+  @endif
+
   <div class="footer">
     <p>Rapport généré automatiquement le {{ now()->format('d/m/Y à H:i') }}</p>
     <p>Plateforme de formation - {{ config('app.name') }}</p>

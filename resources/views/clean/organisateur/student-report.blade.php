@@ -433,60 +433,278 @@
     </div>
     @endif
 
-    {{-- PDF Viewer Section --}}
+    {{-- Rapport de connexion et activité --}}
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-8">
       <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Rapport PDF</h3>
-          <div class="flex items-center space-x-3">
-            <a href="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
-              target="_blank"
-              class="inline-flex items-center px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900 hover:bg-blue-100 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-              Ouvrir dans un nouvel onglet
-            </a>
-
-            <a href="{{ route('organisateur.formations.students.report.pdf.download', [$team, $formation, $student]) }}"
-              class="inline-flex items-center px-3 py-2 border border-green-300 dark:border-green-600 rounded-md shadow-sm text-sm font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900 hover:bg-green-100 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                </path>
-              </svg>
-              Télécharger
-            </a>
+          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Rapport de connexion</h3>
+          <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-blue-400 rounded-full mr-2"></div>
+              {{ $activitySummary['total_sessions'] ?? 0 }} sessions
+            </div>
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+              {{ $activitySummary['total_page_views'] ?? 0 }} pages vues
+            </div>
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-purple-400 rounded-full mr-2"></div>
+              {{ $activitySummary['unique_ips'] ?? 0 }} IPs uniques
+            </div>
           </div>
         </div>
       </div>
       <div class="px-4 py-5 sm:px-6">
-        <div class="mb-4">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Visualisez le rapport PDF complet ci-dessous ou téléchargez-le pour l'imprimer ou le partager.
-          </p>
-        </div>
+        {{-- Formulaire de recherche --}}
+        <form method="GET"
+          action="{{ route('organisateur.formations.students.report', [$team, $formation, $student]) }}" class="mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label for="activity_search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Recherche
+              </label>
+              <input type="text" id="activity_search" name="activity_search" value="{{ request('activity_search') }}"
+                placeholder="IP, URL, navigateur..."
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+            </div>
 
-        {{-- PDF iframe --}}
-        <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
-          <iframe src="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
-            class="w-full h-96 border-0" title="Rapport PDF - {{ $student->name }}">
-            <p class="p-4 text-gray-600 dark:text-gray-400">
-              Votre navigateur ne supporte pas les iframes.
-              <a href="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
-                target="_blank" class="text-blue-600 hover:text-blue-800 underline">
-                Cliquez ici pour voir le PDF dans un nouvel onglet
-              </a>.
+            <div>
+              <label for="lesson_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Filtre par leçon
+              </label>
+              <select id="lesson_filter" name="lesson_filter"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                <option value="">Toutes les leçons</option>
+                @foreach($lessons as $lesson)
+                <option value="{{ $lesson->id }}" {{ request('lesson_filter')==$lesson->id ? 'selected' : '' }}>
+                  {{ $lesson->title }}
+                </option>
+                @endforeach
+              </select>
+            </div>
+
+            <div>
+              <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Date début
+              </label>
+              <input type="date" id="start_date" name="start_date" value="{{ request('start_date') }}"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+            </div>
+
+            <div>
+              <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Date fin
+              </label>
+              <input type="date" id="end_date" name="end_date" value="{{ request('end_date') }}"
+                class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+            </div>
+          </div>
+
+          <div class="mt-4 flex items-center space-x-3">
+            <button type="submit"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              Filtrer
+            </button>
+
+            @if(request('activity_search') || request('lesson_filter') || request('start_date') || request('end_date'))
+            <a href="{{ route('organisateur.formations.students.report', [$team, $formation, $student]) }}"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                </path>
+              </svg>
+              Réinitialiser
+            </a>
+            @endif
+          </div>
+        </form>
+        <div class="px-4 py-5 sm:px-6">
+          {{-- Résumé d'activité --}}
+          @if(isset($activitySummary) && $activitySummary['total_sessions'] > 0)
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-4">
+              <div class="text-sm font-medium text-blue-600 dark:text-blue-300">Sessions totales</div>
+              <div class="text-2xl font-bold text-blue-900 dark:text-blue-100">{{ $activitySummary['total_sessions'] }}
+              </div>
+            </div>
+            <div class="bg-green-50 dark:bg-green-900 rounded-lg p-4">
+              <div class="text-sm font-medium text-green-600 dark:text-green-300">Pages vues</div>
+              <div class="text-2xl font-bold text-green-900 dark:text-green-100">{{ $activitySummary['total_page_views']
+                }}</div>
+            </div>
+            <div class="bg-purple-50 dark:bg-purple-900 rounded-lg p-4">
+              <div class="text-sm font-medium text-purple-600 dark:text-purple-300">IPs uniques</div>
+              <div class="text-2xl font-bold text-purple-900 dark:text-purple-100">{{ $activitySummary['unique_ips'] }}
+              </div>
+            </div>
+            <div class="bg-orange-50 dark:bg-orange-900 rounded-lg p-4">
+              <div class="text-sm font-medium text-orange-600 dark:text-orange-300">Temps moyen/session</div>
+              <div class="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                @if($activitySummary['average_session_duration'] > 0)
+                {{ floor($activitySummary['average_session_duration'] / 60) }}min {{
+                $activitySummary['average_session_duration'] % 60 }}s
+                @else
+                N/A
+                @endif
+              </div>
+            </div>
+          </div>
+          @endif
+
+          {{-- Tableau des connexions --}}
+          @if($activityLogs->count() > 0)
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Date/Heure
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    IP Address
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Navigateur
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Appareil
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Page
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Durée
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Méthode
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                @foreach($activityLogs as $activity)
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {{ $activity->created_at->format('d/m/Y H:i:s') }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ $activity->formatted_ip }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ $activity->browser_info ?? 'N/A' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ $activity->device_type }}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate"
+                    title="{{ $activity->url }}">
+                    {{ $activity->url ? parse_url($activity->url, PHP_URL_PATH) : 'N/A' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ $activity->formatted_duration }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    {{ $activity->method === 'GET' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                       ($activity->method === 'POST' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                       'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200') }}">
+                      {{ $activity->method }}
+                    </span>
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+
+          {{-- Pagination info --}}
+          <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            <p>Affichage des {{ $activityLogs->count() }} dernières activités. Total: {{
+              $activitySummary['total_page_views'] ?? 0 }} pages vues.</p>
+          </div>
+          @else
+          <div class="text-center py-8">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+              </path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Aucune activité</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Aucune activité de connexion n'a été enregistrée pour cet étudiant.
             </p>
-          </iframe>
+          </div>
+          @endif
         </div>
+      </div>
 
-        <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
-          <p><strong>Note:</strong> Si le PDF ne s'affiche pas correctement, essayez de le télécharger directement ou de
-            l'ouvrir dans un nouvel onglet.</p>
+      {{-- PDF Viewer Section --}}
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Rapport PDF</h3>
+            <div class="flex items-center space-x-3">
+              <a href="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
+                target="_blank"
+                class="inline-flex items-center px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900 hover:bg-blue-100 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+                Ouvrir dans un nouvel onglet
+              </a>
+
+              <a href="{{ route('organisateur.formations.students.report.pdf.download', [$team, $formation, $student]) }}"
+                class="inline-flex items-center px-3 py-2 border border-green-300 dark:border-green-600 rounded-md shadow-sm text-sm font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900 hover:bg-green-100 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                  </path>
+                </svg>
+                Télécharger
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-5 sm:px-6">
+          <div class="mb-4">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Visualisez le rapport PDF complet ci-dessous ou téléchargez-le pour l'imprimer ou le partager.
+            </p>
+          </div>
+
+          {{-- PDF iframe --}}
+          <div
+            class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
+            <iframe src="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
+              class="w-full h-96 border-0" title="Rapport PDF - {{ $student->name }}">
+              <p class="p-4 text-gray-600 dark:text-gray-400">
+                Votre navigateur ne supporte pas les iframes.
+                <a href="{{ route('organisateur.formations.students.report.pdf', [$team, $formation, $student]) }}"
+                  target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                  Cliquez ici pour voir le PDF dans un nouvel onglet
+                </a>.
+              </p>
+            </iframe>
+          </div>
+
+          <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+            <p><strong>Note:</strong> Si le PDF ne s'affiche pas correctement, essayez de le télécharger directement ou
+              de
+              l'ouvrir dans un nouvel onglet.</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 </x-organisateur-layout>

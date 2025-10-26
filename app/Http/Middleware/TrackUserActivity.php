@@ -23,7 +23,7 @@ class TrackUserActivity
     public function handle(Request $request, Closure $next): Response
     {
         // Only track authenticated users
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return $next($request);
         }
 
@@ -37,7 +37,7 @@ class TrackUserActivity
             $this->userActivityService->logActivity($request);
         } catch (\Exception $e) {
             // Log error but don't break the request
-            Log::error('Failed to track user activity: ' . $e->getMessage(), [
+            Log::error('Failed to track user activity: '.$e->getMessage(), [
                 'user_id' => Auth::id(),
                 'url' => $request->fullUrl(),
                 'ip' => $request->ip(),

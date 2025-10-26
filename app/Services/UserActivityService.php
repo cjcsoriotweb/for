@@ -16,7 +16,7 @@ class UserActivityService
     {
         $userId = $userId ?? Auth::id();
 
-        if (!$userId) {
+        if (! $userId) {
             throw new \Exception('User ID is required for activity logging');
         }
 
@@ -39,7 +39,37 @@ class UserActivityService
             'request_data' => $this->getRequestData($request),
         ];
 
+        // Before creating new activity, update the duration of the previous activity for this session
+        $this->updatePreviousActivityDuration($userId, $sessionId);
+
         return UserActivityLog::create($activityData);
+    }
+
+    /**
+     * Update the duration of the previous activity for this user/session
+     */
+    private function updatePreviousActivityDuration(int $userId, string $sessionId): void
+    {
+        // Find the most recent activity for this user and session that doesn't have an end time
+        $previousActivity = UserActivityLog::forUser($userId)
+            ->forSession($sessionId)
+            ->whereNull('ended_at')
+            ->whereNotNull('started_at')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($previousActivity) {
+            $endedAt = now();
+            $duration = $previousActivity->started_at->diffInSeconds($endedAt);
+
+            // Only update if duration is reasonable (between 1 second and 1 hour)
+            if ($duration >= 1 && $duration <= 3600) {
+                $previousActivity->update([
+                    'ended_at' => $endedAt,
+                    'duration_seconds' => $duration,
+                ]);
+            }
+        }
     }
 
     /**
@@ -59,9 +89,9 @@ class UserActivityService
     }
 
     /**
-     * Get activity logs for a user
+     * Get activity logs for a user with search and filters
      */
-    public function getUserActivityLogs(int $userId, ?int $limit = null, ?string $startDate = null, ?string $endDate = null)
+    public function getUserActivityLogs(int $userId, ?int $limit = null, ?string $startDate = null, ?string $endDate = null, ?string $search = null, ?string $lessonFilter = null)
     {
         $query = UserActivityLog::forUser($userId)
             ->with('user')
@@ -69,6 +99,19 @@ class UserActivityService
 
         if ($startDate && $endDate) {
             $query->dateRange($startDate, $endDate);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('url', 'like', '%'.$search.'%')
+                    ->orWhere('ip_address', 'like', '%'.$search.'%')
+                    ->orWhere('user_agent', 'like', '%'.$search.'%');
+            });
+        }
+
+        if ($lessonFilter) {
+            // Filter by lesson-related URLs
+            $query->where('url', 'like', '%'.$lessonFilter.'%');
         }
 
         if ($limit) {

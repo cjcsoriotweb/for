@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
 use App\Services\Formation\StudentFormationService;
+use App\Services\UserActivityService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrganisateurPageController extends Controller
@@ -14,6 +16,7 @@ class OrganisateurPageController extends Controller
     public function __construct(
         private readonly AccountService $accountService,
         private readonly StudentFormationService $studentFormationService,
+        private readonly UserActivityService $userActivityService,
     ) {}
 
     public function home(Team $team)
@@ -88,7 +91,7 @@ class OrganisateurPageController extends Controller
         ));
     }
 
-    public function studentReport(Team $team, \App\Models\Formation $formation, \App\Models\User $student)
+    public function studentReport(Request $request, Team $team, \App\Models\Formation $formation, \App\Models\User $student)
     {
         // Vérifier que la formation est bien accessible à cette équipe
         $isFormationVisible = $formation->teams()
@@ -185,6 +188,22 @@ class OrganisateurPageController extends Controller
             $averageQuizScore = round($totalQuizScore / $quizAttempts->count(), 1);
         }
 
+        // Récupérer les données d'activité de l'étudiant avec filtres
+        $search = $request->get('activity_search');
+        $lessonFilter = $request->get('lesson_filter');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        $activityLogs = $this->userActivityService->getUserActivityLogs(
+            $student->id,
+            100,
+            $startDate,
+            $endDate,
+            $search,
+            $lessonFilter
+        );
+        $activitySummary = $this->userActivityService->getUserActivitySummary($student->id, $startDate, $endDate);
+
         return view('clean.organisateur.student-report', compact(
             'team',
             'formation',
@@ -200,7 +219,9 @@ class OrganisateurPageController extends Controller
             'totalHours',
             'totalMinutes',
             'totalSeconds',
-            'averageQuizScore'
+            'averageQuizScore',
+            'activityLogs',
+            'activitySummary'
         ));
     }
 
