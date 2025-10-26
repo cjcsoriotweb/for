@@ -87,7 +87,7 @@
     <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center justify-between">
         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-          Activités détaillées ({{ $activityLogs->count() }} résultats)
+          Activités détaillées ({{ method_exists($activityLogs, 'total') ? $activityLogs->total() : $activityLogs->count() }} résultats)
         </h3>
         <div class="flex items-center space-x-2">
           <label for="per_page" class="text-sm text-gray-500 dark:text-gray-400">Afficher:</label>

@@ -89,9 +89,11 @@ class UserActivityService
     }
 
     /**
-     * Get activity logs for a user with search and filters
+     * Get activity logs for a user with search and filters.
+     *
+     * @param  bool  $paginate  When true, return a paginator instead of a plain collection.
      */
-    public function getUserActivityLogs(int $userId, ?int $limit = null, ?string $startDate = null, ?string $endDate = null, ?string $search = null, ?string $lessonFilter = null)
+    public function getUserActivityLogs(int $userId, ?int $limit = null, ?string $startDate = null, ?string $endDate = null, ?string $search = null, ?string $lessonFilter = null, bool $paginate = false)
     {
         $query = UserActivityLog::forUser($userId)
             ->with('user')
@@ -112,6 +114,10 @@ class UserActivityService
         if ($lessonFilter) {
             // Filter by lesson-related URLs
             $query->where('url', 'like', '%'.$lessonFilter.'%');
+        }
+
+        if ($paginate) {
+            return $query->paginate($limit ?? 20);
         }
 
         if ($limit) {

@@ -18,7 +18,6 @@ class ActivityLogsTable extends Component
     public $endDate = '';
     public $perPage = 20;
 
-    public $activityLogs;
     public $activitySummary;
     public $availableLessons = [];
     public $lessons = [];
@@ -79,15 +78,6 @@ class ActivityLogsTable extends Component
     {
         $activityService = app(UserActivityService::class);
 
-        $this->activityLogs = $activityService->getUserActivityLogs(
-            $this->userId,
-            $this->perPage,
-            $this->startDate ?: null,
-            $this->endDate ?: null,
-            $this->search ?: null,
-            $this->lessonFilter ?: null
-        );
-
         $this->activitySummary = $activityService->getUserActivitySummary(
             $this->userId,
             $this->startDate ?: null,
@@ -107,6 +97,20 @@ class ActivityLogsTable extends Component
 
     public function render()
     {
-        return view('livewire.activity-logs-table');
+        $activityService = app(UserActivityService::class);
+
+        $activityLogs = $activityService->getUserActivityLogs(
+            $this->userId,
+            $this->perPage,
+            $this->startDate ?: null,
+            $this->endDate ?: null,
+            $this->search ?: null,
+            $this->lessonFilter ?: null,
+            true
+        );
+
+        return view('livewire.activity-logs-table', [
+            'activityLogs' => $activityLogs,
+        ]);
     }
 }
