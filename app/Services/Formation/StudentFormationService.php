@@ -56,7 +56,7 @@ class StudentFormationService extends BaseFormationService
      */
     public function listAvailableFormationsForTeam(Team $team): Collection
     {
-        return Formation::withCount('learners')
+        return Formation::withCount(['learners', 'lessons'])
             ->whereHas('teams', function (Builder $query) use ($team): void {
                 $query->where('teams.id', $team->id)
                     ->where('formation_in_teams.visible', true);
@@ -66,10 +66,11 @@ class StudentFormationService extends BaseFormationService
 
     public function listAvailableFormationsForTeamExceptCurrentUseByMe(Team $team): Collection
     {
-        return Formation::whereHas('teams', function (Builder $query) use ($team): void {
-            $query->where('teams.id', $team->id)
-                ->where('formation_in_teams.visible', true);
-        })
+        return Formation::withCount(['learners', 'lessons'])
+            ->whereHas('teams', function (Builder $query) use ($team): void {
+                $query->where('teams.id', $team->id)
+                    ->where('formation_in_teams.visible', true);
+            })
             ->whereDoesntHave('learners', function (Builder $q) {
                 $q->where('users.id', Auth::user()->id);
                 // Si tu n’as pas team_id sur ce pivot, supprime cette ligne.
