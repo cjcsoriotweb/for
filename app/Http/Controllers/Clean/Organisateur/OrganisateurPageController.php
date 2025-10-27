@@ -28,7 +28,7 @@ class OrganisateurPageController extends Controller
         $visibleFormations = $this->organisateurService->listVisibleFormations($team);
         $allFormations = Formation::withCount(['learners', 'lessons'])
             ->with(['lessons' => function ($query) {
-                $query->select('id', 'chapter_id', 'title', 'lessonable_type', 'lessonable_id');
+                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
             }])
             ->get();
 
@@ -48,10 +48,10 @@ class OrganisateurPageController extends Controller
         $formationWithDetails = Formation::withCount(['learners', 'lessons'])
             ->with([
                 'lessons' => function ($query) {
-                    $query->select('id', 'chapter_id', 'title', 'lessonable_type', 'lessonable_id');
+                    $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
                 },
                 'chapters.lessons' => function ($query) {
-                    $query->select('id', 'chapter_id', 'title', 'lessonable_type', 'lessonable_id');
+                    $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
                 }
             ])
             ->find($formation->id);

@@ -58,7 +58,7 @@ class StudentFormationService extends BaseFormationService
     {
         return Formation::withCount(['learners', 'lessons'])
             ->with(['lessons' => function ($query) {
-                $query->select('id', 'chapter_id', 'title', 'lessonable_type', 'lessonable_id');
+                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
             }])
             ->whereHas('teams', function (Builder $query) use ($team): void {
                 $query->where('teams.id', $team->id)
@@ -71,7 +71,7 @@ class StudentFormationService extends BaseFormationService
     {
         return Formation::withCount(['learners', 'lessons'])
             ->with(['lessons' => function ($query) {
-                $query->select('id', 'chapter_id', 'title', 'lessonable_type', 'lessonable_id');
+                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
             }])
             ->whereHas('teams', function (Builder $query) use ($team): void {
                 $query->where('teams.id', $team->id)
