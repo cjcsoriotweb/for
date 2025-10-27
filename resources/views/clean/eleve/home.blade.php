@@ -1,20 +1,12 @@
 <x-eleve-layout :team="$team">
-  {{-- Messages de notification --}}
-  @if(session('success'))
-  <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-    {{ session("success") }}
-  </div>
-  @endif @if(session('warning'))
-  <div class="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
-    {{ session("warning") }}
-  </div>
-  @endif @if(session('error'))
-  <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-    {{ session("error") }}
-  </div>
-  @endif
+  <div class="relative isolate min-h-[calc(100vh-8rem)] bg-gradient-to-b from-slate-900 via-slate-850 to-slate-800 text-slate-50">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.18),transparent_60%),linear-gradient(145deg,rgba(148,163,184,0.12),transparent_65%)]"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-14">
+      <x-eleve.notification-messages />
 
-  <x-eleve.hello :team="$team" :current-formation="$formationsWithProgress" />
-  <x-eleve.FormationChoice :team="$team" />
-  <x-eleve.FormationContinue :team="$team" :formations="$formationsWithProgress" />
+      <x-eleve.hello :team="$team" :current-formation="$formationsWithProgress" />
+      <x-eleve.FormationContinue :team="$team" :formations="$formationsWithProgress" />
+      <x-eleve.FormationChoice :team="$team" />
+    </div>
+  </div>
 </x-eleve-layout>
