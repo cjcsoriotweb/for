@@ -18,7 +18,7 @@
       @endphp
 
       <article
-        class="group relative isolate flex min-w-[260px] max-w-xs snap-start flex-col justify-between overflow-hidden rounded-3xl border border-white/15 bg-slate-900/60 transition duration-300 hover:-translate-y-1 hover:border-white/35 hover:shadow-[0_35px_120px_-45px_rgba(129,140,248,0.5)]">
+        class="group relative isolate flex min-w-[260px] max-w-xs snap-start flex-col justify-between overflow-hidden rounded-3xl border border-white/15 bg-slate-900/60 transition duration-300 hover:-translate-y-1 ">
         <div class="relative h-36 w-full overflow-hidden border-b border-white/10 bg-white/5 sm:h-40">
           <img src="{{ $formation->cover_image_url }}" alt="Image de couverture de {{ $fallbackTitle }}"
             class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy"
@@ -29,7 +29,7 @@
           <div class="flex items-center justify-between">
             <span
               class="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/80">
-              {{ $isCompleted ? 'Termin&eacute;' : 'Continuer' }}
+              {{ $isCompleted ? 'Terminé' : 'Continuer' }}
             </span>
             <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
               {{ $progressPercent }}%
@@ -59,7 +59,7 @@
 
           <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
             class="group/btn inline-flex items-center justify-center gap-2 rounded-2xl bg-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/30">
-            {{ $isCompleted ? 'Revoir la formation' : 'Voir les d&eacute;tails' }}
+            {{ $isCompleted ? 'Revoir la formation' : 'Voir les détails' }}
             <svg class="h-4 w-4 transition group-hover/btn:translate-x-0.5" viewBox="0 0 20 20" fill="currentColor"
               aria-hidden="true">
               <path fill-rule="evenodd"
