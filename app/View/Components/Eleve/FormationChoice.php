@@ -4,23 +4,71 @@ namespace App\View\Components\Eleve;
 
 use App\Models\Team;
 use App\Services\Formation\StudentFormationService;
+use App\Services\FormationEnrollmentService;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
 class FormationChoice extends Component
 {
-    public $availableFormations;
+    public Collection $formations;
 
-    public $team;
+    public Team $team;
 
     /**
      * Create a new component instance.
      */
-    public function __construct(StudentFormationService $studentFormationService, Team $team)
-    {
+    public function __construct(
+        StudentFormationService $studentFormationService,
+        FormationEnrollmentService $formationEnrollmentService,
+        Team $team
+    ) {
         $this->team = $team;
-        $this->availableFormations = $studentFormationService->listAvailableFormationsForTeamExceptCurrentUseByMe($team);
+
+        $user = Auth::user();
+
+        $availableFormations = $studentFormationService
+            ->listAvailableFormationsForTeamExceptCurrentUseByMe($team);
+
+        $this->formations = $availableFormations->map(function ($formation) use (
+            $studentFormationService,
+            $formationEnrollmentService,
+            $team,
+            $user
+        ) {
+            $isEnrolled = $user
+                ? $studentFormationService->isEnrolledInFormation($user, $formation, $team)
+                : false;
+
+            $progress = $isEnrolled && $user
+                ? $studentFormationService->getStudentProgress($user, $formation)
+                : null;
+
+            $progressPercent = (int) ($progress['progress_percent'] ?? 0);
+            $canAfford = $formationEnrollmentService->canTeamAffordFormation($team, $formation);
+
+            return [
+                'id' => $formation->id,
+                'title' => $formation->title ?: 'Titre par défaut',
+                'description' => $formation->description ?: 'Description par défaut',
+                'cover_image_url' => $formation->cover_image_url,
+                'price_label' => $formation->money_amount
+                    ? number_format((int) $formation->money_amount, 0, ',', ' ') . ' &euro;'
+                    : 'Gratuit',
+                'status_label' => $isEnrolled ? 'Déjà inscrit' : 'Nouvelle formation',
+                'is_enrolled' => $isEnrolled,
+                'has_progress' => $isEnrolled && $progress !== null,
+                'progress_percent' => $progressPercent,
+                'show_route' => route('eleve.formation.show', [$team, $formation->id]),
+                'enroll_route' => route('eleve.formation.enroll', [
+                    'team' => $team,
+                    'formation' => $formation->id,
+                ]),
+                'can_afford' => $canAfford,
+            ];
+        });
     }
 
     /**
@@ -30,6 +78,7 @@ class FormationChoice extends Component
     {
         return view('components.eleve.FormationChoice', [
             'team' => $this->team,
+            'formations' => $this->formations,
         ]);
     }
 }
