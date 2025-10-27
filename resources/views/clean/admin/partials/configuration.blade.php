@@ -25,7 +25,7 @@
           Eleve
         </a>
         <a href="{{
-                        route('formateur.home', ['team' => $team, 'team_name' => $team->name])
+                        route('organisateur.index', ['team' => $team])
                     }}"
           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -41,7 +41,7 @@
 
 
         <a href="{{
-                        route('formateur.home', ['team' => $team, 'team_name' => $team->name])
+                        route('formateur.home', ['team' => $team])
                     }}"
           class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-sm transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"

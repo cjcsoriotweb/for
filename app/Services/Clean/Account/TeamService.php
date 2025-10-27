@@ -25,7 +25,7 @@ class TeamService
         $role = $user->teamRole($team)->key;
 
         if (Auth::user()->superadmin) {
-            return redirect()->route('application.admin.index', ['team' => $team, 'team_name' => $this->str_slug($team->name)]);
+            return redirect()->route('application.admin.index', ['team' => $team]);
         }
 
         if (Auth::user()->hasTeamRole($team, 'manager')) {
@@ -36,6 +36,6 @@ class TeamService
             return redirect()->route('eleve.index', ['team' => $team]);
         }
 
-        return abort(403, __('You do not have permission to access this team.'));
+        return abort(403, __("Vous n'avez aucun accès ici."));
     }
 }

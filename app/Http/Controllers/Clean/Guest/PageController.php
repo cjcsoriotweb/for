@@ -6,6 +6,7 @@ class PageController
 {
     public function index()
     {
+        return redirect()->route('user.dashboard');
         return view('clean.guest.hello');
     }
 
