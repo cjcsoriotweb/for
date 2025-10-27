@@ -11,11 +11,13 @@ class FormationCatalogueCard extends Component
 {
     public Formation $formation;
     public Team $team;
+    public bool $isVisible;
 
-    public function __construct(Formation $formation, Team $team)
+    public function __construct(Formation $formation, Team $team, bool $isVisible = false)
     {
         $this->formation = $formation;
         $this->team = $team;
+        $this->isVisible = $isVisible;
     }
 
     public function render(): View

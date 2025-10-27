@@ -25,9 +25,10 @@ class OrganisateurPageController extends Controller
 
     public function catalogue(Team $team)
     {
-        $formations = $this->organisateurService->listVisibleFormations($team);
+        $visibleFormations = $this->organisateurService->listVisibleFormations($team);
+        $allFormations = Formation::withCount(['learners', 'lessons'])->get();
 
-        return view('clean.organisateur.catalogue', compact('team', 'formations'));
+        return view('clean.organisateur.catalogue', compact('team', 'visibleFormations', 'allFormations'));
     }
 
     public function users(Team $team)
