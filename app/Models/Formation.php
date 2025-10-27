@@ -30,6 +30,7 @@ class Formation extends Model
         'description',
         'level',
         'money_amount',
+        'active',
     ];
 
     protected function casts(): array
@@ -39,6 +40,7 @@ class Formation extends Model
             'description' => 'string',
             'level' => 'string',
             'money_amount' => 'integer',
+            'active' => 'boolean',
         ];
     }
 

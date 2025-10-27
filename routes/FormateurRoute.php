@@ -18,6 +18,7 @@ Route::prefix('formateur')
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
         Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show', 'formation.edit');
         Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
+        Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');
 
         // Chapter routes
         Route::get('/formation/{formation}/chapitre/{chapter}/show', [FormationChapterController::class, 'editChapter'])->name('formation.chapter.edit');
