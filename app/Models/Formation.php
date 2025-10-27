@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\FormationCompletionDocument;
 use Database\Factories\FormationFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Auth;
@@ -91,6 +93,11 @@ class Formation extends Model
     public function students()
     {
         return $this->learners();
+    }
+
+    public function completionDocuments(): HasMany
+    {
+        return $this->hasMany(FormationCompletionDocument::class);
     }
 
     /*

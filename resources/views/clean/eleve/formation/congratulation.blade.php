@@ -77,6 +77,35 @@
           </p>
         </div>
 
+        <div class="mb-10">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Documents de fin de formation
+          </h3>
+          @if($formationWithProgress->completionDocuments->isNotEmpty())
+          <ul class="space-y-3">
+            @foreach($formationWithProgress->completionDocuments as $document)
+            <li
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3">
+              <div>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $document->title }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {{ $document->original_name }}
+                </p>
+              </div>
+              <a href="{{ route('eleve.formation.documents.download', [$team, $formationWithProgress, $document]) }}"
+                class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200">
+                Telecharger
+              </a>
+            </li>
+            @endforeach
+          </ul>
+          @else
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Aucun document n'est disponible pour cette formation.
+          </p>
+          @endif
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
           <a href="{{ route('eleve.index', $team) }}"

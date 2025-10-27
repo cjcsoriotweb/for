@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Clean\Formateur\FormateurPageController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationController;
+use App\Http\Controllers\Clean\Formateur\Formation\FormationCompletionDocumentController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
 use App\Http\Middleware\AdminMiddleware;
@@ -23,6 +24,8 @@ Route::prefix('formateur')
         Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
         Route::put('/formation/{formation}/pricing', [FormateurFormationController::class, 'updatePricing'])->name('formation.pricing.update');
         Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');
+        Route::post('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'store'])->name('formation.completion-documents.store');
+        Route::delete('/formation/{formation}/completion-documents/{document}', [FormationCompletionDocumentController::class, 'destroy'])->name('formation.completion-documents.destroy');
 
         // Chapter routes
         Route::get('/formation/{formation}/chapitre/{chapter}/show', [FormationChapterController::class, 'editChapter'])->name('formation.chapter.edit');

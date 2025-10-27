@@ -116,6 +116,9 @@ class StudentFormationService extends BaseFormationService
                             $lessonQuery->orderBy('position');
                         }]);
                 },
+                'completionDocuments' => function ($query): void {
+                    $query->orderBy('created_at');
+                },
             ])
             ->first();
 
