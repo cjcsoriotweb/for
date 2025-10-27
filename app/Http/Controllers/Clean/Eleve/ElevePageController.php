@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Http\Controllers\Clean\Eleve;
 
@@ -605,7 +605,7 @@ class ElevePageController extends Controller
         // Rediriger vers la formation si le quiz est rÃ©ussi
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'FÃ©licitations ! Vous avez rÃ©ussi le quiz avec un score de '.round($score, 1).'%.');
+                ->with('success', 'FÃ©licitations ! Vous avez rÃ©ussi le quiz avec un score de ' . round($score, 1) . '%.');
         }
 
         // Retourner seulement les donnÃ©es nÃ©cessaires pour les quiz Ã©chouÃ©s (pas de vue complÃ¨te)
