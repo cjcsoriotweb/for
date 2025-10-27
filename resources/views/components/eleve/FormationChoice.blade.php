@@ -58,13 +58,10 @@
         </a>
         @else
 
-        @if($team->money > $formation->money_amount)
+        @if($team->money >= $formation->money_amount)
         <div class="flex items-center justify-between mb-4">
           <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
             Disponible
-          </span>
-          <span class="text-sm font-semibold text-primary">
-            {{ $formation->money_amount ? $formation->money_amount . '€' : 'Gratuit' }}
           </span>
         </div>
 
