@@ -14,7 +14,7 @@
   </div>
   @endif
 
-  <x-eleve.hello :team="$team" />
+  <x-eleve.hello :team="$team" :current-formation="$formationsWithProgress" />
   <x-eleve.FormationChoice :team="$team" />
   <x-eleve.FormationContinue :team="$team" :formations="$formationsWithProgress" />
 </x-eleve-layout>
