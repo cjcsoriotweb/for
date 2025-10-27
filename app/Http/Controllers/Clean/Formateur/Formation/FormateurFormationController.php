@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationPricingRequest;
+use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
 use App\Models\Formation;
 use App\Services\FormationService;
+use Illuminate\Support\Facades\Storage;
 
 class FormateurFormationController extends Controller
 {
@@ -32,11 +33,21 @@ class FormateurFormationController extends Controller
 
     public function updateFormation(UpdateFormationRequest $request, Formation $formation)
     {
-        $formation->update([
+        $updatePayload = [
             'title' => $request->title,
             'description' => $request->description,
             'active' => $request->has('active') ? (bool) $request->active : $formation->active,
-        ]);
+        ];
+
+        if ($request->hasFile('cover_image')) {
+            if ($formation->cover_image_path && Storage::disk('public')->exists($formation->cover_image_path)) {
+                Storage::disk('public')->delete($formation->cover_image_path);
+            }
+
+            $updatePayload['cover_image_path'] = $request->file('cover_image')->store('formations/covers', 'public');
+        }
+
+        $formation->update($updatePayload);
 
         return back()->with('success', 'Formation mise à jour avec succès.');
     }
@@ -50,7 +61,7 @@ class FormateurFormationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Tarification mise à jour avec succès.',
-            'new_price' => $formation->fresh()->money_amount
+            'new_price' => $formation->fresh()->money_amount,
         ]);
     }
 

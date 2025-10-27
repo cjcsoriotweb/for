@@ -20,18 +20,24 @@
       @endphp
 
       <article
-        class="group relative isolate flex min-w-[260px] max-w-xs snap-start flex-col justify-between overflow-hidden rounded-3xl border border-white/15 bg-slate-900/55 transition duration-300 hover:-translate-y-1 hover:border-white/35 hover:shadow-[0_35px_120px_-45px_rgba(129,140,248,0.5)]">
+        class="group relative isolate flex min-w-[260px] max-w-xs snap-start flex-col justify-between overflow-hidden rounded-3xl border border-white/15 bg-slate-900/55 transition duration-300">
         <div class="absolute inset-0 bg-gradient-to-br {{ $statusColor }} opacity-60 transition group-hover:opacity-80">
         </div>
         <div
           class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.42),transparent_58%)] opacity-30 mix-blend-screen">
         </div>
 
-        <div class="relative space-y-4 p-6">
+        <div class="relative z-10 h-36 w-full overflow-hidden border-b border-white/15 bg-white/10 sm:h-40">
+          <img src="{{ $formation->cover_image_url }}" alt="Image de couverture de {{ $formation->title }}"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy"
+            onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';" />
+        </div>
+
+        <div class="relative z-10 space-y-4 p-6">
           <div class="flex items-center justify-between">
             <span
               class="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/80">
-              {{ $isCompleted ? 'Termin&eacute;' : 'En cours' }}
+              {{ $isCompleted ? 'Terminé' : 'En cours' }}
             </span>
             <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
               {{ $progressPercent }}%

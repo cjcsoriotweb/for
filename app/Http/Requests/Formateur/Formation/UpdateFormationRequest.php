@@ -28,6 +28,7 @@ class UpdateFormationRequest extends FormRequest
             'description' => 'required|string',
             'money_amount' => 'nullable|numeric|min:0',
             'active' => 'nullable|boolean',
+            'cover_image' => 'nullable|image|max:4096',
         ];
     }
 
@@ -42,6 +43,8 @@ class UpdateFormationRequest extends FormRequest
             'money_amount.numeric' => 'Le prix doit être un nombre.',
             'money_amount.min' => 'Le prix ne peut pas être négatif.',
             'active.boolean' => 'Le statut de la formation doit être un booléen.',
+            'cover_image.image' => 'Le fichier téléchargé doit être une image.',
+            'cover_image.max' => 'L\'image ne doit pas dépasser 4 Mo.',
         ];
     }
 }

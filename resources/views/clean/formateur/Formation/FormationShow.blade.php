@@ -26,6 +26,16 @@
               <p class="text-gray-700 text-lg leading-relaxed">
                 {{ $formation->description }}
               </p>
+              <div class="mt-6">
+                <div class="overflow-hidden rounded-3xl border border-white/60 shadow-inner">
+                  <img
+                    src="{{ $formation->cover_image_url }}"
+                    alt="Image de couverture de {{ $formation->title }}"
+                    class="h-56 w-full object-cover sm:h-64 lg:h-72"
+                    onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

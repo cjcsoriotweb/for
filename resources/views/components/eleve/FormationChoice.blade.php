@@ -29,7 +29,17 @@
         <div class="absolute inset-0 bg-gradient-to-br from-sky-500/80 via-indigo-500/60 to-purple-500/50 opacity-60 transition group-hover:opacity-80"></div>
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.42),transparent_60%)] mix-blend-screen opacity-35"></div>
 
-        <div class="relative flex h-full flex-col justify-between p-6">
+        <div class="relative z-10 h-36 w-full overflow-hidden border-b border-white/15 bg-white/10 sm:h-40">
+          <img
+            src="{{ $formation->cover_image_url }}"
+            alt="Image de couverture de {{ $formation->title }}"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            loading="lazy"
+            onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';"
+          />
+        </div>
+
+        <div class="relative z-10 flex h-full flex-col justify-between p-6">
           <div class="space-y-4">
             <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-white/70">
               <span>{{ $isEnrolled ? 'D&eacute;j&agrave; inscrit' : 'Nouvelle formation' }}</span>

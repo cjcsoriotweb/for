@@ -1,0 +1,20 @@
+﻿<svg width="800" height="480" viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Image de formation</title>
+  <desc id="desc">Illustration générique affichée lorsque aucune image de formation n'est disponible.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#9333ea" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="480" fill="url(#bg)" rx="32" />
+  <g fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="4">
+    <rect x="120" y="120" width="560" height="280" rx="24" />
+    <path d="M160 360l120-144 96 112 72-80 132 112" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="284" cy="204" r="36" />
+  </g>
+  <text x="50%" y="82%" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="28" fill="rgba(255,255,255,0.85)">
+    Visuel en attente
+  </text>
+</svg>

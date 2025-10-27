@@ -37,7 +37,7 @@
       <!-- Edit Form -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="p-8">
-          <form action="{{ route('formateur.formation.update', $formation) }}" method="POST">
+          <form action="{{ route('formateur.formation.update', $formation) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -66,6 +66,37 @@
               @error('description')
               <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
               @enderror
+            </div>
+
+            <div class="mb-6">
+              <label for="cover_image" class="block text-lg font-semibold text-gray-900 mb-3">
+                Image de couverture
+              </label>
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <div class="h-40 w-full overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 sm:h-48 sm:w-72">
+                  <img
+                    src="{{ $formation->cover_image_url }}"
+                    alt="Image actuelle de la formation"
+                    class="h-full w-full object-cover"
+                    onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';"
+                  />
+                </div>
+                <div class="flex-1 space-y-3">
+                  <input
+                    type="file"
+                    id="cover_image"
+                    name="cover_image"
+                    accept="image/*"
+                    class="block w-full rounded-xl border border-dashed border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <p class="text-sm text-gray-500">
+                    Formats acceptés : JPEG, PNG, WEBP. Taille maximale : 4 Mo. L'image sera redimensionnée automatiquement.
+                  </p>
+                  @error('cover_image')
+                  <p class="text-sm text-red-600">{{ $message }}</p>
+                  @enderror
+                </div>
+              </div>
             </div>
 
 

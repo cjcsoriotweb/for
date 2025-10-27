@@ -16,7 +16,17 @@
     class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-400/10 to-cyan-400/10 rounded-full blur-xl transform -translate-x-12 translate-y-12 group-hover:-translate-x-8 group-hover:translate-y-8 transition-transform duration-700">
   </div>
 
-  <div class="relative p-8">
+  <div class="relative z-10 h-44 w-full overflow-hidden border-b border-white/40 bg-white/50">
+    <img
+      src="{{ $formation->cover_image_url }}"
+      alt="Image de couverture de {{ $formation->title }}"
+      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+      loading="lazy"
+      onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';"
+    />
+  </div>
+
+  <div class="relative z-10 p-8">
     <div class="flex items-start justify-between mb-6">
       <div class="flex-1">
         <div class="flex items-center space-x-3 mb-3">
