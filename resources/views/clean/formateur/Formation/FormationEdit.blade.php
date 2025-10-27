@@ -14,7 +14,7 @@
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
-                  Retour à la formation
+                  Retour au tableau de bord
                 </a>
                 <div class="h-6 w-px bg-gray-300 mx-4"></div>
                 <h1 class="text-3xl font-bold text-gray-900 flex items-center">
@@ -29,22 +29,6 @@
               <p class="text-gray-700 text-lg leading-relaxed">
                 Modifiez les informations de votre formation
               </p>
-            </div>
-
-            <!-- Sidebar avec composants modulaires -->
-            <x-formateur.formation.formation-sidebar :formation="$formation" />
-
-            <!-- Navigation Buttons -->
-            <div class="flex flex-col space-y-3">
-              <a href="{{ route('formateur.formation.chapters.index', $formation) }}"
-                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                  </path>
-                </svg>
-                Gérer les chapitres
-              </a>
             </div>
           </div>
         </div>
@@ -84,27 +68,7 @@
               @enderror
             </div>
 
-            <!-- Formation Price -->
-            <div class="mb-8">
-              <label for="money_amount" class="block text-lg font-semibold text-gray-900 mb-3">
-                Prix de la formation (€)
-              </label>
-              <div class="relative">
-                <input type="number" id="money_amount" name="money_amount" min="0" step="0.01"
-                  value="{{ old('money_amount', $formation->money_amount ?? 0) }}"
-                  class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 pr-12"
-                  placeholder="0.00" />
-                <div class="absolute inset-y-0 right-0 flex items-center pr-4">
-                  <span class="text-gray-500 text-lg">€</span>
-                </div>
-              </div>
-              @error('money_amount')
-              <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-              @enderror
-              <p class="mt-2 text-sm text-gray-600">
-                Laissez à 0 si la formation est gratuite
-              </p>
-            </div>
+
 
             <!-- Formation Status -->
             <div class="mb-8">

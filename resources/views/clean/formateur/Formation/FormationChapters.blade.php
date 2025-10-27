@@ -14,7 +14,7 @@
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
-                  Retour à la formation
+                  Retour au tableau de bord
                 </a>
                 <div class="h-6 w-px bg-gray-300 mx-4"></div>
                 <h1 class="text-3xl font-bold text-gray-900 flex items-center">
@@ -29,47 +29,6 @@
               <p class="text-gray-700 text-lg leading-relaxed">
                 {{ $formation->description }}
               </p>
-            </div>
-
-            <!-- Sidebar avec composants modulaires -->
-            <x-formateur.formation.formation-sidebar :formation="$formation" />
-
-            <!-- Action Buttons -->
-            <div class="flex flex-col space-y-3">
-              <a href="{{ route('formateur.formation.edit', $formation) }}"
-                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                  </path>
-                </svg>
-                Modifier la formation
-              </a>
-
-              <form action="{{ route('formateur.formation.chapter.add.post', $formation) }}" method="POST"
-                class="inline">
-                @csrf
-                <button
-                  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  Créer un chapitre
-                </button>
-              </form>
-
-              <a href="{{ route('formateur.formation.show', $formation) }}"
-                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                  </path>
-                </svg>
-                Voir la formation
-              </a>
             </div>
           </div>
         </div>

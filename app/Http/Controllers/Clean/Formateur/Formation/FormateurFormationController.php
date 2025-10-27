@@ -19,6 +19,11 @@ class FormateurFormationController extends Controller
         return view('clean.formateur.Formation.FormationEdit', compact('formation'));
     }
 
+    public function editPricing(Formation $formation)
+    {
+        return view('clean.formateur.Formation.FormationPricing', compact('formation'));
+    }
+
     public function manageChapters(Formation $formation)
     {
         return view('clean.formateur.Formation.FormationChapters', compact('formation'));
@@ -29,17 +34,25 @@ class FormateurFormationController extends Controller
         $formation->update([
             'title' => $request->title,
             'description' => $request->description,
-            'money_amount' => $request->money_amount,
             'active' => $request->has('active') ? (bool) $request->active : $formation->active,
         ]);
 
         return back()->with('success', 'Formation mise à jour avec succès.');
     }
 
+    public function updatePricing(UpdateFormationRequest $request, Formation $formation)
+    {
+        $formation->update([
+            'money_amount' => $request->money_amount ?? 0,
+        ]);
+
+        return redirect()->route('formateur.formation.pricing.edit', $formation)->with('success', 'Tarification mise à jour avec succès.');
+    }
+
     public function toggleStatus(Formation $formation)
     {
         $formation->update([
-            'active' => !$formation->active,
+            'active' => ! $formation->active,
         ]);
 
         $status = $formation->active ? 'activée' : 'désactivée';
