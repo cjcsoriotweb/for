@@ -5,9 +5,9 @@
     $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_completed))->count();
 @endphp
 
-<section class="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/60 shadow-[0_40px_120px_-50px_rgba(59,130,246,0.6)]">
+<section class="relative overflow-hidden rounded-3xl border border-white/15 bg-slate-900/45 shadow-[0_50px_140px_-60px_rgba(59,130,246,0.55)]">
   <div class="absolute inset-0">
-    <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/85 to-slate-900/10"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/70 to-slate-800/40"></div>
     <img
       src="{{ $team->profile_photo_url }}"
       alt="{{ $team->name }}"
@@ -45,7 +45,7 @@
       <div class="flex flex-wrap items-center gap-4 pt-6">
         <a
           href="{{ route('eleve.formation.show', [$team, $featuredFormation->id]) }}"
-          class="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-lg shadow-blue-500/25 transition hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/35"
+          class="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-sky-400 via-indigo-500 to-purple-500 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-slate-50 shadow-lg shadow-sky-500/25 transition hover:scale-[1.02] hover:shadow-xl hover:shadow-sky-500/35"
         >
           <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white">
             <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -56,7 +56,7 @@
         </a>
         <a
           href="{{ route('eleve.formation.show', [$team, $featuredFormation->id]) }}"
-          class="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:border-white/40 hover:bg-white/5"
+          class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-slate-100 transition hover:border-white/40 hover:bg-white/10"
         >
           Voir les d&eacute;tails
         </a>
@@ -65,8 +65,8 @@
     </div>
 
     <div class="relative hidden w-full max-w-xs shrink-0 md:block">
-      <div class="relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_30px_80px_-35px_rgba(14,165,233,0.65)] backdrop-blur">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/60 via-indigo-500/50 to-blue-600/60"></div>
+      <div class="relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10 bg-white/10 shadow-[0_30px_90px_-40px_rgba(14,165,233,0.55)] backdrop-blur">
+        <div class="absolute inset-0 bg-gradient-to-br from-sky-400/65 via-indigo-500/55 to-sky-600/60"></div>
         <div class="absolute inset-0 flex flex-col justify-end p-6">
           @if($featuredFormation)
           <h2 class="text-xl font-semibold text-white">
