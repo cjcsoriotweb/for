@@ -5,11 +5,7 @@
     <h3 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">
         Informations du Quiz
     </h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-        <div>
-            <span class="font-medium">Score de passage:</span>
-            {{ $lessonContent->passing_score }}%
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         @if($lessonContent->max_attempts > 0)
         <div>
             <span class="font-medium">Tentatives max:</span>

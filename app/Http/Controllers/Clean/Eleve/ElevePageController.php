@@ -540,7 +540,8 @@ class ElevePageController extends Controller
         }
 
         $score = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
-        $passed = $score >= $quiz->passing_score;
+        $passingScore = $quiz->passing_score ?? 0;
+        $passed = $passingScore > 0 ? $score >= $passingScore : true;
 
         // Créer la tentative de quiz
         $attempt = \App\Models\QuizAttempt::create([

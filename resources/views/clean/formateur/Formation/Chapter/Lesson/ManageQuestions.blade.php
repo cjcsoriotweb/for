@@ -135,9 +135,8 @@
                                         class="w-4 h-4 mr-2"
                                         fill="none"
                                         stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
+                                        viewBox="0 0 24 24">
+                                    <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
                                             stroke-width="2"
@@ -288,9 +287,7 @@
                             </h3>
                             <dl class="space-y-3">
                                 <div>
-                                    <dt
-                                        class="text-sm font-medium text-gray-500"
-                                    >
+                                    <dt class="text-sm font-medium text-gray-500">
                                         Titre
                                     </dt>
                                     <dd class="text-sm text-gray-900">
@@ -299,9 +296,7 @@
                                 </div>
                                 @if($quiz->description)
                                 <div>
-                                    <dt
-                                        class="text-sm font-medium text-gray-500"
-                                    >
+                                    <dt class="text-sm font-medium text-gray-500">
                                         Description
                                     </dt>
                                     <dd class="text-sm text-gray-900">
@@ -309,21 +304,9 @@
                                     </dd>
                                 </div>
                                 @endif
-                                <div>
-                                    <dt
-                                        class="text-sm font-medium text-gray-500"
-                                    >
-                                        Score de réussite
-                                    </dt>
-                                    <dd class="text-sm text-gray-900">
-                                        {{ $quiz->passing_score }}%
-                                    </dd>
-                                </div>
                                 @if($quiz->max_attempts)
                                 <div>
-                                    <dt
-                                        class="text-sm font-medium text-gray-500"
-                                    >
+                                    <dt class="text-sm font-medium text-gray-500">
                                         Tentatives max
                                     </dt>
                                     <dd class="text-sm text-gray-900">
@@ -332,9 +315,7 @@
                                 </div>
                                 @endif
                                 <div>
-                                    <dt
-                                        class="text-sm font-medium text-gray-500"
-                                    >
+                                    <dt class="text-sm font-medium text-gray-500">
                                         Questions
                                     </dt>
                                     <dd class="text-sm text-gray-900">
