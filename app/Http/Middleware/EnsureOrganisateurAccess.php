@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\Team;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureOrganisateurAccess

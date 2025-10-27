@@ -73,20 +73,20 @@ class UserActivityLog extends Model
     public function getFormattedDurationAttribute(): string
     {
         if ($this->duration_seconds < 60) {
-            return $this->duration_seconds . 's';
+            return $this->duration_seconds.'s';
         }
 
         $minutes = floor($this->duration_seconds / 60);
         $seconds = $this->duration_seconds % 60;
 
         if ($minutes < 60) {
-            return $minutes . 'min ' . $seconds . 's';
+            return $minutes.'min '.$seconds.'s';
         }
 
         $hours = floor($minutes / 60);
         $remainingMinutes = $minutes % 60;
 
-        return $hours . 'h ' . $remainingMinutes . 'min';
+        return $hours.'h '.$remainingMinutes.'min';
     }
 
     /**
@@ -129,7 +129,7 @@ class UserActivityLog extends Model
      */
     public function getDeviceTypeAttribute(): string
     {
-        if (!$this->user_agent) {
+        if (! $this->user_agent) {
             return 'Unknown';
         }
 
@@ -147,7 +147,7 @@ class UserActivityLog extends Model
      */
     public function getFormationName(): ?string
     {
-        if (!$this->url) {
+        if (! $this->url) {
             return null;
         }
 
@@ -156,6 +156,7 @@ class UserActivityLog extends Model
         if (preg_match($pattern, $this->url, $matches)) {
             try {
                 $formation = \App\Models\Formation::find($matches[1]);
+
                 return $formation ? $formation->title : null;
             } catch (\Exception $e) {
                 return null;
@@ -170,7 +171,7 @@ class UserActivityLog extends Model
      */
     public function getLessonName(): ?string
     {
-        if (!$this->url) {
+        if (! $this->url) {
             return null;
         }
 
@@ -179,6 +180,7 @@ class UserActivityLog extends Model
         if (preg_match($pattern, $this->url, $matches)) {
             try {
                 $lesson = \App\Models\Lesson::find($matches[1]);
+
                 return $lesson ? $lesson->title : null;
             } catch (\Exception $e) {
                 return null;
@@ -203,7 +205,7 @@ class UserActivityLog extends Model
      */
     public function getPageTypeAttribute(): string
     {
-        if (!$this->url) {
+        if (! $this->url) {
             return 'Unknown';
         }
 

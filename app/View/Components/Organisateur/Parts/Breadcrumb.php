@@ -11,8 +11,11 @@ use Illuminate\View\View;
 class Breadcrumb extends Component
 {
     public Team $team;
+
     public ?Formation $formation;
+
     public ?User $student;
+
     public ?string $currentPage;
 
     public function __construct(

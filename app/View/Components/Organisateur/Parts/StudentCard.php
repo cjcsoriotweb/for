@@ -10,7 +10,9 @@ use Illuminate\View\View;
 class StudentCard extends Component
 {
     public object $summary;
+
     public Formation $formation;
+
     public Team $team;
 
     public function __construct(

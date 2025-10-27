@@ -324,6 +324,7 @@ class QuizComponentO extends Component
                     'created_at' => $timestamp,
                     'updated_at' => $timestamp,
                 ];
+
                 continue;
             }
 

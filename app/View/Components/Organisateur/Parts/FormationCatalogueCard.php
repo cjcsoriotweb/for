@@ -10,7 +10,9 @@ use Illuminate\View\View;
 class FormationCatalogueCard extends Component
 {
     public Formation $formation;
+
     public Team $team;
+
     public bool $isVisible;
 
     public function __construct(Formation $formation, Team $team, bool $isVisible = false)

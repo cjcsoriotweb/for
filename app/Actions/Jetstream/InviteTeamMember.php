@@ -7,7 +7,6 @@ use App\Models\User;
 use Closure;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\Contracts\InvitesTeamMembers;
@@ -24,7 +23,7 @@ class InviteTeamMember implements InvitesTeamMembers
     public function invite(User $user, Team $team, string $email, ?string $role = null): void
     {
 
-        if (!auth()->user()->superadmin) {
+        if (! auth()->user()->superadmin) {
             throw new \Exception('Unauthorized');
         }
 
@@ -36,7 +35,6 @@ class InviteTeamMember implements InvitesTeamMembers
             'email' => $email,
             'role' => $role,
         ]);
-
 
         Mail::to($email)->send(new TeamInvitation($invitation));
     }

@@ -10,6 +10,7 @@ use Illuminate\View\View;
 class FormationCard extends Component
 {
     public Formation $formation;
+
     public Team $team;
 
     public function __construct(Formation $formation, Team $team)

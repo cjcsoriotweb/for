@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\UserActivityLog;
 use App\Services\UserActivityService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,14 +11,21 @@ class ActivityLogsTable extends Component
     use WithPagination;
 
     public $userId;
+
     public $search = '';
+
     public $lessonFilter = '';
+
     public $startDate = '';
+
     public $endDate = '';
+
     public $perPage = 20;
 
     public $activitySummary;
+
     public $availableLessons = [];
+
     public $lessons = [];
 
     public function mount($userId, $lessons = null)

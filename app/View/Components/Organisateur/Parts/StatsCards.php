@@ -10,10 +10,15 @@ use Illuminate\View\View;
 class StatsCards extends Component
 {
     public array $stats;
+
     public string $type;
+
     public ?Team $team;
+
     public ?Formation $formation;
+
     public ?int $monthlyCost;
+
     public int $monthlyEnrollmentsCount;
 
     public function __construct(

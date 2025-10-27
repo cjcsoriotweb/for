@@ -9,17 +9,22 @@ use Illuminate\View\View;
 class Filters extends Component
 {
     public string $search;
+
     public ?string $statusFilter;
+
     public ?string $selectedMonth;
+
     public Collection $availableMonths;
+
     public string $routeName;
+
     public array $routeParams;
 
     public function __construct(
         string $search = '',
         ?string $statusFilter = null,
         ?string $selectedMonth = null,
-        Collection $availableMonths = new Collection(),
+        Collection $availableMonths = new Collection,
         string $routeName = '',
         array $routeParams = []
     ) {

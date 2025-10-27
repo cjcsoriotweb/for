@@ -8,10 +8,15 @@ use Illuminate\View\View;
 class EmptyState extends Component
 {
     public string $icon;
+
     public string $title;
+
     public string $description;
+
     public string $action;
+
     public string $actionText;
+
     public string $actionUrl;
 
     public function __construct(

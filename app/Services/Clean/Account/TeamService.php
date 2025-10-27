@@ -36,8 +36,6 @@ class TeamService
             return redirect()->route('eleve.index', ['team' => $team]);
         }
 
-
-
         return abort(403, __('You do not have permission to access this team.'));
     }
 }
