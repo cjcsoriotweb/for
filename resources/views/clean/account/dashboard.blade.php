@@ -8,24 +8,43 @@
       </div>
       <div class="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <!-- Hero Section -->
-        <div class="mb-16 text-center">
-          <div
-            class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
-            <span class="material-symbols-outlined text-3xl text-white">auto_awesome</span>
+        <div
+          class="relative mb-16 overflow-hidden rounded-3xl border border-slate-200/70 bg-white/80 p-12 text-center shadow-xl shadow-slate-200/60 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-900/40 dark:shadow-none">
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-indigo-500/10">
           </div>
-          <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-            {{ __("Bienvenue sur votre") }}
-            <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {{ __("espace de formation") }}
-            </span>
-          </h1>
-          <p class="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300">
-            {{
-            __(
-            "Gérez vos formations et rejoignez de nouveaux organismes en toute simplicité"
-            )
-            }}
-          </p>
+          <div class="pointer-events-none absolute -right-24 -top-20 h-56 w-56 rounded-full bg-blue-400/20 blur-3xl dark:bg-blue-400/10">
+          </div>
+          <div class="relative">
+            <div
+              class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/30">
+              <span class="material-symbols-outlined text-3xl text-white">auto_awesome</span>
+            </div>
+            <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+              {{ __("Bienvenue sur votre") }}
+              <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                {{ __("espace de formation") }}
+              </span>
+            </h1>
+            <p class="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300">
+              {{
+              __(
+              "Gérez vos formations, suivez vos parcours et rejoignez de nouveaux organismes en toute simplicité."
+              )
+              }}
+            </p>
+            <div class="mt-8 flex flex-wrap justify-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+              <span
+                class="inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-4 py-2 backdrop-blur-sm dark:bg-slate-800/70">
+                <span class="material-symbols-outlined text-base text-blue-500 dark:text-blue-300">timeline</span>
+                {{ __("Suivi en temps réel") }}
+              </span>
+              <span
+                class="inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-4 py-2 backdrop-blur-sm dark:bg-slate-800/70">
+                <span class="material-symbols-outlined text-base text-purple-500 dark:text-purple-300">workspace_premium</span>
+                {{ __("Collaboration simplifiée") }}
+              </span>
+            </div>
+          </div>
         </div>
         @if ($organisations->count() > 0)
         <!-- Organizations Section -->
@@ -44,9 +63,11 @@
           </div>
 
 
-          @foreach ($organisations as $application)
-          <x-account.application.switch :application="$application" />
-          @endforeach
+          <div class="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
+            @foreach ($organisations as $application)
+            <x-account.application.switch :application="$application" />
+            @endforeach
+          </div>
         </div>
       </div>
       @else

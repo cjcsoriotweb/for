@@ -1,5 +1,11 @@
+@php
+    $role = auth()->user()->teamRole($application);
+    $roleLabel = $role?->name ?? \Illuminate\Support\Str::headline($role?->key ?? 'membre');
+@endphp
+
 <form method="POST" action="{{ route('user.switch', $application) }}">
-    @csrf @csrf @if ($errors->any())
+    @csrf
+    @if ($errors->any())
     <div class="alert alert-danger">
         <ul>
             @foreach ($errors->all() as $error)
@@ -49,6 +55,18 @@
         </div>
 
         <div class="relative z-10">
+            <!-- Role pill -->
+            <div class="mb-5 flex items-center justify-between gap-4 text-sm">
+                <div class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700 dark:bg-blue-500/10 dark:text-blue-200">
+                    <span class="material-symbols-outlined mr-2 text-sm">workspace_premium</span>
+                    <span>{{ __($roleLabel) }}</span>
+                </div>
+                <div class="hidden sm:flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                    <span class="material-symbols-outlined text-base">groups_3</span>
+                    <span>{{ __('Votre équipe') }}</span>
+                </div>
+            </div>
+
             <!-- Logo container as main feature -->
             <div
                 class="mb-6 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-white via-slate-50 to-slate-100 ring-2 ring-slate-200/50 dark:from-slate-700/50 dark:via-slate-600/50 dark:to-slate-500/50 dark:ring-slate-600/30 group-hover/btn:ring-blue-300/50 dark:group-hover/btn:ring-blue-400/50 transition-all duration-500 group-hover/btn:scale-105"
