@@ -53,6 +53,8 @@ class FormationChoice extends Component
             $progressPercent = (int) ($progress['progress_percent'] ?? 0);
             $canAfford = $formationEnrollmentService->canTeamAffordFormation($team, $formation);
 
+            $canJoin = !$isEnrolled && $canAfford;
+
             return [
                 'id' => $formation->id,
                 'title' => $formation->title ?: 'Titre par defaut',
@@ -71,6 +73,8 @@ class FormationChoice extends Component
                     'formation' => $formation->id,
                 ]),
                 'can_afford' => $canAfford,
+                'can_join' => $canJoin,
+                'enroll_button_label' => $canJoin ? 'Rejoindre cette formation' : null,
             ];
         });
     }
