@@ -70,25 +70,6 @@
 
 
 
-            <!-- Formation Status -->
-            <div class="mb-8">
-              <label class="block text-lg font-semibold text-gray-900 mb-4">
-                Statut de la formation
-              </label>
-              <div class="flex items-center space-x-6">
-                <label class="flex items-center">
-                  <input type="checkbox" name="active" value="1" {{ old('active', $formation->active) ? 'checked' : ''
-                  }}
-                  class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2">
-                  <span class="ml-3 text-lg text-gray-700">
-                    Formation active (visible pour les élèves)
-                  </span>
-                </label>
-              </div>
-              @error('active')
-              <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-              @enderror
-            </div>
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-between pt-6 border-t border-gray-200">
