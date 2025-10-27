@@ -12,6 +12,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Models\FormationCompletionDocument;
 use App\Models\TextContent;
+use App\Models\TextContentAttachment;
 use App\Services\Clean\Account\AccountService;
 use App\Services\Formation\StudentFormationService;
 use App\Services\FormationEnrollmentService;
@@ -31,10 +32,10 @@ class ElevePageController extends Controller
     {
         $user = Auth::user();
 
-        // RÃ©cupÃ©rer les formations actuelles de l'Ã©tudiant
+        // RÃƒÂ©cupÃƒÂ©rer les formations actuelles de l'ÃƒÂ©tudiant
         $formations = $this->studentFormationService->listFormationCurrentByStudent($team, $user);
 
-        // Ajouter les donnÃ©es de progression pour chaque formation
+        // Ajouter les donnÃƒÂ©es de progression pour chaque formation
         $formationsWithProgress = $formations->map(function ($formation) use ($user) {
             $progress = $this->studentFormationService->getStudentProgress($user, $formation);
             $formation->progress_data = $progress ?? [
@@ -63,67 +64,161 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Afficher les dÃ©tails d'une formation pour un Ã©tudiant
+     * Afficher les dÃƒÂ©tails d'une formation pour un ÃƒÂ©tudiant
      */
     public function showFormation(Team $team, Formation $formation)
     {
         $user = Auth::user();
 
-        // VÃ©rifier si l'Ã©tudiant est inscrit
+        // VÃƒÂ©rifier si l'ÃƒÂ©tudiant est inscrit
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
+            abort(403, 'Vous n\'ÃƒÂªtes pas inscrit ÃƒÂ  cette formation.');
         }
         $studentFormationService = $this->studentFormationService;
 
-        // RÃ©cupÃ©rer la formation avec le progrÃ¨s de l'Ã©tudiant
+        // RÃƒÂ©cupÃƒÂ©rer la formation avec le progrÃƒÂ¨s de l'ÃƒÂ©tudiant
         $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
 
         if (! $formationWithProgress) {
-            abort(404, 'Formation non trouvÃ©e ou non accessible.');
+            abort(404, 'Formation non trouvÃƒÂ©e ou non accessible.');
         }
 
-        // RÃ©cupÃ©rer le progrÃ¨s dÃ©taillÃ©
+        // RÃƒÂ©cupÃƒÂ©rer le progrÃƒÂ¨s dÃƒÂ©taillÃƒÂ©
         $progress = $this->studentFormationService->getStudentProgress($user, $formation);
+
+        $formationDocuments = $formation->completionDocuments()->get();
+        $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
+
+        $lessonAttachments = TextContentAttachment::query()
+            ->whereHas('textContent.lessonable', function ($lessonQuery) use ($formation) {
+                $lessonQuery->whereHas('chapter', function ($chapterQuery) use ($formation) {
+                    $chapterQuery->where('formation_id', $formation->id);
+                });
+            })
+            ->with([
+                'textContent',
+                'textContent.lessonable.chapter',
+                'textContent.lessonable.learners' => function ($learnerQuery) use ($user) {
+                    $learnerQuery->where('user_id', $user->id);
+                },
+            ])
+            ->get();
+
+        $lessonResources = $lessonAttachments
+            ->groupBy('text_content_id')
+            ->map(function ($attachments) {
+                /** @var \Illuminate\Support\Collection<int, TextContentAttachment> $attachments */
+                $firstAttachment = $attachments->first();
+                $textContent = $firstAttachment?->textContent;
+                $lesson = $textContent?->lessonable;
+
+                if (! $lesson) {
+                    return null;
+                }
+
+                $lessonLearner = $lesson->learners->first();
+                $isCompleted = optional($lessonLearner?->pivot)->status === 'completed';
+
+                return [
+                    'chapter_title' => $lesson->chapter?->title,
+                    'chapter_position' => $lesson->chapter?->position ?? 0,
+                    'lesson_id' => $lesson->id,
+                    'lesson_title' => $lesson->title,
+                    'lesson_position' => $lesson->position ?? 0,
+                    'attachments' => $attachments,
+                    'is_completed' => $isCompleted,
+                ];
+            })
+            ->filter()
+            ->sortBy([
+                fn($item) => $item['chapter_position'],
+                fn($item) => $item['lesson_position'],
+            ])
+            ->values();
 
         return view('clean.eleve.formation.show', compact(
             'team',
             'studentFormationService',
             'formationWithProgress',
-            'progress'
+            'progress',
+            'formationDocuments',
+            'lessonResources',
+            'isFormationCompleted'
         ));
     }
 
     /**
-     * Afficher la page de fÃ©licitations pour une formation terminÃ©e
+     * Afficher la page de fÃƒÂ©licitations pour une formation terminÃƒÂ©e
      */
     public function formationCongratulation(Team $team, Formation $formation)
     {
         $user = Auth::user();
 
-        // VÃ©rifier si l'Ã©tudiant est inscrit
+        // Verifier si l'etudiant est inscrit
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation.');
         }
 
-        // VÃ©rifier si la formation est terminÃ©e
+        // Verifier si la formation est terminee
         if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('warning', 'La formation n\'est pas encore terminÃ©e.');
+                ->with('warning', 'La formation n\'est pas encore terminee.');
         }
 
-        // RÃ©cupÃ©rer la formation avec le progrÃ¨s de l'Ã©tudiant
+        // Recuperer la formation avec le progrès de l'etudiant
         $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
 
         if (! $formationWithProgress) {
-            abort(404, 'Formation non trouvÃ©e ou non accessible.');
+            abort(404, 'Formation non trouvee ou non accessible.');
         }
+
+        $formationDocuments = $formation->completionDocuments()->get();
+
+        $lessonAttachments = TextContentAttachment::query()
+            ->whereHas('textContent.lessonable', function ($lessonQuery) use ($formation) {
+                $lessonQuery->whereHas('chapter', function ($chapterQuery) use ($formation) {
+                    $chapterQuery->where('formation_id', $formation->id);
+                });
+            })
+            ->with(['textContent', 'textContent.lessonable.chapter'])
+            ->get();
+
+        $lessonResources = $lessonAttachments
+            ->groupBy('text_content_id')
+            ->map(function ($attachments) {
+                /** @var \Illuminate\Support\Collection<int, TextContentAttachment> $attachments */
+                $firstAttachment = $attachments->first();
+                $textContent = $firstAttachment?->textContent;
+                $lesson = $textContent?->lessonable;
+
+                if (! $lesson) {
+                    return null;
+                }
+
+                return [
+                    'chapter_title' => $lesson->chapter?->title,
+                    'chapter_position' => $lesson->chapter?->position ?? 0,
+                    'lesson_id' => $lesson->id,
+                    'lesson_title' => $lesson->title,
+                    'lesson_position' => $lesson->position ?? 0,
+                    'attachments' => $attachments,
+                    'is_completed' => true,
+                ];
+            })
+            ->filter()
+            ->sortBy([
+                fn($item) => $item['chapter_position'],
+                fn($item) => $item['lesson_position'],
+            ])
+            ->values();
 
         return view('clean.eleve.formation.congratulation', compact(
             'team',
-            'formationWithProgress'
+            'formationWithProgress',
+            'formationDocuments',
+            'lessonResources'
         ));
     }
-
 
     public function downloadCompletionDocument(Team $team, Formation $formation, FormationCompletionDocument $document)
     {
@@ -153,22 +248,22 @@ class ElevePageController extends Controller
     {
         $user = Auth::user();
 
-        // VÃ©rifier si l'Ã©tudiant est dÃ©jÃ  inscrit
+        // VÃƒÂ©rifier si l'ÃƒÂ©tudiant est dÃƒÂ©jÃƒÂ  inscrit
         if ($this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return back()->with('warning', 'Vous Ãªtes dÃ©jÃ  inscrit Ã  cette formation.');
+            return back()->with('warning', 'Vous ÃƒÂªtes dÃƒÂ©jÃƒÂ  inscrit ÃƒÂ  cette formation.');
         }
 
-        // VÃ©rifier si la formation est disponible pour cette Ã©quipe
+        // VÃƒÂ©rifier si la formation est disponible pour cette ÃƒÂ©quipe
         $availableFormations = $team->formationsByTeam()
             ->where('formation_in_teams.visible', true)
             ->pluck('formations.id');
 
         if (! $availableFormations->contains($formation->id)) {
-            return back()->with('error', 'Cette formation n\'est pas disponible pour votre Ã©quipe.');
+            return back()->with('error', 'Cette formation n\'est pas disponible pour votre ÃƒÂ©quipe.');
         }
 
         if (! $this->formationEnrollmentService->canTeamAffordFormation($team, $formation)) {
-            return back()->with('error', 'Le solde de votre Ã©quipe est insuffisant pour cette formation.');
+            return back()->with('error', 'Le solde de votre ÃƒÂ©quipe est insuffisant pour cette formation.');
         }
 
         try {
@@ -178,7 +273,7 @@ class ElevePageController extends Controller
                 return back()->with('error', 'Une erreur est survenue lors de l\'inscription.');
             }
 
-            return back()->with('success', 'Vous avez Ã©tÃ© inscrit Ã  la formation avec succÃ¨s !');
+            return back()->with('success', 'Vous avez ÃƒÂ©tÃƒÂ© inscrit ÃƒÂ  la formation avec succÃƒÂ¨s !');
         } catch (\Throwable $e) {
             report($e);
 
@@ -187,19 +282,19 @@ class ElevePageController extends Controller
     }
 
     /**
-     * RÃ©initialiser le progrÃ¨s d'un Ã©tudiant dans une formation
+     * RÃƒÂ©initialiser le progrÃƒÂ¨s d'un ÃƒÂ©tudiant dans une formation
      */
     public function resetProgress(Team $team, Formation $formation)
     {
         $user = Auth::user();
 
-        // VÃ©rifier si l'Ã©tudiant est inscrit Ã  cette formation
+        // VÃƒÂ©rifier si l'ÃƒÂ©tudiant est inscrit ÃƒÂ  cette formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return back()->with('error', 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
+            return back()->with('error', 'Vous n\'ÃƒÂªtes pas inscrit ÃƒÂ  cette formation.');
         }
 
         try {
-            // RÃ©cupÃ©rer la premiÃ¨re leÃ§on de la formation pour remettre current_lesson_id
+            // RÃƒÂ©cupÃƒÂ©rer la premiÃƒÂ¨re leÃƒÂ§on de la formation pour remettre current_lesson_id
             $firstLesson = $formation->chapters()
                 ->orderBy('position')
                 ->first()
@@ -207,7 +302,7 @@ class ElevePageController extends Controller
                 ->orderBy('position')
                 ->first();
 
-            // RÃ©initialiser le progrÃ¨s Ã  0
+            // RÃƒÂ©initialiser le progrÃƒÂ¨s ÃƒÂ  0
             $formation->learners()->updateExistingPivot($user->id, [
                 'status' => 'enrolled',
                 'enrolled_at' => now(),
@@ -215,26 +310,26 @@ class ElevePageController extends Controller
                 'last_seen_at' => now(),
             ]);
 
-            return back()->with('success', 'Le progrÃ¨s a Ã©tÃ© rÃ©initialisÃ© avec succÃ¨s.');
+            return back()->with('success', 'Le progrÃƒÂ¨s a ÃƒÂ©tÃƒÂ© rÃƒÂ©initialisÃƒÂ© avec succÃƒÂ¨s.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Une erreur est survenue lors de la rÃ©initialisation du progrÃ¨s.');
+            return back()->with('error', 'Une erreur est survenue lors de la rÃƒÂ©initialisation du progrÃƒÂ¨s.');
         }
     }
 
     /**
-     * Afficher les formations disponibles pour une Ã©quipe
+     * Afficher les formations disponibles pour une ÃƒÂ©quipe
      */
     public function availableFormations(Team $team)
     {
         $user = Auth::user();
 
-        // RÃ©cupÃ©rer les formations disponibles pour cette Ã©quipe
+        // RÃƒÂ©cupÃƒÂ©rer les formations disponibles pour cette ÃƒÂ©quipe
         $availableFormations = $team->formationsByTeam()
             ->where('formation_in_teams.visible', true)
             ->with(['chapters.lessons'])
             ->get();
 
-        // VÃ©rifier l'inscription de l'utilisateur Ã  chaque formation
+        // VÃƒÂ©rifier l'inscription de l'utilisateur ÃƒÂ  chaque formation
         foreach ($availableFormations as $formation) {
             $formation->is_enrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation, $team);
             $formation->progress = $formation->is_enrolled
@@ -249,7 +344,7 @@ class ElevePageController extends Controller
     }
 
     /**
-     * API endpoint pour rÃ©cupÃ©rer les formations d'un Ã©tudiant (pour AJAX)
+     * API endpoint pour rÃƒÂ©cupÃƒÂ©rer les formations d'un ÃƒÂ©tudiant (pour AJAX)
      */
     public function apiFormations(Team $team, Request $request)
     {
@@ -266,15 +361,15 @@ class ElevePageController extends Controller
     }
 
     /**
-     * API endpoint pour rÃ©cupÃ©rer la progression d'une formation
+     * API endpoint pour rÃƒÂ©cupÃƒÂ©rer la progression d'une formation
      */
     public function apiProgress(Team $team, Formation $formation, Request $request)
     {
         $user = Auth::user();
 
-        // VÃ©rifier les permissions
+        // VÃƒÂ©rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return response()->json(['error' => 'Non autorisÃ©'], 403);
+            return response()->json(['error' => 'Non autorisÃƒÂ©'], 403);
         }
 
         $progress = $this->studentFormationService->getStudentProgress($user, $formation);
@@ -287,31 +382,31 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Afficher le contenu d'une leÃ§on
+     * Afficher le contenu d'une leÃƒÂ§on
      */
     public function showLesson(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
 
-        // VÃ©rifier si l'Ã©tudiant est inscrit Ã  la formation
+        // VÃƒÂ©rifier si l'ÃƒÂ©tudiant est inscrit ÃƒÂ  la formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
+            abort(403, 'Vous n\'ÃƒÂªtes pas inscrit ÃƒÂ  cette formation.');
         }
 
-        // VÃ©rifier que la leÃ§on appartient bien au chapitre et Ã  la formation
+        // VÃƒÂ©rifier que la leÃƒÂ§on appartient bien au chapitre et ÃƒÂ  la formation
         if ($lesson->chapter_id !== $chapter->id || $chapter->formation_id !== $formation->id) {
-            abort(404, 'LeÃ§on non trouvÃ©e.');
+            abort(404, 'LeÃƒÂ§on non trouvÃƒÂ©e.');
         }
 
-        // VÃ©rifier si la leÃ§on est dÃ©jÃ  terminÃ©e (sauf si c'est la premiÃ¨re visite)
+        // VÃƒÂ©rifier si la leÃƒÂ§on est dÃƒÂ©jÃƒÂ  terminÃƒÂ©e (sauf si c'est la premiÃƒÂ¨re visite)
         $lessonProgress = $lesson->learners()->where('user_id', $user->id)->first();
         if ($lessonProgress && $lessonProgress->pivot->status === 'completed') {
             // Rediriger vers la formation avec un message d'information
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('info', 'Cette leÃ§on est dÃ©jÃ  terminÃ©e. Vous pouvez passer Ã  la leÃ§on suivante.');
+                ->with('info', 'Cette leÃƒÂ§on est dÃƒÂ©jÃƒÂ  terminÃƒÂ©e. Vous pouvez passer ÃƒÂ  la leÃƒÂ§on suivante.');
         }
 
-        // RÃ©cupÃ©rer le contenu de la leÃ§on selon son type
+        // RÃƒÂ©cupÃƒÂ©rer le contenu de la leÃƒÂ§on selon son type
         $lessonContent = null;
         $lessonType = null;
 
@@ -333,18 +428,18 @@ class ElevePageController extends Controller
         }
 
         if (! $lessonContent) {
-            abort(404, 'Contenu de leÃ§on non trouvÃ©.');
+            abort(404, 'Contenu de leÃƒÂ§on non trouvÃƒÂ©.');
         }
 
-        // DÃ©marrer automatiquement la leÃ§on lors de la visite (seulement si pas dÃ©jÃ  terminÃ©e)
+        // DÃƒÂ©marrer automatiquement la leÃƒÂ§on lors de la visite (seulement si pas dÃƒÂ©jÃƒÂ  terminÃƒÂ©e)
         $this->startLessonAutomatically($team, $formation, $chapter, $lesson);
 
-        // RÃ©cupÃ©rer la progression de l'Ã©tudiant pour cette leÃ§on
+        // RÃƒÂ©cupÃƒÂ©rer la progression de l'ÃƒÂ©tudiant pour cette leÃƒÂ§on
         $lessonProgress = $lesson->learners()
             ->where('user_id', $user->id)
             ->first();
 
-        // RÃ©cupÃ©rer les leÃ§ons prÃ©cÃ©dente et suivante dans le chapitre
+        // RÃƒÂ©cupÃƒÂ©rer les leÃƒÂ§ons prÃƒÂ©cÃƒÂ©dente et suivante dans le chapitre
         $previousLesson = $chapter->lessons()
             ->where('position', '<', $lesson->position)
             ->orderBy('position', 'desc')
@@ -355,7 +450,7 @@ class ElevePageController extends Controller
             ->orderBy('position', 'asc')
             ->first();
 
-        // RÃ©cupÃ©rer les autres chapitres de la formation pour la navigation
+        // RÃƒÂ©cupÃƒÂ©rer les autres chapitres de la formation pour la navigation
         $otherChapters = $formation->chapters()
             ->where('id', '!=', $chapter->id)
             ->orderBy('position')
@@ -381,13 +476,13 @@ class ElevePageController extends Controller
     }
 
     /**
-     * DÃ©marrer automatiquement une leÃ§on lors de la visite
+     * DÃƒÂ©marrer automatiquement une leÃƒÂ§on lors de la visite
      */
     private function startLessonAutomatically(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
 
-        // CrÃ©er ou mettre Ã  jour la progression de l'Ã©tudiant pour cette leÃ§on
+        // CrÃƒÂ©er ou mettre ÃƒÂ  jour la progression de l'ÃƒÂ©tudiant pour cette leÃƒÂ§on
         $lesson->learners()->syncWithoutDetaching([
             $user->id => [
                 'started_at' => now(),
@@ -398,18 +493,18 @@ class ElevePageController extends Controller
     }
 
     /**
-     * DÃ©marrer une leÃ§on (tracking du temps) - API endpoint
+     * DÃƒÂ©marrer une leÃƒÂ§on (tracking du temps) - API endpoint
      */
     public function startLesson(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
 
-        // VÃ©rifier les permissions
+        // VÃƒÂ©rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return response()->json(['error' => 'Non autorisÃ©'], 403);
+            return response()->json(['error' => 'Non autorisÃƒÂ©'], 403);
         }
 
-        // CrÃ©er ou mettre Ã  jour la progression de l'Ã©tudiant pour cette leÃ§on
+        // CrÃƒÂ©er ou mettre ÃƒÂ  jour la progression de l'ÃƒÂ©tudiant pour cette leÃƒÂ§on
         $lesson->learners()->syncWithoutDetaching([
             $user->id => [
                 'started_at' => now(),
@@ -422,18 +517,18 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Marquer une leÃ§on comme terminÃ©e
+     * Marquer une leÃƒÂ§on comme terminÃƒÂ©e
      */
     public function completeLesson(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
 
-        // VÃ©rifier les permissions
+        // VÃƒÂ©rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return response()->json(['error' => 'Non autorisÃ©'], 403);
+            return response()->json(['error' => 'Non autorisÃƒÂ©'], 403);
         }
 
-        // Marquer la leÃ§on comme terminÃ©e
+        // Marquer la leÃƒÂ§on comme terminÃƒÂ©e
         $lesson->learners()->syncWithoutDetaching([
             $user->id => [
                 'completed_at' => now(),
@@ -442,27 +537,27 @@ class ElevePageController extends Controller
             ],
         ]);
 
-        // Mettre Ã  jour la progression globale de la formation
+        // Mettre ÃƒÂ  jour la progression globale de la formation
         $this->updateFormationProgress($user, $formation);
 
         return response()->json(['success' => true]);
     }
 
     /**
-     * Mettre Ã  jour la progression d'une leÃ§on (pour le contenu textuel)
+     * Mettre ÃƒÂ  jour la progression d'une leÃƒÂ§on (pour le contenu textuel)
      */
     public function updateProgress(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, Request $request)
     {
         $user = Auth::user();
 
-        // VÃ©rifier les permissions
+        // VÃƒÂ©rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return response()->json(['error' => 'Non autorisÃ©'], 403);
+            return response()->json(['error' => 'Non autorisÃƒÂ©'], 403);
         }
 
         $readPercent = $request->input('read_percent', 0);
 
-        // Mettre Ã  jour la progression de lecture
+        // Mettre ÃƒÂ  jour la progression de lecture
         $lesson->learners()->syncWithoutDetaching([
             $user->id => [
                 'read_percent' => $readPercent,
@@ -474,45 +569,45 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Afficher la page de quiz pour un Ã©tudiant
+     * Afficher la page de quiz pour un ÃƒÂ©tudiant
      */
     public function attemptQuiz(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $user = Auth::user();
 
-        // VÃ©rifier les permissions
+        // VÃƒÂ©rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
+            abort(403, 'Vous n\'ÃƒÂªtes pas inscrit ÃƒÂ  cette formation.');
         }
 
-        // VÃ©rifier que la leÃ§on est bien un quiz
+        // VÃƒÂ©rifier que la leÃƒÂ§on est bien un quiz
         if ($lesson->lessonable_type !== \App\Models\Quiz::class) {
-            abort(404, 'Quiz non trouvÃ©.');
+            abort(404, 'Quiz non trouvÃƒÂ©.');
         }
 
         $quiz = $lesson->lessonable;
 
-        // RÃ©cupÃ©rer les questions du quiz
+        // RÃƒÂ©cupÃƒÂ©rer les questions du quiz
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
-        // VÃ©rifier si l'Ã©tudiant a dÃ©jÃ  atteint le nombre maximum de tentatives
+        // VÃƒÂ©rifier si l'ÃƒÂ©tudiant a dÃƒÂ©jÃƒÂ  atteint le nombre maximum de tentatives
         $attempts = $lesson->learners()
             ->where('user_id', $user->id)
             ->first()?->pivot?->attempts ?? 0;
 
         if ($attempts >= $quiz->max_attempts && $quiz->max_attempts > 0) {
-            // Marquer la leÃ§on comme terminÃ©e mÃªme si le quiz n'est pas rÃ©ussi
-            // pour permettre Ã  l'Ã©tudiant de continuer la formation
+            // Marquer la leÃƒÂ§on comme terminÃƒÂ©e mÃƒÂªme si le quiz n'est pas rÃƒÂ©ussi
+            // pour permettre ÃƒÂ  l'ÃƒÂ©tudiant de continuer la formation
             $lesson->learners()->syncWithoutDetaching([
                 $user->id => [
                     'completed_at' => now(),
                     'last_activity_at' => now(),
-                    'status' => 'completed', // âœ… Marquer comme terminÃ© pour dÃ©bloquer la progression
+                    'status' => 'completed', // Ã¢Å“â€¦ Marquer comme terminÃƒÂ© pour dÃƒÂ©bloquer la progression
                     'attempts' => $attempts,
                 ],
             ]);
 
-            // Mettre Ã  jour la progression globale de la formation
+            // Mettre ÃƒÂ  jour la progression globale de la formation
             $this->updateFormationProgress($user, $formation);
 
             return redirect()->route('eleve.formation.show', [$team, $formation])
@@ -530,20 +625,20 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Soumettre les rÃ©ponses d'un quiz
+     * Soumettre les rÃƒÂ©ponses d'un quiz
      */
     public function submitQuiz(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, Request $request)
     {
         $user = Auth::user();
 
-        // VÃ©rifier les permissions
+        // VÃƒÂ©rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return response()->json(['error' => 'Non autorisÃ©'], 403);
+            return response()->json(['error' => 'Non autorisÃƒÂ©'], 403);
         }
 
-        // VÃ©rifier que la leÃ§on est bien un quiz
+        // VÃƒÂ©rifier que la leÃƒÂ§on est bien un quiz
         if ($lesson->lessonable_type !== \App\Models\Quiz::class) {
-            return response()->json(['error' => 'Quiz non trouvÃ©'], 404);
+            return response()->json(['error' => 'Quiz non trouvÃƒÂ©'], 404);
         }
 
         $quiz = $lesson->lessonable;
@@ -571,18 +666,18 @@ class ElevePageController extends Controller
         $passingScore = $quiz->passing_score ?? 0;
         $passed = $passingScore > 0 ? $score >= $passingScore : true;
 
-        // CrÃ©er la tentative de quiz
+        // CrÃƒÂ©er la tentative de quiz
         $attempt = \App\Models\QuizAttempt::create([
             'user_id' => $user->id,
             'quiz_id' => $quiz->id,
             'score' => $score,
             'max_score' => $maxScore,
-            'duration_seconds' => 0, // TODO: calculer la durÃ©e rÃ©elle si nÃ©cessaire
+            'duration_seconds' => 0, // TODO: calculer la durÃƒÂ©e rÃƒÂ©elle si nÃƒÂ©cessaire
             'started_at' => now(),
             'submitted_at' => now(),
         ]);
 
-        // Enregistrer la tentative dans la progression de la leÃ§on
+        // Enregistrer la tentative dans la progression de la leÃƒÂ§on
         $attempts = ($lesson->learners()->where('user_id', $user->id)->first()?->pivot?->attempts ?? 0) + 1;
 
         $lesson->learners()->syncWithoutDetaching([
@@ -591,12 +686,12 @@ class ElevePageController extends Controller
                 'best_score' => max($lesson->learners()->where('user_id', $user->id)->first()?->pivot?->best_score ?? 0, $score),
                 'max_score' => $maxScore,
                 'last_activity_at' => now(),
-                'completed_at' => now(), // âœ… Marquer comme terminÃ© Ã  chaque tentative
-                'status' => 'completed', // âœ… La leÃ§on est terminÃ©e (quiz fait)
+                'completed_at' => now(), // Ã¢Å“â€¦ Marquer comme terminÃƒÂ© ÃƒÂ  chaque tentative
+                'status' => 'completed', // Ã¢Å“â€¦ La leÃƒÂ§on est terminÃƒÂ©e (quiz fait)
             ],
         ]);
 
-        // Enregistrer les rÃ©ponses individuelles
+        // Enregistrer les rÃƒÂ©ponses individuelles
         foreach ($answers as $questionId => $choiceId) {
             \App\Models\QuizAnswer::create([
                 'quiz_attempt_id' => $attempt->id,
@@ -606,52 +701,52 @@ class ElevePageController extends Controller
             ]);
         }
 
-        // âœ… Mettre Ã  jour la progression globale Ã  chaque soumission de quiz
+        // Ã¢Å“â€¦ Mettre ÃƒÂ  jour la progression globale ÃƒÂ  chaque soumission de quiz
         $this->updateFormationProgress($user, $formation);
 
-        // Rediriger vers la formation si le quiz est rÃ©ussi
+        // Rediriger vers la formation si le quiz est rÃƒÂ©ussi
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'FÃ©licitations ! Vous avez rÃ©ussi le quiz avec un score de ' . round($score, 1) . '%.');
+                ->with('success', 'FÃƒÂ©licitations ! Vous avez rÃƒÂ©ussi le quiz avec un score de ' . round($score, 1) . '%.');
         }
 
-        // Retourner seulement les donnÃ©es nÃ©cessaires pour les quiz Ã©chouÃ©s (pas de vue complÃ¨te)
+        // Retourner seulement les donnÃƒÂ©es nÃƒÂ©cessaires pour les quiz ÃƒÂ©chouÃƒÂ©s (pas de vue complÃƒÂ¨te)
         return response()->json([
             'success' => false,
             'passed' => false,
             'can_retry' => true,
-            'message' => 'Quiz Ã©chouÃ©. Vous pouvez rÃ©essayer.',
+            'message' => 'Quiz ÃƒÂ©chouÃƒÂ©. Vous pouvez rÃƒÂ©essayer.',
         ]);
     }
 
     /**
-     * Afficher les rÃ©sultats d'une tentative de quiz
+     * Afficher les rÃƒÂ©sultats d'une tentative de quiz
      */
     public function quizResults(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, QuizAttempt $attempt)
     {
         $user = Auth::user();
 
-        // VÃ©rifier les permissions
+        // VÃƒÂ©rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
+            abort(403, 'Vous n\'ÃƒÂªtes pas inscrit ÃƒÂ  cette formation.');
         }
 
-        // VÃ©rifier que la leÃ§on est bien un quiz
+        // VÃƒÂ©rifier que la leÃƒÂ§on est bien un quiz
         if ($lesson->lessonable_type !== \App\Models\Quiz::class) {
-            abort(404, 'Quiz non trouvÃ©.');
+            abort(404, 'Quiz non trouvÃƒÂ©.');
         }
 
-        // VÃ©rifier que la tentative appartient Ã  l'utilisateur connectÃ©
+        // VÃƒÂ©rifier que la tentative appartient ÃƒÂ  l'utilisateur connectÃƒÂ©
         if ($attempt->user_id !== $user->id || $attempt->lesson_id !== $lesson->id) {
-            abort(403, 'Tentative non autorisÃ©e.');
+            abort(403, 'Tentative non autorisÃƒÂ©e.');
         }
 
         $quiz = $lesson->lessonable;
 
-        // RÃ©cupÃ©rer les rÃ©ponses de cette tentative
+        // RÃƒÂ©cupÃƒÂ©rer les rÃƒÂ©ponses de cette tentative
         $answers = $attempt->answers()->with(['question', 'choice'])->get();
 
-        // RÃ©cupÃ©rer les informations du quiz
+        // RÃƒÂ©cupÃƒÂ©rer les informations du quiz
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
         return view('clean.eleve.lesson.quiz-results', compact(
@@ -667,11 +762,11 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Mettre Ã  jour la progression globale d'une formation
+     * Mettre ÃƒÂ  jour la progression globale d'une formation
      */
     private function updateFormationProgress(User $user, Formation $formation)
     {
-        // RÃ©cupÃ©rer tous les chapitres avec leurs leÃ§ons et la progression de l'utilisateur
+        // RÃƒÂ©cupÃƒÂ©rer tous les chapitres avec leurs leÃƒÂ§ons et la progression de l'utilisateur
         $chapters = $formation->chapters()
             ->with(['lessons' => function ($query) use ($user) {
                 $query->with(['learners' => function ($learnerQuery) use ($user) {
@@ -680,7 +775,7 @@ class ElevePageController extends Controller
             }])
             ->get();
 
-        // Calculer la progression basÃ©e sur les leÃ§ons terminÃ©es
+        // Calculer la progression basÃƒÂ©e sur les leÃƒÂ§ons terminÃƒÂ©es
         $totalLessons = $chapters->pluck('lessons')->flatten()->count();
         $completedLessons = 0;
 
@@ -695,10 +790,10 @@ class ElevePageController extends Controller
 
         $progressPercent = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
 
-        // Mettre Ã  jour la progression de la formation et le current_lesson_id
+        // Mettre ÃƒÂ  jour la progression de la formation et le current_lesson_id
         $this->updateCurrentLessonId($user, $formation);
 
-        // Mettre Ã  jour la progression de la formation
+        // Mettre ÃƒÂ  jour la progression de la formation
         $formation->learners()->syncWithoutDetaching([
             $user->id => [
                 'last_seen_at' => now(),
@@ -708,11 +803,11 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Mettre Ã  jour le current_lesson_id pour pointer vers la prochaine leÃ§on non terminÃ©e
+     * Mettre ÃƒÂ  jour le current_lesson_id pour pointer vers la prochaine leÃƒÂ§on non terminÃƒÂ©e
      */
     private function updateCurrentLessonId(User $user, Formation $formation): void
     {
-        // RÃ©cupÃ©rer la formation avec tous les chapitres et leÃ§ons ordonnÃ©s
+        // RÃƒÂ©cupÃƒÂ©rer la formation avec tous les chapitres et leÃƒÂ§ons ordonnÃƒÂ©s
         $formationWithLessons = $formation->load([
             'chapters' => function ($query) {
                 $query->orderBy('position')
@@ -724,23 +819,23 @@ class ElevePageController extends Controller
 
         $nextLessonId = null;
 
-        // Parcourir tous les chapitres et leÃ§ons pour trouver la premiÃ¨re non terminÃ©e
+        // Parcourir tous les chapitres et leÃƒÂ§ons pour trouver la premiÃƒÂ¨re non terminÃƒÂ©e
         foreach ($formationWithLessons->chapters as $chapter) {
             foreach ($chapter->lessons as $lesson) {
-                // VÃ©rifier si cette leÃ§on est terminÃ©e
+                // VÃƒÂ©rifier si cette leÃƒÂ§on est terminÃƒÂ©e
                 $lessonProgress = $lesson->learners()
                     ->where('user_id', $user->id)
                     ->first();
 
                 if (! $lessonProgress || $lessonProgress->pivot->status !== 'completed') {
-                    // Cette leÃ§on n'est pas terminÃ©e, c'est la suivante
+                    // Cette leÃƒÂ§on n'est pas terminÃƒÂ©e, c'est la suivante
                     $nextLessonId = $lesson->id;
                     break 2; // Sortir des deux boucles
                 }
             }
         }
 
-        // Mettre Ã  jour le current_lesson_id dans formation_user
+        // Mettre ÃƒÂ  jour le current_lesson_id dans formation_user
         $formation->learners()->syncWithoutDetaching([
             $user->id => [
                 'current_lesson_id' => $nextLessonId,
@@ -749,3 +844,4 @@ class ElevePageController extends Controller
         ]);
     }
 }
+
