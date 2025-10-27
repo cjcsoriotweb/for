@@ -96,17 +96,7 @@
     <p class="mt-3 text-sm text-slate-300/80">
       Parcourez le catalogue des formations disponibles et lancez votre prochain apprentissage.
     </p>
-    <a href="{{ route('eleve.formation.available', [$team]) }}"
-      class="mt-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/25">
-      Explorer les formations
-      <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd"
-          d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z"
-          clip-rule="evenodd" />
-        <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z"
-          clip-rule="evenodd" />
-      </svg>
-    </a>
+
   </div>
   @endif
 </section>
