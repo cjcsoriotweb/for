@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Blade::component('organisateur.parts.filters', \App\View\Components\Organisateur\Parts\Filters::class);
         \Illuminate\Support\Facades\Blade::component('organisateur.parts.student-card', \App\View\Components\Organisateur\Parts\StudentCard::class);
         \Illuminate\Support\Facades\Blade::component('organisateur.parts.formation-card', \App\View\Components\Organisateur\Parts\FormationCard::class);
+        \Illuminate\Support\Facades\Blade::component('organisateur.parts.formation-catalogue-card', \App\View\Components\Organisateur\Parts\FormationCatalogueCard::class);
         \Illuminate\Support\Facades\Blade::component('organisateur.parts.empty-state', \App\View\Components\Organisateur\Parts\EmptyState::class);
         \Illuminate\Support\Facades\Blade::component('organisateur.parts.action-buttons', \App\View\Components\Organisateur\Parts\ActionButtons::class);
     }
