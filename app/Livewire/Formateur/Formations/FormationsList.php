@@ -3,6 +3,8 @@
 namespace App\Livewire\Formateur\Formations;
 
 use App\Models\Formation;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -30,9 +32,11 @@ class FormationsList extends Component
     public function loadFormations()
     {
         $query = Formation::withCount(['learners', 'lessons'])
-            ->with(['lessons' => function ($query) {
-                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
-            }]);
+            ->with([
+                'lessons' => function ($query) {
+                    $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
+                },
+            ]);
 
         if ($this->search) {
             $query->where('title', 'like', '%'.$this->search.'%')
@@ -41,13 +45,22 @@ class FormationsList extends Component
 
         $this->formations = $query->paginate($this->perPage);
 
-        // Add content type counts and duration for each formation
+        // Shape data for the view to keep Blade templates presentation-only.
         $this->formations->each(function ($formation) {
             $formation->video_count = $formation->lessons->where('lessonable_type', 'App\\Models\\VideoContent')->count();
             $formation->quiz_count = $formation->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
             $formation->text_count = $formation->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
 
-            // Calculate total duration in minutes
+            $formation->card_lessons_count = $formation->lessons_count ?? 0;
+            $formation->card_learners_count = $formation->learners_count ?? 0;
+            $formation->card_description = Str::limit((string) $formation->description, 180);
+            $formation->card_completion_percentage = min(100, $formation->completion_percentage ?? 75);
+            $formation->card_created_label = $formation->created_at instanceof Carbon
+                ? $formation->created_at->diffForHumans()
+                : null;
+            $formation->card_is_active = (bool) $formation->active;
+
+            // Calculate total duration in minutes.
             $totalDuration = 0;
 
             foreach ($formation->lessons as $lesson) {
@@ -59,9 +72,8 @@ class FormationsList extends Component
                         $totalDuration += $lesson->lessonable->estimated_read_time ?? 0;
                         break;
                     case 'App\\Models\\Quiz':
-                        // Estimate quiz duration: 2 minutes per question
                         $questionCount = $lesson->lessonable->quizQuestions()->count();
-                        $totalDuration += max($questionCount * 2, 5); // Minimum 5 minutes per quiz
+                        $totalDuration += max($questionCount * 2, 5);
                         break;
                 }
             }

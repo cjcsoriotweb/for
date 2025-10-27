@@ -57,6 +57,8 @@
           Continuer la formation
         </a>
         @else
+
+        @if($team->money > $formation->money_amount)
         <div class="flex items-center justify-between mb-4">
           <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
             Disponible
@@ -75,6 +77,16 @@
             S'inscrire à cette formation
           </button>
         </form>
+
+        @else
+        <div class="flex-col items-center justify-between mb-4">
+          <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">
+            Solde application insuffisant
+          </span>
+        </div>
+        @endif
+
+
         @endif
       </div>
       @endforeach

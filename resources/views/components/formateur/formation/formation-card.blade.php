@@ -2,7 +2,7 @@
 
 <div
   class="group relative bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-white/60 hover:border-blue-200/60 hover:-translate-y-2">
-  <!-- Multiple decorative layers -->
+  <!-- Decorative layers -->
   <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50"></div>
   <div
     class="absolute inset-0 bg-gradient-to-r from-blue-500/3 via-transparent to-purple-500/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -17,7 +17,6 @@
   </div>
 
   <div class="relative p-8">
-    <!-- Header with enhanced status indicators -->
     <div class="flex items-start justify-between mb-6">
       <div class="flex-1">
         <div class="flex items-center space-x-3 mb-3">
@@ -25,12 +24,19 @@
             class="font-bold text-3xl text-gray-900 leading-tight group-hover:text-blue-900 transition-colors duration-300">
             {{ $formation->title }}
           </h3>
-          <!-- Status badges -->
           <div class="flex items-center space-x-2">
             <span
-              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-              <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
-              Active
+              @class([
+                'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border',
+                'bg-emerald-100 text-emerald-800 border-emerald-200' => $formation->card_is_active,
+                'bg-gray-100 text-gray-700 border-gray-200' => ! $formation->card_is_active,
+              ])>
+              <div class="w-2 h-2 rounded-full mr-2 animate-pulse"
+                @class([
+                  'bg-emerald-500' => $formation->card_is_active,
+                  'bg-gray-400' => ! $formation->card_is_active,
+                ])></div>
+              {{ $formation->card_is_active ? 'Active' : 'Inactive' }}
             </span>
           </div>
         </div>
@@ -40,7 +46,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span>Créée récemment</span>
+            <span>{{ $formation->card_created_label ?? '--' }}</span>
           </div>
           <div class="w-1 h-1 bg-gray-300 rounded-full"></div>
           <div class="flex items-center space-x-1">
@@ -48,7 +54,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
-            <span>{{ $formation->learners_count ?? 0 }} étudiants</span>
+            <span>{{ $formation->card_learners_count }} etudiants</span>
           </div>
         </div>
       </div>
@@ -63,28 +69,24 @@
       </div>
     </div>
 
-    <!-- Enhanced description -->
     <div class="mb-8">
       <p class="text-gray-700 text-lg leading-relaxed line-clamp-2 mb-4">
-        {{ Str::limit($formation->description, 180) }}
+        {{ $formation->card_description }}
       </p>
-      <!-- Progress indicator -->
       <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
         <div
           class="bg-gradient-to-r from-blue-500 to-indigo-500 h-1 rounded-full transition-all duration-1000 progress-bar"
-          data-width="{{ min(100, $formation->completion_percentage ?? 75) }}"></div>
+          data-width="{{ $formation->card_completion_percentage }}"></div>
       </div>
     </div>
 
-    <!-- Enhanced action section -->
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-4">
         <a href="{{ route('formateur.formation.show', $formation) }}"
           class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-          Voir les détails
+          Voir les details
         </a>
 
-        <!-- Quick action buttons -->
         <div
           class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
           <button
@@ -108,16 +110,15 @@
         </div>
       </div>
 
-      <!-- Enhanced stats -->
       <div class="flex items-center space-x-6 text-sm">
-        @if($formation->lessons_count > 0)
+        @if($formation->card_lessons_count > 0)
         <div class="flex items-center space-x-2 px-3 py-2 bg-white/60 rounded-xl border border-gray-200/60">
           <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
             </path>
           </svg>
-          <span class="font-medium text-gray-700">{{ $formation->lessons_count }} leçons</span>
+          <span class="font-medium text-gray-700">{{ $formation->card_lessons_count }} lecons</span>
         </div>
         @endif
 
@@ -173,7 +174,6 @@
     </div>
   </div>
 
-  <!-- Enhanced hover effects -->
   <div
     class="absolute inset-0 rounded-3xl ring-2 ring-blue-500/0 group-hover:ring-blue-500/30 transition-all duration-500 pointer-events-none">
   </div>

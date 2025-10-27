@@ -35,87 +35,138 @@ FORMATIONS LIST - MAIN CONTAINER
     </div>
   </div>
 
-  {{-- ========================================
-  ENHANCED JAVASCRIPT SECTION
-  ======================================== --}}
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      // Animate progress bars on scroll
-      const progressBars = document.querySelectorAll('.progress-bar');
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const bar = entry.target;
-            const width = bar.getAttribute('data-width');
-            setTimeout(() => {
-              bar.style.width = width + '%';
-            }, 200);
+</div>
+
+@once
+  @push('scripts')
+    <script>
+      (function () {
+        let progressObserver = null;
+
+        function ensureProgressObserver() {
+          if (progressObserver) {
+            return progressObserver;
+          }
+
+          progressObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) {
+                return;
+              }
+
+              const bar = entry.target;
+              const targetWidth = bar.getAttribute('data-width');
+
+              if (!bar.dataset.progressAnimated) {
+                bar.dataset.progressAnimated = 'true';
+                requestAnimationFrame(() => {
+                  bar.style.width = `${targetWidth}%`;
+                });
+              }
+
+              observer.unobserve(bar);
+            });
+          });
+
+          return progressObserver;
+        }
+
+        function initProgressBars(root = document) {
+          const observer = ensureProgressObserver();
+          root.querySelectorAll('.progress-bar[data-width]').forEach((bar) => {
+            if (bar.dataset.progressObserved) {
+              return;
+            }
+
+            bar.dataset.progressObserved = 'true';
+            observer.observe(bar);
+          });
+        }
+
+        function initSearchInput(root = document) {
+          const searchInput = root.querySelector('input[wire\\:model\\.live="search"]');
+
+          if (!searchInput || searchInput.dataset.formationsSearchBound) {
+            return;
+          }
+
+          searchInput.dataset.formationsSearchBound = 'true';
+
+          searchInput.addEventListener('focus', function () {
+            this.parentElement?.classList.add('ring-4', 'ring-blue-500/30');
+          });
+
+          searchInput.addEventListener('blur', function () {
+            this.parentElement?.classList.remove('ring-4', 'ring-blue-500/30');
+          });
+        }
+
+        function hydrate(root = document) {
+          initProgressBars(root);
+          initSearchInput(root);
+        }
+
+        function boot() {
+          hydrate(document);
+        }
+
+        document.addEventListener('DOMContentLoaded', boot, { once: true });
+
+        document.addEventListener('livewire:load', function () {
+          boot();
+
+          if (window.Livewire && typeof window.Livewire.hook === 'function') {
+            window.Livewire.hook('message.processed', function (_message, component) {
+              hydrate(component ? component.el : document);
+            });
           }
         });
-      });
+      })();
+    </script>
+  @endpush
+@endonce
 
-      progressBars.forEach(bar => {
-        observer.observe(bar);
-      });
-
-      // Enhanced search functionality
-      const searchInput = document.querySelector('input[wire\\:model\\.live="search"]');
-      if (searchInput) {
-        searchInput.addEventListener('focus', function () {
-          this.parentElement.classList.add('ring-4', 'ring-blue-500/30');
-        });
-
-        searchInput.addEventListener('blur', function () {
-          this.parentElement.classList.remove('ring-4', 'ring-blue-500/30');
-        });
-      }
-    });
-  </script>
-
-  {{-- ========================================
-  CUSTOM STYLES SECTION
-  ======================================== --}}
-  <style>
-    .line-clamp-2 {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      width: 0%;
-      transition: width 1s ease-out;
-    }
-
-    /* Enhanced hover effects */
-    .group:hover .group-hover\\:scale-105 {
-      transform: scale(1.05) translateY(-4px);
-    }
-
-    /* Smooth animations for all interactive elements */
-    * {
-      scroll-behavior: smooth;
-    }
-
-    /* Custom gradient text animation */
-    .animate-gradient {
-      background-size: 200% 200%;
-      animation: gradient 3s ease infinite;
-    }
-
-    @keyframes gradient {
-      0% {
-        background-position: 0% 50%;
+@once
+  @push('styles')
+    <style>
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
-      50% {
-        background-position: 100% 50%;
+      .progress-bar {
+        width: 0%;
+        transition: width 1s ease-out;
       }
 
-      100% {
-        background-position: 0% 50%;
+      .group:hover .group-hover\:scale-105 {
+        transform: scale(1.05) translateY(-4px);
       }
-    }
-  </style>
-</div>
+
+      * {
+        scroll-behavior: smooth;
+      }
+
+      .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient 3s ease infinite;
+      }
+
+      @keyframes gradient {
+        0% {
+          background-position: 0% 50%;
+        }
+
+        50% {
+          background-position: 100% 50%;
+        }
+
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+    </style>
+  @endpush
+@endonce
