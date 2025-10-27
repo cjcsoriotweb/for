@@ -14,7 +14,7 @@
     <div class="flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 sm:px-2">
       @foreach($formations as $formation)
       <article
-        class="group relative isolate min-w-[260px] max-w-xs snap-start overflow-hidden rounded-3xl border border-white/15 bg-slate-900/55 transition duration-300 hover:-translate-y-1 ">
+        class="group relative isolate min-w-[260px] max-w-xs snap-start overflow-hidden rounded-3xl border border-white/15 bg-slate-900/55 transition duration-300 hover:-translate-y-1">
         <div
           class="absolute inset-0 bg-gradient-to-br from-sky-500/80 via-indigo-500/60 to-purple-500/50 opacity-60 transition group-hover:opacity-80">
         </div>
@@ -32,8 +32,14 @@
           <div class="space-y-4">
             <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-white/70">
               <span>{{ $formation['status_label'] }}</span>
-              <span class="rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-white">{{
-                $formation['price_label'] }}</span>
+              <span class=" flex rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-white">
+                {{ $formation['price_label'] }}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+                </svg>
+              </span>
             </div>
 
             <div class="space-y-3">

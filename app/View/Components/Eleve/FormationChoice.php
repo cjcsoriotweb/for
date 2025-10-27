@@ -13,6 +13,8 @@ use Illuminate\View\Component;
 
 class FormationChoice extends Component
 {
+    public Collection $availableFormations;
+
     public Collection $formations;
 
     public Team $team;
@@ -31,6 +33,8 @@ class FormationChoice extends Component
 
         $availableFormations = $studentFormationService
             ->listAvailableFormationsForTeamExceptCurrentUseByMe($team);
+
+        $this->availableFormations = $availableFormations;
 
         $this->formations = $availableFormations->map(function ($formation) use (
             $studentFormationService,
@@ -51,13 +55,13 @@ class FormationChoice extends Component
 
             return [
                 'id' => $formation->id,
-                'title' => $formation->title ?: 'Titre par défaut',
-                'description' => $formation->description ?: 'Description par défaut',
-                'cover_image_url' => $formation->cover_image_url,
+                'title' => $formation->title ?: 'Titre par defaut',
+                'description' => $formation->description ?: 'Description par defaut',
+                'cover_image_url' => $formation->cover_image_url ?: asset('images/formation-placeholder.svg'),
                 'price_label' => $formation->money_amount
-                    ? number_format((int) $formation->money_amount, 0, ',', ' ') . ' &euro;'
+                    ? number_format((int) $formation->money_amount, 0, ',', ' ')
                     : 'Gratuit',
-                'status_label' => $isEnrolled ? 'Déjà inscrit' : 'Nouvelle formation',
+                'status_label' => $isEnrolled ? 'Deja inscrit' : 'Nouvelle formation',
                 'is_enrolled' => $isEnrolled,
                 'has_progress' => $isEnrolled && $progress !== null,
                 'progress_percent' => $progressPercent,
