@@ -23,17 +23,27 @@
             <!-- Sidebar avec composants modulaires -->
             <x-formateur.formation.formation-sidebar :formation="$formation" />
 
-            <!-- Create Chapter Button -->
-            <div class="flex justify-end">
+            <!-- Navigation Buttons -->
+            <div class="flex flex-col space-y-3">
+              <a href="{{ route('formateur.formation.chapters.index', $formation) }}"
+                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                  </path>
+                </svg>
+                Gérer les chapitres
+              </a>
+
               <form action="{{
                                 route(
                                     'formateur.formation.chapter.add.post',
                                     $formation
                                 )
-                            }}" method="POST">
+                            }}" method="POST" class="inline">
                 @csrf
                 <button
-                  class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
                   <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
