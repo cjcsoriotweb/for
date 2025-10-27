@@ -8,7 +8,7 @@
         <div class="p-8">
           <div class="flex items-start justify-between mb-6">
             <div class="flex-1">
-              <div class="flex items-center mb-4">
+              <div>
                 <a href="{{ route('formateur.formation.show', $formation) }}"
                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors duration-200 mr-4">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
                   </svg>
                   Retour au tableau de bord
                 </a>
-                <div class="h-6 w-px bg-gray-300 mx-4"></div>
+
                 <h1 class="text-3xl font-bold text-gray-900 flex items-center">
                   <svg class="w-8 h-8 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
