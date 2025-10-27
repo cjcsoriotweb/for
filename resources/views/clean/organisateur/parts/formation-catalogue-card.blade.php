@@ -64,46 +64,100 @@
   </div>
 
   {{-- Content Stats --}}
-  <div class="relative mb-4">
-    <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-      @if($formation->video_count > 0)
-      <div class="flex items-center gap-1">
-        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-          </path>
-        </svg>
-        {{ $formation->video_count }} vidéo{{ $formation->video_count > 1 ? 's' : '' }}
-      </div>
-      @endif
-      @if($formation->quiz_count > 0)
-      <div class="flex items-center gap-1">
-        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-          </path>
-        </svg>
-        {{ $formation->quiz_count }} quiz{{ $formation->quiz_count > 1 ? '' : '' }}
-      </div>
-      @endif
-      @if($formation->text_count > 0)
-      <div class="flex items-center gap-1">
-        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-          </path>
-        </svg>
-        {{ $formation->text_count }} texte{{ $formation->text_count > 1 ? 's' : '' }}
-      </div>
-      @endif
+  <div class="relative mb-6">
+    <div class="flex flex-wrap gap-3">
       @if($formation->lessons_count > 0)
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
           </path>
         </svg>
-        {{ $formation->lessons_count }} leçon{{ ($formation->lessons_count ?? 1) > 1 ? 's' : '' }}
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {{ $formation->lessons_count }} leçon{{ $formation->lessons_count > 1 ? 's' : '' }}
+        </span>
+      </div>
+      @endif
+
+      @if($formation->video_count > 0)
+      <div class="flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+          </path>
+        </svg>
+        <span class="text-sm font-medium text-red-700 dark:text-red-300">
+          {{ $formation->video_count }} vidéo{{ $formation->video_count > 1 ? 's' : '' }}
+        </span>
+      </div>
+      @endif
+
+      @if($formation->quiz_count > 0)
+      <div class="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+          </path>
+        </svg>
+        <span class="text-sm font-medium text-blue-700 dark:text-blue-300">
+          {{ $formation->quiz_count }} quiz
+        </span>
+      </div>
+      @endif
+
+      @if($formation->text_count > 0)
+      <div class="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+          </path>
+        </svg>
+        <span class="text-sm font-medium text-green-700 dark:text-green-300">
+          {{ $formation->text_count }} texte{{ $formation->text_count > 1 ? 's' : '' }}
+        </span>
+      </div>
+      @endif
+
+      @if($formation->learners_count > 0)
+      <div class="flex items-center gap-2 px-3 py-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+        <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+          </path>
+        </svg>
+        <span class="text-sm font-medium text-orange-700 dark:text-orange-300">
+          {{ $formation->learners_count }} apprenant{{ $formation->learners_count > 1 ? 's' : '' }}
+        </span>
+      </div>
+      @endif
+
+      {{-- Duration Badge --}}
+      @php
+      $duration = $formation->total_duration_minutes ?? 0;
+      $hours = floor($duration / 60);
+      $minutes = $duration % 60;
+      $durationText = '';
+      if ($hours > 0) {
+      $durationText .= $hours . 'h';
+      }
+      if ($minutes > 0) {
+      $durationText .= ($hours > 0 ? ' ' : '') . $minutes . 'min';
+      }
+      if (empty($durationText)) {
+      $durationText = '0min';
+      }
+      @endphp
+
+      @if($duration > 0)
+      <div class="flex items-center gap-2 px-3 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+          </path>
+        </svg>
+        <span class="text-sm font-medium text-indigo-700 dark:text-indigo-300">
+          {{ $durationText }}
+        </span>
       </div>
       @endif
     </div>

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('organisateur')
     ->name('organisateur.')
     ->middleware(['auth', 'organisateur'])
-    ->scopeBindings()
     ->group(function () {
         // Main routes - ordered by specificity (most specific first)
         Route::get('/{team}/formations/{formation}/students', [OrganisateurPageController::class, 'students'])->name('formations.students');

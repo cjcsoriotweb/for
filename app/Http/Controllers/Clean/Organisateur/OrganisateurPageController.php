@@ -23,23 +23,84 @@ class OrganisateurPageController extends Controller
         return view('clean.organisateur.home', compact('team', 'formations'));
     }
 
-    public function catalogue(Team $team)
+    public function catalogue(Request $request, Team $team)
     {
+        $search = $request->query('search', '');
+        $filter = $request->query('filter', 'all'); // all, visible, hidden
+        $sortBy = $request->query('sort', 'title'); // title, price, created_at
+        $sortDirection = $request->query('direction', 'asc'); // asc, desc
+
         $visibleFormations = $this->organisateurService->listVisibleFormations($team);
-        $allFormations = Formation::withCount(['learners', 'lessons'])
+
+        // Build query for all formations with search and filters
+        $formationsQuery = Formation::withCount(['learners', 'lessons'])
             ->with(['lessons' => function ($query) {
                 $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
-            }])
-            ->get();
+            }]);
 
-        // Count different content types for each formation
+        // Apply search filter
+        if (! empty($search)) {
+            $formationsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('level', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply visibility filter
+        if ($filter === 'visible') {
+            $formationsQuery->whereIn('id', $visibleFormations->pluck('id'));
+        } elseif ($filter === 'hidden') {
+            $formationsQuery->whereNotIn('id', $visibleFormations->pluck('id'));
+        }
+
+        // Apply sorting
+        $validSortFields = ['title', 'money_amount', 'created_at', 'learners_count', 'lessons_count', 'total_duration_minutes'];
+        if (in_array($sortBy, $validSortFields)) {
+            $formationsQuery->orderBy($sortBy, $sortDirection);
+        } else {
+            $formationsQuery->orderBy('title', 'asc');
+        }
+
+        $allFormations = $formationsQuery->get();
+
+        // Count different content types and calculate duration for each formation
         $allFormations->each(function ($formation) {
             $formation->video_count = $formation->lessons->where('lessonable_type', 'App\\Models\\VideoContent')->count();
             $formation->quiz_count = $formation->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
             $formation->text_count = $formation->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
+
+            // Calculate total duration in minutes
+            $totalDuration = 0;
+
+            foreach ($formation->lessons as $lesson) {
+                switch ($lesson->lessonable_type) {
+                    case 'App\\Models\\VideoContent':
+                        $totalDuration += $lesson->lessonable->duration_minutes ?? 0;
+                        break;
+                    case 'App\\Models\\TextContent':
+                        $totalDuration += $lesson->lessonable->estimated_read_time ?? 0;
+                        break;
+                    case 'App\\Models\\Quiz':
+                        // Estimate quiz duration: 2 minutes per question
+                        $questionCount = $lesson->lessonable->quizQuestions()->count();
+                        $totalDuration += max($questionCount * 2, 5); // Minimum 5 minutes per quiz
+                        break;
+                }
+            }
+
+            $formation->total_duration_minutes = $totalDuration;
         });
 
-        return view('clean.organisateur.catalogue', compact('team', 'visibleFormations', 'allFormations'));
+        return view('clean.organisateur.catalogue', compact(
+            'team',
+            'visibleFormations',
+            'allFormations',
+            'search',
+            'filter',
+            'sortBy',
+            'sortDirection'
+        ));
     }
 
     public function show(Team $team, Formation $formation)
@@ -52,7 +113,7 @@ class OrganisateurPageController extends Controller
                 },
                 'chapters.lessons' => function ($query) {
                     $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
-                }
+                },
             ])
             ->find($formation->id);
 
@@ -61,7 +122,7 @@ class OrganisateurPageController extends Controller
         $quizCount = $formationWithDetails->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
         $textCount = $formationWithDetails->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
 
-        // Check if formation is visible to this team
+        // Check if formation is visible to this team (for display purposes only)
         $isVisible = $this->organisateurService->formationIsVisibleToTeam($team, $formation);
 
         return view('clean.organisateur.formation-show', compact(
@@ -183,7 +244,7 @@ class OrganisateurPageController extends Controller
             'student' => $student,
         ], $reportData));
 
-        return $pdf->stream('rapport-' . $student->name . '.pdf');
+        return $pdf->stream('rapport-'.$student->name.'.pdf');
     }
 
     public function studentReportPdfDownload(Team $team, Formation $formation, User $student)
@@ -210,6 +271,6 @@ class OrganisateurPageController extends Controller
             'student' => $student,
         ], $reportData));
 
-        return $pdf->download('rapport-' . $student->name . '-' . now()->format('Y-m-d') . '.pdf');
+        return $pdf->download('rapport-'.$student->name.'-'.now()->format('Y-m-d').'.pdf');
     }
 }
