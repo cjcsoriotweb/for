@@ -29,17 +29,7 @@
             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-200">
             {{ $formation->level ?? 'Débutant' }}
           </span>
-          @if($formation->learners_count > 0)
-          <span
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900 dark:to-emerald-900 dark:text-green-200">
-            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd"></path>
-            </svg>
-            {{ $formation->learners_count }} étudiant{{ $formation->learners_count > 1 ? 's' : '' }}
-          </span>
-          @endif
+
         </div>
       </div>
     </div>
@@ -55,17 +45,6 @@
   {{-- Stats and Action --}}
   <div class="relative flex items-center justify-between">
     <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-      @php
-      $enrolledCount = $formation->learners_count ?? 0;
-      @endphp
-      <div class="flex items-center gap-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-          </path>
-        </svg>
-        {{ $enrolledCount }} étudiant{{ $enrolledCount > 1 ? 's' : '' }}
-      </div>
       @if($formation->lessons_count ?? false)
       <div class="flex items-center gap-1">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +66,7 @@
           d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
         </path>
       </svg>
-      Voir les étudiants
+      Voir contenu de la formation
     </a>
   </div>
 </div>
