@@ -14,6 +14,11 @@ class FormateurFormationController extends Controller
         return view('clean.formateur.Formation.FormationShow', compact('formation'));
     }
 
+    public function editFormation(Formation $formation)
+    {
+        return view('clean.formateur.Formation.FormationEdit', compact('formation'));
+    }
+
     public function manageChapters(Formation $formation)
     {
         return view('clean.formateur.Formation.FormationChapters', compact('formation'));
