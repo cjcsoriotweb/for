@@ -1,8 +1,9 @@
-{{-- Formation Card Component --}}
+{{-- Formation Catalogue Card Component --}}
 @props(['formation', 'team'])
 
 <div
   class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-6 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-blue-300 dark:hover:border-blue-600">
+
   {{-- Background decoration --}}
   <div
     class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full -translate-y-16 translate-x-16 transition-transform duration-300 group-hover:scale-110">
@@ -29,7 +30,6 @@
             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-200">
             {{ $formation->level ?? 'Débutant' }}
           </span>
-
         </div>
       </div>
     </div>
@@ -42,16 +42,14 @@
     </p>
   </div>
 
-  {{-- Stats and Action --}}
+  {{-- Price and Action --}}
   <div class="relative flex items-center justify-between">
-    <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+    <div class="flex items-center gap-2">
+      <div class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ number_format($formation->money_amount, 0, ',', ' ') }} €
+      </div>
       @if($formation->lessons_count ?? false)
-      <div class="flex items-center gap-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-          </path>
-        </svg>
+      <div class="text-sm text-gray-500 dark:text-gray-400">
         {{ $formation->lessons_count }} leçon{{ ($formation->lessons_count ?? 1) > 1 ? 's' : '' }}
       </div>
       @endif
@@ -66,7 +64,7 @@
           d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
         </path>
       </svg>
-      Voir les étudiants
+      Voir contenu de la formation
     </a>
   </div>
 </div>
