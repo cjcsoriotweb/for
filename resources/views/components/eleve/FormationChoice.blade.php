@@ -23,6 +23,8 @@
               ? number_format((int) $formation->money_amount, 0, ',', ' ') . ' &euro;'
               : 'Gratuit';
           $progressPercent = (int) ($progress['progress_percent'] ?? 0);
+          $fallbackTitle = $formation->title ?: 'Titre par d&eacute;faut';
+          $fallbackDescription = $formation->description ?: 'Description par d&eacute;faut';
       @endphp
 
       <article class="group relative isolate min-w-[260px] max-w-xs snap-start overflow-hidden rounded-3xl border border-white/15 bg-slate-900/55 transition duration-300 hover:-translate-y-1 hover:border-white/35 hover:shadow-[0_35px_120px_-45px_rgba(14,165,233,0.55)]">
@@ -48,10 +50,10 @@
 
             <div class="space-y-3">
               <h3 class="text-lg font-semibold leading-snug text-white line-clamp-2">
-                {{ $formation->title }}
+                {{ $fallbackTitle }}
               </h3>
               <p class="text-sm text-slate-100/80 line-clamp-3">
-                {{ $formation->description ?? 'Explorez ce programme et progressez &agrave; votre rythme.' }}
+                {{ $fallbackDescription }}
               </p>
             </div>
           </div>

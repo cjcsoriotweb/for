@@ -4,8 +4,6 @@
       <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400/70">Continuez vos formations</p>
       <h2 class="text-2xl font-semibold text-white sm:text-3xl">Continuer mes formations</h2>
     </div>
-
-
   </div>
 
   @if($formationsWithProgress->count() > 0)
@@ -15,29 +13,23 @@
       @php
       $progressPercent = (int) ($formation->progress_data['progress_percent'] ?? 0);
       $isCompleted = (bool) ($formation->is_completed ?? false);
-      $statusColor = $isCompleted ? 'from-emerald-400/80 via-emerald-500/60 to-emerald-500/40' : 'from-blue-500/90
-      via-indigo-500/70 to-purple-500/60';
+      $fallbackTitle = $formation->title ?: 'Titre par d&eacute;faut';
+      $fallbackDescription = $formation->description ?: 'Description par d&eacute;faut';
       @endphp
 
       <article
-        class="group relative isolate flex min-w-[260px] max-w-xs snap-start flex-col justify-between overflow-hidden rounded-3xl border border-white/15 bg-slate-900/55 transition duration-300">
-        <div class="absolute inset-0 bg-gradient-to-br {{ $statusColor }} opacity-60 transition group-hover:opacity-80">
-        </div>
-        <div
-          class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.42),transparent_58%)] opacity-30 mix-blend-screen">
-        </div>
-
-        <div class="relative z-10 h-36 w-full overflow-hidden border-b border-white/15 bg-white/10 sm:h-40">
-          <img src="{{ $formation->cover_image_url }}" alt="Image de couverture de {{ $formation->title }}"
+        class="group relative isolate flex min-w-[260px] max-w-xs snap-start flex-col justify-between overflow-hidden rounded-3xl border border-white/15 bg-slate-900/60 transition duration-300 hover:-translate-y-1 hover:border-white/35 hover:shadow-[0_35px_120px_-45px_rgba(129,140,248,0.5)]">
+        <div class="relative h-36 w-full overflow-hidden border-b border-white/10 bg-white/5 sm:h-40">
+          <img src="{{ $formation->cover_image_url }}" alt="Image de couverture de {{ $fallbackTitle }}"
             class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy"
             onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';" />
         </div>
 
-        <div class="relative z-10 space-y-4 p-6">
+        <div class="relative space-y-4 p-6">
           <div class="flex items-center justify-between">
             <span
               class="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/80">
-              {{ $isCompleted ? 'Terminé' : 'En cours' }}
+              {{ $isCompleted ? 'Termin&eacute;' : 'Continuer' }}
             </span>
             <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
               {{ $progressPercent }}%
@@ -46,11 +38,10 @@
 
           <div class="space-y-3">
             <h3 class="text-lg font-semibold leading-snug text-white line-clamp-2">
-              {{ $formation->title }}
+              {{ $fallbackTitle }}
             </h3>
             <p class="text-sm text-slate-100/80 line-clamp-3">
-              {{ $formation->description ?? 'Poursuivez votre apprentissage et d&eacute;bloquez le prochain chapitre.'
-              }}
+              {{ $fallbackDescription }}
             </p>
           </div>
         </div>
@@ -62,13 +53,13 @@
           </div>
 
           <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-white/60">
-            <span>Progression</span>
+            <span>Progression :</span>
             <span>{{ $progressPercent }}%</span>
           </div>
 
           <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
             class="group/btn inline-flex items-center justify-center gap-2 rounded-2xl bg-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/30">
-            {{ $isCompleted ? 'Revoir la formation' : 'Continuer' }}
+            {{ $isCompleted ? 'Revoir la formation' : 'Voir les d&eacute;tails' }}
             <svg class="h-4 w-4 transition group-hover/btn:translate-x-0.5" viewBox="0 0 20 20" fill="currentColor"
               aria-hidden="true">
               <path fill-rule="evenodd"
@@ -96,7 +87,17 @@
     <p class="mt-3 text-sm text-slate-300/80">
       Parcourez le catalogue des formations disponibles et lancez votre prochain apprentissage.
     </p>
-
+    <a href="{{ route('eleve.formation.available', [$team]) }}"
+      class="mt-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/25">
+      Explorer les formations
+      <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z"
+          clip-rule="evenodd" />
+        <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z"
+          clip-rule="evenodd" />
+      </svg>
+    </a>
   </div>
   @endif
 </section>
