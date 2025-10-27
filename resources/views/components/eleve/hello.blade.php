@@ -40,18 +40,16 @@ $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_c
         <a href="{{ route('eleve.formation.show', [$team, $featuredFormation->id]) }}"
           class="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-sky-400 via-indigo-500 to-purple-500 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-slate-50 shadow-lg shadow-sky-500/25 transition hover:scale-[1.02] hover:shadow-xl hover:shadow-sky-500/35">
           <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white">
-            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd"
-                d="M4.5 3.5a.75.75 0 0 1 .75-.75h.5A4.25 4.25 0 0 1 10 3.75h.354a5.25 5.25 0 0 1 5.146 4.208c.03.166.05.335.07.504a4.501 4.501 0 0 1-2.892 8.03H6.5a3.75 3.75 0 0 1-2-6.928V4.25a.75.75 0 0 1 .75-.75h-.75Z"
-                clip-rule="evenodd" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
+
           </span>
-          Continuer {{ $featuredFormation->title }}
+          Continuer
         </a>
-        <a href="{{ route('eleve.formation.show', [$team, $featuredFormation->id]) }}"
-          class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-slate-100 transition hover:border-white/40 hover:bg-white/10">
-          Voir les d&eacute;tails
-        </a>
+
       </div>
       @endif
     </div>
