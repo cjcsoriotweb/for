@@ -14,10 +14,10 @@
       <div>
         <h1
           class="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
-          Mes formations
+          Espace formations
         </h1>
         <p class="text-gray-600 mt-1 text-lg">
-          Gérez vos formations et contenus pédagogiques
+          Gérez vos formations
         </p>
       </div>
     </div>

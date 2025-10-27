@@ -81,7 +81,6 @@ class FormationLessonController
         $validated = request()->validate([
             'quiz_title' => 'required|string|max:255',
             'quiz_description' => 'nullable|string',
-            'passing_score' => 'required|integer|min:0|max:100',
             'max_attempts' => 'nullable|integer|min:1|max:10',
         ]);
 
@@ -91,8 +90,8 @@ class FormationLessonController
                 'lesson_id' => $lesson->id,
                 'title' => $validated['quiz_title'],
                 'description' => $validated['quiz_description'],
-                'passing_score' => $validated['passing_score'],
-                'max_attempts' => $validated['max_attempts'],
+                'passing_score' => 0,
+                'max_attempts' => $validated['max_attempts'] ?? null,
             ]);
 
             // Update lesson with polymorphic relationship
@@ -210,7 +209,6 @@ class FormationLessonController
         $validated = request()->validate([
             'quiz_title' => 'required|string|max:255',
             'quiz_description' => 'nullable|string',
-            'passing_score' => 'required|integer|min:0|max:100',
             'max_attempts' => 'nullable|integer|min:1|max:10',
         ]);
 
@@ -219,8 +217,8 @@ class FormationLessonController
             $quiz->update([
                 'title' => $validated['quiz_title'],
                 'description' => $validated['quiz_description'],
-                'passing_score' => $validated['passing_score'],
-                'max_attempts' => $validated['max_attempts'],
+                'passing_score' => 0,
+                'max_attempts' => $validated['max_attempts'] ?? null,
             ]);
 
             return redirect()->route('formateur.formation.show', $formation)

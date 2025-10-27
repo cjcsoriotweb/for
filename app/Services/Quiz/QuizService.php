@@ -68,7 +68,8 @@ class QuizService
         }
 
         $score = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
-        $passed = $score >= $quiz->passing_score;
+        $passingScore = $quiz->passing_score ?? 0;
+        $passed = $passingScore > 0 ? $score >= $passingScore : true;
 
         return [
             'score' => $score,
@@ -225,7 +226,10 @@ class QuizService
         $totalAttempts = $attempts->count();
         $uniqueUsers = $attempts->pluck('user_id')->unique()->count();
         $averageScore = $attempts->avg('score');
-        $passedAttempts = $attempts->where('score', '>=', $quiz->passing_score)->count();
+        $passingScore = $quiz->passing_score ?? 0;
+        $passedAttempts = $passingScore > 0
+            ? $attempts->where('score', '>=', $passingScore)->count()
+            : $attempts->count();
         $passRate = $totalAttempts > 0 ? ($passedAttempts / $totalAttempts) * 100 : 0;
         $averageDuration = $attempts->where('duration_seconds', '>', 0)->avg('duration_seconds');
 
@@ -284,7 +288,9 @@ class QuizService
     {
         return QuizAttempt::where('quiz_id', $quiz->id)
             ->with('user')
-            ->where('score', '>=', $quiz->passing_score)
+            ->when(($quiz->passing_score ?? 0) > 0, function ($query) use ($quiz) {
+                return $query->where('score', '>=', $quiz->passing_score);
+            })
             ->orderBy('score', 'desc')
             ->orderBy('duration_seconds', 'asc')
             ->limit($limit)
