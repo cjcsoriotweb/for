@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Modèle Formation
@@ -33,6 +34,7 @@ class Formation extends Model
         'level',
         'money_amount',
         'active',
+        'cover_image_path',
     ];
 
     protected function casts(): array
@@ -102,10 +104,19 @@ class Formation extends Model
 
     /**
      * Alias for completionDocuments to support scoped route bindings (documents/{document}).
-     */
+    */
     public function documents(): HasMany
     {
         return $this->completionDocuments();
+    }
+
+    public function getCoverImageUrlAttribute(): string
+    {
+        if ($this->cover_image_path && Storage::disk('public')->exists($this->cover_image_path)) {
+            return Storage::disk('public')->url($this->cover_image_path);
+        }
+
+        return asset('images/formation-placeholder.svg');
     }
 
     /*
