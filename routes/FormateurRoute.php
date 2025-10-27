@@ -16,7 +16,8 @@ Route::prefix('formateur')
 
         // Formation routes
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
-        Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show', 'formation.edit');
+        Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show');
+        Route::get('/formation/{formation}/chapters', [FormateurFormationController::class, 'showFormation'])->name('formation.chapters.index');
         Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
         Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');
 
@@ -25,15 +26,16 @@ Route::prefix('formateur')
 
         // Lesson routes
         Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/define', [FormationLessonController::class, 'showDefineLesson'])->name('formation.chapter.lesson.define');
-        Route::post('/formation-edit/{formation}/chapitre/{chapter}/lesson/add', [FormationLessonController::class, 'createLesson'])->name('formation.chapter.lesson.add.post');
-        Route::post('/formation-edit/{formation}/chapitre/{chapter}/lesson/{lesson}/delete', [FormationLessonController::class, 'deleteLesson'])->name('formation.chapter.lesson.delete.post');
+        Route::post('/formation/{formation}/chapitre/{chapter}/lesson/add', [FormationLessonController::class, 'createLesson'])->name('formation.chapter.lesson.add.post');
+        Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/delete', [FormationLessonController::class, 'deleteLesson'])->name('formation.chapter.lesson.delete.post');
         Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/define', [FormationLessonController::class, 'defineLesson'])->name('formation.chapter.lesson.define.post');
         Route::put('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/title', [FormationLessonController::class, 'updateLessonTitle'])->name('formation.chapter.lesson.title.update');
+        Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/title', [FormationLessonController::class, 'updateLessonTitle'])->name('formation.chapter.lesson.title.post');
 
         // Chapter management routes
         Route::put('/formation/{formation}/chapitre/{chapter}/put', [FormationChapterController::class, 'updateChapter'])->name('formation.chapter.update.put');
-        Route::post('/formation-edit/{formation}/chapitre/add', [FormationChapterController::class, 'createChapter'])->name('formation.chapter.add.post');
-        Route::post('/formation-edit/{formation}/chapitre/{chapter}/delete', [FormationChapterController::class, 'deleteChapter'])->name('formation.chapter.delete.post');
+        Route::post('/formation/{formation}/chapitre/add', [FormationChapterController::class, 'createChapter'])->name('formation.chapter.add.post');
+        Route::post('/formation/{formation}/chapitre/{chapter}/delete', [FormationChapterController::class, 'deleteChapter'])->name('formation.chapter.delete.post');
 
         // Lesson type specific routes (Quiz)
         Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/create', [FormationLessonController::class, 'createQuiz'])->name('formation.chapter.lesson.quiz.create');
