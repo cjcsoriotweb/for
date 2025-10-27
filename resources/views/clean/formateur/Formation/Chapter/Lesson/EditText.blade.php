@@ -143,7 +143,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label for="estimated_read_time" class="block text-sm font-medium text-gray-700 mb-2">
-                  Temps de lecture obligatoire
+                  Temps de lecture obligatoire (minute)
                 </label>
                 <input type="number" id="estimated_read_time" name="estimated_read_time"
                   value="{{ old('estimated_read_time', $textContent->estimated_read_time) }}" min="1" max="120"
