@@ -26,9 +26,53 @@ class OrganisateurPageController extends Controller
     public function catalogue(Team $team)
     {
         $visibleFormations = $this->organisateurService->listVisibleFormations($team);
-        $allFormations = Formation::withCount(['learners', 'lessons'])->get();
+        $allFormations = Formation::withCount(['learners', 'lessons'])
+            ->with(['lessons.lessonable' => function ($query) {
+                $query->select('id', 'lesson_id', 'lessonable_type');
+            }])
+            ->get();
+
+        // Count different content types for each formation
+        $allFormations->each(function ($formation) {
+            $formation->video_count = $formation->lessons->where('lessonable_type', 'App\\Models\\VideoContent')->count();
+            $formation->quiz_count = $formation->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
+            $formation->text_count = $formation->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
+        });
 
         return view('clean.organisateur.catalogue', compact('team', 'visibleFormations', 'allFormations'));
+    }
+
+    public function show(Team $team, Formation $formation)
+    {
+        // Get detailed formation data with content counts
+        $formationWithDetails = Formation::withCount(['learners', 'lessons'])
+            ->with([
+                'lessons.lessonable' => function ($query) {
+                    $query->select('id', 'lesson_id', 'lessonable_type');
+                },
+                'chapters.lessons.lessonable' => function ($query) {
+                    $query->select('id', 'lesson_id', 'lessonable_type');
+                }
+            ])
+            ->find($formation->id);
+
+        // Count different content types
+        $videoCount = $formationWithDetails->lessons->where('lessonable_type', 'App\\Models\\VideoContent')->count();
+        $quizCount = $formationWithDetails->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
+        $textCount = $formationWithDetails->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
+
+        // Check if formation is visible to this team
+        $isVisible = $this->organisateurService->formationIsVisibleToTeam($team, $formation);
+
+        return view('clean.organisateur.formation-show', compact(
+            'team',
+            'formation',
+            'formationWithDetails',
+            'videoCount',
+            'quizCount',
+            'textCount',
+            'isVisible'
+        ));
     }
 
     public function users(Team $team)
