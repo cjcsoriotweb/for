@@ -34,23 +34,6 @@
                 </svg>
                 Gérer les chapitres
               </a>
-
-              <form action="{{
-                                route(
-                                    'formateur.formation.chapter.add.post',
-                                    $formation
-                                )
-                            }}" method="POST" class="inline">
-                @csrf
-                <button
-                  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  Créer un chapitre
-                </button>
-              </form>
             </div>
           </div>
         </div>
@@ -574,7 +557,7 @@
 
       // Show confirmation dialog
       const action = currentStatus ? 'désactiver' : 'activer';
-      const confirmMessage = `Êtes-vous sûr de vouloir ${action} cette formation ?`;
+      const confirmMessage = 'Êtes-vous sûr de vouloir ' + action + ' cette formation ?';
 
       if (!confirm(confirmMessage)) {
         return;
@@ -730,7 +713,7 @@
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    ${message}
+                    ` + message + `
                 </div>
             `;
 
