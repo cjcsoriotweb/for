@@ -8,7 +8,7 @@
         <div class="p-8">
           <div class="flex items-start justify-between mb-6">
             <div class="flex-1">
-              <div class="flex items-center mb-4">
+              <div class="flex-col items-center mb-4">
                 <a href="{{ route('formateur.formation.show', $formation) }}"
                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition-colors duration-200 mr-4">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,34 +158,7 @@
               </p>
             </div>
 
-            <!-- Preview Section -->
-            <div class="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                  </path>
-                </svg>
-                Aperçu pour les utilisateurs
-              </h3>
-              <div class="space-y-3">
-                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-200">
-                  <span class="text-gray-700">Prix affiché:</span>
-                  <span id="preview-price" class="font-semibold text-lg">
-                    {{ $formation->money_amount ? number_format($formation->money_amount, 2, ',', ' ') . ' €' :
-                    'Gratuit' }}
-                  </span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-200">
-                  <span class="text-gray-700">Type d'accès:</span>
-                  <span id="preview-type" class="font-semibold">
-                    {{ $formation->money_amount > 0 ? 'Accès payant' : 'Accès libre' }}
-                  </span>
-                </div>
-              </div>
-            </div>
+
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-between pt-6 border-t border-gray-200">
@@ -239,41 +212,28 @@
       document.querySelectorAll('input[name="pricing_type"]').forEach(radio => {
         radio.addEventListener('change', function () {
           const priceField = document.querySelector('.pricing-field');
-          const previewPrice = document.getElementById('preview-price');
-          const previewType = document.getElementById('preview-type');
 
           if (this.value === 'free') {
             priceField.style.display = 'none';
             document.getElementById('money_amount').value = '0';
-            previewPrice.textContent = 'Gratuit';
-            previewType.textContent = 'Accès libre';
           } else {
             priceField.style.display = 'block';
-            previewPrice.textContent = document.getElementById('money_amount').value ?
-              number_format(document.getElementById('money_amount').value, 2, ',', ' ') + ' €' :
-              '0,00 €';
-            previewType.textContent = 'Accès payant';
           }
         });
       });
 
       // Handle price input changes
       document.getElementById('money_amount').addEventListener('input', function () {
-        const previewPrice = document.getElementById('preview-price');
         const value = parseFloat(this.value) || 0;
 
         if (value > 0) {
-          previewPrice.textContent = number_format(value, 2, ',', ' ') + ' €';
           // Auto-select paid option if price > 0
           document.querySelector('input[name="pricing_type"][value="paid"]').checked = true;
           document.querySelector('.pricing-field').style.display = 'block';
-          document.getElementById('preview-type').textContent = 'Accès payant';
         } else {
-          previewPrice.textContent = 'Gratuit';
           // Auto-select free option if price = 0
           document.querySelector('input[name="pricing_type"][value="free"]').checked = true;
           document.querySelector('.pricing-field').style.display = 'none';
-          document.getElementById('preview-type').textContent = 'Accès libre';
         }
       });
 
@@ -304,8 +264,6 @@
           document.querySelector('input[name="pricing_type"][value="free"]').checked = true;
           document.getElementById('money_amount').value = '0';
           document.querySelector('.pricing-field').style.display = 'none';
-          document.getElementById('preview-price').textContent = 'Gratuit';
-          document.getElementById('preview-type').textContent = 'Accès libre';
         }
       }
 

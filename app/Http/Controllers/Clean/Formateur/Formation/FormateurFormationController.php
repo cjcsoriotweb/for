@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
+use App\Http\Requests\Formateur\Formation\UpdateFormationPricingRequest;
 use App\Models\Formation;
 use App\Services\FormationService;
 
@@ -40,7 +41,7 @@ class FormateurFormationController extends Controller
         return back()->with('success', 'Formation mise à jour avec succès.');
     }
 
-    public function updatePricing(UpdateFormationRequest $request, Formation $formation)
+    public function updatePricing(UpdateFormationPricingRequest $request, Formation $formation)
     {
         $formation->update([
             'money_amount' => $request->money_amount ?? 0,
