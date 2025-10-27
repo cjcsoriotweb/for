@@ -1,21 +1,20 @@
 <?php
 
-namespace App\View\Components\admin;
+namespace App\View\Components\Admin;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class AdminFormations extends Component
+class AdminConfiguration extends Component
 {
     /**
-     * Get the view / contents that represents the component.
+     * The team whose configuration page is displayed.
      */
     public $team;
 
     public function __construct($team)
     {
         $this->team = $team;
-
     }
 
     public function render(): View

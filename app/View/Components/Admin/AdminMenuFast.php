@@ -1,12 +1,12 @@
 <?php
 
-namespace App\View\Components\admin;
+namespace App\View\Components\Admin;
 
 use App\Services\FormationService;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class AdminFormations extends Component
+class AdminMenuFast extends Component
 {
     /**
      * Get the view / contents that represents the component.
@@ -17,20 +17,20 @@ class AdminFormations extends Component
 
     public $totalCount;
 
-    public $formations;
+    public $catalog;
 
     public function __construct($team, FormationService $formations)
     {
         $this->team = $team;
         $adminService = $formations->admin();
-        $this->formations = $adminService->listWithTeamFlags($team);
-        $this->activeCount = $this->formations->where('is_visible', '>', 0)->count();
-        $this->totalCount = $this->formations->count();
+        $this->catalog = $adminService->listWithTeamFlags($team);
+        $this->activeCount = $this->catalog->where('is_visible', '>', 0)->count();
+        $this->totalCount = $this->catalog->count();
     }
 
     public function render(): View
     {
-        return view('clean.admin.formations.listFormations', [
+        return view('clean.admin.partials.menu-fast.admin-menu-fast', [
             'team' => $this->team,
             'activeCount' => $this->activeCount,
             'totalCount' => $this->totalCount,
