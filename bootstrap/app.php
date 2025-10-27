@@ -26,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'organisateur' => \App\Http\Middleware\EnsureOrganisateurAccess::class,
         ]);
+        $middleware->alias([
+            'eleve' => \App\Http\Middleware\EnsureEleveAccess::class,
+        ]);
     })
     ->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions) {
         // Policies / Gate::authorize() -> AuthorizationException (403)

@@ -70,6 +70,7 @@ class JetstreamServiceProvider extends ServiceProvider
 
         Jetstream::role('eleve', 'Apprentis', [
             'read',
+            'eleve:access',
         ])->description('Peut consulter les contenus de l\'organisme.');
     }
 }
