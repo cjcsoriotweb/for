@@ -80,12 +80,8 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-4">
         <a href="{{ route('formateur.formation.show', $formation) }}"
-          class="group/btn inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-semibold rounded-2xl hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl">
-          <span class="mr-3">Voir les détails</span>
-          <svg class="w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-          </svg>
+          class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+          Voir les détails
         </a>
 
         <!-- Quick action buttons -->
