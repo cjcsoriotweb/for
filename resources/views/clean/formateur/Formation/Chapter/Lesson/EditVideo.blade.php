@@ -119,7 +119,7 @@
             </div>
 
             <!-- Video Source Selection -->
-            <div>
+            <div style="display:none">
               <label class="block text-sm font-medium text-gray-700 mb-3">
                 Source de la Vidéo *
               </label>
