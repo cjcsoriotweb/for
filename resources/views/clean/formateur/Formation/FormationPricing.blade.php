@@ -37,7 +37,7 @@
       <!-- Pricing Form -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="p-8">
-          <form action="{{ route('formateur.formation.pricing.update', $formation) }}" method="POST">
+          <form id="pricingForm" action="{{ route('formateur.formation.pricing.update', $formation) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -308,6 +308,58 @@
           document.getElementById('preview-type').textContent = 'Accès libre';
         }
       }
+
+      // Handle form submission
+      document.getElementById("pricingForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+
+        // Ensure money_amount is set correctly based on pricing type
+        const pricingType = document.querySelector('input[name="pricing_type"]:checked').value;
+        const moneyAmountField = document.getElementById('money_amount');
+
+        if (pricingType === 'free') {
+          formData.set('money_amount', '0');
+        } else {
+          const moneyValue = parseFloat(moneyAmountField.value) || 0;
+          formData.set('money_amount', moneyValue.toString());
+        }
+
+        // Disable submit button and show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML =
+          '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Enregistrement...';
+
+        fetch(this.action, {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            Accept: "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Redirect to dashboard with success message
+              window.location.href = "{{ route('formateur.formation.show', $formation) }}";
+            } else {
+              throw new Error(data.message || "Erreur lors de la modification");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert('Erreur lors de la modification: ' + error.message);
+          })
+          .finally(() => {
+            // Re-enable submit button
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+          });
+      });
 
       // Auto-hide success message after 5 seconds
       const successMessage = document.getElementById("successMessage");

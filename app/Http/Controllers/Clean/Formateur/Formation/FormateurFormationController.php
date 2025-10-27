@@ -46,7 +46,11 @@ class FormateurFormationController extends Controller
             'money_amount' => $request->money_amount ?? 0,
         ]);
 
-        return redirect()->route('formateur.formation.pricing.edit', $formation)->with('success', 'Tarification mise à jour avec succès.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Tarification mise à jour avec succès.',
+            'new_price' => $formation->fresh()->money_amount
+        ]);
     }
 
     public function toggleStatus(Formation $formation)
