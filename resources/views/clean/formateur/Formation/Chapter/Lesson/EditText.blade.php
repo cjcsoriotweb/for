@@ -84,7 +84,7 @@
                                 'formateur.formation.chapter.lesson.text.update',
                                 [$formation, $chapter, $lesson]
                             )
-                        }}" class="space-y-6">
+                        }}" enctype="multipart/form-data" class="space-y-6">
             @csrf @method('PUT')
 
             <!-- Content Title -->
@@ -155,6 +155,85 @@
                 @enderror
               </div>
 
+            </div>
+
+            <!-- Attachments -->
+            <div class="space-y-6">
+              @php
+              $inlineAttachment = $textContent->attachments->firstWhere('display_mode', 'inline');
+              $downloadAttachments = $textContent->attachments->where('display_mode', 'download');
+              @endphp
+
+              <div>
+                <label for="inline_document" class="block text-sm font-medium text-gray-700 mb-2">
+                  Document PDF affich&eacute; automatiquement
+                </label>
+
+                @if($inlineAttachment)
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mb-3">
+                  <a href="{{ Storage::disk('public')->url($inlineAttachment->file_path) }}" target="_blank"
+                    class="text-indigo-600 hover:underline break-all">
+                    {{ $inlineAttachment->name }}
+                  </a>
+                  <label class="mt-2 sm:mt-0 inline-flex items-center text-sm text-gray-600">
+                    <input type="checkbox" name="remove_inline_document" value="1"
+                      class="rounded border-gray-300 mr-2">
+                    Supprimer le PDF existant
+                  </label>
+                </div>
+                @endif
+
+                <input type="file" id="inline_document" name="inline_document" accept="application/pdf"
+                  class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('inline_document') border-red-500 @enderror">
+                @error('inline_document')
+                <p class="mt-1 text-sm text-red-600">
+                  {{ $message }}
+                </p>
+                @enderror
+                <p class="text-xs text-gray-500 mt-1">
+                  T&eacute;l&eacute;chargez un nouveau PDF pour remplacer le document actuel.
+                </p>
+              </div>
+
+              <div>
+                <label for="attachments" class="block text-sm font-medium text-gray-700 mb-2">
+                  Fichiers &agrave; t&eacute;l&eacute;charger
+                </label>
+
+                @if($downloadAttachments->isNotEmpty())
+                <ul class="space-y-2 mb-3">
+                  @foreach($downloadAttachments as $attachment)
+                  <li class="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                    <a href="{{ Storage::disk('public')->url($attachment->file_path) }}" target="_blank"
+                      class="text-indigo-600 hover:underline break-all">
+                      {{ $attachment->name }}
+                    </a>
+                    <label class="mt-2 sm:mt-0 inline-flex items-center text-sm text-gray-600">
+                      <input type="checkbox" name="remove_attachments[]" value="{{ $attachment->id }}"
+                        class="rounded border-gray-300 mr-2">
+                      Supprimer ce fichier
+                    </label>
+                  </li>
+                  @endforeach
+                </ul>
+                @endif
+
+                <input type="file" id="attachments" name="attachments[]" multiple
+                  class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('attachments') border-red-500 @enderror @error('attachments.*') border-red-500 @enderror">
+                @error('attachments')
+                <p class="mt-1 text-sm text-red-600">
+                  {{ $message }}
+                </p>
+                @enderror
+                @error('attachments.*')
+                <p class="mt-1 text-sm text-red-600">
+                  {{ $message }}
+                </p>
+                @enderror
+                <p class="text-xs text-gray-500 mt-1">
+                  Ajoutez de nouveaux documents (20&nbsp;Mo max par fichier). Ils seront propos&eacute;s en t&eacute;l&eacute;chargement.
+                </p>
+              </div>
             </div>
 
             <!-- Action Buttons -->

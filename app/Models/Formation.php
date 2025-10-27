@@ -100,6 +100,14 @@ class Formation extends Model
         return $this->hasMany(FormationCompletionDocument::class);
     }
 
+    /**
+     * Alias for completionDocuments to support scoped route bindings (documents/{document}).
+     */
+    public function documents(): HasMany
+    {
+        return $this->completionDocuments();
+    }
+
     /*
     public function team()
     {

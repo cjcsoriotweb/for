@@ -37,4 +37,12 @@ class TextContent extends Model
     {
         return $this->morphOne(Lesson::class, 'lessonable');
     }
+
+    /**
+     * Additional documents linked to this text content.
+     */
+    public function attachments()
+    {
+        return $this->hasMany(TextContentAttachment::class);
+    }
 }

@@ -11,6 +11,7 @@ use App\Models\QuizAttempt;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\FormationCompletionDocument;
+use App\Models\TextContent;
 use App\Services\Clean\Account\AccountService;
 use App\Services\Formation\StudentFormationService;
 use App\Services\FormationEnrollmentService;
@@ -317,7 +318,8 @@ class ElevePageController extends Controller
         if ($lesson->lessonable_type === \App\Models\VideoContent::class) {
             $lessonContent = $lesson->lessonable;
             $lessonType = 'video';
-        } elseif ($lesson->lessonable_type === \App\Models\TextContent::class) {
+        } elseif ($lesson->lessonable_type === TextContent::class) {
+            $lesson->loadMissing('lessonable.attachments');
             $lessonContent = $lesson->lessonable;
             $lessonType = 'text';
         } elseif ($lesson->lessonable_type === \App\Models\Quiz::class) {
@@ -359,6 +361,9 @@ class ElevePageController extends Controller
             ->orderBy('position')
             ->get();
 
+        $formationDocuments = $formation->completionDocuments()->get();
+        $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
+
         return view('clean.eleve.lesson.show', compact(
             'team',
             'formation',
@@ -369,7 +374,9 @@ class ElevePageController extends Controller
             'lessonProgress',
             'previousLesson',
             'nextLesson',
-            'otherChapters'
+            'otherChapters',
+            'formationDocuments',
+            'isFormationCompleted'
         ));
     }
 
