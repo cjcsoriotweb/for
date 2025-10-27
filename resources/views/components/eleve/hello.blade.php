@@ -59,7 +59,11 @@ $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_c
         class="relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10 bg-white/10 shadow-[0_30px_90px_-40px_rgba(14,165,233,0.55)] backdrop-blur">
         <div class="absolute inset-0 bg-gradient-to-br from-sky-400/65 via-indigo-500/55 to-sky-600/60">
 
+          @if(isset($featuredFormation['cover_image_url']))
           <img src="{{ $featuredFormation['cover_image_url'] }}">
+          @else
+          <img src="{{ asset('images/formation-placeholder.svg') }}" />
+          @endif
 
         </div>
         <div class="absolute inset-0 flex flex-col justify-end p-6">
