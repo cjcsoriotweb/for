@@ -23,6 +23,11 @@ class OrganisateurPageController extends Controller
         return view('clean.organisateur.home', compact('team', 'formations'));
     }
 
+    public function users(Team $team)
+    {
+        return view('clean.organisateur.users', compact('team'));
+    }
+
     public function students(Request $request, Team $team, Formation $formation)
     {
         if (! $this->organisateurService->formationIsVisibleToTeam($team, $formation)) {
@@ -126,7 +131,7 @@ class OrganisateurPageController extends Controller
             'student' => $student,
         ], $reportData));
 
-        return $pdf->stream('rapport-' . $student->name . '.pdf');
+        return $pdf->stream('rapport-'.$student->name.'.pdf');
     }
 
     public function studentReportPdfDownload(Team $team, Formation $formation, User $student)
@@ -153,6 +158,6 @@ class OrganisateurPageController extends Controller
             'student' => $student,
         ], $reportData));
 
-        return $pdf->download('rapport-' . $student->name . '-' . now()->format('Y-m-d') . '.pdf');
+        return $pdf->download('rapport-'.$student->name.'-'.now()->format('Y-m-d').'.pdf');
     }
 }

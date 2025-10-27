@@ -82,10 +82,10 @@
           </div>
         </div>
         <div class="mt-4">
-          <button
-            class="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition-all hover:bg-blue-50 dark:border-blue-600 dark:bg-gray-800 dark:text-blue-300">
+          <a href="{{ route('organisateur.users', $team) }}"
+            class="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition-all hover:bg-blue-50 dark:border-blue-600 dark:bg-gray-800 dark:text-blue-300 inline-block text-center">
             Gérer les utilisateurs
-          </button>
+          </a>
         </div>
       </div>
 
