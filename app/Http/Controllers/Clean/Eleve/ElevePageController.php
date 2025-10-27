@@ -12,6 +12,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Services\Clean\Account\AccountService;
 use App\Services\Formation\StudentFormationService;
+use App\Services\FormationEnrollmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,6 +21,7 @@ class ElevePageController extends Controller
     public function __construct(
         private readonly AccountService $accountService,
         private readonly StudentFormationService $studentFormationService,
+        private readonly FormationEnrollmentService $formationEnrollmentService,
     ) {}
 
     public function home(Team $team)
@@ -140,26 +142,21 @@ class ElevePageController extends Controller
             return back()->with('error', 'Cette formation n\'est pas disponible pour votre équipe.');
         }
 
-        // Inscrire l'étudiant à la formation
-        try {
-            // Récupérer la première leçon de la formation pour initialiser current_lesson_id
-            $firstLesson = $formation->chapters()
-                ->orderBy('position')
-                ->first()
-                ?->lessons()
-                ->orderBy('position')
-                ->first();
+        if (! $this->formationEnrollmentService->canTeamAffordFormation($team, $formation)) {
+            return back()->with('error', 'Le solde de votre équipe est insuffisant pour cette formation.');
+        }
 
-            $formation->learners()->attach($user->id, [
-                'team_id' => $team->id,
-                'status' => 'enrolled',
-                'enrolled_at' => now(),
-                'current_lesson_id' => $firstLesson?->id,
-                'last_seen_at' => now(),
-            ]);
+        try {
+            $enrolled = $this->formationEnrollmentService->enrollUser($formation, $team, $user->id);
+
+            if (! $enrolled) {
+                return back()->with('error', 'Une erreur est survenue lors de l\'inscription.');
+            }
 
             return back()->with('success', 'Vous avez été inscrit à la formation avec succès !');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            report($e);
+
             return back()->with('error', 'Une erreur est survenue lors de l\'inscription.');
         }
     }

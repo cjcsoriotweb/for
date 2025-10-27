@@ -9,12 +9,17 @@
 
     @if($availableFormations->count() > 0)
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      @foreach($availableFormations as $formation) @php $isEnrolled =
-      app(\App\Services\Formation\StudentFormationService::class)
-      ->isEnrolledInFormation(auth()->user(), $formation, $team ?? null);
-      $progress =
-      app(\App\Services\Formation\StudentFormationService::class)
-      ->getStudentProgress(auth()->user(), $formation); @endphp
+      @foreach($availableFormations as $formation)
+      @php
+        $studentFormationService = app(\App\Services\Formation\StudentFormationService::class);
+        $enrollmentService = app(\App\Services\FormationEnrollmentService::class);
+        $isEnrolled = $studentFormationService->isEnrolledInFormation(auth()->user(), $formation, $team ?? null);
+        $progress = $studentFormationService->getStudentProgress(auth()->user(), $formation);
+        $canAfford = isset($team) ? $enrollmentService->canTeamAffordFormation($team, $formation) : false;
+        $formattedPrice = $formation->money_amount
+          ? number_format((int) $formation->money_amount, 0, ',', ' ') . ' EUR'
+          : 'Gratuit';
+      @endphp
 
       <div class="bg-white rounded-xl p-6 hover:shadow-lg transition-shadow border border-gray-200">
         <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -36,7 +41,7 @@
         <div class="mb-4">
           <div class="flex justify-between text-sm text-gray-600 mb-1">
             <span>Progression</span>
-            <span>{{ $progress["progress_percent"] }}%</span>
+            <span>{{ $progress['progress_percent'] }}%</span>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-2">
             <div class="bg-primary h-2 rounded-full" style="width: {{ $progress['progress_percent'] }}%"></div>
@@ -48,7 +53,7 @@
             Inscrit
           </span>
           <span class="text-sm font-semibold text-primary">
-            {{ $formation->money_amount ? $formation->money_amount . '€' : 'Gratuit' }}
+            {{ $formattedPrice }}
           </span>
         </div>
 
@@ -58,10 +63,13 @@
         </a>
         @else
 
-        @if($team->money >= $formation->money_amount)
+        @if($canAfford)
         <div class="flex items-center justify-between mb-4">
           <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
             Disponible
+          </span>
+          <span class="text-sm font-semibold text-primary">
+            {{ $formattedPrice }}
           </span>
         </div>
 
@@ -71,7 +79,7 @@
           @csrf
           <button type="submit"
             class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-center block">
-            S'inscrire à cette formation
+            S'inscrire a cette formation
           </button>
         </form>
 
@@ -82,7 +90,6 @@
           </span>
         </div>
         @endif
-
 
         @endif
       </div>
@@ -101,8 +108,7 @@
         Aucune formation disponible
       </h3>
       <p class="text-gray-500 mb-6">
-        Il n'y a actuellement aucune formation disponible pour votre
-        équipe.
+        Il n'y a actuellement aucune formation disponible pour votre equipe.
       </p>
     </div>
     @endif
