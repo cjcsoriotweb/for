@@ -35,9 +35,7 @@
       {{-- Balance Card --}}
       <div
         class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
-        <div
-          class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 transition-opacity group-hover:opacity-100">
-        </div>
+
         <div class="relative flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Solde disponible</p>
@@ -63,12 +61,11 @@
         </div>
       </div>
 
+
       {{-- Users Card --}}
       <div
         class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
-        <div
-          class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 opacity-0 transition-opacity group-hover:opacity-100">
-        </div>
+
         <div class="relative flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Utilisateurs actifs</p>
@@ -95,9 +92,7 @@
       {{-- Formations Card --}}
       <div
         class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
-        <div
-          class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 transition-opacity group-hover:opacity-100">
-        </div>
+
         <div class="relative flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Formations actives</p>

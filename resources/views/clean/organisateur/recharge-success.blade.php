@@ -64,42 +64,51 @@
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ now()->format('d/m/Y à H:i') }}</p>
             </div>
           </div>
-        </div>
+          </div>
 
-        {{-- Payment Details --}}
-        @if($session ?? false)
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Détails du paiement
-          </h3>
-          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <p class="text-gray-600 dark:text-gray-400">ID de transaction</p>
-                <p class="font-mono text-gray-900 dark:text-white">{{ $session->id }}</p>
-              </div>
-              <div>
-                <p class="text-gray-600 dark:text-gray-400">Montant</p>
-                <p class="text-gray-900 dark:text-white">{{ number_format($session->amount_total / 100, 2, ',', ' ') }}
-                  €</p>
-              </div>
-              <div>
-                <p class="text-gray-600 dark:text-gray-400">Statut</p>
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
-                  {{ ucfirst($session->payment_status) }}
-                </span>
-              </div>
-              <div>
-                <p class="text-gray-600 dark:text-gray-400">Méthode de paiement</p>
-                <p class="text-gray-900 dark:text-white capitalize">{{ $session->payment_method_types[0] ?? 'Carte
-                  bancaire' }}</p>
+          {{-- Payment Details --}}
+          @if($payment ?? false)
+          <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Détails du paiement
+            </h3>
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="text-gray-600 dark:text-gray-400">ID de transaction</p>
+                  <p class="font-mono text-gray-900 dark:text-white">{{ $payment->provider_session_id }}</p>
+                </div>
+                <div>
+                  <p class="text-gray-600 dark:text-gray-400">Montant</p>
+                  <p class="text-gray-900 dark:text-white">{{ number_format(($payment->amount ?? 0) / 100, 2, ',', ' ') }}
+                    €</p>
+                </div>
+                <div>
+                  <p class="text-gray-600 dark:text-gray-400">Statut</p>
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                    {{ ucfirst($payment->status) }}
+                  </span>
+                </div>
+                <div>
+                  <p class="text-gray-600 dark:text-gray-400">Méthode de paiement</p>
+                  @php
+                    $method = data_get($payment->provider_payload, 'payment_method_types.0')
+                      ?? ($session->payment_method_types[0] ?? 'Carte bancaire');
+                  @endphp
+                  <p class="text-gray-900 dark:text-white capitalize">{{ $method }}</p>
+                </div>
+                @if($payment->paid_at)
+                <div>
+                  <p class="text-gray-600 dark:text-gray-400">Date du paiement</p>
+                  <p class="text-gray-900 dark:text-white">{{ $payment->paid_at->format('d/m/Y à H:i') }}</p>
+                </div>
+                @endif
               </div>
             </div>
           </div>
+          @endif
         </div>
-        @endif
-      </div>
     </div>
 
     {{-- Actions --}}

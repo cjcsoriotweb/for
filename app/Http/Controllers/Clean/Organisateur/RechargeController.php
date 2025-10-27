@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Clean\Organisateur;
 
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 
@@ -59,6 +61,20 @@ class RechargeController extends Controller
                 ],
             ]);
 
+            Payment::updateOrCreate(
+                ['provider_session_id' => $session->id],
+                [
+                    'team_id' => $team->id,
+                    'user_id' => Auth::id(),
+                    'provider' => Payment::PROVIDER_STRIPE,
+                    'provider_payment_intent_id' => $session->payment_intent ?? null,
+                    'amount' => $request->amount,
+                    'currency' => $session->currency ?? 'eur',
+                    'status' => $session->status ?? Payment::STATUS_PENDING,
+                    'provider_payload' => $session->toArray(),
+                ]
+            );
+
             return response()->json(['url' => $session->url]);
         } catch (\Stripe\Exception\AuthenticationException $e) {
             return response()->json(['error' => 'Erreur d\'authentification Stripe. Vérifiez vos clés API.'], 500);
@@ -90,20 +106,56 @@ class RechargeController extends Controller
         try {
             $session = Session::retrieve($sessionId);
 
-            if ($session->payment_status === 'paid') {
-                // Créditer le solde de l'équipe
-                $amount = $session->metadata->amount / 100; // Convertir en euros
-                $team->increment('money', $amount);
-
-                return view('clean.organisateur.recharge-success', [
-                    'team' => $team,
-                    'amount' => $amount,
-                    'session' => $session,
+            $payment = DB::transaction(function () use ($session, $team) {
+                $payment = Payment::firstOrNew([
+                    'provider_session_id' => $session->id,
                 ]);
-            } else {
+
+                $wasPaid = $payment->exists && $payment->isPaid();
+
+                if (! $payment->exists) {
+                    $payment->team_id = $team->id;
+                    $payment->user_id = Auth::id();
+                    $payment->provider = Payment::PROVIDER_STRIPE;
+                }
+
+                $payment->provider_payment_intent_id = $session->payment_intent ?? $payment->provider_payment_intent_id;
+                $payment->provider_payload = $session->toArray();
+                $payment->currency = $session->currency ?? $payment->currency ?? 'eur';
+
+                $amountInCents = (int) ($session->metadata->amount ?? $session->amount_total ?? $payment->amount ?? 0);
+                if ($amountInCents > 0 && ! $payment->amount) {
+                    $payment->amount = $amountInCents;
+                }
+
+                if ($session->payment_status === 'paid') {
+                    if (! $wasPaid) {
+                        $team->increment('money', ($payment->amount ?? $amountInCents) / 100);
+                        $payment->paid_at = now();
+                    }
+                    $payment->status = Payment::STATUS_PAID;
+                } else {
+                    $payment->status = $session->payment_status ?? Payment::STATUS_PENDING;
+                }
+
+                $payment->save();
+
+                return $payment;
+            });
+
+            if ($session->payment_status !== 'paid') {
                 return redirect()->route('organisateur.recharge.show', $team)
                     ->with('error', 'Le paiement n\'a pas été complété.');
             }
+
+            $amount = ($payment->amount ?? 0) / 100;
+
+            return view('clean.organisateur.recharge-success', [
+                'team' => $team,
+                'amount' => $amount,
+                'session' => $session,
+                'payment' => $payment,
+            ]);
         } catch (\Exception $e) {
             return redirect()->route('organisateur.recharge.show', $team)
                 ->with('error', 'Erreur lors de la vérification du paiement.');
