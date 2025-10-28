@@ -18,82 +18,16 @@ class AdminPageController extends Controller
         private readonly AccountService $accountService,
     ) {}
 
-    public function overview(Request $request)
+    public function overview()
     {
-        $user = Auth::user();
-        $organisations = $this->accountService->teams()->listByUser($user);
-        $defaultTeam = $organisations->first();
-
-        $teamSearch = trim((string) $request->input('team_search', ''));
-        $userSearch = trim((string) $request->input('user_search', ''));
-        $formationSearch = trim((string) $request->input('formation_search', ''));
-
-        $teamsQuery = Team::query()
-            ->with(['owner:id,name,email'])
-            ->withCount(['users', 'teamInvitations'])
-            ->when($teamSearch !== '', function ($query) use ($teamSearch) {
-                $query->where(function ($subQuery) use ($teamSearch) {
-                    $subQuery
-                        ->where('name', 'like', "%{$teamSearch}%")
-                        ->orWhereHas('owner', function ($ownerQuery) use ($teamSearch) {
-                            $ownerQuery
-                                ->where('name', 'like', "%{$teamSearch}%")
-                                ->orWhere('email', 'like', "%{$teamSearch}%");
-                        });
-                });
-            })
-            ->latest('updated_at');
-
-        $teams = $teamsQuery->take(10)->get();
-
-        $recentUsersQuery = User::query()
-            ->select(['id', 'name', 'email', 'created_at', 'current_team_id'])
-            ->with(['currentTeam:id,name'])
-            ->withCount('teams')
-            ->when($userSearch !== '', function ($query) use ($userSearch) {
-                $query->where(function ($subQuery) use ($userSearch) {
-                    $subQuery
-                        ->where('name', 'like', "%{$userSearch}%")
-                        ->orWhere('email', 'like', "%{$userSearch}%");
-                });
-            })
-            ->latest('created_at')
-            ->take(12);
-
-        $recentUsers = $recentUsersQuery->get();
-
-        $formationsQuery = Formation::query()
-            ->withCount('teams')
-            ->when($formationSearch !== '', function ($query) use ($formationSearch) {
-                $query->where(function ($subQuery) use ($formationSearch) {
-                    $subQuery
-                        ->where('title', 'like', "%{$formationSearch}%")
-                        ->orWhere('description', 'like', "%{$formationSearch}%");
-                });
-            })
-            ->latest('updated_at')
-            ->latest('created_at')
-            ->take(12);
-
-        $formations = $formationsQuery->get();
-
         $stats = [
             'teams' => Team::count(),
             'users' => User::count(),
+            'formations' => Formation::count(),
             'invitations' => TeamInvitation::count(),
         ];
 
-        return view('clean.admin.AdminOverviewPage', compact([
-            'organisations',
-            'teams',
-            'recentUsers',
-            'stats',
-            'formations',
-            'teamSearch',
-            'userSearch',
-            'formationSearch',
-            'defaultTeam',
-        ]));
+        return view('clean.admin.AdminOverviewPage', compact('stats'));
     }
 
     public function teamsIndex(Request $request)
