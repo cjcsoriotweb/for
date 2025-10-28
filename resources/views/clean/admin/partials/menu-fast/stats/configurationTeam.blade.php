@@ -1,18 +1,41 @@
-<a href="{{ route('application.admin.configuration.index', ['team'=> $team, 'team_name' => $team->name])
-  }}" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-  <div class="flex items-center space-x-4">
-    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="size-6">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 9.75V10.5" />
-      </svg>
+<a
+    href="{{ route('application.admin.configuration.index', ['team' => $team, 'team_name' => $team->name]) }}"
+    class="group relative overflow-hidden rounded-2xl border border-indigo-200/70 bg-white/80 p-6 shadow-lg transition-all hover:-translate-y-1 hover:border-indigo-300/80 hover:shadow-xl dark:border-indigo-700/50 dark:bg-slate-800/70"
+>
+    <div class="absolute -left-10 top-10 h-28 w-28 rounded-full bg-indigo-400/20 blur-3xl transition group-hover:bg-indigo-300/25"></div>
+    <div class="absolute -bottom-12 right-0 h-24 w-24 rounded-full bg-purple-400/20 blur-3xl transition group-hover:bg-purple-300/25"></div>
 
+    <div class="relative flex items-start justify-between">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-600/90 dark:text-indigo-300">
+                {{ __('Configuration') }}
+            </p>
+            <span class="mt-3 block text-lg font-semibold text-slate-900 dark:text-white">
+                {{ __('Identité et crédit équipe') }}
+            </span>
+        </div>
+        <span class="material-symbols-outlined text-3xl text-indigo-500 transition group-hover:text-indigo-400 dark:text-indigo-300">
+            settings_cinematic_blur
+        </span>
     </div>
-    <div>
-      <div class="text-sm text-slate-600 dark:text-slate-400">
-        Configuration
-      </div>
-    </div>
-  </div>
+
+    <ul class="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-400">
+        <li class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-indigo-400 dark:text-indigo-300">brush</span>
+            {{ __('Logo, couleurs et descriptif équipe') }}
+        </li>
+        <li class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-indigo-400 dark:text-indigo-300">credit_score</span>
+            {{ __('Crédits disponibles et recharges récentes') }}
+        </li>
+        <li class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-indigo-400 dark:text-indigo-300">verified_user</span>
+            {{ __('Gestion des accès avancés') }}
+        </li>
+    </ul>
+
+    <span class="mt-5 inline-flex items-center text-xs font-medium text-indigo-600 transition group-hover:text-indigo-500 dark:text-indigo-300 dark:group-hover:text-indigo-200">
+        {{ __('Ouvrir les paramètres') }}
+        <span class="material-symbols-outlined ml-2 text-base">arrow_outward</span>
+    </span>
 </a>

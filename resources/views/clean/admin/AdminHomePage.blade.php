@@ -1,23 +1,35 @@
+@php($headerIcon = 'shield_person')
+
 <x-application-layout :team="$team">
     <x-slot name="header">
-        <div class="flex items-center space-x-4">
-            <div
-                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center"
-            >
-                <span class="material-symbols-outlined text-white text-xl"
-                    >admin_panel_settings</span
-                >
-            </div>
+        {{ __('Tableau de bord administrateur') }}
+    </x-slot>
 
-            <div>
-                <h2 class="font-bold text-xl text-white leading-tight">
-                    Tableau de bord Administrateur
-                </h2>
-                <p class="text-blue-100 text-sm">
-                    Gérez votre plateforme de formation
-                </p>
-            </div>
+    <x-slot name="subtitle">
+        {{ __('Pilotez votre plateforme de formation avec une vue claire sur vos actions clés.') }}
+    </x-slot>
+
+    <x-slot name="headerActions">
+        <div class="flex items-center space-x-3">
+            <a
+                href="{{ route('application.admin.formations.index', $team) }}"
+                class="inline-flex items-center px-4 py-2 rounded-lg border border-white/40 text-white bg-white/10 hover:bg-white/20 transition-colors"
+            >
+                <span class="material-symbols-outlined text-base mr-2">library_books</span>
+                {{ __('Formations') }}
+            </a>
+            <a
+                href="{{ route('application.admin.configuration.index', ['team' => $team, 'team_name' => $team->name]) }}"
+                class="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shadow-sm"
+            >
+                <span class="material-symbols-outlined text-base mr-2">tune</span>
+                {{ __('Configuration') }}
+            </a>
         </div>
     </x-slot>
-    <x-admin.admin-menu-fast :team="$team" />
+
+    <div class="relative pb-16">
+        <div class="absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-br from-slate-950 via-indigo-900 to-slate-900 opacity-80 blur-3xl"></div>
+        <x-admin.admin-menu-fast :team="$team" />
+    </div>
 </x-application-layout>

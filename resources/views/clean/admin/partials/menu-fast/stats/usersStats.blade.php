@@ -1,23 +1,39 @@
+@php
+    $userCount = max(0, count($team->allUsers()) - 1);
+@endphp
+
 <a
     href="{{ route('application.admin.users.index', $team) }}"
-    class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6"
+    class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/80 p-6 shadow-lg transition-all hover:-translate-y-1 hover:border-blue-300/80 hover:shadow-xl dark:border-slate-700/60 dark:bg-slate-800/70"
 >
-    <div class="flex items-center space-x-4">
-        <div
-            class="w-12 h-12 bg-blue-100 dark:bg-blue-900 dark:bg-opacity-30 rounded-xl flex items-center justify-center"
-        >
-            <span
-                class="material-symbols-outlined text-blue-600 dark:text-blue-400"
-                >people</span
-            >
-        </div>
+    <div class="absolute -right-6 -top-12 h-32 w-32 rounded-full bg-blue-500/15 blur-3xl transition group-hover:bg-blue-400/20"></div>
+
+    <div class="relative flex items-center justify-between">
         <div>
-            <div class="text-2xl font-bold text-slate-900 dark:text-white">
-                {{ count($team->allUsers() )-1 }}
-            </div>
-            <div class="text-sm text-slate-600 dark:text-slate-400">
-                Utilisateurs dans cette application
-            </div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+                {{ __('Utilisateurs') }}
+            </p>
+            <span class="mt-3 block text-3xl font-bold text-slate-900 dark:text-white">
+                {{ $userCount }}
+            </span>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {{ __('Actifs sur cette application') }}
+            </p>
+        </div>
+        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-inner">
+            <span class="material-symbols-outlined text-3xl">group</span>
         </div>
     </div>
+
+    <div class="relative mt-6 h-2 rounded-full bg-slate-200/80 dark:bg-slate-700/70">
+        <div
+            class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+            style="width: {{ min(100, max(12, $userCount * 8)) }}%;"
+        ></div>
+    </div>
+
+    <span class="mt-3 inline-flex items-center text-xs font-medium text-blue-600 transition group-hover:text-blue-500 dark:text-blue-300 dark:group-hover:text-blue-200">
+        {{ __('Voir les profils') }}
+        <span class="material-symbols-outlined ml-2 text-base">arrow_outward</span>
+    </span>
 </a>
