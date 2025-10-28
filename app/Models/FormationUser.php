@@ -24,6 +24,7 @@ class FormationUser extends Model
         'completed_at',
         'score_total',
         'max_score_total',
+        'enrollment_cost',
     ];
 
     protected function casts(): array
@@ -49,5 +50,15 @@ class FormationUser extends Model
     public function formation()
     {
         return $this->belongsTo(Formation::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

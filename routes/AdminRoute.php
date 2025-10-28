@@ -14,6 +14,7 @@ Route::prefix('administrateur')
         Route::get('{team}/home', [AdminPageController::class, 'home'])->name('index');
         Route::get('{team}/users', [AdminPageController::class, 'users'])->name('users.index');
         Route::get('{team}/formations', [AdminPageController::class, 'formations'])->name('formations.index');
+        Route::get('{team}/formations/{formation}/revenue', [AdminFormationController::class, 'revenueSummary'])->name('formations.revenue');
         Route::get('{team}/configuration', [AdminPageController::class, 'configuration'])->name('configuration.index');
         Route::post('{team}/configuration/credit', [AdminConfigurationController::class, 'addCredit'])->name('configuration.credit');
         Route::put('{team}/photo', [AdminConfigurationController::class, 'updatePhoto'])->name('configuration.photo.update');

@@ -6,12 +6,14 @@
           Gestion des formations
         </h1>
         <p class="text-sm text-gray-600">
-          Supervisez l'ensemble de vos contenus et ajustez leur visibilitée en quelques clics.
+          Supervisez l'ensemble de vos contenus et ajustez leur visibilité en quelques clics.
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-4">
-        <a href="{{ route('formateur.home', ['team' => $team]) }}"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-sm transition">
+        <a
+          href="{{ route('formateur.home', ['team' => $team]) }}"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-sm transition"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -68,6 +70,22 @@
           Aucune description renseignée pour le moment.
         </p>
         @endif
+
+        <a
+          href="{{ route('application.admin.formations.revenue', ['team' => $team, 'formation' => $formation]) }}"
+          class="inline-flex items-center gap-3 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 transition hover:-translate-y-0.5 hover:bg-purple-100 hover:shadow"
+        >
+          <span class="material-symbols-outlined text-lg text-purple-500">token</span>
+          <span class="flex flex-col leading-tight">
+            <span class="text-xs font-medium text-purple-500 uppercase tracking-widest">
+              Revenu {{ $currentMonthLabel }}
+            </span>
+            <span class="text-base font-semibold text-purple-700">
+              {{ number_format($monthlyRevenue->get($formation->id, 0), 0, ',', ' ') }} jetons
+            </span>
+          </span>
+          <span class="material-symbols-outlined text-base text-purple-400">arrow_outward</span>
+        </a>
       </div>
 
       <div class="flex items-center gap-3 md:self-stretch md:flex-col md:justify-between">
@@ -84,7 +102,7 @@
           @if($formation->is_visible)
           <button type="submit" name="enabled" value="0"
             class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition">
-            {{ __('Déactiver') }}
+            {{ __('Désactiver') }}
           </button>
           @else
           <button type="submit" name="enabled" value="1"
