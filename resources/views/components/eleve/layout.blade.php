@@ -58,6 +58,7 @@
     </main>
   </div>
   @auth
+    <livewire:support.chat-widget />
   @endauth
   @livewireScripts
 </body>

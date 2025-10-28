@@ -317,33 +317,6 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Afficher les formations disponibles pour une équipe
-     */
-    public function availableFormations(Team $team)
-    {
-        $user = Auth::user();
-
-        // Récupérer les formations disponibles pour cette équipe
-        $availableFormations = $team->formationsByTeam()
-            ->where('formation_in_teams.visible', true)
-            ->with(['chapters.lessons'])
-            ->get();
-
-        // Vérifier l'inscription de l'utilisateur à chaque formation
-        foreach ($availableFormations as $formation) {
-            $formation->is_enrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation, $team);
-            $formation->progress = $formation->is_enrolled
-                ? $this->studentFormationService->getStudentProgress($user, $formation)
-                : null;
-        }
-
-        return view('clean.eleve.formations.available', compact(
-            'team',
-            'availableFormations'
-        ));
-    }
-
-    /**
      * API endpoint pour récupérer les formations d'un étudiant (pour AJAX)
      */
     public function apiFormations(Team $team, Request $request)
