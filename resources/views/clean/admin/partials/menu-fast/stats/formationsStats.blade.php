@@ -1,7 +1,3 @@
-@php
-    $totalVisible = $totalCount > 0 ? round(($activeCount / max(1, $totalCount)) * 100) : 0;
-@endphp
-
 <a
     href="{{ route('application.admin.formations.index', $team) }}"
     class="group relative overflow-hidden rounded-2xl border border-emerald-200/70 bg-white/80 p-6 shadow-lg transition-all hover:-translate-y-1 hover:border-emerald-300/80 hover:shadow-xl dark:border-emerald-700/40 dark:bg-slate-800/70"
@@ -23,7 +19,7 @@
         <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15">
             <span class="material-symbols-outlined text-3xl text-emerald-500 dark:text-emerald-300">school</span>
             <span class="absolute -bottom-3 inline-flex items-center rounded-full bg-emerald-500 px-2 py-1 text-xs font-semibold text-white shadow-md">
-                {{ $totalVisible }}%
+                {{ $visiblePercentage }}%
             </span>
         </div>
     </div>
@@ -32,7 +28,7 @@
         <div class="relative h-2 rounded-full bg-emerald-100/80 dark:bg-emerald-900/50">
             <div
                 class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400"
-                style="width: {{ min(100, max(8, $totalVisible)) }}%;"
+                style="width: {{ $formationsProgressWidth }}%;"
             ></div>
         </div>
         <p class="flex items-center text-xs font-medium text-emerald-600 transition group-hover:text-emerald-500 dark:text-emerald-300 dark:group-hover:text-emerald-200">

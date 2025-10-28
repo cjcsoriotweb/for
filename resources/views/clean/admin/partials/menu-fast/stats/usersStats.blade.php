@@ -1,7 +1,3 @@
-@php
-    $userCount = max(0, count($team->allUsers()) - 1);
-@endphp
-
 <a
     href="{{ route('application.admin.users.index', $team) }}"
     class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/80 p-6 shadow-lg transition-all hover:-translate-y-1 hover:border-blue-300/80 hover:shadow-xl dark:border-slate-700/60 dark:bg-slate-800/70"
@@ -14,7 +10,7 @@
                 {{ __('Utilisateurs') }}
             </p>
             <span class="mt-3 block text-3xl font-bold text-slate-900 dark:text-white">
-                {{ $userCount }}
+                {{ $totalUsers }}
             </span>
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 {{ __('Actifs sur cette application') }}
@@ -28,7 +24,7 @@
     <div class="relative mt-6 h-2 rounded-full bg-slate-200/80 dark:bg-slate-700/70">
         <div
             class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
-            style="width: {{ min(100, max(12, $userCount * 8)) }}%;"
+            style="width: {{ $usersProgressWidth }}%;"
         ></div>
     </div>
 

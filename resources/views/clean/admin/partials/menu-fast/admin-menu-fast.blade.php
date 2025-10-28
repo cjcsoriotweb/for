@@ -1,9 +1,3 @@
-@php
-    $totalUsers = max(0, count($team->allUsers()) - 1);
-    $usersLabel = $totalUsers > 1 ? __('utilisateurs') : __('utilisateur');
-    $adminName = optional(auth()->user())->name ?? __('Administrateur');
-@endphp
-
 <div class="space-y-12">
     <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-900 to-slate-950 text-white shadow-2xl border border-white/10">
         <div class="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-indigo-500/30 blur-3xl"></div>
