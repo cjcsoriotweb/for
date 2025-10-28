@@ -16,9 +16,10 @@ class OpenAiClient
         private readonly string $apiKey,
         private readonly string $baseUrl,
         private readonly string $chatEndpoint,
+        private readonly bool $requiresApiKey = true,
         ?HttpFactory $http = null
     ) {
-        if ($this->apiKey === '') {
+        if ($this->requiresApiKey && $this->apiKey === '') {
             throw new RuntimeException('OPENAI_API_KEY is not configured.');
         }
 
@@ -30,8 +31,9 @@ class OpenAiClient
         $apiKey = Arr::get($config, 'api_key', '');
         $baseUrl = rtrim(Arr::get($config, 'base_url', 'https://api.openai.com/v1'), '/');
         $chatEndpoint = Arr::get($config, 'chat_endpoint', '/chat/completions');
+        $requiresApiKey = (bool) Arr::get($config, 'requires_api_key', true);
 
-        return new self($apiKey, $baseUrl, $chatEndpoint);
+        return new self($apiKey, $baseUrl, $chatEndpoint, $requiresApiKey);
     }
 
     /**
@@ -46,11 +48,15 @@ class OpenAiClient
     {
         $url = $this->baseUrl.'/'.ltrim($this->chatEndpoint, '/');
 
-        $response = $this->http
-            ->withToken($this->apiKey)
+        $client = $this->http
             ->acceptJson()
-            ->timeout(30)
-            ->post($url, $payload);
+            ->timeout(30);
+
+        if ($this->apiKey !== '') {
+            $client = $client->withToken($this->apiKey);
+        }
+
+        $response = $client->post($url, $payload);
 
         $response->throw();
 

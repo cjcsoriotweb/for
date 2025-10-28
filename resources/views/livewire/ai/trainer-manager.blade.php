@@ -45,7 +45,9 @@
                     wire:model.defer="provider"
                     class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                 >
-                    <option value="openai">OpenAI</option>
+                    @foreach ($providerOptions as $option)
+                        <option value="{{ $option }}">{{ ucfirst($option) }}</option>
+                    @endforeach
                 </select>
                 @error('provider')
                     <p class="text-xs text-red-500">{{ $message }}</p>

@@ -22,10 +22,14 @@ class TrainerManager extends Component
     public float $temperature = 0.7;
     public bool $isDefault = false;
     public bool $isActive = true;
+    /** @var array<int, string> */
+    public array $providerOptions = [];
 
     public function mount(): void
     {
         $this->ensureAuthorized();
+        $this->providerOptions = $this->resolveProviderOptions();
+        $this->provider = $this->providerOptions[0] ?? 'openai';
         $this->loadTrainers();
     }
 
@@ -119,7 +123,7 @@ class TrainerManager extends Component
     {
         $this->name = '';
         $this->model = 'gpt-4o-mini';
-        $this->provider = 'openai';
+        $this->provider = $this->providerOptions[0] ?? 'openai';
         $this->description = null;
         $this->prompt = null;
         $this->avatarPath = null;
@@ -134,7 +138,7 @@ class TrainerManager extends Component
     {
         return [
             'name' => ['required', 'string', 'max:120'],
-            'provider' => ['required', 'string', Rule::in(['openai'])],
+            'provider' => ['required', 'string', Rule::in($this->providerOptions)],
             'model' => ['required', 'string', 'max:120'],
             'temperature' => ['nullable', 'numeric', 'min:0', 'max:2'],
             'description' => ['nullable', 'string'],
@@ -152,5 +156,15 @@ class TrainerManager extends Component
         if (! $user || ! method_exists($user, 'superadmin') || ! $user->superadmin()) {
             abort(403);
         }
+    }
+
+    /**
+     * Resolve provider options from configuration.
+     *
+     * @return array<int, string>
+     */
+    private function resolveProviderOptions(): array
+    {
+        return array_keys(config('ai.providers', []));
     }
 }
