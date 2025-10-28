@@ -83,8 +83,8 @@ class AdminFormationStudentService
                 'current_lesson_id' => $this->firstLessonId($formation),
                 'last_seen_at' => now(),
                 'completed_at' => null,
-                'score_total' => null,
-                'max_score_total' => null,
+                'score_total' => 0,
+                'max_score_total' => 0,
             ]);
         });
     }
