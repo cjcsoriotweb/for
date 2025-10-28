@@ -1,6 +1,4 @@
-<div class="relative overflow-hidden rounded-3xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-white p-8 shadow-xl dark:border-emerald-800/60 dark:bg-slate-900/60">
-    <div class="absolute -left-12 top-8 h-32 w-32 rounded-full bg-emerald-300/30 blur-3xl dark:bg-emerald-400/20"></div>
-    <div class="absolute -right-16 bottom-0 h-40 w-40 rounded-full bg-teal-300/30 blur-3xl dark:bg-teal-400/20"></div>
+<div class="relative overflow-hidden rounded-3xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50/90 via-teal-50/80 to-white p-8 shadow-xl dark:border-emerald-500/60 dark:bg-slate-900/60">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.15),_transparent_65%)]"></div>
 
     <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -9,13 +7,13 @@
                 <span class="material-symbols-outlined text-3xl">bolt</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600/90 dark:text-emerald-300">
+                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600/90 dark:text-emerald-500">
                     {{ __('Changer de perspective') }}
                 </p>
-                <h3 class="mt-2 text-xl font-semibold text-emerald-900 dark:text-emerald-100">
+                <h3 class="mt-2 text-xl font-semibold text-emerald-900 dark:text-emerald-500">
                     {{ __('Basculez instantanément entre vos rôles clés') }}
                 </h3>
-                <p class="mt-2 max-w-xl text-sm text-emerald-800/80 dark:text-emerald-200/80">
+                <p class="mt-2 max-w-xl text-sm text-emerald-800/80 dark:text-emerald-500/80">
                     {{ __('Prévisualisez les espaces Élève et Organisateur pour valider vos paramétrages avant publication.') }}
                 </p>
             </div>
