@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Formateur\Formation\UpdateFormationPricingRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
+use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Services\FormationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class FormateurFormationController extends Controller
@@ -29,6 +31,48 @@ class FormateurFormationController extends Controller
     public function manageChapters(Formation $formation)
     {
         return view('clean.formateur.Formation.FormationChapters', compact('formation'));
+    }
+
+    public function editAi(Formation $formation)
+    {
+        $formation->load('aiTrainers');
+
+        $trainers = AiTrainer::query()
+            ->active()
+            ->orderBy('name')
+            ->get();
+
+        $primaryTrainer = $formation->aiTrainers->first(function (AiTrainer $trainer) {
+            return (bool) $trainer->pivot?->is_primary;
+        });
+
+        $primaryTrainerId = $primaryTrainer?->id;
+
+        return view('clean.formateur.Formation.FormationAi', [
+            'formation' => $formation,
+            'trainers' => $trainers,
+            'primaryTrainerId' => $primaryTrainerId,
+        ]);
+    }
+
+    public function updateAi(Request $request, Formation $formation)
+    {
+        $data = $request->validate([
+            'primary_trainer_id' => ['nullable', 'integer', 'exists:ai_trainers,id'],
+        ]);
+
+        $primaryTrainerId = $data['primary_trainer_id'] ?? null;
+
+        if ($primaryTrainerId) {
+            $trainer = AiTrainer::query()->active()->findOrFail($primaryTrainerId);
+            $formation->aiTrainers()->sync([$trainer->id => ['is_primary' => true]]);
+        } else {
+            $formation->aiTrainers()->detach();
+        }
+
+        return redirect()
+            ->route('formateur.formation.ai.edit', $formation)
+            ->with('success', __('Paramétrage du formateur IA mis à jour.'));
     }
 
     public function updateFormation(UpdateFormationRequest $request, Formation $formation)

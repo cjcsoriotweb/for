@@ -18,8 +18,10 @@ class AiConversationService
 {
     /**
      * Resolve the AI trainer to use for a given formation.
+     *
+     * @return AiTrainer|null
      */
-    public function resolveTrainer(?Formation $formation = null, ?int $trainerId = null): AiTrainer
+    public function resolveTrainer(?Formation $formation = null, ?int $trainerId = null): ?AiTrainer
     {
         $query = AiTrainer::query()->active();
 
@@ -53,10 +55,6 @@ class AiConversationService
             ->where('slug', $defaultSlug)
             ->first()
             ?? $query->orderByDesc('is_default')->orderBy('name')->first();
-
-        if (! $trainer) {
-            throw new RuntimeException('Aucun formateur IA actif disponible.');
-        }
 
         return $trainer;
     }

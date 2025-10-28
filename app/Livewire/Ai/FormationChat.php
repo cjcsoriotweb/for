@@ -28,6 +28,7 @@ class FormationChat extends Component
     public string $trainerName = '';
     public ?string $trainerDescription = null;
     public ?string $trainerAvatar = null;
+    public bool $hasTrainer = false;
 
     public ?string $formationTitle = null;
 
@@ -62,6 +63,12 @@ class FormationChat extends Component
         ]);
 
         $this->error = null;
+
+        if (! $this->hasTrainer || ! $this->conversationId) {
+            $this->error = __('Le formateur IA est indisponible pour cette formation.');
+
+            return;
+        }
 
         try {
             $conversation = AiConversation::query()->findOrFail($this->conversationId);
@@ -106,12 +113,27 @@ class FormationChat extends Component
         if (! $user) {
             $this->messages = [];
             $this->conversationId = null;
+            $this->hasTrainer = false;
 
             return;
         }
 
         $formation = $this->formationId ? Formation::query()->find($this->formationId) : null;
+        $this->formationTitle = $formation?->title;
         $trainer = $this->service()->resolveTrainer($formation, $this->trainerId);
+
+        if (! $trainer) {
+            $this->hasTrainer = false;
+            $this->messages = [];
+            $this->conversationId = null;
+            $this->trainerId = null;
+            $this->trainerName = '';
+            $this->trainerDescription = null;
+            $this->trainerAvatar = null;
+            $this->isOpen = false;
+
+            return;
+        }
 
         $conversation = $this->service()->getOrCreateConversation(
             $trainer,
@@ -120,12 +142,12 @@ class FormationChat extends Component
             $user->currentTeam
         );
 
+        $this->hasTrainer = true;
         $this->conversationId = $conversation->id;
         $this->trainerId = $trainer->id;
         $this->trainerName = $trainer->name;
         $this->trainerDescription = $trainer->description;
         $this->trainerAvatar = $trainer->avatar_path;
-        $this->formationTitle = $formation?->title;
 
         $this->refreshMessages();
     }
