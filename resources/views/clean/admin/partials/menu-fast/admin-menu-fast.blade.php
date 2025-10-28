@@ -52,10 +52,15 @@
                 </div>
             </div>
 
-            <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            
+        </div>
+    </section>
+
+    <div>
+        <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <a
                     href="{{ route('application.admin.users.index', $team) }}"
-                    class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:-translate-y-1 hover:border-white/30 hover:bg-white/10"
+                    class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/80 p-6 shadow-lg transition-all hover:-translate-y-1 hover:border-blue-300/80 hover:shadow-xl dark:border-slate-700/60 dark:bg-slate-800/70"
                 >
                     <div class="flex items-start justify-between">
                         <div>
@@ -75,7 +80,7 @@
 
                 <a
                     href="{{ route('application.admin.formations.index', $team) }}"
-                    class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:-translate-y-1 hover:border-white/30 hover:bg-white/10"
+                    class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/80 p-6 shadow-lg transition-all hover:-translate-y-1 hover:border-blue-300/80 hover:shadow-xl dark:border-slate-700/60 dark:bg-slate-800/70"
                 >
                     <div class="flex items-start justify-between">
                         <div>
@@ -95,7 +100,7 @@
 
                 <a
                     href="{{ route('application.admin.configuration.index', ['team' => $team, 'team_name' => $team->name]) }}"
-                    class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:-translate-y-1 hover:border-white/30 hover:bg-white/10"
+                    class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/80 p-6 shadow-lg transition-all hover:-translate-y-1 hover:border-blue-300/80 hover:shadow-xl dark:border-slate-700/60 dark:bg-slate-800/70"
                 >
                     <div class="flex items-start justify-between">
                         <div>
@@ -113,8 +118,7 @@
                     </span>
                 </a>
             </div>
-        </div>
-    </section>
+    </div>
 
     <section>
         <h2 class="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
