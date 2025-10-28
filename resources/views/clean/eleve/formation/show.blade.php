@@ -20,4 +20,8 @@
     ])
     @endif
   </div>
+
+  @auth
+    <livewire:ai.formation-chat :formation-id="$formationWithProgress->id" />
+  @endauth
 </x-eleve-layout>

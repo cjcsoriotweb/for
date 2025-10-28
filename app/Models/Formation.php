@@ -102,6 +102,13 @@ class Formation extends Model
         return $this->hasMany(FormationCompletionDocument::class);
     }
 
+    public function aiTrainers(): BelongsToMany
+    {
+        return $this->belongsToMany(AiTrainer::class, 'ai_trainer_formation')
+            ->withPivot(['is_primary'])
+            ->withTimestamps();
+    }
+
     /**
      * Alias for completionDocuments to support scoped route bindings (documents/{document}).
     */

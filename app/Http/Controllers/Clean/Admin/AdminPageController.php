@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Clean\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Models\TeamInvitation;
@@ -27,6 +28,7 @@ class AdminPageController extends Controller
             'formations' => Formation::count(),
             'invitations' => TeamInvitation::count(),
             'tickets' => SupportTicket::count(),
+            'ai_trainers' => AiTrainer::count(),
         ];
 
         return view('clean.admin.AdminOverviewPage', compact('stats'));
@@ -113,6 +115,11 @@ class AdminPageController extends Controller
     public function supportIndex()
     {
         return view('clean.admin.SuperadminSupportPage');
+    }
+
+    public function aiIndex()
+    {
+        return view('clean.admin.SuperadminAiPage');
     }
 
     public function home(Team $team, FormationService $formations)

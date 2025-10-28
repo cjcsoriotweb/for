@@ -5,5 +5,6 @@
 >
     <div class="space-y-8">
         <livewire:support.ticket-inbox />
+        <livewire:ai.trainer-tester />
     </div>
 </x-admin.global-layout>

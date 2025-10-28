@@ -35,6 +35,14 @@
             'cta' => __('Ouvrir le centre support'),
         ],
         [
+            'route' => route('superadmin.ai.index'),
+            'icon' => 'smart_toy',
+            'label' => __('Formateurs IA'),
+            'stat' => number_format($stats->get('ai_trainers', 0)),
+            'description' => __('Configurez les profils IA et testez leurs prompts.'),
+            'cta' => __('Gerer lIA'),
+        ],
+        [
             'route' => route('superadmin.teams.index', ['focus' => 'invitations']),
             'icon' => 'forward_to_inbox',
             'label' => __('Invitations en attente'),

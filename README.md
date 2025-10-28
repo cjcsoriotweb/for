@@ -56,6 +56,22 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+## AI Trainers
+
+This project integrates an AI conversation bubble for learners and a superadmin testing tool. Configure the following environment variables before use:
+
+- `OPENAI_API_KEY` : ChatGPT API key.
+- `OPENAI_BASE_URL` : optional, defaults to `https://api.openai.com/v1`.
+- `OPENAI_DEFAULT_MODEL` : optional, defaults to `gpt-4o-mini`.
+- `AI_DEFAULT_TRAINER` : slug of the default AI trainer profile.
+
+Run the new migrations and seeder to publish the default trainer profile:
+
+```bash
+php artisan migrate
+php artisan db:seed --class=AiTrainerSeeder
+```
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

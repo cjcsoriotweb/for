@@ -15,4 +15,8 @@
         {{-- Navigation de la leçon --}}
         @include('clean.eleve.lesson.partials.navigation')
     </div>
+
+    @auth
+        <livewire:ai.formation-chat :formation-id="$formation->id" />
+    @endauth
 </x-eleve-layout>

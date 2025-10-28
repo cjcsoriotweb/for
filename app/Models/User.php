@@ -96,4 +96,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(SupportTicketMessage::class, 'user_id');
     }
+
+    public function aiConversations()
+    {
+        return $this->hasMany(AiConversation::class, 'user_id');
+    }
 }
