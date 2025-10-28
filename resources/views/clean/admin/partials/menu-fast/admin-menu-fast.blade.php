@@ -35,7 +35,15 @@
                     <div class="relative aspect-square w-full overflow-hidden rounded-3xl border border-white/15 bg-white/5 backdrop-blur">
                         <div class="absolute inset-6 rounded-2xl bg-gradient-to-br from-white/10 to-white/5"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-6xl text-white/70">auto_awesome</span>
+                            @if ($hasTeamLogo && $teamLogoUrl)
+                                <img
+                                    src="{{ $teamLogoUrl }}"
+                                    alt="{{ __('Logo de l’équipe :name', ['name' => $team->name]) }}"
+                                    class="h-32 w-32 rounded-2xl object-contain "
+                                />
+                            @else
+                                <span class="material-symbols-outlined text-6xl text-white/70">auto_awesome</span>
+                            @endif
                         </div>
                         <div class="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/15 px-4 py-2 text-xs font-medium uppercase tracking-[0.3em] text-white/70">
                             {{ __('Équipe') }} {{ $team->id }}

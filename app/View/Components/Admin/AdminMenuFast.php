@@ -32,6 +32,10 @@ class AdminMenuFast extends Component
 
     public $formationsProgressWidth;
 
+    public $hasTeamLogo;
+
+    public $teamLogoUrl;
+
     public function __construct($team, FormationService $formations)
     {
         $this->team = $team;
@@ -46,6 +50,8 @@ class AdminMenuFast extends Component
         $this->visiblePercentage = $this->totalCount > 0 ? (int) round(($this->activeCount / max(1, $this->totalCount)) * 100) : 0;
         $this->usersProgressWidth = min(100, max(12, $this->totalUsers * 8));
         $this->formationsProgressWidth = min(100, max(8, $this->visiblePercentage));
+        $this->hasTeamLogo = ! empty($team->profile_photo_path);
+        $this->teamLogoUrl = $this->hasTeamLogo ? asset('storage/' . $team->profile_photo_path) : null;
     }
 
     public function render(): View
@@ -60,6 +66,8 @@ class AdminMenuFast extends Component
             'visiblePercentage' => $this->visiblePercentage,
             'usersProgressWidth' => $this->usersProgressWidth,
             'formationsProgressWidth' => $this->formationsProgressWidth,
+            'hasTeamLogo' => $this->hasTeamLogo,
+            'teamLogoUrl' => $this->teamLogoUrl,
         ]);
     }
 }
