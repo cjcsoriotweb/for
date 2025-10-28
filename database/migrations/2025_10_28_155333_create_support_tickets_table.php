@@ -20,6 +20,8 @@ return new class extends Migration
             $table->timestamp('resolved_at')->nullable();
             $table->timestamp('closed_at')->nullable();
             $table->foreignId('closed_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('origin_label', 60)->nullable();
+            $table->string('origin_path')->nullable();
             $table->timestamps();
 
             $table->index(['user_id', 'status']);

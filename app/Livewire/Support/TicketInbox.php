@@ -31,7 +31,7 @@ class TicketInbox extends Component
 
     public function mount(): void
     {
-        $this->authorize();
+        $this->ensureAuthorized();
         $this->loadTickets();
     }
 
@@ -47,7 +47,7 @@ class TicketInbox extends Component
 
     public function selectTicket(int $ticketId): void
     {
-        $this->authorize();
+        $this->ensureAuthorized();
 
         $ticket = SupportTicket::query()
             ->with([
@@ -63,7 +63,7 @@ class TicketInbox extends Component
 
     public function sendResponse(): void
     {
-        $this->authorize();
+        $this->ensureAuthorized();
 
         if (! $this->activeTicketId) {
             return;
@@ -86,6 +86,8 @@ class TicketInbox extends Component
                 'is_support' => true,
                 'content' => $validated['message'],
                 'read_at' => now(),
+                'context_label' => 'Support',
+                'context_path' => request()->fullUrl() ?? 'superadmin/support',
             ]);
         });
 
@@ -117,7 +119,7 @@ class TicketInbox extends Component
 
     public function loadTickets(): void
     {
-        $this->authorize();
+        $this->ensureAuthorized();
 
         $ticketsQuery = SupportTicket::query()
             ->with('owner:id,name,email')
@@ -163,7 +165,7 @@ class TicketInbox extends Component
         ]);
     }
 
-    private function authorize(): void
+    private function ensureAuthorized(): void
     {
         $user = Auth::user();
 
@@ -174,7 +176,7 @@ class TicketInbox extends Component
 
     private function updateTicketStatus(callable $callback): void
     {
-        $this->authorize();
+        $this->ensureAuthorized();
 
         if (! $this->activeTicketId) {
             return;
@@ -201,6 +203,8 @@ class TicketInbox extends Component
                 'name' => $ticket->owner?->name,
                 'email' => $ticket->owner?->email,
             ],
+            'origin_label' => $ticket->origin_label,
+            'origin_path' => $ticket->origin_path,
             'last_message_at' => optional($lastTimestamp)->toIso8601String(),
             'last_message_human' => optional($lastTimestamp)->diffForHumans(),
         ];
@@ -222,6 +226,10 @@ class TicketInbox extends Component
                 'name' => $ticket->owner?->name,
                 'email' => $ticket->owner?->email,
             ],
+            'origin' => [
+                'label' => $ticket->origin_label,
+                'path' => $ticket->origin_path,
+            ],
             'messages' => $ticket->messages->map(fn (SupportTicketMessage $message) => [
                 'id' => $message->id,
                 'content' => $message->content,
@@ -229,6 +237,8 @@ class TicketInbox extends Component
                 'author' => $message->author?->name ?? ($message->is_support ? __('Support') : __('Utilisateur')),
                 'created_at' => $message->created_at?->toIso8601String(),
                 'created_at_human' => $message->created_at?->diffForHumans(),
+                'context_label' => $message->context_label,
+                'context_path' => $message->context_path,
             ])->all(),
         ];
     }

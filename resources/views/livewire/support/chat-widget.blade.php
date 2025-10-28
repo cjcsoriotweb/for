@@ -83,6 +83,11 @@
                                     <span class="font-semibold text-slate-700 dark:text-slate-100">
                                         {{ $ticket['subject'] }}
                                     </span>
+                                    @if (!empty($ticket['origin_label']))
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
+                                            {{ $ticket['origin_label'] }}
+                                        </span>
+                                    @endif
                                     <span class="mt-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                                         <span class="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-200">
                                             {{ $ticket['status_label'] }}
@@ -159,6 +164,23 @@
                                     <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100">
                                         {{ $activeTicket['subject'] }}
                                     </h3>
+                                    @if (!empty($activeTicket['origin']['label']))
+                                        <p class="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
+                                            {{ __('Contexte') }} :
+                                            @if (!empty($activeTicket['origin']['path']))
+                                                <a
+                                                    href="{{ $activeTicket['origin']['path'] }}"
+                                                    class="underline hover:text-blue-600"
+                                                    target="_blank"
+                                                    rel="noopener"
+                                                >
+                                                    {{ $activeTicket['origin']['label'] }}
+                                                </a>
+                                            @else
+                                                {{ $activeTicket['origin']['label'] }}
+                                            @endif
+                                        </p>
+                                    @endif
                                     <span class="mt-1 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
                                         {{ $activeTicket['status_label'] }}
                                     </span>
@@ -183,6 +205,23 @@
                                         <span class="text-[10px] text-slate-400 dark:text-slate-500">
                                             {{ $messageItem['author'] }} - {{ $messageItem['created_at_human'] }}
                                         </span>
+                                        @if (!empty($messageItem['context_label']))
+                                            <span class="text-[10px] text-slate-400 dark:text-slate-500">
+                                                {{ __('Page') }} :
+                                                @if (!empty($messageItem['context_path']))
+                                                    <a
+                                                        href="{{ $messageItem['context_path'] }}"
+                                                        class="underline hover:text-blue-600"
+                                                        target="_blank"
+                                                        rel="noopener"
+                                                    >
+                                                        {{ $messageItem['context_label'] }}
+                                                    </a>
+                                                @else
+                                                    {{ $messageItem['context_label'] }}
+                                                @endif
+                                            </span>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>

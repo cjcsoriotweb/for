@@ -6,6 +6,7 @@ use App\Models\SupportTicket;
 use App\Models\SupportTicketMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class ChatWidget extends Component
@@ -24,12 +25,16 @@ class ChatWidget extends Component
     public string $subject = '';
     public string $message = '';
 
+    public string $contextLabel = '';
+    public string $contextPath = '';
+
     protected $listeners = [
         'support-ticket-refresh' => 'loadTickets',
     ];
 
     public function mount(): void
     {
+        [$this->contextLabel, $this->contextPath] = $this->resolveContext();
         $this->loadTickets();
     }
 
@@ -131,6 +136,8 @@ class ChatWidget extends Component
                 'subject' => $validated['subject'],
                 'status' => SupportTicket::STATUS_OPEN,
                 'last_message_at' => now(),
+                'origin_label' => $this->contextLabel,
+                'origin_path' => $this->contextPath,
             ]);
 
             SupportTicketMessage::create([
@@ -139,6 +146,8 @@ class ChatWidget extends Component
                 'is_support' => false,
                 'content' => $validated['message'],
                 'read_at' => now(),
+                'context_label' => $this->contextLabel,
+                'context_path' => $this->contextPath,
             ]);
 
             return $ticket;
@@ -189,7 +198,16 @@ class ChatWidget extends Component
             'is_support' => false,
             'content' => $validated['message'],
             'read_at' => now(),
+            'context_label' => $this->contextLabel,
+            'context_path' => $this->contextPath,
         ]);
+
+        if (! $ticket->origin_label || ! $ticket->origin_path) {
+            $ticket->forceFill([
+                'origin_label' => $ticket->origin_label ?: $this->contextLabel,
+                'origin_path' => $ticket->origin_path ?: $this->contextPath,
+            ])->save();
+        }
 
         $this->message = '';
 
@@ -213,6 +231,8 @@ class ChatWidget extends Component
             'subject' => $ticket->subject,
             'status' => $ticket->status,
             'status_label' => $this->statusLabel($ticket->status),
+            'origin_label' => $ticket->origin_label,
+            'origin_path' => $ticket->origin_path,
             'last_message_at' => optional($lastTimestamp)->toIso8601String(),
             'last_message_human' => optional($lastTimestamp)->diffForHumans(),
         ];
@@ -227,6 +247,10 @@ class ChatWidget extends Component
             'subject' => $ticket->subject,
             'status' => $ticket->status,
             'status_label' => $this->statusLabel($ticket->status),
+            'origin' => [
+                'label' => $ticket->origin_label,
+                'path' => $ticket->origin_path,
+            ],
             'messages' => $ticket->messages->map(function (SupportTicketMessage $message) use ($ticket) {
                 return [
                     'id' => $message->id,
@@ -235,6 +259,8 @@ class ChatWidget extends Component
                     'author' => $message->author?->name ?? ($message->is_support ? __('Support') : __('Vous')),
                     'created_at' => $message->created_at?->toIso8601String(),
                     'created_at_human' => $message->created_at?->diffForHumans(),
+                    'context_label' => $message->context_label,
+                    'context_path' => $message->context_path,
                 ];
             })->all(),
         ];
@@ -249,5 +275,53 @@ class ChatWidget extends Component
             SupportTicket::STATUS_CLOSED => __('Ferme'),
             default => ucfirst($status),
         };
+    }
+
+    /**
+     * Determine the current page context to send alongside support messages.
+     */
+    private function resolveContext(): array
+    {
+        $routeName = optional(request()->route())->getName() ?? '';
+        $fullUrl = request()->fullUrl() ?? '/';
+        $path = Str::limit($fullUrl, 255, '');
+
+        $source = Str::lower($routeName . ' ' . request()->path());
+
+        $label = match (true) {
+            str_contains($source, 'quiz') => 'Quiz',
+            str_contains($source, 'video') => 'Video',
+            str_contains($source, 'lesson') => 'Lesson',
+            str_contains($source, 'formation') => 'Formation',
+            str_contains($source, 'join') => 'Join',
+            default => $this->fallbackContextLabel($source),
+        };
+
+        return [
+            Str::limit($label, 60, ''),
+            $path ?: '/',
+        ];
+    }
+
+    private function fallbackContextLabel(string $source): string
+    {
+        $path = request()->path() ?: '';
+        $segments = array_values(array_filter(explode('/', $path)));
+
+        $candidate = null;
+        foreach (array_reverse($segments) as $segment) {
+            if ($segment === '' || is_numeric($segment)) {
+                continue;
+            }
+
+            $candidate = $segment;
+            break;
+        }
+
+        if (! $candidate) {
+            $candidate = $segments[0] ?? ($source ?: 'Page');
+        }
+
+        return Str::title(str_replace(['-', '_'], ' ', $candidate));
     }
 }

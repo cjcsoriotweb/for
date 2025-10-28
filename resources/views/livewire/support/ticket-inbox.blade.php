@@ -53,6 +53,11 @@
                                 {{ $ticket['status_label'] }}
                             </span>
                         </div>
+                        @if (!empty($ticket['origin_label']))
+                            <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-300">
+                                {{ $ticket['origin_label'] }}
+                            </p>
+                        @endif
                         <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
                             {{ $ticket['owner']['name'] ?? __('Utilisateur inconnu') }}
                         </p>
@@ -76,19 +81,36 @@
         <div class="flex h-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
             @if ($activeTicket)
                 <div class="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-                                {{ $activeTicket['subject'] }}
-                            </h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400">
-                                {{ $activeTicket['owner']['name'] ?? __('Utilisateur inconnu') }} - {{ $activeTicket['owner']['email'] }}
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
-                                {{ $activeTicket['status_label'] }}
-                            </span>
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                                    {{ $activeTicket['subject'] }}
+                                </h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">
+                                    {{ $activeTicket['owner']['name'] ?? __('Utilisateur inconnu') }} - {{ $activeTicket['owner']['email'] }}
+                                </p>
+                                @if (!empty($activeTicket['origin']['label']))
+                                    <p class="text-[11px] text-slate-400 dark:text-slate-500">
+                                        {{ __('Contexte') }} :
+                                        @if (!empty($activeTicket['origin']['path']))
+                                            <a
+                                                href="{{ $activeTicket['origin']['path'] }}"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="underline hover:text-blue-600"
+                                            >
+                                                {{ $activeTicket['origin']['label'] }}
+                                            </a>
+                                        @else
+                                            {{ $activeTicket['origin']['label'] }}
+                                        @endif
+                                    </p>
+                                @endif
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
+                                    {{ $activeTicket['status_label'] }}
+                                </span>
                             <button
                                 type="button"
                                 wire:click="reopenTicket"
@@ -115,20 +137,37 @@
                 </div>
 
                 <div class="flex-1 overflow-y-auto px-6 py-5">
-                    <div class="space-y-4">
-                        @foreach ($activeTicket['messages'] as $messageItem)
-                            <div class="flex flex-col {{ $messageItem['is_support'] ? 'items-end' : 'items-start' }} space-y-2">
-                                <div class="{{ $messageItem['is_support'] ? 'rounded-xl rounded-tr-sm bg-blue-600 text-white' : 'rounded-xl rounded-tl-sm bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100' }} max-w-[80%] px-4 py-3 text-sm leading-relaxed shadow-sm">
-                                    <p class="text-xs font-semibold uppercase tracking-wide">
-                                        {{ $messageItem['author'] }}
-                                    </p>
-                                    <p class="mt-1 whitespace-pre-wrap text-sm">{{ $messageItem['content'] }}</p>
-                                </div>
-                                <span class="text-[11px] text-slate-400 dark:text-slate-500">
-                                    {{ $messageItem['created_at_human'] }}
-                                </span>
-                            </div>
-                        @endforeach
+                            <div class="space-y-4">
+                                @foreach ($activeTicket['messages'] as $messageItem)
+                                    <div class="flex flex-col {{ $messageItem['is_support'] ? 'items-end' : 'items-start' }} space-y-2">
+                                        <div class="{{ $messageItem['is_support'] ? 'rounded-xl rounded-tr-sm bg-blue-600 text-white' : 'rounded-xl rounded-tl-sm bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100' }} max-w-[80%] px-4 py-3 text-sm leading-relaxed shadow-sm">
+                                            <p class="text-xs font-semibold uppercase tracking-wide">
+                                                {{ $messageItem['author'] }}
+                                            </p>
+                                            <p class="mt-1 whitespace-pre-wrap text-sm">{{ $messageItem['content'] }}</p>
+                                        </div>
+                                        <span class="text-[11px] text-slate-400 dark:text-slate-500">
+                                            {{ $messageItem['created_at_human'] }}
+                                        </span>
+                                        @if (!empty($messageItem['context_label']))
+                                            <span class="text-[11px] text-slate-400 dark:text-slate-500">
+                                                {{ __('Page') }} :
+                                                @if (!empty($messageItem['context_path']))
+                                                    <a
+                                                        href="{{ $messageItem['context_path'] }}"
+                                                        target="_blank"
+                                                        rel="noopener"
+                                                        class="underline hover:text-blue-500"
+                                                    >
+                                                        {{ $messageItem['context_label'] }}
+                                                    </a>
+                                                @else
+                                                    {{ $messageItem['context_label'] }}
+                                                @endif
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endforeach
                     </div>
                 </div>
 

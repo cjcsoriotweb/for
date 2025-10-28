@@ -16,6 +16,8 @@ class SupportTicketMessage extends Model
         'is_support',
         'content',
         'read_at',
+        'context_label',
+        'context_path',
     ];
 
     protected $casts = [
@@ -44,6 +46,8 @@ class SupportTicketMessage extends Model
                 'status' => $message->is_support
                     ? SupportTicket::STATUS_PENDING
                     : SupportTicket::STATUS_OPEN,
+                'origin_label' => $ticket->origin_label ?: $message->context_label,
+                'origin_path' => $message->context_path ?? $ticket->origin_path,
             ])->save();
         });
     }

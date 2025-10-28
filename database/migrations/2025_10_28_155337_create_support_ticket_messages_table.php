@@ -23,6 +23,8 @@ return new class extends Migration
             $table->boolean('is_support')->default(false);
             $table->text('content');
             $table->timestamp('read_at')->nullable();
+            $table->string('context_label', 80)->nullable();
+            $table->string('context_path')->nullable();
             $table->timestamps();
 
             $table->index(['ticket_id', 'created_at']);

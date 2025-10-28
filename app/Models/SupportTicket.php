@@ -19,6 +19,8 @@ class SupportTicket extends Model
         'resolved_at',
         'closed_at',
         'closed_by',
+        'origin_label',
+        'origin_path',
     ];
 
     protected $casts = [
