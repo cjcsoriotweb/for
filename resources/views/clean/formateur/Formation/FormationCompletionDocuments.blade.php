@@ -11,7 +11,7 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
-                Retour Ã  la formation
+                Retour à  la formation
               </a>
               <h1 class="text-3xl font-bold text-gray-900 mb-3 flex items-center">
                 <svg class="w-8 h-8 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,7 +22,7 @@
                 Documents de fin de formation - {{ $formation->title }}
               </h1>
               <p class="text-gray-700 text-lg leading-relaxed">
-                GÃ©rez les documents remis aux apprenants Ã  la fin de la formation.
+                Gérez les documents remis aux apprenants Ã  la fin de la formation.
               </p>
             </div>
           </div>
@@ -82,14 +82,14 @@
                   </p>
                   @if($document->created_at)
                   <p class="text-xs text-gray-500 mt-1">
-                    AjoutÃ© le {{ $document->created_at->format('d/m/Y H:i') }}
+                    Ajouté le {{ $document->created_at->format('d/m/Y H:i') }}
                   </p>
                   @endif
                 </div>
                 <div class="mt-3 sm:mt-0 flex items-center gap-3">
                   <a href="{{ Storage::disk('public')->url($document->file_path) }}" target="_blank"
                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors duration-200">
-                    TÃ©lÃ©charger
+                    Télécharger
                   </a>
                   <form
                     action="{{ route('formateur.formation.completion-documents.destroy', [$formation, $document]) }}"
