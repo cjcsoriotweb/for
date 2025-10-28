@@ -12,6 +12,7 @@ Route::prefix('administrateur')
     ->middleware(['auth', AdminMiddleware::class])
     ->scopeBindings()
     ->group(function () {
+        Route::get('/', [AdminPageController::class, 'overview'])->name('overview');
         Route::get('{team}/home', [AdminPageController::class, 'home'])->name('index');
         Route::get('{team}/users', [AdminPageController::class, 'users'])->name('users.index');
         Route::get('{team}/formations', [AdminPageController::class, 'formations'])->name('formations.index');
