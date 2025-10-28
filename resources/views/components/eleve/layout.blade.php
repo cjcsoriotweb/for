@@ -15,6 +15,7 @@
 
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @livewireStyles
 </head>
 
 <body class="font-sans antialiased bg-slate-950 text-slate-50">
@@ -53,9 +54,12 @@
 
     <!-- Page Content -->
     <main>
-      {{ $slot }}
+      
     </main>
   </div>
+  @auth
+  @endauth
+  @livewireScripts
 </body>
 
 </html>
