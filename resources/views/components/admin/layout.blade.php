@@ -33,5 +33,7 @@
         </div>
     </x-slot>
 
-    {{ $slot }}
+    <div class=" p-5">
+        {{ $slot }}
+    </div>
 </x-application-layout>
