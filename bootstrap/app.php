@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'organisateur' => \App\Http\Middleware\EnsureOrganisateurAccess::class,
             'eleve' => \App\Http\Middleware\EnsureEleveAccess::class,
             'tutorial' => \App\Http\Middleware\EnsureTutorialIsSeen::class,
+            'fortifyTutorial' => \App\Http\Middleware\EnsureFortifyTutorial::class,
 
         ]);
     })

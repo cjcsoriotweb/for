@@ -7,7 +7,13 @@
 @endphp
 
 @section('header-title', __('Preparation du tutoriel'))
-@section('header-subtitle', __("Dans 10 secondes, le tutoriel demarrera automatiquement. Tu peux le lancer maintenant ou l'ignorer."))
+@section('header-subtitle')
+    @if ($forced ?? false)
+        {{ __("Dans 10 secondes, le tutoriel demarrera automatiquement. Cette lecture est obligatoire avant d'acceder a la page.") }}
+    @else
+        {{ __("Dans 10 secondes, le tutoriel demarrera automatiquement. Tu peux le lancer maintenant ou l'ignorer.") }}
+    @endif
+@endsection
 
 @section('content')
     <div class="section flex min-h-screen flex-col items-center justify-center bg-slate-900 px-6">
@@ -20,15 +26,21 @@
                 <span id="tutorial-countdown" class="font-semibold text-emerald-400">10</span>
                 {{ __("secondes.") }}
             </p>
-            <p class="mt-4 text-sm text-slate-400">
-                {{ __("Tu n'es pas oblige de le lire : passe-le si tu connais deja le fonctionnement.") }}
-            </p>
+            @if ($forced ?? false)
+                <p class="mt-4 text-sm text-slate-400">
+                    {{ __("Cette introduction est requise pour garantir la bonne comprehension du processus.") }}
+                </p>
+            @else
+                <p class="mt-4 text-sm text-slate-400">
+                    {{ __("Tu n'es pas oblige de le lire : passe-le si tu connais deja le fonctionnement.") }}
+                </p>
+            @endif
 
             <div class="mt-8 flex flex-wrap justify-center gap-4">
                 <a href="{{ $tutorialUrl }}" id="start-tutorial" class="rounded-md bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-600" data-target="{{ $tutorialUrl }}">
-                    {{ __("Lancer maintenant") }}
+                    {{ ($forced ?? false) ? __("Commencer la lecture") : __("Lancer maintenant") }}
                 </a>
-                @isset($tutorialKey)
+                @if (($forced ?? false) === false && isset($tutorialKey))
                     <form method="POST" action="{{ route('tutorial.skip', $tutorialKey) }}">
                         @csrf
                         <input type="hidden" name="return" value="{{ $returnUrl ?? request()->query('return') }}">
@@ -36,7 +48,7 @@
                             {{ __("Ignorer le tutoriel") }}
                         </button>
                     </form>
-                @endisset
+                @endif
             </div>
         </div>
     </div>

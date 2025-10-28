@@ -90,11 +90,10 @@
                     @csrf
                     <input type="hidden" name="return" value="{{ $returnUrl ?? request()->query('return') }}">
                     <button type="submit" class="rounded-md bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-600">
-                        {{ __("J'ai compris") }}
+                        {{ ($forced ?? false) ? __("Continuer vers Mon compte") : __("J'ai compris") }}
                     </button>
                 </form>
             @endisset
         </div>
     </div>
 @endsection
-

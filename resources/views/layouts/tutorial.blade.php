@@ -19,7 +19,7 @@
                     @yield('header-subtitle')
                 </p>
             </div>
-            @isset($tutorialKey)
+            @if (isset($tutorialKey) && !($forced ?? false))
                 <form method="POST" action="{{ route('tutorial.skip', $tutorialKey) }}">
                     @csrf
                     <input type="hidden" name="return" value="{{ $returnUrl ?? request()->query('return') }}">
@@ -27,7 +27,11 @@
                         {{ __('Passer le tutoriel') }}
                     </button>
                 </form>
-            @endisset
+            @elseif (($forced ?? false))
+                <span class="rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-amber-200">
+                    {{ __('Lecture obligatoire') }}
+                </span>
+            @endif
         </div>
     </header>
 
@@ -52,10 +56,12 @@
                 licenseKey: 'gplv3-license',
                 navigation: true,
                 scrollOverflow: true,
+                credits: {
+                    enabled: false,
+                },
             });
         });
     </script>
     @stack('tutorial-scripts')
 </body>
 </html>
-

@@ -27,10 +27,13 @@ class TutorialController extends Controller
             $params['return'] = $targetUrl;
         }
 
+        $forced = (bool) $request->session()->get("tutorial.forced.{$tutorialKey}", false);
+
         return view($view, [
             'tutorialKey' => $tutorialKey,
             'returnUrl' => $targetUrl,
             'tutorialUrl' => route('tutorial.show', $params),
+            'forced' => $forced,
         ]);
     }
 
@@ -45,9 +48,12 @@ class TutorialController extends Controller
             $request->session()->put("tutorial.return.{$tutorialKey}", $returnUrl);
         }
 
+        $forced = (bool) $request->session()->get("tutorial.forced.{$tutorialKey}", false);
+
         return view($view, [
             'tutorialKey' => $tutorialKey,
             'returnUrl' => $returnUrl ?? $request->session()->get("tutorial.return.{$tutorialKey}"),
+            'forced' => $forced,
         ]);
     }
 
@@ -63,6 +69,7 @@ class TutorialController extends Controller
         $pendingUrl = $request->session()->pull("tutorial.pending.{$tutorialKey}");
         $request->session()->forget("tutorial.return.{$tutorialKey}");
         $request->session()->forget("tutorial.intro_shown.{$tutorialKey}");
+        $request->session()->forget("tutorial.forced.{$tutorialKey}");
 
         $targetUrl = $data['return'] ?? $pendingUrl ?? url()->previous() ?? url('/');
 
