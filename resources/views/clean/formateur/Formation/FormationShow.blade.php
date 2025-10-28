@@ -199,7 +199,7 @@
                     Documents de fin de formation
                   </h3>
                   <p class="text-sm text-gray-600">
-                    GÃ©rez les attestations et supports remis aux apprenants.
+                    Gérez les attestations et supports remis aux apprenants.
                   </p>
                 </div>
               </div>

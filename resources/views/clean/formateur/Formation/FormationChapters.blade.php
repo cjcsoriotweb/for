@@ -29,11 +29,28 @@
               <p class="text-gray-700 text-lg leading-relaxed">
                 {{ $formation->description }}
               </p>
+
             </div>
           </div>
         </div>
       </div>
 
+      <div class="mb-1">
+        
+              <form method="post"
+                  action="{{ route('formateur.formation.chapter.add.post', [$formation]) }}"
+                  class="inline">
+                  @csrf
+                  <button
+                    class="inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Ajouter un chapitre
+                  </button>
+                </form>
+      </div>
       @if($formation->chapters->isEmpty())
       <!-- Empty State -->
       <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
