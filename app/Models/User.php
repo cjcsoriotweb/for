@@ -86,4 +86,14 @@ class User extends Authenticatable
     {
         return $this->superadmin;
     }
+
+    public function supportTickets()
+    {
+        return $this->hasMany(SupportTicket::class, 'user_id');
+    }
+
+    public function supportTicketMessages()
+    {
+        return $this->hasMany(SupportTicketMessage::class, 'user_id');
+    }
 }

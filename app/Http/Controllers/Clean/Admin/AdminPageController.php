@@ -7,6 +7,7 @@ use App\Models\Formation;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
+use App\Models\SupportTicket;
 use App\Services\Clean\Account\AccountService;
 use App\Services\FormationService;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class AdminPageController extends Controller
             'users' => User::count(),
             'formations' => Formation::count(),
             'invitations' => TeamInvitation::count(),
+            'tickets' => SupportTicket::count(),
         ];
 
         return view('clean.admin.AdminOverviewPage', compact('stats'));
@@ -106,6 +108,11 @@ class AdminPageController extends Controller
             'formations' => $catalog,
             'search' => $search,
         ]);
+    }
+
+    public function supportIndex()
+    {
+        return view('clean.admin.SuperadminSupportPage');
     }
 
     public function home(Team $team, FormationService $formations)

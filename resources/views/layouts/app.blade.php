@@ -69,6 +69,10 @@
     </footer>
   </div>
 
+  @auth
+    <livewire:support.chat-widget />
+  @endauth
+
   @stack('modals') @livewireScripts @stack('scripts')
 
   <style>
