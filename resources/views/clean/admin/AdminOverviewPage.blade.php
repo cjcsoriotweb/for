@@ -19,7 +19,7 @@
             'cta' => __('Gerer les utilisateurs'),
         ],
         [
-            'route' => route('superadmin.formations.index'),
+            'route' => route('formateur.home'),
             'icon' => 'library_books',
             'label' => __('Formations disponibles'),
             'stat' => number_format($stats->get('formations', 0)),
