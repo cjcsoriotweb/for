@@ -184,7 +184,7 @@
                                     <td class="px-4 py-3 text-right">
                                         @if($enrollment->user)
                                             <a
-                                                href="{{ route('application.admin.formations.students.show', [$team, $formation, $enrollment->user]) }}"
+                                                href="{{ route('application.admin.formations.students.show', [$team, $formation, $enrollment->user_id]) }}"
                                                 class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-purple-700"
                                             >
                                                 <span class="material-symbols-outlined text-base">visibility</span>
