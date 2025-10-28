@@ -7,7 +7,14 @@
         aria-expanded="{{ $isOpen ? 'true' : 'false' }}"
         aria-controls="support-chat-panel"
     >
-        <span class="material-symbols-outlined text-3xl">support_agent</span>
+        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="9" r="2.75" />
+            <path d="M19.5 12V9a7.5 7.5 0 0 0-15 0v3" />
+            <path d="M4.5 12v3a2.25 2.25 0 0 0 2.25 2.25H8.1" />
+            <path d="M19.5 12v3a2.25 2.25 0 0 1-2.25 2.25H15.9" />
+            <path d="M8.25 19.5a3.75 3.75 0 0 1 7.5 0" />
+        </svg>
     </button>
 
     @if ($isOpen)
@@ -31,7 +38,13 @@
                         class="rounded-full p-1 text-slate-500 transition hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-slate-300 dark:hover:text-white"
                         title="{{ __('Actualiser') }}"
                     >
-                        <span class="material-symbols-outlined text-xl">refresh</span>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4.5 12a7.5 7.5 0 0 1 12.223-5.657" />
+                            <path d="M16.5 6.343V3.75h2.593" />
+                            <path d="M19.5 12a7.5 7.5 0 0 1-12.223 5.657" />
+                            <path d="M7.5 17.657V20.25H4.907" />
+                        </svg>
                     </button>
                     <button
                         type="button"
@@ -39,7 +52,11 @@
                         class="rounded-full p-1 text-slate-500 transition hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-slate-300 dark:hover:text-white"
                         title="{{ __('Fermer la fenetre de support') }}"
                     >
-                        <span class="material-symbols-outlined text-xl">close</span>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M6 18 18 6" />
+                            <path d="M6 6l12 12" />
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -57,7 +74,12 @@
                                     wire:click="showNewTicket"
                                     class="flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                 >
-                                    <span class="material-symbols-outlined mr-1 text-sm">add</span>
+                                    <svg class="mr-1 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                        aria-hidden="true">
+                                        <path d="M12 5v14" />
+                                        <path d="M5 12h14" />
+                                    </svg>
                                     {{ __('Nouveau ticket') }}
                                 </button>
                             @else
@@ -152,7 +174,12 @@
                                     type="submit"
                                     class="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                 >
-                                    <span class="material-symbols-outlined mr-1 text-base">send</span>
+                                    <svg class="mr-1 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                        aria-hidden="true">
+                                        <path d="m4.5 5.25 15 6.75-15 6.75L7.5 12z" />
+                                        <path d="M7.5 12h6" />
+                                    </svg>
                                     {{ __('Envoyer au support') }}
                                 </button>
                             </div>
@@ -247,7 +274,12 @@
                                         type="submit"
                                         class="flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                     >
-                                        <span class="material-symbols-outlined mr-1 text-base">send</span>
+                                        <svg class="mr-1 h-4 w-4" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round" aria-hidden="true">
+                                            <path d="m4.5 5.25 15 6.75-15 6.75L7.5 12z" />
+                                            <path d="M7.5 12h6" />
+                                        </svg>
                                         {{ __('Envoyer') }}
                                     </button>
                                 </div>
@@ -255,7 +287,11 @@
                         </div>
                     @else
                         <div class="flex h-full flex-col items-center justify-center space-y-3 text-center text-slate-500 dark:text-slate-400">
-                            <span class="material-symbols-outlined text-4xl text-blue-500">chat</span>
+                            <svg class="h-10 w-10 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path
+                                    d="M4.5 6.75A2.25 2.25 0 0 1 6.75 4.5h10.5A2.25 2.25 0 0 1 19.5 6.75v7.5A2.25 2.25 0 0 1 17.25 16.5H9l-4.5 3v-3H6.75A2.25 2.25 0 0 1 4.5 14.25z" />
+                            </svg>
                             <p class="text-sm font-medium">
                                 {{ __('Selectionnez un ticket pour voir la conversation ou creez un nouveau message.') }}
                             </p>

@@ -194,7 +194,12 @@
                                 type="submit"
                                 class="inline-flex items-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                             >
-                                <span class="material-symbols-outlined mr-1 text-base">send</span>
+                                <svg class="mr-1 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                    aria-hidden="true">
+                                    <path d="m4.5 5.25 15 6.75-15 6.75L7.5 12z" />
+                                    <path d="M7.5 12h6" />
+                                </svg>
                                 {{ __('Envoyer la reponse') }}
                             </button>
                         </div>
@@ -202,7 +207,14 @@
                 </div>
             @else
                 <div class="flex h-full flex-col items-center justify-center space-y-4 text-center">
-                    <span class="material-symbols-outlined text-5xl text-blue-500">support_agent</span>
+                    <svg class="h-14 w-14 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="9" r="3" />
+                        <path d="M19.5 12V9a7.5 7.5 0 0 0-15 0v3" />
+                        <path d="M4.5 12v3a2.25 2.25 0 0 0 2.25 2.25H8.1" />
+                        <path d="M19.5 12v3a2.25 2.25 0 0 1-2.25 2.25H15.9" />
+                        <path d="M8.25 20.25a3.75 3.75 0 0 1 7.5 0" />
+                    </svg>
                     <div>
                         <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
                             {{ __('Selectionnez un ticket') }}

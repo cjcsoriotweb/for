@@ -43,9 +43,18 @@
           <div
             class="flex size-12 shrink-0 items-center justify-center rounded-lg {{ $isCorrect ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
             @if($isCorrect)
-            <x-heroicon-o-check-circle class="w-6 h-6" />
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 12.75 11.25 15 15 9.75" />
+              <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+            </svg>
             @else
-            <x-heroicon-o-exclamation-circle class="w-6 h-6" />
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 8v4" />
+              <path d="M12 16h.01" />
+              <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+            </svg>
             @endif
           </div>
 
