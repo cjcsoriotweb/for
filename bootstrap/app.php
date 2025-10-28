@@ -10,6 +10,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // On peut passer un ARRAY de fichiers pour "web"
         web: [
             __DIR__.'/../routes/GuestRoute.php',
+            __DIR__.'/../routes/TutorialRoute.php',
             __DIR__.'/../routes/UserRoute.php',
             __DIR__.'/../routes/AdminRoute.php',
             __DIR__.'/../routes/SuperadminRoute.php',
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'organisateur' => \App\Http\Middleware\EnsureOrganisateurAccess::class,
             'eleve' => \App\Http\Middleware\EnsureEleveAccess::class,
+            'tutorial' => \App\Http\Middleware\EnsureTutorialIsSeen::class,
 
         ]);
     })
