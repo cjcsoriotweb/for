@@ -25,10 +25,6 @@
             {{ __('Logo, couleurs et descriptif équipe') }}
         </li>
         <li class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-base text-indigo-400 dark:text-indigo-300">credit_score</span>
-            {{ __('Crédits disponibles et recharges récentes') }}
-        </li>
-        <li class="flex items-center gap-2">
             <span class="material-symbols-outlined text-base text-indigo-400 dark:text-indigo-300">verified_user</span>
             {{ __('Gestion des accès avancés') }}
         </li>

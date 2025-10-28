@@ -3,7 +3,9 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+<link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet" />
+<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
 
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 @livewireStyles
 @stack('head')

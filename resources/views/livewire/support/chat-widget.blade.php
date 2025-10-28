@@ -1,4 +1,4 @@
-<div class="fixed bottom-6 right-6 z-40" x-data="{ focusMessage() { $nextTick(() => document.getElementById('support-message-input')?.focus()); } }">
+<div id="chat" class="fixed bottom-6 right-6 z-40" x-data="{ focusMessage() { $nextTick(() => document.getElementById('support-message-input')?.focus()); } }">
     <button
         wire:click="toggle"
         type="button"
