@@ -13,7 +13,7 @@
             data-lesson-content-id="{{ $lessonContent->id ?? '' }}"
         >
             <source
-                src="{{ asset('storage/' . $lessonContent->video_path) }}"
+                src="{{ Storage::disk('public')->url($lessonContent->video_path) }}"
                 type="video/mp4"
             />
             Votre navigateur ne supporte pas la lecture de vidéos.

@@ -206,7 +206,7 @@
                 <div class="aspect-video bg-black rounded-lg overflow-hidden">
                   @if($videoContent->video_path)
                   <video class="w-full h-full" controls preload="metadata">
-                    <source src="{{ asset('storage/' . $videoContent->video_path) }}" type="video/mp4" />
+                    <source src="{{ Storage::disk('public')->url($videoContent->video_path) }}" type="video/mp4" />
                     Votre navigateur ne supporte pas la
                     lecture de vidéos.
                   </video>
@@ -229,7 +229,7 @@
                 <!-- Uploaded Video Preview -->
                 <div style="width:100%;height:300px" class="aspect-video bg-black rounded-lg overflow-hidden">
                   <video class="h-full w-full" controls preload="metadata">
-                    <source src="{{ asset('storage/' . $videoContent->video_path) }}" type="video/mp4" />
+                    <source src="{{ Storage::disk('public')->url($videoContent->video_path) }}" type="video/mp4" />
                     Votre navigateur ne supporte pas la
                     lecture de vidéos.
                   </video>
@@ -309,7 +309,7 @@
           previewContainer.innerHTML = `
                         <div class="aspect-video bg-black rounded-lg overflow-hidden">
                             <video class="w-full h-full" controls preload="metadata">
-                                <source src="{{ asset('storage/' . $videoContent->video_path) }}" type="video/mp4">
+                                <source src="{{ Storage::disk('public')->url($videoContent->video_path) }}" type="video/mp4">
                                 Votre navigateur ne supporte pas la lecture de vidéos.
                             </video>
                         </div>

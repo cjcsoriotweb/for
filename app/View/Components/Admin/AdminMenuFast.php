@@ -4,6 +4,7 @@ namespace App\View\Components\Admin;
 
 use App\Services\FormationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
@@ -51,7 +52,9 @@ class AdminMenuFast extends Component
         $this->usersProgressWidth = min(100, max(12, $this->totalUsers * 8));
         $this->formationsProgressWidth = min(100, max(8, $this->visiblePercentage));
         $this->hasTeamLogo = ! empty($team->profile_photo_path);
-        $this->teamLogoUrl = $this->hasTeamLogo ? asset('storage/' . $team->profile_photo_path) : null;
+        $this->teamLogoUrl = $this->hasTeamLogo
+            ? $this->publicStorageUrl($team->profile_photo_path)
+            : null;
     }
 
     public function render(): View
@@ -69,5 +72,12 @@ class AdminMenuFast extends Component
             'hasTeamLogo' => $this->hasTeamLogo,
             'teamLogoUrl' => $this->teamLogoUrl,
         ]);
+    }
+
+    private function publicStorageUrl(string $path): string
+    {
+        $relativePath = ltrim($path, '/');
+
+        return Storage::disk('public')->url($relativePath);
     }
 }

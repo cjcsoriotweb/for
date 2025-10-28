@@ -12,7 +12,7 @@
                                     route('application.admin.index', $team)
                                 }}"
                 class="w-12 h-12 bg-white bg-opacity-15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white border-opacity-30 shadow-lg overflow-hidden">
-                <img src="{{ asset('storage/'.$team->profile_photo_path) }}" alt="Logo {{ $team->name }}"
+                <img src="{{ Storage::disk('public')->url($team->profile_photo_path) }}" alt="Logo {{ $team->name }}"
                   class="w-full h-full rounded-lg object-contain p-1" />
               </a>
               @endif
@@ -62,7 +62,7 @@
             <div class="relative">
               <div
                 class="w-16 h-16 bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white border-opacity-30 shadow-2xl overflow-hidden">
-                <img src="{{ asset('storage/'.$team->profile_photo_path) }}" alt="Logo {{ $team->name }}"
+                <img src="{{ Storage::disk('public')->url($team->profile_photo_path) }}" alt="Logo {{ $team->name }}"
                   class="w-full h-full rounded-xl object-contain p-1" />
               </div>
               <div class="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm">
