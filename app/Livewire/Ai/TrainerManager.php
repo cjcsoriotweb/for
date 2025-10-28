@@ -5,13 +5,21 @@ namespace App\Livewire\Ai;
 use App\Models\AiTrainer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class TrainerManager extends Component
 {
-    /** @var array<int, array<string, mixed>> */
-    public array $trainers = [];
+    use WithPagination;
+    use WithFileUploads;
+
+    protected string $paginationTheme = 'tailwind';
+
+    public int $perPage = 6;
 
     public string $name = '';
     public string $model = 'gpt-4o-mini';
@@ -19,9 +27,11 @@ class TrainerManager extends Component
     public ?string $description = null;
     public ?string $prompt = null;
     public ?string $avatarPath = null;
+    public ?\Livewire\Features\SupportFileUploads\TemporaryUploadedFile $avatarUpload = null;
     public float $temperature = 0.7;
     public bool $isDefault = false;
     public bool $isActive = true;
+    public bool $showForm = false;
     /** @var array<int, string> */
     public array $providerOptions = [];
     public ?int $editingTrainerId = null;
@@ -31,13 +41,29 @@ class TrainerManager extends Component
         $this->ensureAuthorized();
         $this->providerOptions = $this->resolveProviderOptions();
         $this->provider = $this->providerOptions[0] ?? 'openai';
-        $this->loadTrainers();
     }
 
     public function updated($property): void
     {
         $this->ensureAuthorized();
+
         $this->validateOnly($property, $this->rules());
+    }
+
+    public function startCreate(): void
+    {
+        $this->ensureAuthorized();
+
+        $this->resetForm();
+        $this->showForm = true;
+    }
+
+    public function closeForm(): void
+    {
+        $this->ensureAuthorized();
+
+        $this->resetForm();
+        $this->showForm = false;
     }
 
     public function submitTrainer(): void
@@ -65,7 +91,6 @@ class TrainerManager extends Component
         $trainer = AiTrainer::query()->findOrFail($trainerId);
         $trainer->forceFill(['is_default' => true])->save();
 
-        $this->loadTrainers();
         session()->flash('ai_trainer_updated', __('Le formateur par defaut a ete mis a jour.'));
     }
 
@@ -76,7 +101,6 @@ class TrainerManager extends Component
         $trainer = AiTrainer::query()->findOrFail($trainerId);
         $trainer->forceFill(['is_active' => ! $trainer->is_active])->save();
 
-        $this->loadTrainers();
         session()->flash('ai_trainer_updated', __('Statut du formateur mis a jour.'));
     }
 
@@ -84,26 +108,14 @@ class TrainerManager extends Component
     {
         $this->ensureAuthorized();
 
-        return view('livewire.ai.trainer-manager');
-    }
-
-    private function loadTrainers(): void
-    {
-        $this->trainers = AiTrainer::query()
+        $trainers = AiTrainer::query()
             ->orderByDesc('is_default')
             ->orderBy('name')
-            ->get(['id', 'name', 'provider', 'model', 'description', 'is_default', 'is_active', 'updated_at'])
-            ->map(fn (AiTrainer $trainer) => [
-                'id' => $trainer->id,
-                'name' => $trainer->name,
-                'provider' => $trainer->provider,
-                'model' => $trainer->model,
-                'description' => $trainer->description,
-                'is_default' => (bool) $trainer->is_default,
-                'is_active' => (bool) $trainer->is_active,
-                'updated_at_human' => optional($trainer->updated_at)->diffForHumans(),
-            ])
-            ->all();
+            ->paginate($this->perPage, ['id', 'name', 'provider', 'model', 'description', 'avatar_path', 'is_default', 'is_active', 'updated_at']);
+
+        return view('livewire.ai.trainer-manager', [
+            'trainers' => $trainers,
+        ]);
     }
 
     private function resetForm(): void
@@ -114,6 +126,7 @@ class TrainerManager extends Component
         $this->description = null;
         $this->prompt = null;
         $this->avatarPath = null;
+        $this->avatarUpload = null;
         $this->temperature = 0.7;
         $this->isDefault = false;
         $this->isActive = true;
@@ -132,6 +145,7 @@ class TrainerManager extends Component
             'description' => ['nullable', 'string'],
             'prompt' => ['nullable', 'string'],
             'avatarPath' => ['nullable', 'string', 'max:255'],
+            'avatarUpload' => ['nullable', 'image', 'max:2048'],
             'isDefault' => ['boolean'],
             'isActive' => ['boolean'],
         ];
@@ -145,7 +159,7 @@ class TrainerManager extends Component
             'model' => $validated['model'],
             'description' => $this->description,
             'prompt' => $this->prompt,
-            'avatar_path' => $this->avatarPath,
+            'avatar_path' => $this->resolvedAvatarPath(),
             'is_default' => $this->isDefault,
             'is_active' => $this->isActive,
             'settings' => [
@@ -154,7 +168,8 @@ class TrainerManager extends Component
         ]);
 
         $this->resetForm();
-        $this->loadTrainers();
+        $this->showForm = false;
+        $this->resetPage();
 
         $this->dispatch('ai-trainer-created', id: $trainer->id);
         session()->flash('ai_trainer_created', __('Formateur IA cree avec succes.'));
@@ -170,7 +185,7 @@ class TrainerManager extends Component
             'model' => $validated['model'],
             'description' => $this->description,
             'prompt' => $this->prompt,
-            'avatar_path' => $this->avatarPath,
+            'avatar_path' => $this->resolvedAvatarPath($trainer),
             'is_default' => $this->isDefault,
             'is_active' => $this->isActive,
             'settings' => [
@@ -179,7 +194,7 @@ class TrainerManager extends Component
         ])->save();
 
         $this->resetForm();
-        $this->loadTrainers();
+        $this->showForm = false;
 
         session()->flash('ai_trainer_updated', __('Formateur IA mis a jour.'));
     }
@@ -216,14 +231,75 @@ class TrainerManager extends Component
         $this->description = $trainer->description;
         $this->prompt = $trainer->prompt;
         $this->avatarPath = $trainer->avatar_path;
+        $this->avatarUpload = null;
         $this->isDefault = (bool) $trainer->is_default;
         $this->isActive = (bool) $trainer->is_active;
         $this->temperature = (float) ($trainer->settings['temperature'] ?? 0.7);
+        $this->showForm = true;
     }
 
     public function cancelEdit(): void
     {
         $this->ensureAuthorized();
-        $this->resetForm();
+        $this->closeForm();
+    }
+
+    public function usePlaceholderAvatar(): void
+    {
+        $this->ensureAuthorized();
+
+        if ($this->editingTrainerId) {
+            $trainer = AiTrainer::query()->find($this->editingTrainerId);
+
+            if ($trainer && $this->isStoredAvatar($trainer->avatar_path)) {
+                $this->deleteStoredAvatar($trainer->avatar_path);
+            }
+        }
+
+        $this->avatarUpload = null;
+        $this->avatarPath = 'images/ai-trainer-placeholder.svg';
+    }
+
+    private function resolvedAvatarPath(?AiTrainer $existingTrainer = null): string
+    {
+        if ($this->avatarUpload) {
+            if ($existingTrainer && $this->isStoredAvatar($existingTrainer->avatar_path)) {
+                $this->deleteStoredAvatar($existingTrainer->avatar_path);
+            }
+
+            $storedPath = $this->avatarUpload->store('ai-trainers', 'public');
+            $this->avatarUpload = null;
+            $this->avatarPath = 'storage/' . ltrim($storedPath, '/');
+
+            return $this->avatarPath;
+        }
+
+        if ($this->avatarPath) {
+            return $this->avatarPath;
+        }
+
+        if ($existingTrainer && $existingTrainer->avatar_path) {
+            return $existingTrainer->avatar_path;
+        }
+
+        return 'images/ai-trainer-placeholder.svg';
+    }
+
+    private function isStoredAvatar(?string $path): bool
+    {
+        return is_string($path) && str_starts_with($path, 'storage/');
+    }
+
+    private function deleteStoredAvatar(?string $path): void
+    {
+        if (! $this->isStoredAvatar($path)) {
+            return;
+        }
+
+        $relativePath = Str::after($path, 'storage/');
+
+        if ($relativePath !== '' && Storage::disk('public')->exists($relativePath)) {
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 }

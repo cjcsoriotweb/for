@@ -29,6 +29,7 @@ class FormationChat extends Component
     public ?string $trainerDescription = null;
     public ?string $trainerAvatar = null;
     public bool $hasTrainer = false;
+    public bool $awaitingResponse = false;
 
     public ?string $formationTitle = null;
 
@@ -70,6 +71,10 @@ class FormationChat extends Component
             return;
         }
 
+        if ($this->awaitingResponse) {
+            return;
+        }
+
         try {
             $conversation = AiConversation::query()->findOrFail($this->conversationId);
             $trainer = AiTrainer::query()->findOrFail($conversation->ai_trainer_id);
@@ -93,11 +98,15 @@ class FormationChat extends Component
 
             $this->message = '';
 
+            $this->awaitingResponse = true;
+
             $this->service()->generateAssistantReply($conversation, $trainer);
         } catch (Throwable $exception) {
             $this->error = $exception->getMessage();
+            $this->awaitingResponse = false;
         } finally {
             $this->refreshMessages();
+            $this->awaitingResponse = false;
         }
     }
 
@@ -114,6 +123,7 @@ class FormationChat extends Component
             $this->messages = [];
             $this->conversationId = null;
             $this->hasTrainer = false;
+            $this->awaitingResponse = false;
 
             return;
         }
@@ -131,6 +141,7 @@ class FormationChat extends Component
             $this->trainerDescription = null;
             $this->trainerAvatar = null;
             $this->isOpen = false;
+            $this->awaitingResponse = false;
 
             return;
         }
@@ -147,7 +158,7 @@ class FormationChat extends Component
         $this->trainerId = $trainer->id;
         $this->trainerName = $trainer->name;
         $this->trainerDescription = $trainer->description;
-        $this->trainerAvatar = $trainer->avatar_path;
+        $this->trainerAvatar = $trainer->avatar_path ?: 'images/ai-trainer-placeholder.svg';
 
         $this->refreshMessages();
     }
@@ -160,9 +171,7 @@ class FormationChat extends Component
             return;
         }
 
-        $conversation = AiConversation::query()
-            ->with(['messages' => fn ($query) => $query->orderBy('created_at')])
-            ->find($this->conversationId);
+        $conversation = AiConversation::query()->find($this->conversationId);
 
         if (! $conversation) {
             $this->messages = [];
@@ -170,7 +179,12 @@ class FormationChat extends Component
             return;
         }
 
-        $this->messages = $conversation->messages->map(function (AiConversationMessage $message) {
+        $orderedMessages = $conversation->messages()
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+
+        $this->messages = $orderedMessages->map(function (AiConversationMessage $message) {
             $author = match ($message->role) {
                 AiConversationMessage::ROLE_ASSISTANT => $this->trainerName,
                 AiConversationMessage::ROLE_SYSTEM => 'Systeme',
