@@ -24,6 +24,7 @@ class TrainerManager extends Component
     public bool $isActive = true;
     /** @var array<int, string> */
     public array $providerOptions = [];
+    public ?int $editingTrainerId = null;
 
     public function mount(): void
     {
@@ -39,7 +40,7 @@ class TrainerManager extends Component
         $this->validateOnly($property, $this->rules());
     }
 
-    public function createTrainer(): void
+    public function submitTrainer(): void
     {
         $this->ensureAuthorized();
 
@@ -50,25 +51,11 @@ class TrainerManager extends Component
             'temperature' => __('Temperature'),
         ]);
 
-        $trainer = AiTrainer::create([
-            'name' => $validated['name'],
-            'provider' => $validated['provider'],
-            'model' => $validated['model'],
-            'description' => $this->description,
-            'prompt' => $this->prompt,
-            'avatar_path' => $this->avatarPath,
-            'is_default' => $this->isDefault,
-            'is_active' => $this->isActive,
-            'settings' => [
-                'temperature' => Arr::get($validated, 'temperature'),
-            ],
-        ]);
-
-        $this->resetForm();
-        $this->loadTrainers();
-
-        $this->dispatch('ai-trainer-created', id: $trainer->id);
-        session()->flash('ai_trainer_created', __('Formateur IA cree avec succes.'));
+        if ($this->editingTrainerId) {
+            $this->updateTrainer($validated);
+        } else {
+            $this->createTrainer($validated);
+        }
     }
 
     public function setDefault(int $trainerId): void
@@ -132,6 +119,7 @@ class TrainerManager extends Component
         $this->isActive = true;
         $this->resetErrorBag();
         $this->resetValidation();
+        $this->editingTrainerId = null;
     }
 
     private function rules(): array
@@ -147,6 +135,53 @@ class TrainerManager extends Component
             'isDefault' => ['boolean'],
             'isActive' => ['boolean'],
         ];
+    }
+
+    private function createTrainer(array $validated): void
+    {
+        $trainer = AiTrainer::create([
+            'name' => $validated['name'],
+            'provider' => $validated['provider'],
+            'model' => $validated['model'],
+            'description' => $this->description,
+            'prompt' => $this->prompt,
+            'avatar_path' => $this->avatarPath,
+            'is_default' => $this->isDefault,
+            'is_active' => $this->isActive,
+            'settings' => [
+                'temperature' => Arr::get($validated, 'temperature'),
+            ],
+        ]);
+
+        $this->resetForm();
+        $this->loadTrainers();
+
+        $this->dispatch('ai-trainer-created', id: $trainer->id);
+        session()->flash('ai_trainer_created', __('Formateur IA cree avec succes.'));
+    }
+
+    private function updateTrainer(array $validated): void
+    {
+        $trainer = AiTrainer::query()->findOrFail($this->editingTrainerId);
+
+        $trainer->forceFill([
+            'name' => $validated['name'],
+            'provider' => $validated['provider'],
+            'model' => $validated['model'],
+            'description' => $this->description,
+            'prompt' => $this->prompt,
+            'avatar_path' => $this->avatarPath,
+            'is_default' => $this->isDefault,
+            'is_active' => $this->isActive,
+            'settings' => [
+                'temperature' => Arr::get($validated, 'temperature'),
+            ],
+        ])->save();
+
+        $this->resetForm();
+        $this->loadTrainers();
+
+        session()->flash('ai_trainer_updated', __('Formateur IA mis a jour.'));
     }
 
     private function ensureAuthorized(): void
@@ -166,5 +201,29 @@ class TrainerManager extends Component
     private function resolveProviderOptions(): array
     {
         return array_keys(config('ai.providers', []));
+    }
+
+    public function editTrainer(int $trainerId): void
+    {
+        $this->ensureAuthorized();
+
+        $trainer = AiTrainer::query()->findOrFail($trainerId);
+
+        $this->editingTrainerId = $trainer->id;
+        $this->name = $trainer->name;
+        $this->model = $trainer->model;
+        $this->provider = $trainer->provider;
+        $this->description = $trainer->description;
+        $this->prompt = $trainer->prompt;
+        $this->avatarPath = $trainer->avatar_path;
+        $this->isDefault = (bool) $trainer->is_default;
+        $this->isActive = (bool) $trainer->is_active;
+        $this->temperature = (float) ($trainer->settings['temperature'] ?? 0.7);
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->ensureAuthorized();
+        $this->resetForm();
     }
 }

@@ -11,13 +11,24 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="createTrainer" class="space-y-4 rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900">
-        <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100">
-            {{ __('Creer un nouveau formateur IA') }}
-        </h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400">
-            {{ __('Definissez un prompt et un modele pour rendre ce formateur disponible aux formations.') }}
-        </p>
+    <form wire:submit.prevent="submitTrainer" class="space-y-4 rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900">
+        <div class="flex items-start justify-between gap-3">
+            <div>
+                <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100">
+                    {{ $editingTrainerId ? __('Modifier le formateur IA') : __('Creer un nouveau formateur IA') }}
+                </h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                    {{ $editingTrainerId
+                        ? __('Mettez a jour les informations de ce formateur IA.')
+                        : __('Definissez un prompt et un modele pour rendre ce formateur disponible aux formations.') }}
+                </p>
+            </div>
+            @if ($editingTrainerId)
+                <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-200">
+                    {{ __('Edition en cours') }}
+                </span>
+            @endif
+        </div>
 
         <div class="grid gap-4 md:grid-cols-2">
             <div class="space-y-2">
@@ -132,14 +143,29 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end">
-            <button
-                type="submit"
-                class="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            >
-                <span class="material-symbols-outlined text-base">add</span>
-                {{ __('Ajouter le formateur') }}
-            </button>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-xs text-slate-400 dark:text-slate-500">
+                {{ __('Les formateurs crees ici pourront etre associes aux formations.') }}
+            </p>
+            <div class="flex items-center gap-2">
+                @if ($editingTrainerId)
+                    <button
+                        type="button"
+                        wire:click="cancelEdit"
+                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+                    >
+                        <span class="material-symbols-outlined text-sm">close</span>
+                        {{ __('Annuler') }}
+                    </button>
+                @endif
+                <button
+                    type="submit"
+                    class="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                >
+                    <span class="material-symbols-outlined text-base">{{ $editingTrainerId ? 'save' : 'add' }}</span>
+                    {{ $editingTrainerId ? __('Mettre a jour le formateur') : __('Ajouter le formateur') }}
+                </button>
+            </div>
         </div>
     </form>
 
@@ -189,6 +215,15 @@
                         </div>
 
                         <div class="flex flex-wrap items-center gap-2">
+                            <button
+                                type="button"
+                                wire:click="editTrainer({{ $trainer['id'] }})"
+                                class="inline-flex items-center gap-1 rounded-full border border-indigo-200 px-3 py-1 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-indigo-500/40 dark:text-indigo-200"
+                            >
+                                <span class="material-symbols-outlined text-xs">edit</span>
+                                {{ __('Editer') }}
+                            </button>
+
                             @if (! $trainer['is_default'])
                                 <button
                                     type="button"
