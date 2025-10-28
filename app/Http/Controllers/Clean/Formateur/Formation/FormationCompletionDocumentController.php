@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Storage;
 
 class FormationCompletionDocumentController extends Controller
 {
+    public function index(Formation $formation)
+    {
+        return view('clean.formateur.Formation.FormationCompletionDocuments', compact('formation'));
+    }
+
     public function store(StoreFormationCompletionDocumentRequest $request, Formation $formation): RedirectResponse
     {
         $uploadedFile = $request->file('file');

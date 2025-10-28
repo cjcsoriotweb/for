@@ -5,26 +5,26 @@
         [
             'route' => route('superadmin.teams.index'),
             'icon' => 'groups_2',
-            'label' => __('Equipes actives'),
+            'label' => __('Équipes actives'),
             'stat' => number_format($stats->get('teams', 0)),
-            'description' => __('Gerez toutes les organisations et leurs acces.'),
-            'cta' => __('Gerer les equipes'),
+            'description' => __('Gérez toutes les organisations et leurs accès.'),
+            'cta' => __('Gérer les équipes'),
         ],
         [
             'route' => route('superadmin.users.index'),
             'icon' => 'person_check',
-            'label' => __('Utilisateurs enregistres'),
+            'label' => __('Utilisateurs enregistrés'),
             'stat' => number_format($stats->get('users', 0)),
-            'description' => __('Supervisez les comptes et leurs roles.'),
-            'cta' => __('Gerer les utilisateurs'),
+            'description' => __('Supervisez les comptes et leurs rôles.'),
+            'cta' => __('Gérer les utilisateurs'),
         ],
         [
             'route' => route('formateur.home'),
             'icon' => 'library_books',
             'label' => __('Formations disponibles'),
             'stat' => number_format($stats->get('formations', 0)),
-            'description' => __('Pilotez le catalogue pour chaque equipe.'),
-            'cta' => __('Gerer les formations'),
+            'description' => __('Pilotez le catalogue pour chaque équipe.'),
+            'cta' => __('Gérer les formations'),
         ],
         [
             'route' => route('superadmin.support.index'),
@@ -40,14 +40,14 @@
             'label' => __('Formateurs IA'),
             'stat' => number_format($stats->get('ai_trainers', 0)),
             'description' => __('Configurez les profils IA et testez leurs prompts.'),
-            'cta' => __('Gerer lIA'),
+            'cta' => __('Gérer l\'IA'),
         ],
         [
             'route' => route('superadmin.teams.index', ['focus' => 'invitations']),
             'icon' => 'forward_to_inbox',
             'label' => __('Invitations en attente'),
             'stat' => number_format($stats->get('invitations', 0)),
-            'description' => __('Relancez ou validez les acces en attente.'),
+            'description' => __('Relancez ou validez les accès en attente.'),
             'cta' => __('Voir les invitations'),
         ],
     ];
@@ -56,7 +56,7 @@
 <x-admin.global-layout
     icon="domain"
     :title="__('Pilotage global')"
-    :subtitle="__('Accedez rapidement a chaque espace de gestion superadministrateur.')"
+    :subtitle="__('Accédez rapidement à chaque espace de gestion superadministrateur.')"
 >
     <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ($cards as $card)
