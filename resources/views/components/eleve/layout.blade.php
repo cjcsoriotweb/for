@@ -22,7 +22,7 @@
   <div class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900">
     <!-- Navigation -->
     <nav
-      class="relative border-b border-white/10 bg-gradient-to-r from-slate-950/95 via-slate-900/88 to-slate-900/80 text-slate-100 backdrop-blur">
+      class="mb-5 relative border-b border-white/10 bg-gradient-to-r from-slate-950/95 via-slate-900/88 to-slate-900/80 text-slate-100 backdrop-blur">
       <div
         class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_60%)]">
       </div>
