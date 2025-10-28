@@ -108,7 +108,7 @@
                             @enderror
                             <div class="flex items-center justify-between">
                                 <p class="text-[11px] text-slate-400 dark:text-slate-500">
-                                    {{ __('Les reponses sont generees automatiquement .') }} {{ config('app.name')}}
+                                    {{ __('Assistant IA') }} par <b>{{ config('app.name')}}</b>.
                                 </p>
                                 <button
                                     type="submit"
