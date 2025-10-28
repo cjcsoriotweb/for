@@ -17,7 +17,7 @@ class FormationLessonController
     {
         $lesson = $formationService->lessons()->createLesson($formation, $chapter);
 
-        return redirect()->route('formateur.formation.show', $formation)->with('success', 'Leçon créée avec succès.');
+        return redirect()->route('formateur.formation.chapters.index', $formation)->with('success', 'Leçon créée avec succès.');
     }
 
     public function deleteLesson(Formation $formation, Chapter $chapter, Lesson $lesson, FormationService $formationService)
@@ -25,7 +25,7 @@ class FormationLessonController
         try {
             $formationService->lessons()->deleteLesson($lesson);
 
-            return redirect()->route('formateur.formation.show', $formation)
+            return redirect()->route('formateur.formation.chapters.index', $formation)
                 ->with('success', 'Leçon supprimée avec succès.');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Erreur lors de la suppression de la leçon: '.$e->getMessage()]);
