@@ -13,6 +13,10 @@
   <div class="-mx-4 overflow-hidden sm:-mx-2">
     <div class="flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 sm:px-2">
       @foreach($formations as $formation)
+      @php
+      $isEnrolled = data_get($formation, 'is_enrolled', false);
+      $canJoin = data_get($formation, 'can_join', true);
+      @endphp
       <article
         class="group relative isolate min-w-[260px] max-w-xs snap-start overflow-hidden rounded-3xl border border-white/15 bg-slate-900/55 transition duration-300 hover:-translate-y-1">
         <div
@@ -28,7 +32,7 @@
             onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';" />
         </div>
 
-        <div class="relative z-10 flex h-full flex-col justify-between p-6">
+        <div class="relative z-10 flex flex-col justify-between gap-6 p-6">
           <div class="space-y-4">
             <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-white/70">
               <span>{{ $formation['status_label'] }}</span>
@@ -67,7 +71,7 @@
             </div>
             @endif
 
-            @if($formation['is_enrolled'])
+            @if($isEnrolled)
             <a href="{{ $formation['show_route'] }}"
               class="group/btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/30">
               Continuer la formation
@@ -82,7 +86,7 @@
               </svg>
             </a>
             @else
-            @if($formation['can_join'])
+            @if($canJoin)
             <form method="POST" action="{{ $formation['enroll_route'] }}" class="w-full">
               @csrf
               <button type="submit"
@@ -113,8 +117,7 @@
     </div>
     <h3 class="text-xl font-semibold text-white">Aucune formation disponible</h3>
     <p class="mt-3 text-sm text-slate-300/80">
-      Revenez bient&ocirc;t pour d&eacute;couvrir les nouvelles formations propos&eacute;es &agrave; votre
-      &eacute;quipe.
+      Revenez bientôt pour découvrir les nouvelles formations proposées à votre équipe.
     </p>
   </div>
   @endif
