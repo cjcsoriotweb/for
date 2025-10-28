@@ -7,7 +7,7 @@
     </div>
     <div class="flex-1">
       <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">
-        {{ __("Actions rapides") }}
+        {{ __("Basculez en tant que") }}
       </h3>
     </div>
     <div class="hidden md:block">
@@ -40,26 +40,6 @@
 
 
 
-        <a href="{{
-                        route('formateur.home', ['team' => $team])
-                    }}"
-          class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-sm transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-          </svg>
-
-          Formateur
-        </a>
-
-        <a href="{{
-                        route('application.admin.configuration.index', ['team' => $team, 'team_name' => $team->name])
-                    }}"
-          class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-sm transition-colors">
-          <span class="material-symbols-outlined mr-2 text-sm">settings</span>
-          Configuration
-        </a>
       </div>
     </div>
   </div>

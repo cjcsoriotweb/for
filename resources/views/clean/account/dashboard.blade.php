@@ -3,16 +3,16 @@
   <div class="min-h-screen flex flex-col">
     <main class="flex-1 relative">
       <!-- Background gradient overlay -->
-      <div
-        class="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pointer-events-none">
-      </div>
+
       <div class="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <!-- Hero Section -->
         <div
           class="relative mb-16 overflow-hidden rounded-3xl border border-slate-200/70 bg-white/80 p-12 text-center shadow-xl shadow-slate-200/60 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-900/40 dark:shadow-none">
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-indigo-500/10">
+          <div
+            class="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-indigo-500/10">
           </div>
-          <div class="pointer-events-none absolute -right-24 -top-20 h-56 w-56 rounded-full bg-blue-400/20 blur-3xl dark:bg-blue-400/10">
+          <div
+            class="pointer-events-none absolute -right-24 -top-20 h-56 w-56 rounded-full bg-blue-400/20 blur-3xl dark:bg-blue-400/10">
           </div>
           <div class="relative">
             <div
@@ -32,7 +32,8 @@
               )
               }}
             </p>
-            <div class="mt-8 flex flex-wrap justify-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+            <div
+              class="mt-8 flex flex-wrap justify-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
               <span
                 class="inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-4 py-2 backdrop-blur-sm dark:bg-slate-800/70">
                 <span class="material-symbols-outlined text-base text-blue-500 dark:text-blue-300">timeline</span>
@@ -40,7 +41,8 @@
               </span>
               <span
                 class="inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-4 py-2 backdrop-blur-sm dark:bg-slate-800/70">
-                <span class="material-symbols-outlined text-base text-purple-500 dark:text-purple-300">workspace_premium</span>
+                <span
+                  class="material-symbols-outlined text-base text-purple-500 dark:text-purple-300">workspace_premium</span>
                 {{ __("Collaboration simplifiée") }}
               </span>
             </div>
@@ -49,18 +51,6 @@
         @if ($organisations->count() > 0)
         <!-- Organizations Section -->
         <div class="mb-16">
-          <div class="mb-8 text-center">
-            <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
-              {{ __("Vos organismes") }}
-            </h2>
-            <p class="text-slate-600 dark:text-slate-300">
-              {{
-              __(
-              "Sélectionnez l'organisme pour accéder à votre espace de formation"
-              )
-              }}
-            </p>
-          </div>
 
 
           <div class="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
@@ -79,9 +69,6 @@
             class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20">
             <span class="material-symbols-outlined text-2xl text-amber-600 dark:text-amber-400">school</span>
           </div>
-          <h3 class="mb-4 text-xl font-semibold text-slate-900 dark:text-white">
-            {{ __("Aucun organisme") }}
-          </h3>
           <p class="mb-6 text-slate-600 dark:text-slate-300">
             {{
             __(
@@ -116,12 +103,6 @@
       <!-- Superadmin -->
       @if(Auth::user()->superadmin)
       <div class="mb-8 text-center">
-        <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
-          {{ __("Organisations") }}
-        </h2>
-        <p class="text-slate-600 dark:text-slate-300">
-          {{ __("Gérez les organismes de formation") }}
-        </p>
 
         <!-- Button to create team -->
         <div class="mt-6 flex justify-center">
