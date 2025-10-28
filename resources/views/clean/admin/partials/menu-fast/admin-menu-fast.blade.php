@@ -8,12 +8,8 @@
             <div class="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
                 <div class="max-w-2xl">
                     <p class="text-sm uppercase tracking-[0.4em] text-white/50">{{ __('Espace administrateur') }}</p>
-                    <h1 class="mt-2 text-3xl font-bold lg:text-4xl">
-                        {{ __('Bonjour :name', ['name' => $adminName]) }}
-                    </h1>
-                    <p class="mt-4 text-lg text-white/80">
-                        {{ __('Gardez le cap sur la réussite de votre équipe :team en suivant vos indicateurs clés et vos actions prioritaires.', ['team' => $team->name]) }}
-                    </p>
+           
+         
 
                     <div class="mt-6 flex flex-wrap gap-3">
                         <span class="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur">
