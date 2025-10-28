@@ -156,7 +156,11 @@
 
     // Copy email to clipboard functionality
     function copyToClipboard(text) {
-        if (navigator.clipboard) {
+        if (!text) {
+            return;
+        }
+
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
             navigator.clipboard
                 .writeText(text)
                 .then(function () {
@@ -228,14 +232,15 @@
     // Enhanced button interactions
     document.addEventListener("DOMContentLoaded", function () {
         // Add click handlers for copy buttons
-        const copyButtons = document.querySelectorAll(
-            '[onclick*="navigator.clipboard.writeText"]'
-        );
+        const copyButtons =
+            document.querySelectorAll("[data-copy-text]");
         copyButtons.forEach((button) => {
             button.addEventListener("click", function (e) {
                 e.preventDefault();
-                const email = "{{ auth()->user()->email }}";
-                copyToClipboard(email);
+                const textToCopy = button.getAttribute("data-copy-text");
+                if (textToCopy) {
+                    copyToClipboard(textToCopy);
+                }
             });
         });
 

@@ -84,7 +84,7 @@
             </p>
             <div class="flex items-center justify-between rounded-md bg-white px-3 py-2 dark:bg-slate-800">
               <span class="text-sm font-mono text-slate-900 dark:text-slate-100">{{ auth()->user()->email }}</span>
-              <button onclick="navigator.clipboard.writeText('{{ auth()->user()->email }}')"
+              <button type="button" data-copy-text="{{ auth()->user()->email }}"
                 class="flex h-6 w-6 items-center justify-center rounded text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-600 dark:hover:text-slate-300">
                 <span class="material-symbols-outlined text-sm">content_copy</span>
               </button>
