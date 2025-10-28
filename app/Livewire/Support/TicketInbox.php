@@ -45,7 +45,7 @@ class TicketInbox extends Component
         $this->loadTickets();
     }
 
-    public function selectTicket(int $ticketId): void
+    public function selectTicket(int $ticketId, bool $preserveMessage = false): void
     {
         $this->ensureAuthorized();
 
@@ -56,9 +56,11 @@ class TicketInbox extends Component
             ])
             ->findOrFail($ticketId);
 
+        $draft = $this->message;
+
         $this->activeTicketId = $ticket->id;
         $this->activeTicket = $this->ticketDetailResource($ticket);
-        $this->message = '';
+        $this->message = $preserveMessage ? $draft : '';
     }
 
     public function sendResponse(): void
@@ -93,7 +95,6 @@ class TicketInbox extends Component
 
         $this->message = '';
         $this->loadTickets();
-        $this->selectTicket($ticket->id);
     }
 
     public function markResolved(): void
@@ -117,7 +118,14 @@ class TicketInbox extends Component
         });
     }
 
-    public function loadTickets(): void
+    public function pollTickets(): void
+    {
+        $preserveDraft = $this->activeTicketId !== null && $this->message !== '';
+
+        $this->loadTickets(! $preserveDraft);
+    }
+
+    public function loadTickets(bool $refreshActive = true): void
     {
         $this->ensureAuthorized();
 
@@ -148,7 +156,10 @@ class TicketInbox extends Component
             ->all();
 
         if ($this->activeTicketId) {
-            $this->selectTicket($this->activeTicketId);
+            $this->selectTicket(
+                $this->activeTicketId,
+                preserveMessage: ! $refreshActive && $this->message !== ''
+            );
         }
     }
 

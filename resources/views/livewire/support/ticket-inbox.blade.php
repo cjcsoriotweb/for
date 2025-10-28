@@ -1,4 +1,4 @@
-<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3" wire:poll.8s="pollTickets">
     <div class="flex flex-col rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <div class="border-b border-slate-200 px-4 py-4 dark:border-slate-800">
             <h2 class="text-base font-semibold text-slate-800 dark:text-white">
