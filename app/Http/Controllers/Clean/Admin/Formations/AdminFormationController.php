@@ -116,7 +116,7 @@ class AdminFormationController extends Controller
         $teamSummaries = $this->groupEnrollmentsByTeam($enrollments, $formation);
 
         if ($availableMonths->doesntContain($selectedMonth)) {
-            $availableMonths = $availableMonths->prepend($selectedMonth)->unique()->sortDesc()->values();
+            $availableMonths = $availableMonths->push($selectedMonth)->sortDesc()->values();
         }
 
         return view('clean.admin.formations.revenue-details', [
