@@ -53,7 +53,13 @@
 
 
 
-    
+        <section id="bascule">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+            {{ __('Actions contextuelles') }}
+        </h2>
+        @include('clean.admin.partials.configuration')
+    </section>
+
     <section id="fonctionnement">
         <h2 class="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
             {{ __('Basique') }}
@@ -64,17 +70,11 @@
         </div>
     </section>
 
-    <section id="bascule">
-        <h2 class="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
-            {{ __('Actions contextuelles') }}
-        </h2>
-        @include('clean.admin.partials.configuration')
-    </section>
 
     
         <section id="configuration">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
-            {{ __('Vos indicateurs') }}
+            {{ __('Important') }}
         </h2>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             @include('clean.admin.partials.menu-fast.stats.creditTeam', ['team' => $team])

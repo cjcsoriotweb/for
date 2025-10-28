@@ -17,7 +17,7 @@
         {{ __('Gestion des fonds') }}
       </p>
       <h3 class="mt-2 text-lg font-semibold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-300">
-        {{ __('Identité et crédit équipe') }}
+        {{ __("Crédit de l'équipe") }}
       </h3>
     </div>
     <span class="material-symbols-outlined text-3xl text-indigo-500 transition-transform duration-300 group-hover:rotate-12 group-hover:text-indigo-400 dark:text-indigo-300">

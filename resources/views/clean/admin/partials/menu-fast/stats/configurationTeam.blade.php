@@ -11,7 +11,7 @@
                 {{ __('Configuration') }}
             </p>
             <span class="mt-3 block text-lg font-semibold text-slate-900 dark:text-white">
-                {{ __('Identité et crédit équipe') }}
+                {{ __("Identité et de l'équipe") }}
             </span>
         </div>
         <span class="material-symbols-outlined text-3xl text-indigo-500 transition group-hover:text-indigo-400 dark:text-indigo-300">
