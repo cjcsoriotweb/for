@@ -9,6 +9,7 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use App\Services\Clean\Account\AccountService;
 use App\Services\FormationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdminPageController extends Controller
@@ -17,25 +18,64 @@ class AdminPageController extends Controller
         private readonly AccountService $accountService,
     ) {}
 
-    public function overview()
+    public function overview(Request $request)
     {
         $user = Auth::user();
         $organisations = $this->accountService->teams()->listByUser($user);
+        $defaultTeam = $organisations->first();
 
-        $teams = Team::query()
+        $teamSearch = trim((string) $request->input('team_search', ''));
+        $userSearch = trim((string) $request->input('user_search', ''));
+        $formationSearch = trim((string) $request->input('formation_search', ''));
+
+        $teamsQuery = Team::query()
             ->with(['owner:id,name,email'])
             ->withCount(['users', 'teamInvitations'])
-            ->latest('updated_at')
-            ->take(10)
-            ->get();
+            ->when($teamSearch !== '', function ($query) use ($teamSearch) {
+                $query->where(function ($subQuery) use ($teamSearch) {
+                    $subQuery
+                        ->where('name', 'like', "%{$teamSearch}%")
+                        ->orWhereHas('owner', function ($ownerQuery) use ($teamSearch) {
+                            $ownerQuery
+                                ->where('name', 'like', "%{$teamSearch}%")
+                                ->orWhere('email', 'like', "%{$teamSearch}%");
+                        });
+                });
+            })
+            ->latest('updated_at');
 
-        $recentUsers = User::query()
+        $teams = $teamsQuery->take(10)->get();
+
+        $recentUsersQuery = User::query()
             ->select(['id', 'name', 'email', 'created_at', 'current_team_id'])
             ->with(['currentTeam:id,name'])
             ->withCount('teams')
+            ->when($userSearch !== '', function ($query) use ($userSearch) {
+                $query->where(function ($subQuery) use ($userSearch) {
+                    $subQuery
+                        ->where('name', 'like', "%{$userSearch}%")
+                        ->orWhere('email', 'like', "%{$userSearch}%");
+                });
+            })
             ->latest('created_at')
-            ->take(12)
-            ->get();
+            ->take(12);
+
+        $recentUsers = $recentUsersQuery->get();
+
+        $formationsQuery = Formation::query()
+            ->withCount('teams')
+            ->when($formationSearch !== '', function ($query) use ($formationSearch) {
+                $query->where(function ($subQuery) use ($formationSearch) {
+                    $subQuery
+                        ->where('title', 'like', "%{$formationSearch}%")
+                        ->orWhere('description', 'like', "%{$formationSearch}%");
+                });
+            })
+            ->latest('updated_at')
+            ->latest('created_at')
+            ->take(12);
+
+        $formations = $formationsQuery->get();
 
         $stats = [
             'teams' => Team::count(),
@@ -48,7 +88,90 @@ class AdminPageController extends Controller
             'teams',
             'recentUsers',
             'stats',
+            'formations',
+            'teamSearch',
+            'userSearch',
+            'formationSearch',
+            'defaultTeam',
         ]));
+    }
+
+    public function teamsIndex(Request $request)
+    {
+        $search = trim((string) $request->input('search', ''));
+
+        $teams = Team::query()
+            ->with(['owner:id,name,email'])
+            ->withCount(['users', 'teamInvitations'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('owner', function ($ownerQuery) use ($search) {
+                            $ownerQuery
+                                ->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest('updated_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('clean.admin.SuperadminTeamsPage', [
+            'teams' => $teams,
+            'search' => $search,
+        ]);
+    }
+
+    public function usersIndex(Request $request)
+    {
+        $search = trim((string) $request->input('search', ''));
+
+        $users = User::query()
+            ->select(['id', 'name', 'email', 'created_at', 'current_team_id'])
+            ->with(['currentTeam:id,name'])
+            ->withCount('teams')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->latest('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('clean.admin.SuperadminUsersPage', [
+            'users' => $users,
+            'search' => $search,
+        ]);
+    }
+
+    public function formationsIndex(Request $request)
+    {
+        $search = trim((string) $request->input('search', ''));
+
+        $catalog = Formation::query()
+            ->select(['id', 'title', 'description', 'updated_at', 'created_at'])
+            ->withCount('teams')
+            ->with('teams:id,name')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->latest('updated_at')
+            ->paginate(18)
+            ->withQueryString();
+
+        return view('clean.admin.SuperadminFormationsPage', [
+            'formations' => $catalog,
+            'search' => $search,
+        ]);
     }
 
     public function home(Team $team, FormationService $formations)

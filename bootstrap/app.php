@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
             __DIR__.'/../routes/GuestRoute.php',
             __DIR__.'/../routes/UserRoute.php',
             __DIR__.'/../routes/AdminRoute.php',
+            __DIR__.'/../routes/SuperadminRoute.php',
             __DIR__.'/../routes/EleveRoute.php',
             __DIR__.'/../routes/OrganisateurRoute.php',
             __DIR__.'/../routes/FormateurRoute.php',
