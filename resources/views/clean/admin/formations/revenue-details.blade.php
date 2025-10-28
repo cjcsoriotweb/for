@@ -159,6 +159,7 @@
                                 <th scope="col" class="px-4 py-3">Équipe</th>
                                 <th scope="col" class="px-4 py-3">Date d'inscription</th>
                                 <th scope="col" class="px-4 py-3 text-right">Jetons</th>
+                                <th scope="col" class="px-4 py-3 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
@@ -180,10 +181,23 @@
                                     <td class="px-4 py-3 text-right font-semibold text-gray-900">
                                         {{ number_format($tokenAmount, 0, ',', ' ') }}
                                     </td>
+                                    <td class="px-4 py-3 text-right">
+                                        @if($enrollment->user)
+                                            <a
+                                                href="{{ route('application.admin.formations.students.show', [$team, $formation, $enrollment->user]) }}"
+                                                class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-purple-700"
+                                            >
+                                                <span class="material-symbols-outlined text-base">visibility</span>
+                                                Suivre
+                                            </a>
+                                        @else
+                                            <span class="text-sm text-gray-400">—</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">
+                                    <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">
                                         Aucune inscription sur la période sélectionnée.
                                     </td>
                                 </tr>

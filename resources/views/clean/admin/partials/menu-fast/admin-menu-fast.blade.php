@@ -46,7 +46,7 @@
                             @endif
                         </div>
                         <div class="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/15 px-4 py-2 text-xs font-medium uppercase tracking-[0.3em] text-white/70">
-                            {{ __('Équipe') }} {{ $team->id }}
+                            {{ $team->name }}
                         </div>
                     </div>
                 </div>
