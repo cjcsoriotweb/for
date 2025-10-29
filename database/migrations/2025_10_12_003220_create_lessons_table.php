@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-
             // FK vers chapters.id (c'est la clé attendue par les relations)
             $table->foreignId('chapter_id')->constrained('chapters')->cascadeOnDelete();
 

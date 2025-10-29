@@ -35,6 +35,7 @@ class Formation extends Model
         'money_amount',
         'active',
         'cover_image_path',
+        'user_id'
     ];
 
     protected function casts(): array

@@ -96,6 +96,7 @@ class FormationLessonList extends Component
         }
     }
 
+    // to delete
     /** Crée une nouvelle leçon */
     public function addLesson(): void
     {

@@ -4,6 +4,7 @@ namespace App\Livewire\Formateur\Formations;
 
 use App\Models\Formation;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,7 +14,6 @@ class FormationsList extends Component
     use WithPagination;
 
     public $search = '';
-
     public $perPage = 5;
 
     protected $paginationTheme = 'tailwind';
@@ -31,16 +31,29 @@ class FormationsList extends Component
 
     public function loadFormations()
     {
+        if(Auth::user()->superadmin){
         $query = Formation::withCount(['learners', 'lessons'])
             ->with([
                 'lessons' => function ($query) {
                     $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
                 },
             ]);
+        } else {
+        $query = Formation::where('user_id', '=', Auth::user()->id)
+        ->withCount(['learners', 'lessons'])
+            ->with([
+                'lessons' => function ($query) {
+                    $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
+                },
+            ]);
+        }
+
 
         if ($this->search) {
             $query->where('title', 'like', '%'.$this->search.'%')
                 ->orWhere('description', 'like', '%'.$this->search.'%');
+            
+
         }
 
         $this->formations = $query->paginate($this->perPage);

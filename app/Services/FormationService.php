@@ -7,6 +7,7 @@ use App\Services\Formation\AdminFormationService;
 use App\Services\Formation\ChapterFormationService;
 use App\Services\Formation\LessonFormationService;
 use App\Services\Formation\StudentFormationService;
+use Illuminate\Support\Facades\Auth;
 
 class FormationService
 {
@@ -39,6 +40,7 @@ class FormationService
             'description' => 'Description par defaut',
             'level' => 'debutant',
             'money_amount' => 0,
+            'user_id' => Auth::user()->id,
         ], $attributes);
 
         return Formation::create($payload);

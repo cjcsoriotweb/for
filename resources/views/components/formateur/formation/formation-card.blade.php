@@ -48,6 +48,16 @@
                 ])></div>
               {{ $formation->card_is_active ? 'Active' : 'Inactive' }}
             </span>
+
+              <span>
+              @if($formation->user_id !== Auth::user()->id )
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border bg-red-100 text-red-800 border-red-200">
+                  <div class="w-2 h-2 rounded-full mr-2 animate-pulse"></div>
+                  {{ App\Models\User::find($formation->user_id)->name }}
+                </span>
+
+              @endif
+            </span>
           </div>
         </div>
         <div class="flex items-center space-x-3 text-sm text-gray-500">
