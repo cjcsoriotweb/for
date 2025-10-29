@@ -1,1 +1,1 @@
-<x-application-logo size="xl"/>
+<x-application-logo size="4xl"/>
