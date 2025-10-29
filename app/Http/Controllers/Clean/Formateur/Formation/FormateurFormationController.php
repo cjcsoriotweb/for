@@ -15,22 +15,22 @@ class FormateurFormationController extends Controller
 {
     public function showFormation(Formation $formation)
     {
-        return view('clean.formateur.Formation.FormationShow', compact('formation'));
+        return view('out-application.formateur.formation.formation-show', compact('formation'));
     }
 
     public function editFormation(Formation $formation)
     {
-        return view('clean.formateur.Formation.FormationEdit', compact('formation'));
+        return view('out-application.formateur.formation.formation-edit', compact('formation'));
     }
 
     public function editPricing(Formation $formation)
     {
-        return view('clean.formateur.Formation.FormationPricing', compact('formation'));
+        return view('out-application.formateur.formation.formation-pricing', compact('formation'));
     }
 
     public function manageChapters(Formation $formation)
     {
-        return view('clean.formateur.Formation.FormationChapters', compact('formation'));
+        return view('out-application.formateur.formation.formation-chapters', compact('formation'));
     }
 
     public function editAi(Formation $formation)
@@ -48,7 +48,7 @@ class FormateurFormationController extends Controller
 
         $primaryTrainerId = $primaryTrainer?->id;
 
-        return view('clean.formateur.Formation.FormationAi', [
+        return view('out-application.formateur.formation.formation-ia', [
             'formation' => $formation,
             'trainers' => $trainers,
             'primaryTrainerId' => $primaryTrainerId,

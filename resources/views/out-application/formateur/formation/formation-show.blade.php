@@ -55,12 +55,12 @@
 
 
           <!-- Modifier la formation (include) !-->
-          @include('clean.formateur.Formation.Formation.Card.modify-formation-informations')
-          @include('clean.formateur.Formation.Formation.Card.modify-formation-ia')
-          @include('clean.formateur.Formation.Formation.Card.modify-formation-pricing')
-          @include('clean.formateur.Formation.Formation.Card.manage-formation-chapter')
-          @include('clean.formateur.Formation.Formation.Card.manage-files-end-formation')
-          @include('clean.formateur.Formation.Formation.Card.owner-formation-modify')
+          @include('out-application.formateur.Formation.Formation.Card.modify-formation-informations')
+          @include('out-application.formateur.Formation.Formation.Card.modify-formation-ia')
+          @include('out-application.formateur.Formation.Formation.Card.modify-formation-pricing')
+          @include('out-application.formateur.Formation.Formation.Card.manage-formation-chapter')
+          @include('out-application.formateur.Formation.Formation.Card.manage-files-end-formation')
+          @include('out-application.formateur.Formation.Formation.Card.owner-formation-modify')
 
         </div>
       </div>
