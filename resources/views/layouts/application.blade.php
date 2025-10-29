@@ -2,51 +2,24 @@
   @if(isset($header) && isset($team))
   <x-slot name="header">
     <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            @if($team->profile_photo_path)
-            <div class="relative">
-              @if(Auth::user()->hasTeamRole($team, 'admin'))
-              <a href="{{
-                                    route('application.admin.index', $team)
-                                }}"
-                class="w-12 h-12 bg-white bg-opacity-15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white border-opacity-30 shadow-lg overflow-hidden">
-                <img src="{{ Storage::disk('public')->url($team->profile_photo_path) }}" alt="Logo {{ $team->name }}"
-                  class="w-full h-full rounded-lg object-contain p-1" />
-              </a>
-              @endif
-              <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm">
-              </div>
-            </div>
-            @else
-            <div
-              class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <span class="material-symbols-outlined text-lg text-white">{{ $headerIcon ?? "school" }}</span>
-            </div>
-            @endif
-            <div>
-              <h2 class="text-2xl font-bold text-white">
-                {{ $header }}
-              </h2>
-              @isset($subtitle)
-              <p class="text-slate-300 mt-1">{{ $subtitle }}</p>
-              @endisset
-            </div>
-          </div>
-          @isset($headerActions)
-          {{ $headerActions }}
-          @else
-          <div class="flex items-center space-x-3">
-            <form method="POST" action="{{ route('logout') }}" class="inline">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex flex-col gap-4">
+          {{ $header }}
+
+          @unless(isset($headerHasOwnActions) && $headerHasOwnActions)
+          <div class="flex justify-end">
+            <form method="POST" action="{{ route('logout') }}" class="inline-flex">
               @csrf
-              <button type="submit"
-                class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
-                <span class="material-symbols-outlined mr-2">logout</span>
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:bg-white/20 hover:text-white"
+              >
+                <span class="material-symbols-outlined text-base">logout</span>
+                {{ __('Déconnexion') }}
               </button>
             </form>
           </div>
-          @endisset
+          @endunless
         </div>
       </div>
     </div>
