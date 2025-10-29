@@ -141,7 +141,7 @@ class AdminPageController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.admin-home-page', compact([
+        return view('in-application.admin.admin-home-page', compact([
             'organisations',
             'team',
             'recentFormations',
