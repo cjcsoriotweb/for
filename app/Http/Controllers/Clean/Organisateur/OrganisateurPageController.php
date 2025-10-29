@@ -20,7 +20,7 @@ class OrganisateurPageController extends Controller
     {
         $formations = $this->organisateurService->listVisibleFormations($team);
 
-        return view('clean.organisateur.home', compact('team', 'formations'));
+        return view('in-application.organisateur.home', compact('team', 'formations'));
     }
 
     public function catalogue(Request $request, Team $team)
@@ -92,7 +92,7 @@ class OrganisateurPageController extends Controller
             $formation->total_duration_minutes = $totalDuration;
         });
 
-        return view('clean.organisateur.catalogue', compact(
+        return view('in-application.organisateur.catalogue', compact(
             'team',
             'visibleFormations',
             'allFormations',
@@ -125,7 +125,7 @@ class OrganisateurPageController extends Controller
         // Check if formation is visible to this team (for display purposes only)
         $isVisible = $this->organisateurService->formationIsVisibleToTeam($team, $formation);
 
-        return view('clean.organisateur.formation-show', compact(
+        return view('in-application.organisateur.formation-show', compact(
             'team',
             'formation',
             'formationWithDetails',
@@ -138,7 +138,7 @@ class OrganisateurPageController extends Controller
 
     public function users(Team $team)
     {
-        return view('clean.organisateur.users', compact('team'));
+        return view('in-application.organisateur.users', compact('team'));
     }
 
     public function students(Request $request, Team $team, Formation $formation)
@@ -155,7 +155,7 @@ class OrganisateurPageController extends Controller
 
         $overview = $this->organisateurService->getStudentsOverview($formation, $team, $filters);
 
-        return view('clean.organisateur.students', [
+        return view('in-application.organisateur.students', [
             'team' => $team,
             'formation' => $formation,
             'students' => $overview['students'],
@@ -181,7 +181,7 @@ class OrganisateurPageController extends Controller
             $request->query('month')
         );
 
-        return view('clean.organisateur.students-cost', array_merge([
+        return view('in-application.organisateur.students-cost', array_merge([
             'team' => $team,
             'formation' => $formation,
         ], $summary));
@@ -213,7 +213,7 @@ class OrganisateurPageController extends Controller
             true
         );
 
-        return view('clean.organisateur.student-report', array_merge([
+        return view('in-application.organisateur.student-report', array_merge([
             'team' => $team,
             'formation' => $formation,
             'student' => $student,
@@ -238,7 +238,7 @@ class OrganisateurPageController extends Controller
             includeActivity: false
         );
 
-        $pdf = Pdf::loadView('clean.organisateur.student-report-pdf', array_merge([
+        $pdf = Pdf::loadView('in-application.organisateur.student-report-pdf', array_merge([
             'team' => $team,
             'formation' => $formation,
             'student' => $student,
@@ -265,7 +265,7 @@ class OrganisateurPageController extends Controller
             includeActivity: false
         );
 
-        $pdf = Pdf::loadView('clean.organisateur.student-report-pdf', array_merge([
+        $pdf = Pdf::loadView('in-application.organisateur.student-report-pdf', array_merge([
             'team' => $team,
             'formation' => $formation,
             'student' => $student,

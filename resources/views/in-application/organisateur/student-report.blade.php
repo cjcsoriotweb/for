@@ -58,23 +58,23 @@
 
       <div>
         <div x-show="activeTab === 'overview'" x-transition>
-          @include('clean.organisateur.student-report.overview')
+          @include('in-application.organisateur.student-report.overview')
         </div>
 
         <div x-show="activeTab === 'progress'" x-transition>
-          @include('clean.organisateur.student-report.progress')
+          @include('in-application.organisateur.student-report.progress')
         </div>
 
         <div x-show="activeTab === 'quizzes'" x-transition>
-          @include('clean.organisateur.student-report.quizzes')
+          @include('in-application.organisateur.student-report.quizzes')
         </div>
 
         <div x-show="activeTab === 'activity'" x-transition>
-          @include('clean.organisateur.student-report.activity')
+          @include('in-application.organisateur.student-report.activity')
         </div>
 
         <div x-show="activeTab === 'documents'" x-transition>
-          @include('clean.organisateur.student-report.pdf')
+          @include('in-application.organisateur.student-report.pdf')
         </div>
       </div>
     </div>

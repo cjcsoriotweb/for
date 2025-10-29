@@ -9,13 +9,13 @@
     </div>
 
     <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-        @include('clean.admin.partials.menu-fast.stats.usersStats', [
+        @include('in-application.admin.partials.menu-fast.stats.usersStats', [
             'team' => $team,
             'totalUsers' => $totalUsers ?? 0,
             'usersProgressWidth' => $usersProgressWidth ?? 0,
         ])
 
-        @include('clean.admin.partials.menu-fast.stats.formationsStats', [
+        @include('in-application.admin.partials.menu-fast.stats.formationsStats', [
             'team' => $team,
             'activeCount' => $activeCount ?? 0,
             'totalCount' => $totalCount ?? 0,

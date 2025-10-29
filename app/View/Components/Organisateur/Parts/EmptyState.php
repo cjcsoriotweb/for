@@ -37,7 +37,7 @@ class EmptyState extends Component
 
     public function render(): View
     {
-        return view('clean.organisateur.parts.empty-state', [
+        return view('in-application.organisateur.parts.empty-state', [
             'icon' => $this->icon,
             'title' => $this->title,
             'description' => $this->description,

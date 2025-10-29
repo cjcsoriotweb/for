@@ -2,9 +2,9 @@
     :team="$team"
     :subtitle="__('Gérez les paramètres globaux de l\'application et les configurations spécifiques à l\'organisme.')"
 >
-    @include('clean.admin.partials.configuration.index', ['team' => $team])
+    @include('in-application.admin.partials.configuration.index', ['team' => $team])
     <br />
-    @include('clean.admin.partials.home-button', ['team' => $team])
+    @include('in-application.admin.partials.home-button', ['team' => $team])
     <div class="mt-10 flex justify-end">
         <a
             href="{{ route('application.admin.configuration.credits', $team) }}"

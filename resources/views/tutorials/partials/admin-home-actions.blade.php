@@ -8,5 +8,5 @@
         </p>
     </div>
 
-    @include('clean.admin.partials.configuration', ['team' => $team])
+    @include('in-application.admin.partials.configuration', ['team' => $team])
 </div>

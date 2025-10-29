@@ -3,7 +3,7 @@
     <x-eleve.notification-messages />
 
     @if($studentFormationService->isFormationCompleted(Auth::user(),$formationWithProgress))
-    @include('clean.eleve.formation.congratulation')
+    @include('in-application.eleve.formation.congratulation')
     @else
     <x-eleve.formation-header :formation="$formationWithProgress" :progress="$progress" />
 
@@ -11,7 +11,7 @@
 
     <x-eleve.formation-actions :team="$team" :formation="$formationWithProgress" :progress="$progress" />
 
-    @include('clean.eleve.formation.partials.resources', [
+    @include('in-application.eleve.formation.partials.resources', [
       'formationDocuments' => $formationDocuments ?? collect(),
       'lessonResources' => $lessonResources ?? collect(),
       'isFormationCompleted' => $isFormationCompleted ?? false,

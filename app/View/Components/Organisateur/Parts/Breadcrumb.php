@@ -32,7 +32,7 @@ class Breadcrumb extends Component
 
     public function render(): View
     {
-        return view('clean.organisateur.parts.breadcrumb', [
+        return view('in-application.organisateur.parts.breadcrumb', [
             'team' => $this->team,
             'formation' => $this->formation,
             'student' => $this->student,

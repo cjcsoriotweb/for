@@ -9,8 +9,8 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-        @include('clean.admin.partials.menu-fast.stats.creditTeam', ['team' => $team])
-        @include('clean.admin.partials.menu-fast.stats.configurationTeam', ['team' => $team])
+        @include('in-application.admin.partials.menu-fast.stats.creditTeam', ['team' => $team])
+        @include('in-application.admin.partials.menu-fast.stats.configurationTeam', ['team' => $team])
     </div>
 </div>
 

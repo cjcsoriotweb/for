@@ -194,7 +194,7 @@
             </h2>
         </div>
         <div class="rounded-3xl border border-slate-200/70 bg-white/70 p-6 shadow-sm shadow-slate-200/60 backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/70 dark:shadow-none">
-            @include('clean.admin.partials.configuration')
+            @include('in-application.admin.partials.configuration')
         </div>
     </section>
 
@@ -206,8 +206,8 @@
             </h2>
         </div>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            @include('clean.admin.partials.menu-fast.stats.usersStats', ['team' => $team])
-            @include('clean.admin.partials.menu-fast.stats.formationsStats', ['team' => $team])
+            @include('in-application.admin.partials.menu-fast.stats.users-stats', ['team' => $team])
+            @include('in-application.admin.partials.menu-fast.stats.formations-stats', ['team' => $team])
         </div>
     </section>
 
@@ -219,8 +219,8 @@
             </h2>
         </div>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            @include('clean.admin.partials.menu-fast.stats.creditTeam', ['team' => $team])
-            @include('clean.admin.partials.menu-fast.stats.configurationTeam', ['team' => $team])
+            @include('in-application.admin.partials.menu-fast.stats.credit-team', ['team' => $team])
+            @include('in-application.admin.partials.menu-fast.stats.configuration-team', ['team' => $team])
         </div>
     </section>
 </div>

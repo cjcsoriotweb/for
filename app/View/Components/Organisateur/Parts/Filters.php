@@ -38,7 +38,7 @@ class Filters extends Component
 
     public function render(): View
     {
-        return view('clean.organisateur.parts.filters', [
+        return view('in-application.organisateur.parts.filters', [
             'search' => $this->search,
             'statusFilter' => $this->statusFilter,
             'selectedMonth' => $this->selectedMonth,

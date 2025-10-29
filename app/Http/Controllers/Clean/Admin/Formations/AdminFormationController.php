@@ -119,7 +119,7 @@ class AdminFormationController extends Controller
             $availableMonths = $availableMonths->push($selectedMonth)->sortDesc()->values();
         }
 
-        return view('clean.admin.formations.revenue-details', [
+        return view('in-application.admin.formations.revenue-details', [
             'team' => $team,
             'formation' => $formation,
             'enrollments' => $enrollments,

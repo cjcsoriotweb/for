@@ -49,7 +49,7 @@
       </div>
       @endif
 
-      @include('clean.eleve.formation.partials.resources', [
+      @include('in-application.eleve.formation.partials.resources', [
       'formationDocuments' => collect(),
       'lessonResources' => $lessonResources ?? collect(),
       'isFormationCompleted' => true,
