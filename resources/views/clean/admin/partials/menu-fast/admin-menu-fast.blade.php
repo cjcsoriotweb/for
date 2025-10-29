@@ -1,4 +1,4 @@
-<div class="space-y-12">
+﻿<div class="space-y-12">
     <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-900 to-slate-950 text-white shadow-2xl border border-white/10">
         <div class="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-indigo-500/30 blur-3xl"></div>
         <div class="absolute -bottom-28 -right-20 h-72 w-72 rounded-full bg-emerald-500/25 blur-3xl"></div>
@@ -33,8 +33,8 @@
                             @if ($hasTeamLogo && $teamLogoUrl)
                                 <img
                                     src="{{ $teamLogoUrl }}"
-                                    alt="{{ __('Logo de l’équipe :name', ['name' => $team->name]) }}"
-                                    class="h-32 w-32 rounded-2xl object-contain "
+                                    alt="{{ __("Logo de l'\u{00E9}quipe :name", ['name' => $team->name]) }}"
+                                    class="h-32 w-32 rounded-2xl object-contain"
                                 />
                             @else
                                 <span class="material-symbols-outlined text-6xl text-white/70">auto_awesome</span>
@@ -85,3 +85,8 @@
     </section>
     
 </div>
+
+
+
+
+

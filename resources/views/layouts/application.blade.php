@@ -6,20 +6,6 @@
         <div class="flex flex-col gap-4">
           {{ $header }}
 
-          @unless(isset($headerHasOwnActions) && $headerHasOwnActions)
-          <div class="flex justify-end">
-            <form method="POST" action="{{ route('logout') }}" class="inline-flex">
-              @csrf
-              <button
-                type="submit"
-                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:bg-white/20 hover:text-white"
-              >
-                <span class="material-symbols-outlined text-base">logout</span>
-                {{ __('Déconnexion') }}
-              </button>
-            </form>
-          </div>
-          @endunless
         </div>
       </div>
     </div>
@@ -98,3 +84,5 @@
   {{-- CONTENU PRINCIPAL AVEC ESPACE --}}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">@yield('content')</div>
 </x-app-layout>
+
+
