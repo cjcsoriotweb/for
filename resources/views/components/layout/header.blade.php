@@ -5,25 +5,9 @@
         <div class="flex h-16 items-center justify-between">
             <!-- Logo and Title -->
             <div class="flex items-center space-x-3">
-                <div
-                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600"
-                >
-                    <span class="material-symbols-outlined text-lg text-white"
-                        >school</span
-                    >
-                </div>
-                <div>
-                    <h1
-                        class="text-lg font-semibold text-slate-900 dark:text-white"
-                    >
-                        {{ __("Formation") }}
-                    </h1>
-                    <a
-                        href="{{ route('user.dashboard') }}"
-                        class="text-xs text-slate-500 dark:text-slate-400"
-                        >{{ __("Espace personnel") }}</a
-                    >
-                </div>
+           
+               <x-application-logo size="5xl"/>
+     
             </div>
 
             <!-- User Menu -->
