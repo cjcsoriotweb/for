@@ -15,6 +15,7 @@ Route::prefix('superadmin')
         Route::get('/formations', [AdminPageController::class, 'formationsIndex'])->name('formations.index');
         Route::get('/support', [AdminPageController::class, 'supportIndex'])->name('support.index');
         Route::get('/ai-trainers', [AdminPageController::class, 'aiIndex'])->name('ai.index');
+        Route::get('/page-notes-overview', [PageNoteController::class, 'overview'])->name('page-notes.overview');
 
         Route::prefix('page-notes')
             ->name('page-notes.')

@@ -135,9 +135,35 @@
             normalizedPath = normalizedPath.slice(0, -1);
         }
 
-        const pageKey = normalizedPath || '/';
+        let currentPath = normalizedPath || '/';
 
-        pathDisplay.textContent = pageKey;
+        function normalizeTargetPath(path) {
+            if (typeof path !== 'string') {
+                return currentPath;
+            }
+
+            let sanitized = path.trim();
+
+            if (sanitized === '') {
+                sanitized = '/';
+            }
+
+            if (!sanitized.startsWith('/')) {
+                sanitized = `/${sanitized}`;
+            }
+
+            if (sanitized.length > 1 && sanitized.endsWith('/')) {
+                sanitized = sanitized.slice(0, -1);
+            }
+
+            return sanitized;
+        }
+
+        function refreshPathDisplay() {
+            pathDisplay.textContent = currentPath;
+        }
+
+        refreshPathDisplay();
 
         const endpoints = {
             list: (path) => `/superadmin/page-notes?path=${encodeURIComponent(path)}`,
@@ -413,10 +439,17 @@
             });
         }
 
-    async function loadNotes() {
+        async function loadNotes() {
+            const targetPath = currentPath;
+
             try {
                 setStatus('Chargement des notes…');
-                const data = await request('GET', endpoints.list(pageKey));
+                const data = await request('GET', endpoints.list(targetPath));
+
+                if (targetPath !== currentPath) {
+                    return;
+                }
+
                 state.notes = Array.isArray(data?.data) ? data.data : [];
                 renderNotes();
                 setStatus('');
@@ -463,7 +496,7 @@
                     }
                 } else {
                     const response = await request('POST', endpoints.store, {
-                        path: pageKey,
+                        path: currentPath,
                         title: title || null,
                         content,
                     });
@@ -503,6 +536,24 @@
             }
         }
 
+        function setWidgetPath(path) {
+            const sanitized = normalizeTargetPath(path);
+
+            if (sanitized === currentPath) {
+                loadNotes();
+                return;
+            }
+
+            currentPath = sanitized;
+            refreshPathDisplay();
+            resetForm();
+            loadNotes();
+        }
+
+        window.__pageNotesWidgetSetPath = function(path) {
+            setWidgetPath(path);
+        };
+
         toggleButton.addEventListener('click', () => {
             togglePanel();
         });
@@ -520,6 +571,12 @@
         openTriggers.forEach((trigger) => {
             trigger.addEventListener('click', (event) => {
                 event.preventDefault();
+
+                const targetPath = trigger.getAttribute('data-open-page-notes-path');
+                if (targetPath) {
+                    setWidgetPath(targetPath);
+                }
+
                 togglePanel(true);
                 setTimeout(() => {
                     contentInput.focus();

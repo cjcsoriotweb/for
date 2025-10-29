@@ -27,6 +27,14 @@
             'cta' => __('Ouvrir le centre support'),
         ],
         [
+            'route' => route('superadmin.page-notes.overview'),
+            'icon' => 'note_stack',
+            'label' => __('Notes développeur'),
+            'stat' => sprintf('%s / %s', number_format($stats->get('page_notes_pending', 0)), number_format($stats->get('page_notes_total', 0))),
+            'description' => __('Consultez et priorisez les retours laissés par le widget.'),
+            'cta' => __('Voir les notes'),
+        ],
+        [
             'route' => route('superadmin.ai.index'),
             'icon' => 'smart_toy',
             'label' => __('Formateurs IA'),
