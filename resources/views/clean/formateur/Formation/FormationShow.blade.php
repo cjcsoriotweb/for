@@ -32,8 +32,7 @@
                     src="{{ $formation->cover_image_url }}"
                     alt="Image de couverture de {{ $formation->title }}"
                     class="h-56 w-full object-cover sm:h-64 lg:h-72"
-                    onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';"
-                  />
+                    onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';" />
                 </div>
               </div>
             </div>
@@ -48,170 +47,21 @@
       <div class="mb-8 p-5">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Gestion de la formation</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Edit Formation Card -->
-          <a href="{{ route('formateur.formation.edit', $formation) }}"
-            class="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
-            <div class="p-6">
-              <div class="flex items-center mb-4">
-                <div
-                  class="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors duration-200">
-                  <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                    </path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3
-                    class="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
-                    Modifier la formation
-                  </h3>
-                  <p class="text-sm text-gray-600">
-                    Titre, description et paramètres
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center text-sm text-indigo-600 font-medium">
-                Modifier
-                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </div>
-          </a>
 
-          <!-- AI Trainer Card -->
-          <a href="{{ route('formateur.formation.ai.edit', $formation) }}"
-            class="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
-            <div class="p-6">
-              <div class="flex items-center mb-4">
-                <div
-                  class="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors duration-200">
-                  <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 14l9-5-9-5-9 5 9 5zm0 0v7m0 0l-3.5-2m3.5 2l3.5-2">
-                    </path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3
-                    class="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-200">
-                    Configurer le formateur IA
-                  </h3>
-                  <p class="text-sm text-gray-600">
-                    Associez ou retirez un assistant IA pour cette formation.
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center text-sm text-purple-600 font-medium">
-                Gérer
-                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </div>
-          </a>
 
-          <!-- Pricing Card -->
-          <a href="{{ route('formateur.formation.pricing.edit', $formation) }}"
-            class="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
-            <div class="p-6">
-              <div class="flex items-center mb-4">
-                <div
-                  class="flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors duration-200">
-                  <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                    </path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3
-                    class="text-lg font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors duration-200">
-                    Configurer la tarification
-                  </h3>
-                  <p class="text-sm text-gray-600">
-                    Prix et options de paiement
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center text-sm text-emerald-600 font-medium">
-                Configurer
-                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </div>
-          </a>
 
-          <!-- Chapters Card -->
-          <a href="{{ route('formateur.formation.chapters.index', $formation) }}"
-            class="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
-            <div class="p-6">
-              <div class="flex items-center mb-4">
-                <div
-                  class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
-                  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                    </path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3
-                    class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
-                    Gérer les chapitres
-                  </h3>
-                  <p class="text-sm text-gray-600">
-                    {{ $formation->chapters->count() }} chapitre{{ $formation->chapters->count() > 1 ? 's' : '' }}
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center text-sm text-blue-600 font-medium">
-                Gérer
-                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </div>
-          </a>
 
-          <!-- Completion Documents Card -->
-          <a href="{{ route('formateur.formation.completion-documents.index', $formation) }}"
-            class="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
-            <div class="p-6">
-              <div class="flex items-center mb-4">
-                <div
-                  class="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors duration-200">
-                  <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z">
-                    </path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3
-                    class="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-200">
-                    Documents de fin de formation
-                  </h3>
-                  <p class="text-sm text-gray-600">
-                    Gérez les attestations et supports remis aux apprenants.
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center text-sm text-purple-600 font-medium">
-                Ouvrir l'espace documents
-                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </div>
-          </a>
+
+
+
+
+          @include('clean.formateur.Formation.Buttons.ManageFormation')
+          @include('clean.formateur.Formation.Buttons.IaFormationCard')
+          @include('clean.formateur.Formation.Buttons.PricingCard')
+          @include('clean.formateur.Formation.Buttons.ChapterManage')
+          @include('clean.formateur.Formation.Buttons.DocumentToFormationEnd')
+          @include('clean.formateur.Formation.Buttons.ChangeUser')
+
         </div>
       </div>
 
@@ -441,59 +291,66 @@
     }
 
     function toggleFormationStatus() {
-      const formationId = {{ $formation-> id
-    }};
-    const currentStatus = {{ $formation-> active ? 'true' : 'false' }};
-
-    // Show confirmation dialog
-    const action = currentStatus ? 'désactiver' : 'activer';
-    const confirmMessage = 'Êtes-vous sûr de vouloir ' + action + ' cette formation ?';
-
-    if (!confirm(confirmMessage)) {
-      return;
-    }
-
-    // Disable the button and show loading state
-    const button = event.target.closest('button');
-    const originalText = button.innerHTML;
-
-    button.disabled = true;
-    button.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Traitement...';
-
-    // Make AJAX request to toggle status
-    fetch('/formateur/formation/' + formationId + '/toggle-status', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Update the UI
-          location.reload(); // Simple reload to reflect changes
-        } else {
-          throw new Error(data.message || 'Erreur lors du changement de statut');
+      const formationId = {
+        {
+          $formation - > id
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Erreur lors du changement de statut: ' + error.message);
-      })
-      .finally(() => {
-        // Re-enable button and restore original text
-        button.disabled = false;
-        button.innerHTML = originalText;
-      });
+      };
+      const currentStatus = {
+        {
+          $formation - > active ? 'true' : 'false'
+        }
+      };
+
+      // Show confirmation dialog
+      const action = currentStatus ? 'désactiver' : 'activer';
+      const confirmMessage = 'Êtes-vous sûr de vouloir ' + action + ' cette formation ?';
+
+      if (!confirm(confirmMessage)) {
+        return;
       }
+
+      // Disable the button and show loading state
+      const button = event.target.closest('button');
+      const originalText = button.innerHTML;
+
+      button.disabled = true;
+      button.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Traitement...';
+
+      // Make AJAX request to toggle status
+      fetch('/formateur/formation/' + formationId + '/toggle-status', {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the UI
+            location.reload(); // Simple reload to reflect changes
+          } else {
+            throw new Error(data.message || 'Erreur lors du changement de statut');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Erreur lors du changement de statut: ' + error.message);
+        })
+        .finally(() => {
+          // Re-enable button and restore original text
+          button.disabled = false;
+          button.innerHTML = originalText;
+        });
+    }
 
 
 
     document
       .getElementById("editContentModal")
-      .addEventListener("click", function (e) {
+      .addEventListener("click", function(e) {
         if (e.target === this) {
           closeEditContentModal();
         }
@@ -501,7 +358,7 @@
 
     document
       .getElementById("editPriceModal")
-      .addEventListener("click", function (e) {
+      .addEventListener("click", function(e) {
         if (e.target === this) {
           closeEditPriceModal();
         }
@@ -509,7 +366,7 @@
 
     document
       .getElementById("editLessonModal")
-      .addEventListener("click", function (e) {
+      .addEventListener("click", function(e) {
         if (e.target === this) {
           closeEditLessonModal();
         }
@@ -518,7 +375,7 @@
     // Handle lesson form submission with AJAX
     document
       .getElementById("editLessonForm")
-      .addEventListener("submit", function (e) {
+      .addEventListener("submit", function(e) {
         e.preventDefault();
 
         const formData = new FormData(this);
@@ -533,13 +390,13 @@
           '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Enregistrement...';
 
         fetch(this.action, {
-          method: "POST",
-          body: formData,
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-            Accept: "application/json",
-          },
-        })
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+              Accept: "application/json",
+            },
+          })
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
@@ -630,7 +487,7 @@
     }
 
     // Keyboard shortcuts
-    document.addEventListener("keydown", function (e) {
+    document.addEventListener("keydown", function(e) {
       // Escape key closes modals
       if (e.key === "Escape") {
         closeEditContentModal();
