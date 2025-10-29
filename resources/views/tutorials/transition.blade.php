@@ -19,7 +19,7 @@
     <div class="section flex min-h-screen flex-col items-center justify-center bg-slate-900 px-6">
         <div class="max-w-2xl text-center">
             <h2 class="text-3xl font-semibold">
-                {{ __("Tutoriel pour :name", ['name' => $tutorialLabel]) }}
+                {{ __("Présentation de la page :name", ['name' => $tutorialLabel]) }}
             </h2>
             <p class="mt-4 text-base text-slate-300">
                 {{ __("Nous allons afficher un guide pour t'aider a prendre en main cette page. Sans action de ta part, il demarrera dans") }}
