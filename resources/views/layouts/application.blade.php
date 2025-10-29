@@ -6,6 +6,7 @@
         <div class="flex flex-col gap-4">
           {{ $header }}
 
+
         </div>
       </div>
     </div>
@@ -84,6 +85,7 @@
   {{-- CONTENU PRINCIPAL AVEC ESPACE --}}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">@yield('content')</div>
 </x-app-layout>
+
 
 
 

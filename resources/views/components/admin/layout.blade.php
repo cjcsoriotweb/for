@@ -86,104 +86,101 @@
 
 <x-application-layout :team="$team">
     <x-slot name="header">
-        <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-2xl">
-            <div class="absolute -top-24 -left-16 h-60 w-60 rounded-full bg-indigo-500/20 blur-3xl"></div>
-            <div class="absolute -bottom-28 -right-16 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl"></div>
+        <div class="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm shadow-slate-200/70 dark:border-slate-700/60 dark:bg-slate-900/80 dark:shadow-none">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    @if ($backUrl)
+                        <a
+                            href="{{ $backUrl }}"
+                            class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-white"
+                        >
+                            <span class="material-symbols-outlined text-base">arrow_back</span>
+                            {{ __('Retour') }}
+                        </a>
+                    @endif
 
-            <div class="relative space-y-8 p-8 lg:p-10">
-                <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex flex-wrap items-center gap-3">
-                        @if ($backUrl)
-                            <a
-                                href="{{ $backUrl }}"
-                                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:bg-white/20 hover:text-white"
-                            >
-                                <span class="material-symbols-outlined text-base">arrow_back</span>
-                                {{ __('Retour') }}
-                            </a>
-                        @endif
+                    @if ($hasBreadcrumbs)
+                        <nav aria-label="{{ __('Fil d\'Ariane') }}">
+                            <ol class="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-400 dark:text-slate-500">
+                                @foreach ($breadcrumbs as $index => $crumb)
+                                    @if ($index)
+                                        <li class="text-slate-300 dark:text-slate-600">•</li>
+                                    @endif
 
-                        @if ($hasBreadcrumbs)
-                            <nav aria-label="{{ __('Fil d\'Ariane') }}">
-                                <ol class="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60">
-                                    @foreach ($breadcrumbs as $index => $crumb)
-                                        @if ($index)
-                                            <li class="text-white/30">/</li>
+                                    <li>
+                                        @if (! empty($crumb['url']))
+                                            <a href="{{ $crumb['url'] }}" class="transition hover:text-slate-700 dark:hover:text-slate-300">
+                                                {{ $crumb['label'] }}
+                                            </a>
+                                        @else
+                                            <span class="text-slate-500 dark:text-slate-300">
+                                                {{ $crumb['label'] }}
+                                            </span>
                                         @endif
+                                    </li>
+                                @endforeach
+                            </ol>
+                        </nav>
+                    @endif
+                </div>
 
-                                        <li>
-                                            @if (! empty($crumb['url']))
-                                                <a href="{{ $crumb['url'] }}" class="transition hover:text-white">{{ $crumb['label'] }}</a>
-                                            @else
-                                                <span class="text-white/85">{{ $crumb['label'] }}</span>
-                                            @endif
-                                        </li>
-                                    @endforeach
-                                </ol>
-                            </nav>
-                        @endif
+                <div class="flex flex-wrap items-center gap-2">
+                    @isset($headerActions)
+                        {{ $headerActions }}
+                    @else
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-white"
+                            >
+                                <span class="material-symbols-outlined text-base">logout</span>
+                                {{ __("D\u{00E9}connexion") }}
+                            </button>
+                        </form>
+                    @endisset
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex items-start gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-200">
+                        <span class="material-symbols-outlined text-xl">{{ $icon }}</span>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3">
-                        @isset($headerActions)
-                            {{ $headerActions }}
-                        @else
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button
-                                    type="submit"
-                                    class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:bg-white/20 hover:text-white"
-                                >
-                                    <span class="material-symbols-outlined text-base">logout</span>
-                                    {{ __("D\u{00E9}connexion") }}
-                                </button>
-                            </form>
-                        @endisset
+                    <div>
+                        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                            {{ $title }}
+                        </h1>
+
+                        @if (! empty($subtitle))
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-300">
+                                {{ $subtitle }}
+                            </p>
+                        @endif
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="max-w-2xl space-y-4">
-                        <div class="flex items-start gap-4">
-                            <div class="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-lg">
-                                <span class="material-symbols-outlined text-2xl text-white">{{ $icon }}</span>
-                            </div>
-
-                            <div>
-                                <h1 class="text-3xl font-semibold leading-tight text-white">
-                                    {{ $title }}
-                                </h1>
-
-                                @if (! empty($subtitle))
-                                    <p class="mt-2 text-sm text-white/70">
-                                        {{ $subtitle }}
-                                    </p>
-                                @endif
-                            </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                        <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-white">
+                            @if ($team->profile_photo_path)
+                                <img
+                                    src="{{ Storage::disk('public')->url($team->profile_photo_path) }}"
+                                    alt="{{ __("Logo de l'\u{00E9}quipe :name", ['name' => $teamName ?: __('Sans nom')]) }}"
+                                    class="h-full w-full object-contain"
+                                />
+                            @else
+                                <span class="text-lg font-semibold">{{ $teamInitials }}</span>
+                            @endif
                         </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-4 rounded-2xl border border-white/15 bg-white/10 px-5 py-4 backdrop-blur">
-                            <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-white/10 text-2xl font-semibold text-white">
-                                @if ($team->profile_photo_path)
-                                    <img
-                                        src="{{ Storage::disk('public')->url($team->profile_photo_path) }}"
-                                        alt="{{ __("Logo de l'\u{00E9}quipe :name", ['name' => $teamName ?: __('Sans nom')]) }}"
-                                        class="h-full w-full rounded-xl object-contain"
-                                    />
-                                @else
-                                    <span>{{ $teamInitials }}</span>
-                                @endif
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold uppercase tracking-[0.35em] text-white/70">
-                                    {{ __("\u{00C9}quipe") }}
-                                </p>
-                                <p class="text-lg font-semibold text-white">
-                                    {{ $teamName !== '' ? $teamName : __('Sans nom') }}
-                                </p>
-                            </div>
+                        <div class="leading-tight">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                                {{ __("\u{00C9}quipe") }}
+                            </p>
+                            <p class="text-sm font-semibold text-slate-900 dark:text-white">
+                                {{ $teamName !== '' ? $teamName : __('Sans nom') }}
+                            </p>
                         </div>
                     </div>
                 </div>
