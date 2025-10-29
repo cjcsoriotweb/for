@@ -11,7 +11,7 @@
                 {{ __('Configuration') }}
             </p>
             <span class="mt-3 block text-lg font-semibold text-slate-900 dark:text-white">
-                {{ __("Identité et de l'équipe") }}
+                {{ __('Identite de l equipe') }}
             </span>
         </div>
         <span class="material-symbols-outlined text-3xl text-indigo-500 transition group-hover:text-indigo-400 dark:text-indigo-300">
@@ -22,16 +22,17 @@
     <ul class="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-400">
         <li class="flex items-center gap-2">
             <span class="material-symbols-outlined text-base text-indigo-400 dark:text-indigo-300">brush</span>
-            {{ __('Logo, couleurs et descriptif équipe') }}
+            {{ __('Logo, couleurs et presentation de l equipe') }}
         </li>
         <li class="flex items-center gap-2">
             <span class="material-symbols-outlined text-base text-indigo-400 dark:text-indigo-300">verified_user</span>
-            {{ __('Gestion des accès avancés') }}
+            {{ __('Gestion des acces avances') }}
         </li>
     </ul>
 
     <span class="mt-5 inline-flex items-center text-xs font-medium text-indigo-600 transition group-hover:text-indigo-500 dark:text-indigo-300 dark:group-hover:text-indigo-200">
-        {{ __('Ouvrir les paramètres') }}
+        {{ __('Ouvrir la configuration') }}
         <span class="material-symbols-outlined ml-2 text-base">arrow_outward</span>
     </span>
 </a>
+
