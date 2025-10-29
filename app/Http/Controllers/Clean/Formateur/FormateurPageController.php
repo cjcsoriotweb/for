@@ -13,6 +13,6 @@ class FormateurPageController extends Controller
 
     public function home()
     {
-        return view('clean.formateur.FormateurHomePage');
+        return view('out-application.formateur.formateur-home-page');
     }
 }

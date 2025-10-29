@@ -20,7 +20,7 @@ class AccountPageController extends Controller
         $organisations = $this->accountService->teams()->listByUser($user);
         $invitationsPending = $this->accountService->teams()->pendingInvitations($user);
 
-        return view('clean.account.dashboard', [
+        return view('out-application.account.dashboard', [
             'organisations' => $organisations,
             'invitations_pending' => $invitationsPending,
         ]);
