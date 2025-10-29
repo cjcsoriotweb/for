@@ -19,14 +19,6 @@
             'cta' => __('Gérer les utilisateurs'),
         ],
         [
-            'route' => route('formateur.home'),
-            'icon' => 'library_books',
-            'label' => __('Formations disponibles'),
-            'stat' => number_format($stats->get('formations', 0)),
-            'description' => __('Pilotez le catalogue pour chaque équipe.'),
-            'cta' => __('Gérer les formations'),
-        ],
-        [
             'route' => route('superadmin.support.index'),
             'icon' => 'support_agent',
             'label' => __('Tickets support'),

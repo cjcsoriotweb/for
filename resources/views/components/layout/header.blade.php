@@ -1,13 +1,12 @@
 <header
-    class="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/80"
->
+    class="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/80">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
             <!-- Logo and Title -->
             <div class="flex items-center space-x-3">
-           
-               <x-application-logo size="5xl"/>
-     
+
+                <x-application-logo size="5xl" />
+
             </div>
 
             <!-- User Menu -->
@@ -15,8 +14,7 @@
                 <!-- User Info -->
                 <div class="hidden sm:block text-right">
                     <p
-                        class="text-sm font-medium text-slate-900 dark:text-white"
-                    >
+                        class="text-sm font-medium text-slate-900 dark:text-white">
                         {{ auth()->user()->name }}
                     </p>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
@@ -28,79 +26,72 @@
                 <div class="relative" id="user-menu">
                     <button
                         onclick="toggleUserMenu()"
-                        class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-                    >
-                        <span class="material-symbols-outlined text-lg"
-                            >person</span
-                        >
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">
+                        <span class="material-symbols-outlined text-lg">person</span>
                     </button>
 
                     <!-- Dropdown Menu -->
                     <div
                         id="user-menu-dropdown"
-                        class="absolute right-0 mt-2 w-56 origin-top-right scale-95 transform rounded-lg bg-white py-2 shadow-lg ring-1 ring-slate-200 opacity-0 transition-all focus:outline-none dark:bg-slate-800 dark:ring-slate-700 hidden"
-                    >
+                        class="absolute right-0 mt-2 w-56 origin-top-right scale-95 transform rounded-lg bg-white py-2 shadow-lg ring-1 ring-slate-200 opacity-0 transition-all focus:outline-none dark:bg-slate-800 dark:ring-slate-700 hidden">
                         <!-- User Info Header -->
                         <div
-                            class="px-4 py-3 border-b border-slate-200 dark:border-slate-700"
-                        >
+                            class="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
                             <p
-                                class="text-sm font-medium text-slate-900 dark:text-white"
-                            >
+                                class="text-sm font-medium text-slate-900 dark:text-white">
                                 {{ auth()->user()->name }}
                             </p>
                             <p
-                                class="text-xs text-slate-500 dark:text-slate-400"
-                            >
+                                class="text-xs text-slate-500 dark:text-slate-400">
                                 {{ auth()->user()->email }}
                             </p>
                         </div>
 
                         <!-- Menu Items -->
                         <div class="py-1">
-      @if(Auth::user()->superadmin)
+                            @if(Auth::user()->superadmin)
 
                             <a
                                 href="{{ route('superadmin.overview') }}"
-                                class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
-                            >
+                                class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
                                 <span
-                                    class="material-symbols-outlined text-base mr-3"
-                                    >manage_accounts</span
-                                >
+                                    class="material-symbols-outlined text-base mr-3">manage_accounts</span>
                                 {{ __("Superadmin") }}
+                            </a>
+                            @endif
+
+                            @if(Auth::user()->formateur)
+
+                            <a
+                                href="{{ route('formateur.home') }}"
+                                class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
+                                <span
+                                    class="material-symbols-outlined text-base mr-3">manage_accounts</span>
+                                {{ __("Formateur") }}
                             </a>
                             @endif
                             <a
                                 href="{{ route('profile.show') }}#settings"
-                                class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
-                            >
+                                class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
                                 <span
-                                    class="material-symbols-outlined text-base mr-3"
-                                    >settings</span
-                                >
+                                    class="material-symbols-outlined text-base mr-3">settings</span>
                                 {{ __("Paramètres") }}
                             </a>
                         </div>
 
                         <!-- Logout -->
                         <div
-                            class="border-t border-slate-200 pt-1 dark:border-slate-700"
-                        >
+                            class="border-t border-slate-200 pt-1 dark:border-slate-700">
                             <form
                                 method="POST"
                                 action="{{ route('logout') }}"
-                                class="inline"
-                            >
+                                class="inline">
                                 @csrf
                                 <button
                                     type="submit"
-                                    class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                                >
+                                    class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
                                     <span
-                                        class="material-symbols-outlined text-base mr-3"
-                                        >logout</span
-                                    >
+                                        class="material-symbols-outlined text-base mr-3">logout</span>
                                     {{ __("Déconnexion") }}
                                 </button>
                             </form>
@@ -125,7 +116,7 @@
     let refreshTimeout;
 
     function startAutoRefresh() {
-        refreshTimeout = setTimeout(function () {
+        refreshTimeout = setTimeout(function() {
             const refreshForm = document.getElementById("refresh-form");
             const refreshIcon = document.getElementById("refresh-icon");
 
@@ -147,11 +138,11 @@
         if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
             navigator.clipboard
                 .writeText(text)
-                .then(function () {
+                .then(function() {
                     // Show success feedback
                     showToast("Adresse e-mail copiée !");
                 })
-                .catch(function (err) {
+                .catch(function(err) {
                     console.error("Erreur lors de la copie: ", err);
                     fallbackCopyTextToClipboard(text);
                 });
@@ -214,12 +205,12 @@
     }
 
     // Enhanced button interactions
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         // Add click handlers for copy buttons
         const copyButtons =
             document.querySelectorAll("[data-copy-text]");
         copyButtons.forEach((button) => {
-            button.addEventListener("click", function (e) {
+            button.addEventListener("click", function(e) {
                 e.preventDefault();
                 const textToCopy = button.getAttribute("data-copy-text");
                 if (textToCopy) {
@@ -238,7 +229,7 @@
     // Refresh form submission
     document
         .getElementById("refresh-form")
-        ?.addEventListener("submit", function (e) {
+        ?.addEventListener("submit", function(e) {
             e.preventDefault();
 
             // Show loading state
@@ -298,7 +289,7 @@
     // Close dropdown when clicking on links inside it
     document
         .getElementById("user-menu-dropdown")
-        ?.addEventListener("click", function (e) {
+        ?.addEventListener("click", function(e) {
             if (
                 e.target.tagName === "A" ||
                 e.target.closest('button[type="submit"]')
