@@ -19,7 +19,7 @@ class TeamService
         return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string)));
     }
 
-    public function switchTeam(User $user, Team $team)
+    public function availableDestinations(User $user, Team $team): array
     {
         $destinations = [];
 
@@ -58,6 +58,13 @@ class TeamService
                 'route' => route('eleve.index', ['team' => $team]),
             ];
         }
+
+        return $destinations;
+    }
+
+    public function switchTeam(User $user, Team $team)
+    {
+        $destinations = $this->availableDestinations($user, $team);
 
         if (empty($destinations)) {
             return abort(403, __("Vous n'avez aucun acces ici."));
