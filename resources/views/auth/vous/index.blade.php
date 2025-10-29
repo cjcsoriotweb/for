@@ -308,7 +308,7 @@
                 </div>
 
                 <!-- Accept button -->
-                <form method="POST" action="{{ route('vous.invitation.accept', $invitation->id) }}"
+                <form method="POST" action="{{ route('user.invitation.accept', $invitation->id) }}"
                   class="flex items-center gap-2">
                   @csrf @method('PATCH')
                   <button type="submit"

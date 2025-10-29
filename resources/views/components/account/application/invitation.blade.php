@@ -1,4 +1,8 @@
-@if(isset($invitations_pending)) @if ($invitations_pending->count() > 0)
+@php
+    /** @var \Illuminate\Support\Collection|\Laravel\Jetstream\TeamInvitation[] $pendingInvitations */
+    $pendingInvitations = $invitations_pending ?? $invitationsPending ?? null;
+@endphp
+@if(isset($pendingInvitations) && $pendingInvitations->count() > 0)
 <!-- Pending Invitations Section -->
 <div class="mb-16">
     <div class="mb-8 text-center">
@@ -15,7 +19,7 @@
     </div>
 
     <div class="mx-auto max-w-2xl space-y-4">
-        @foreach ($invitations_pending as $invitation)
+        @foreach ($pendingInvitations as $invitation)
         <div
             class="group relative overflow-hidden rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition-all duration-300 hover:shadow-lg dark:bg-slate-800/50 dark:ring-slate-700"
         >
@@ -61,7 +65,7 @@
                 <!-- Accept button -->
                 <form
                     method="POST"
-                    action="{{ route('vous.invitation.accept', $invitation->id) }}"
+                    action="{{ route('user.invitation.accept', $invitation->id) }}"
                     class="flex items-center gap-2"
                 >
                     @csrf @method('PATCH')
@@ -81,4 +85,4 @@
         @endforeach
     </div>
 </div>
-@endif @endif
+@endif

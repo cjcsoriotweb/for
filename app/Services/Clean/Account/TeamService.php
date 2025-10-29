@@ -3,7 +3,9 @@
 namespace App\Services\Clean\Account;
 
 use App\Models\Team;
+use App\Models\TeamInvitation;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class TeamService
 {
@@ -33,6 +35,16 @@ class TeamService
                 'gradient' => 'from-sky-500 via-blue-500 to-indigo-500',
                 'route' => route('application.admin.index', ['team' => $team]),
             ];
+
+            $destinations[] = [
+                'key' => 'formateur',
+                'badge' => __('Formateur'),
+                'title' => __('Studio de cours'),
+                'description' => __('Creer et mettre a jour les contenus pedagogiques de l equipe.'),
+                'icon' => 'draw',
+                'gradient' => 'from-amber-500 via-orange-500 to-rose-500',
+                'route' => route('formateur.home', ['team' => $team]),
+            ];
         }
 
         if ($user->hasTeamRole($team, 'manager')) {
@@ -60,6 +72,37 @@ class TeamService
         }
 
         return $destinations;
+    }
+
+    public function pendingInvitations(User $user)
+    {
+        return TeamInvitation::query()
+            ->with('team')
+            ->where('email', $user->email)
+            ->latest('id')
+            ->get();
+    }
+
+    public function acceptInvitation(User $user, TeamInvitation $invitation): Team
+    {
+        if (strcasecmp($invitation->email, $user->email) !== 0) {
+            throw new AuthorizationException(__("Vous ne pouvez pas accepter cette invitation."));
+        }
+
+        $team = $invitation->team;
+        if (! $team) {
+            $invitation->delete();
+
+            throw new AuthorizationException(__("Cette invitation n'est plus valide."));
+        }
+
+        $team->users()->syncWithoutDetaching([
+            $user->id => ['role' => $invitation->role],
+        ]);
+
+        $invitation->delete();
+
+        return $team;
     }
 
     public function switchTeam(User $user, Team $team)

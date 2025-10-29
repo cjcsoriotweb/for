@@ -16,9 +16,14 @@ class AccountPageController extends Controller
 
     public function dashboard()
     {
-        $organisations = $this->accountService->teams()->listByUser(Auth::user());
+        $user = Auth::user();
+        $organisations = $this->accountService->teams()->listByUser($user);
+        $invitationsPending = $this->accountService->teams()->pendingInvitations($user);
 
-        return view('clean.account.dashboard', compact('organisations'));
+        return view('clean.account.dashboard', [
+            'organisations' => $organisations,
+            'invitations_pending' => $invitationsPending,
+        ]);
     }
 
     public function switch(SwitchTeamRequest $request)

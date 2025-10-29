@@ -102,7 +102,7 @@
       @endif
 
       <!-- Invitation Component -->
-      <x-account.application.invitation />
+      <x-account.application.invitation :invitations_pending="$invitations_pending" />
   </div>
   </main>
   </div>
