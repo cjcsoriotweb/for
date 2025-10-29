@@ -1,60 +1,79 @@
+{{-- resources/views/components/logo-img.blade.php --}}
 @props([
-    // Taille prédéfinie OU valeur numérique en pixels
-    // Ex: size="3xl" | size="full" | size=256
-    'size' => 'md',          // xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|full
+    // Fichier dans public/ (ex: logo.png, images/brand.png)
+    'src'   => 'logo.png',
+
+    // Taille prédéfinie OU valeur numérique en px (ex: '3xl' ou 256)
+    'size'  => 'md',  // xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|full | int
+
+    // Texte alternatif
     'label' => config('app.name', 'App').' logo',
+
+    // Mode de remplissage CSS object-fit
+    'fit'   => 'contain', // contain|cover|fill|none|scale-down
+
+    // Coins arrondis (optionnel)
+    'rounded' => 'none', // none|sm|md|lg|xl|2xl|full
 ])
 
 @php
-    // Classes Tailwind prêtes à l'emploi
     $presets = [
-        'xs'   => 'w-5 h-5',
-        'sm'   => 'w-6 h-6',
-        'md'   => 'w-8 h-8',
-        'lg'   => 'w-12 h-12',
-        'xl'   => 'w-16 h-16',    // 64px
-        '2xl'  => 'w-24 h-24',    // 96px
-        '3xl'  => 'w-32 h-32',    // 128px
-        '4xl'  => 'w-48 h-48',    // 192px
-        '5xl'  => 'w-64 h-64',    // 256px
-        'full' => 'w-full h-auto' // s’adapte au conteneur (responsive)
+        'xs'   => ['w' => 20,  'h' => 20 ],   // 5 * 4
+        'sm'   => ['w' => 24,  'h' => 24 ],
+        'md'   => ['w' => 32,  'h' => 32 ],
+        'lg'   => ['w' => 48,  'h' => 48 ],
+        'xl'   => ['w' => 64,  'h' => 64 ],
+        '2xl'  => ['w' => 96,  'h' => 96 ],
+        '3xl'  => ['w' => 128, 'h' => 128],
+        '4xl'  => ['w' => 192, 'h' => 192],
+        '5xl'  => ['w' => 256, 'h' => 256],
+        'full' => ['w' => null, 'h' => null],
     ];
 
-    $svgPath = public_path('logo.svg');
-    $svg = is_file($svgPath) ? file_get_contents($svgPath) : null;
+    $isNumeric = is_numeric($size);
+    $dim = $isNumeric
+        ? ['w' => (int) $size, 'h' => (int) $size]
+        : ($presets[$size] ?? $presets['md']);
 
-    // Détermine classe/inline-style selon le type de "size"
-    $dimClass = '';
-    $dimStyle = '';
+    // Classes utilitaires
+    $objectFit = match($fit) {
+        'cover' => 'object-cover',
+        'fill' => 'object-fill',
+        'none' => 'object-none',
+        'scale-down' => 'object-scale-down',
+        default => 'object-contain',
+    };
 
-    if (is_numeric($size)) {
-        // Taille exacte en pixels (ex: size=512)
-        $px = (int) $size;
-        $dimStyle = "width: {$px}px; height: {$px}px;";
-    } else {
-        $dimClass = $presets[$size] ?? $presets['md'];
+    $roundClass = match($rounded) {
+        'sm' => 'rounded-sm',
+        'md' => 'rounded-md',
+        'lg' => 'rounded-lg',
+        'xl' => 'rounded-xl',
+        '2xl' => 'rounded-2xl',
+        'full' => 'rounded-full',
+        default => '',
+    };
+
+    // Style width/height si taille numérique, sinon Tailwind gèrera via classes externes si besoin
+    $style = '';
+    if ($isNumeric) {
+        $style = "width: {$dim['w']}px; height: {$dim['h']}px;";
+    } elseif ($size !== 'full' && $dim['w'] && $dim['h']) {
+        $style = "width: {$dim['w']}px; height: {$dim['h']}px;";
     }
 
-    if ($svg) {
-        // Injecte classes + style + a11y dans la 1ère <svg>
-        $classAttr = trim(($dimClass ? $dimClass.' ' : '').'fill-current');
-        $styleAttr = $dimStyle ? ' style="'.$dimStyle.'"' : '';
-
-        $svg = preg_replace(
-            '/<svg\b([^>]*)>/i',
-            '<svg$1 class="'.$classAttr.'" role="img" aria-label="'.e($label).'"'.$styleAttr.'>',
-            $svg,
-            1
-        );
-        // Option : décommenter pour forcer toute la couleur à suivre currentColor
-        // $svg = preg_replace('/\sfill="[^"]*"/i', ' fill="currentColor"', $svg);
-    }
+    // URL publique
+    $url = asset($src);
 @endphp
 
-@if($svg)
-    <span {{ $attributes->merge(['class' => 'inline-block leading-none']) }}>
-        {!! $svg !!}
-    </span>
-@else
-    <div {{ $attributes->merge(['class' => ($presets['md']).' bg-slate-300/20 rounded']) }} aria-label="Logo placeholder"></div>
-@endif
+<img
+    src="{{ $url }}"
+    alt="{{ $label }}"
+    loading="lazy"
+    decoding="async"
+    fetchpriority="auto"
+    {{ $attributes->merge([
+        'class' => trim("inline-block {$objectFit} {$roundClass}"),
+        'style' => $style,
+    ]) }}
+/>

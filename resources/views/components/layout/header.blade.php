@@ -5,7 +5,7 @@
             <!-- Logo and Title -->
             <div class="flex items-center space-x-3">
 
-                <x-application-logo size="5xl" />
+                <x-application-logo size="2xl" />
 
             </div>
 
