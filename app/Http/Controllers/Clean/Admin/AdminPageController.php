@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Clean\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AiTrainer;
 use App\Models\Formation;
+use App\Models\PageNote;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
@@ -29,7 +30,18 @@ class AdminPageController extends Controller
             'invitations' => TeamInvitation::count(),
             'tickets' => SupportTicket::count(),
             'ai_trainers' => AiTrainer::count(),
+            'page_notes_total' => 0,
+            'page_notes_pending' => 0,
         ];
+
+        $pageNoteSummary = PageNote::query()
+            ->selectRaw('count(*) as total_notes, sum(case when is_resolved = 0 then 1 else 0 end) as pending_notes')
+            ->first();
+
+        if ($pageNoteSummary) {
+            $stats['page_notes_total'] = (int) ($pageNoteSummary->total_notes ?? 0);
+            $stats['page_notes_pending'] = (int) ($pageNoteSummary->pending_notes ?? 0);
+        }
 
         return view('out-application.superadmin.superadmin-overview-page', compact('stats'));
     }
