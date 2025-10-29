@@ -31,7 +31,7 @@ class AdminPageController extends Controller
             'ai_trainers' => AiTrainer::count(),
         ];
 
-        return view('clean.admin.AdminOverviewPage', compact('stats'));
+        return view('out-application.superadmin.superadmin-overview-page', compact('stats'));
     }
 
     public function teamsIndex(Request $request)
@@ -56,7 +56,7 @@ class AdminPageController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('clean.admin.SuperadminTeamsPage', [
+        return view('out-application.superadmin.superadmin-teams-page', [
             'teams' => $teams,
             'search' => $search,
         ]);
@@ -81,7 +81,7 @@ class AdminPageController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('clean.admin.SuperadminUsersPage', [
+        return view('out-application.superadmin.superadmin-users-page', [
             'users' => $users,
             'search' => $search,
         ]);
@@ -106,7 +106,7 @@ class AdminPageController extends Controller
             ->paginate(18)
             ->withQueryString();
 
-        return view('clean.admin.SuperadminFormationsPage', [
+        return view('out-application.superadmin.superadmin-formations-page', [
             'formations' => $catalog,
             'search' => $search,
         ]);
@@ -114,12 +114,12 @@ class AdminPageController extends Controller
 
     public function supportIndex()
     {
-        return view('clean.admin.SuperadminSupportPage');
+        return view('out-application.superadmin.superadmin-support-page');
     }
 
     public function aiIndex()
     {
-        return view('clean.admin.SuperadminAiPage');
+        return view('out-application.superadmin.superadmin-ia-page');
     }
 
     public function home(Team $team, FormationService $formations)
@@ -141,7 +141,7 @@ class AdminPageController extends Controller
             ->take(5)
             ->get();
 
-        return view('clean.admin.AdminHomePage', compact([
+        return view('admin.admin-home-page', compact([
             'organisations',
             'team',
             'recentFormations',
@@ -154,32 +154,32 @@ class AdminPageController extends Controller
     {
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
-        return view('clean.admin.AdminUsersPage', compact(['organisations', 'team']));
+        return view('in-application.admin.admin-users-page', compact(['organisations', 'team']));
     }
 
     public function formations(Team $team)
     {
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
-        return view('clean.admin.AdminFormationsPage', compact(['organisations', 'team']));
+        return view('in-application.admin.admin-formations-page', compact(['organisations', 'team']));
     }
 
     public function configuration(Team $team)
     {
         $organisations = $this->accountService->teams()->listByUser(Auth::user());
 
-        return view('clean.admin.AdminConfigurationPage', compact(['organisations', 'team']));
+        return view('in-application.admin.admin-configuration-page', compact(['organisations', 'team']));
     }
 
     public function formationCreate(Team $team)
     {
-        return view('clean.admin.formation.create', compact(['team']));
+        return view('in-application.admin.formation.create', compact(['team']));
     }
 
     public function formationEdit(Team $team, $formation_id)
     {
         $formation = Formation::findOrFail($formation_id);
 
-        return view('clean.admin.formation.editFormation', compact(['team', 'formation']));
+        return view('in-application.admin.formation.edit-formation', compact(['team', 'formation']));
     }
 }

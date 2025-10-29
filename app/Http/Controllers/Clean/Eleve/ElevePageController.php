@@ -56,7 +56,7 @@ class ElevePageController extends Controller
         // Paginer les formations pour l'API
         $formationsPaginees = $this->studentFormationService->paginateFormationCurrentByStudent($team, $user, 10);
 
-        return view('clean.eleve.home', compact(
+        return view('in-application.eleve.home', compact(
             'team',
             'formationsWithProgress',
             'formationsPaginees'
@@ -136,7 +136,7 @@ class ElevePageController extends Controller
             ])
             ->values();
 
-        return view('clean.eleve.formation.show', compact(
+        return view('in-application.eleve.formation.show', compact(
             'team',
             'studentFormationService',
             'formationWithProgress',
@@ -212,7 +212,7 @@ class ElevePageController extends Controller
             ])
             ->values();
 
-        return view('clean.eleve.formation.congratulation', compact(
+        return view('in-application.eleve.formation.congratulation', compact(
             'team',
             'formationWithProgress',
             'formationDocuments',
@@ -432,7 +432,7 @@ class ElevePageController extends Controller
         $formationDocuments = $formation->completionDocuments()->get();
         $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
 
-        return view('clean.eleve.lesson.show', compact(
+        return view('in-application.eleve.lesson.show', compact(
             'team',
             'formation',
             'chapter',
@@ -587,7 +587,7 @@ class ElevePageController extends Controller
                 ->with('info', 'Vous avez atteint le nombre maximum de tentatives pour ce quiz. Vous pouvez continuer avec la formation.');
         }
 
-        return view('clean.eleve.lesson.quiz', compact(
+        return view('in-application.eleve.lesson.quiz', compact(
             'team',
             'formation',
             'chapter',
@@ -722,7 +722,7 @@ class ElevePageController extends Controller
         // Récupérer les informations du quiz
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
-        return view('clean.eleve.lesson.quiz-results', compact(
+        return view('in-application.eleve.lesson.quiz-results', compact(
             'team',
             'formation',
             'chapter',

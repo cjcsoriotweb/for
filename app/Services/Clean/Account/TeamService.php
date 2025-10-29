@@ -116,7 +116,7 @@ class TeamService
         $role = $user->teamRole($team)?->key;
         $autoRedirectUrl = count($destinations) === 1 ? $destinations[0]['route'] : null;
 
-        return view('clean.account.switch-team', [
+        return view('out-application.account.switch-team', [
             'team' => $team,
             'destinations' => $destinations,
             'selectedRole' => $role,
