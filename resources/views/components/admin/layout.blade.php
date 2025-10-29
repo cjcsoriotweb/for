@@ -24,6 +24,7 @@
         $backUrl = route('application.admin.overview');
         $breadcrumbs = [
             ['label' => __('Accueil administrateur'), 'url' => $backUrl],
+            ['label' => __('Tableau de bord'), 'url' => null],
         ];
     } elseif ($currentRoute && request()->routeIs('application.admin.configuration.credits')) {
         $backUrl = route('application.admin.configuration.index', $teamParam);

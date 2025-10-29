@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
   @if(isset($header) && isset($team))
   <x-slot name="header">
     <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700">
@@ -38,7 +38,7 @@
                 {{ config("app.name", "Application") }}
               </h1>
               <p class="text-slate-300 mt-1">
-                Espace équipe professionnel
+                Espace Ã©quipe professionnel
               </p>
             </div>
           </div>
@@ -55,7 +55,7 @@
 
   <x-error-display />
 
-  {{-- BLOCK ÉLÉGANT --}}
+  {{-- BLOCK Ã‰LÃ‰GANT --}}
   @isset($block)
   <x-slot name="block">
     <div
@@ -79,10 +79,12 @@
   {{ $slot }}
   @endisset
 
-  {{-- Zone d'erreurs / alertes modernisées --}}
+  {{-- Zone d'erreurs / alertes modernisÃ©es --}}
 
   {{-- CONTENU PRINCIPAL AVEC ESPACE --}}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">@yield('content')</div>
 </x-app-layout>
+
+
 
 
