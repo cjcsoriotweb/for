@@ -1,12 +1,49 @@
 @props([
-    'notifications' => [],
+    // Which buttons to show
+    'buttons' => [
+        'page-search' => true,
+        'assistant' => true,
+        'tutor' => true,
+        'bug' => true,
+    ],
+    // Per-button state: enabled, locked, wizz, notify (int)
+    // Example usage:
+    // <x-ui.layout.assistant-dock :state="['assistant' => ['enabled' => true, 'locked' => false, 'wizz' => true, 'notify' => 3]]" />
+    'state' => [],
 ])
 
 @php
-    $initialNotifications = collect($notifications)
-        ->filter(fn ($active, $key) => $active)
-        ->keys()
-        ->implode(',');
+    $defaults = [
+        'enabled' => true,
+        'locked' => false,
+        'wizz' => false,
+        'notify' => 0,
+    ];
+
+    $resolve = function (string $key) use ($state, $defaults) {
+        $cfg = array_merge($defaults, (array) ($state[$key] ?? []));
+        return (object) [
+            'enabled' => (bool) ($cfg['enabled'] ?? true),
+            'locked' => (bool) ($cfg['locked'] ?? false),
+            'wizz' => (bool) ($cfg['wizz'] ?? false),
+            'notify' => (int) max(0, (int) ($cfg['notify'] ?? 0)),
+        ];
+    };
+
+    $assistantCfg = $resolve('assistant');
+    $tutorCfg = $resolve('tutor');
+    $bugCfg = $resolve('bug');
+    $searchCfg = $resolve('page-search');
+
+    // initial notifications string "key:count,key:count" for JS
+    $initialNotifications = collect([
+        'assistant' => $assistantCfg->notify,
+        'tutor' => $tutorCfg->notify,
+        'bug' => $bugCfg->notify,
+        'page-search' => $searchCfg->notify,
+    ])->filter(fn ($v) => (int) $v > 0)
+      ->map(fn ($v, $k) => $k . ':' . (int) $v)
+      ->implode(',');
 @endphp
 
 <div class="assistant-dock pointer-events-none fixed bottom-6 left-1/2 -translate-x-1/2 z-[1200] flex flex-col items-end space-y-2"
@@ -20,22 +57,31 @@
 
   <div
     class="pointer-events-auto flex items-center gap-2 rounded-3xl border border-slate-200/70 bg-white/90 px-3 py-2 shadow-2xl backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/80">
+    @if ($buttons['page-search'] ?? false)
     <button type="button" data-dock-title="Recherche page" data-dock-target="page-search"
+      data-dock-enabled="{{ $searchCfg->enabled ? '1' : '0' }}" data-dock-locked="{{ $searchCfg->locked ? '1' : '0' }}" data-dock-wizz="{{ $searchCfg->wizz ? '1' : '0' }}" data-dock-notify="{{ $searchCfg->notify }}"
       class="dock-action relative flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-500 text-white shadow-md transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900"
       aria-label="Recherche page" title="Recherche page">
       <span data-dock-indicator
         class="absolute -top-1 -right-1 h-3 w-3 scale-0 rounded-full bg-rose-500 shadow ring-2 ring-white transition-transform duration-150 ease-out dark:ring-slate-900"></span>
+      <span data-dock-badge
+        class="absolute -top-1 -right-1 hidden min-w-[1.25rem] rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold leading-5 text-white shadow"></span>
       <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
         stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="7"></circle>
         <path d="M21 21l-4.35-4.35"></path>
       </svg>
     </button>
+    @endif
+    @if ($buttons['assistant'] ?? false)
     <button type="button" data-dock-title="Assistant IA" data-dock-target="assistant"
+      data-dock-enabled="{{ $assistantCfg->enabled ? '1' : '0' }}" data-dock-locked="{{ $assistantCfg->locked ? '1' : '0' }}" data-dock-wizz="{{ $assistantCfg->wizz ? '1' : '0' }}" data-dock-notify="{{ $assistantCfg->notify }}"
       class="dock-action relative flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-md transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-900 focus-visible:ring-offset-white dark:bg-slate-100 dark:text-slate-900 dark:focus-visible:ring-slate-100 dark:focus-visible:ring-offset-slate-900"
       aria-label="Ouvrir l'assistant IA" title="Assistant IA">
       <span data-dock-indicator
         class="absolute -top-1 -right-1 h-3 w-3 scale-0 rounded-full bg-rose-500 shadow ring-2 ring-white transition-transform duration-150 ease-out dark:ring-slate-900"></span>
+      <span data-dock-badge
+        class="absolute -top-1 -right-1 hidden min-w-[1.25rem] rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold leading-5 text-white shadow"></span>
       <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M7 8h10"></path>
@@ -45,12 +91,17 @@
         </path>
       </svg>
     </button>
+    @endif
 
+    @if ($buttons['tutor'] ?? false)
     <button type="button" data-dock-title="Professeur virtuel" data-dock-target="tutor"
+      data-dock-enabled="{{ $tutorCfg->enabled ? '1' : '0' }}" data-dock-locked="{{ $tutorCfg->locked ? '1' : '0' }}" data-dock-wizz="{{ $tutorCfg->wizz ? '1' : '0' }}" data-dock-notify="{{ $tutorCfg->notify }}"
       class="dock-action relative flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-md transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900"
       aria-label="Voir le professeur virtuel" title="Professeur virtuel">
       <span data-dock-indicator
         class="absolute -top-1 -right-1 h-3 w-3 scale-0 rounded-full bg-rose-500 shadow ring-2 ring-white transition-transform duration-150 ease-out dark:ring-slate-900"></span>
+      <span data-dock-badge
+        class="absolute -top-1 -right-1 hidden min-w-[1.25rem] rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold leading-5 text-white shadow"></span>
       <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"></path>
@@ -59,12 +110,17 @@
         <path d="M15 10s1 .5 2 0 1.5-1.5 1.5-1.5"></path>
       </svg>
     </button>
+    @endif
 
+    @if ($buttons['bug'] ?? false)
     <button type="button" data-dock-title="Signaler un bug" data-dock-target="bug"
+      data-dock-enabled="{{ $bugCfg->enabled ? '1' : '0' }}" data-dock-locked="{{ $bugCfg->locked ? '1' : '0' }}" data-dock-wizz="{{ $bugCfg->wizz ? '1' : '0' }}" data-dock-notify="{{ $bugCfg->notify }}"
       class="dock-action relative flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-500 text-white shadow-md transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900"
       aria-label="Signaler un bug" title="Signaler un bug">
       <span data-dock-indicator
         class="absolute -top-1 -right-1 h-3 w-3 scale-0 rounded-full bg-rose-500 shadow ring-2 ring-white transition-transform duration-150 ease-out dark:ring-slate-900"></span>
+      <span data-dock-badge
+        class="absolute -top-1 -right-1 hidden min-w-[1.25rem] rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold leading-5 text-white shadow"></span>
       <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M10 12v-1"></path>
@@ -80,6 +136,7 @@
         <path d="M17 4 15.5 5.5"></path>
       </svg>
     </button>
+    @endif
   </div>
 </div>
 
@@ -108,7 +165,11 @@
           const initial = (dock.getAttribute('data-dock-initial-notifications') || '')
             .split(',')
             .map((value) => value.trim())
-            .filter(Boolean);
+            .filter(Boolean)
+            .map((pair) => {
+              const [key, count] = pair.split(':');
+              return { key, count: parseInt(count || '0', 10) || 0 };
+            });
 
           const toggleNotification = (target, active) => {
             const action = dock.querySelector(`[data-dock-target=\"${escapeSelector(target)}\"]`);
@@ -116,11 +177,32 @@
               return;
             }
             const indicator = action.querySelector('[data-dock-indicator]');
-            if (!indicator) {
+            const badge = action.querySelector('[data-dock-badge]');
+
+            if (typeof active === 'number') {
+              const count = Math.max(0, active|0);
+              if (badge) {
+                if (count > 0) {
+                  badge.textContent = String(count);
+                  badge.classList.remove('hidden');
+                } else {
+                  badge.classList.add('hidden');
+                }
+              }
+              if (indicator) {
+                indicator.classList.add('scale-0');
+                indicator.classList.remove('scale-100');
+              }
               return;
             }
-            indicator.classList.toggle('scale-100', Boolean(active));
-            indicator.classList.toggle('scale-0', !active);
+
+            if (indicator) {
+              indicator.classList.toggle('scale-100', Boolean(active));
+              indicator.classList.toggle('scale-0', !active);
+            }
+            if (badge) {
+              badge.classList.add('hidden');
+            }
           };
 
           if (!tooltip || !tooltipText || actions.length === 0) {
@@ -146,6 +228,10 @@
           actions.forEach((action) => {
             const title = action.getAttribute('data-dock-title') || action.getAttribute('title');
             const target = action.getAttribute('data-dock-target');
+            const enabled = action.getAttribute('data-dock-enabled') !== '0';
+            const locked = action.getAttribute('data-dock-locked') === '1';
+            const wizz = action.getAttribute('data-dock-wizz') === '1';
+            const notify = parseInt(action.getAttribute('data-dock-notify') || '0', 10) || 0;
 
             action.addEventListener('mouseenter', () => showTooltip(title));
             action.addEventListener('focus', () => showTooltip(title));
@@ -156,8 +242,23 @@
               return;
             }
 
+            if (!enabled) {
+              action.classList.add('opacity-60', 'cursor-not-allowed');
+            }
+            if (wizz) {
+              action.classList.add('animate-pulse');
+            }
+            if (locked) {
+              action.setAttribute('aria-disabled', 'true');
+            }
+
+            if (notify > 0) {
+              toggleNotification(target, notify);
+            }
+
             if (target === 'assistant') {
               action.addEventListener('click', () => {
+                if (!enabled) return;
                 window.assistantDockNotify('assistant', false);
 
                 // Open the AI chat (assistant)
@@ -171,6 +272,7 @@
 
             if (target === 'bug') {
               action.addEventListener('click', () => {
+                if (!enabled) return;
                 window.assistantDockNotify('bug', false);
 
                 // Open the support ticket widget
@@ -184,6 +286,7 @@
 
             if (target === 'tutor') {
               action.addEventListener('click', () => {
+                if (!enabled) return;
                 window.assistantDockNotify('tutor', false);
 
                 // Open the tutor chat (same chat IA, but can be specialized by component)
@@ -209,7 +312,7 @@
 
           dock.addEventListener('mouseleave', hideTooltip);
 
-          initial.forEach((key) => toggleNotification(key, true));
+          initial.forEach(({ key, count }) => toggleNotification(key, count));
 
           window.addEventListener(EVENT_NAME, (event) => {
             const detail = event.detail || {};

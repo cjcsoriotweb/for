@@ -42,15 +42,19 @@
             if (window.__aiWidgetBound) { return; }
             window.__aiWidgetBound = true;
 
-            const dispatchToLivewire = (eventName) => {
-                document.querySelectorAll('[wire\\:id]').forEach((el) => {
-                    try { window.Livewire.find(el.getAttribute('wire:id')).dispatch(eventName); } catch (e) {}
-                });
+            const ensureLivewire = () => typeof window.Livewire !== 'undefined' && window.Livewire.find;
+            const getId = () => {
+                try { return @this.__instance.id; } catch (e) { return null; }
             };
 
-            window.addEventListener('assistant-toggle', () => dispatchToLivewire('assistant-toggle'));
-            window.addEventListener('tutor-toggle', () => dispatchToLivewire('tutor-toggle'));
+            const callOn = (method) => {
+                const id = getId();
+                if (!id || !ensureLivewire()) return;
+                try { window.Livewire.find(id).call(method); } catch (e) {}
+            };
+
+            window.addEventListener('assistant-toggle', () => callOn('onAssistantToggle'));
+            window.addEventListener('tutor-toggle', () => callOn('onTutorToggle'));
         })();
     </script>
 </div>
-

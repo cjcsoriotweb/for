@@ -37,10 +37,8 @@
 
   </div>
 
-  @php
-    $hasAssistantNotifications = auth()->check() && auth()->user()->unreadNotifications()->exists();
-  @endphp
-  <x-ui.layout.assistant-dock :notifications="['assistant' => $hasAssistantNotifications]" />
+
+  <x-ui.layout.assistant-dock :notifications="9" :enable="true" :locked="false" />
 
   <!-- Bottom widget from layouts/app.blade -->
   @auth
