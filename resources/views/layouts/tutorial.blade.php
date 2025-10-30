@@ -364,6 +364,11 @@
             });
         });
     </script>
+    @php
+        $hasAssistantNotifications = auth()->check() && auth()->user()->unreadNotifications()->exists();
+    @endphp
+    <x-ui.layout.assistant-dock :notifications="['assistant' => $hasAssistantNotifications]" />
     @stack('tutorial-scripts')
+    @stack('scripts')
 </body>
 </html>

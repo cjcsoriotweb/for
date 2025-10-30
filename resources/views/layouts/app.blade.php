@@ -37,6 +37,11 @@
 
   </div>
 
+  @php
+    $hasAssistantNotifications = auth()->check() && auth()->user()->unreadNotifications()->exists();
+  @endphp
+  <x-ui.layout.assistant-dock :notifications="['assistant' => $hasAssistantNotifications]" />
+
   <!-- Bottom widget from layouts/app.blade -->
   @auth
   <livewire:support.chat-widget :show-launcher="false" />
