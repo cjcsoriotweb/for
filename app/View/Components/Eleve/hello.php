@@ -29,7 +29,7 @@ class Hello extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.eleve.hello', [
+        return view('components.eleve.dashboard.hello', [
             'team' => $this->team,
         ]);
     }

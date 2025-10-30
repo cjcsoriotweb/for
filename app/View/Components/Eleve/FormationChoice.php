@@ -84,7 +84,7 @@ class FormationChoice extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.eleve.formation-choice', [
+        return view('components.eleve.formation.choice', [
             'team' => $this->team,
             'formations' => $this->formations,
         ]);

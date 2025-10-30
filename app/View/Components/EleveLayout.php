@@ -17,6 +17,6 @@ class EleveLayout extends Component
 
     public function render(): View
     {
-        return view('components.eleve.layout', ['team' => $this->team]);
+        return view('components.eleve.layouts.app', ['team' => $this->team]);
     }
 }

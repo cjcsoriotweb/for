@@ -80,7 +80,7 @@ class FormationContinue extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.eleve.formation-continue', [
+        return view('components.eleve.formation.continue', [
             'team' => $this->team,
             'formationsWithProgress' => $this->formationsWithProgress,
         ]);

@@ -17,6 +17,6 @@ class OrganisateurLayout extends Component
 
     public function render(): View
     {
-        return view('components.organisateur.layout', ['team' => $this->team]);
+        return view('components.organisateur.layouts.app', ['team' => $this->team]);
     }
 }

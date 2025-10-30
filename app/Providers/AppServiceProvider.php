@@ -64,6 +64,18 @@ class AppServiceProvider extends ServiceProvider
             'welcome' => 'components.ui.cards.welcome',
             'authentication-card' => 'components.ui.auth.authentication-card',
             'header' => 'components.ui.layout.header',
+            'admin.layout' => 'components.admin.layouts.app',
+            'admin.global-layout' => 'components.admin.layouts.global',
+            'eleve.notification-messages' => 'components.eleve.dashboard.notification-messages',
+            'eleve.hello' => 'components.eleve.dashboard.hello',
+            'eleve.formation-actions' => 'components.eleve.formation.actions',
+            'eleve.formation-chapters' => 'components.eleve.formation.chapters',
+            'eleve.formation-choice' => 'components.eleve.formation.choice',
+            'eleve.formation-continue' => 'components.eleve.formation.continue',
+            'eleve.formation-header' => 'components.eleve.formation.header',
+            'layout.header' => 'components.app.layout.header',
+            'layout.page-notes' => 'components.app.notes.page-notes',
+            'organisateur.layout' => 'components.organisateur.layouts.app',
         ];
 
         foreach ($anonymousComponents as $alias => $view) {
