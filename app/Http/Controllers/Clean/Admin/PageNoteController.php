@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Clean\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PageNote;
+use App\Models\PageNoteReply;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +50,7 @@ class PageNoteController extends Controller
         ]);
 
         $notes = PageNote::query()
-            ->with('user:id,name')
+            ->with(['user:id,name', 'replies.user:id,name'])
             ->where('path', $validated['path'])
             ->latest()
             ->get();
@@ -88,6 +89,7 @@ class PageNoteController extends Controller
             'title' => ['sometimes', 'nullable', 'string', 'max:255'],
             'content' => ['sometimes', 'string'],
             'is_resolved' => ['sometimes', 'boolean'],
+            'is_hidden' => ['sometimes', 'boolean'],
         ]);
 
         $pageNote->fill($validated);
@@ -97,6 +99,52 @@ class PageNoteController extends Controller
 
         return response()->json([
             'data' => $this->transformNote($pageNote),
+        ]);
+    }
+
+    public function toggleHidden(PageNote $pageNote): JsonResponse
+    {
+        $pageNote->update([
+            'is_hidden' => ! $pageNote->is_hidden,
+        ]);
+
+        $pageNote->load('user:id,name');
+
+        return response()->json([
+            'data' => $this->transformNote($pageNote),
+        ]);
+    }
+
+    public function storeReply(PageNote $pageNote, Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'content' => ['required', 'string'],
+        ]);
+
+        $reply = PageNoteReply::create([
+            'page_note_id' => $pageNote->id,
+            'user_id' => Auth::id(),
+            'content' => $validated['content'],
+        ]);
+
+        $reply->load('user:id,name');
+
+        return response()->json([
+            'data' => $this->transformReply($reply),
+        ], 201);
+    }
+
+    public function destroyReply(PageNoteReply $pageNoteReply): JsonResponse
+    {
+        // Vérifier que l'utilisateur est autorisé à supprimer cette réponse
+        if ($pageNoteReply->user_id !== Auth::id()) {
+            abort(403, 'Non autorisé à supprimer cette réponse.');
+        }
+
+        $pageNoteReply->delete();
+
+        return response()->json([
+            'message' => 'Réponse supprimée',
         ]);
     }
 
@@ -116,9 +164,23 @@ class PageNoteController extends Controller
             'title' => $note->title,
             'content' => $note->content,
             'is_resolved' => $note->is_resolved,
+            'is_hidden' => $note->is_hidden,
             'author' => $note->user?->name,
             'created_at' => $note->created_at?->toIso8601String(),
             'updated_at' => $note->updated_at?->toIso8601String(),
+            'replies' => $note->replies->map(fn ($reply) => $this->transformReply($reply)),
+            'replies_count' => $note->replies->count(),
+        ];
+    }
+
+    private function transformReply(PageNoteReply $reply): array
+    {
+        return [
+            'id' => $reply->id,
+            'content' => $reply->content,
+            'author' => $reply->user?->name,
+            'created_at' => $reply->created_at?->toIso8601String(),
+            'updated_at' => $reply->updated_at?->toIso8601String(),
         ];
     }
 }

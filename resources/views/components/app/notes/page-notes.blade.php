@@ -1,20 +1,20 @@
 <div
     id="page-notes-widget"
-    class="fixed bottom-6 left-6 m-5 z-50 flex flex-col items-end space-y-3 ">
+    class="fixed bottom-6 left-6 m-5 z-50 flex flex-col items-end space-y-3">
     <button
         type="button"
         id="page-notes-toggle"
-        class="flex items-center space-x-2 rounded-full bg-blue-600 px-10 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-        <span class="material-symbols-outlined text-lg">note_alt</span>
-        <span>Notes page developpeur</span>
+        class="group flex items-center space-x-2 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transform transition-all duration-300 hover:bg-blue-500 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 active:scale-95">
+        <span class="material-symbols-outlined text-lg transition-transform group-hover:rotate-12">note_alt</span>
+        <span class="hidden sm:inline">Notes page developpeur</span>
         <span
             id="page-notes-counter"
-            class="ml-2 hidden rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white"></span>
+            class="ml-1 hidden rounded-full bg-white/25 px-2 py-0.5 text-xs font-semibold text-white transition-all duration-300"></span>
     </button>
 
     <div
         id="page-notes-panel"
-        class="hidden w-[22rem] max-w-sm rounded-xl border border-slate-200 bg-white p-4 text-slate-800 shadow-2xl dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+        class="hidden w-[26rem] max-w-sm transform scale-95 opacity-0 transition-all duration-300 rounded-xl border border-slate-200 bg-white text-slate-800 shadow-2xl dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
         <div class="flex items-start justify-between space-x-4">
             <div>
                 <h2 class="text-base font-semibold">Notes pour cette page</h2>
@@ -128,6 +128,9 @@
             list: (path) => `/superadmin/page-notes?path=${encodeURIComponent(path)}`,
             store: `/superadmin/page-notes`,
             update: (id) => `/superadmin/page-notes/${id}`,
+            toggleHidden: (id) => `/superadmin/page-notes/${id}/toggle-hidden`,
+            storeReply: (id) => `/superadmin/page-notes/${id}/replies`,
+            deleteReply: (id) => `/superadmin/page-notes/replies/${id}`,
             remove: (id) => `/superadmin/page-notes/${id}`,
         };
 
@@ -246,90 +249,187 @@
                 return;
             }
 
-            state.notes.forEach((note) => {
+            // Separate hidden and visible notes
+            const visibleNotes = state.notes.filter(note => !note.is_hidden);
+            const hiddenNotes = state.notes.filter(note => note.is_hidden);
+
+            // Render visible notes first
+            visibleNotes.concat(hiddenNotes).forEach((note) => {
                 const card = document.createElement('div');
-                card.className = `rounded-lg border px-3 py-3 shadow-sm transition ${
+                const isHidden = note.is_hidden;
+                const cardClasses = `rounded-lg border px-3 py-3 shadow-sm transition ${
                     note.is_resolved
                         ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-700/40 dark:bg-emerald-900/20'
                         : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'
-                }`;
+                } ${isHidden ? 'border-dashed opacity-60' : ''}`;
 
-                const title = note.title ? `<p class="text-sm font-semibold">${escapeHtml(note.title)}</p>` : '';
+                card.className = cardClasses;
 
-                // Handle content display with show more/less functionality
-                const isLongContent = note.content.length > 300;
-                const truncatedContent = isLongContent ? note.content.substring(0, 300) + '...' : escapeHtml(note.content);
-                const fullContent = escapeHtml(note.content);
+                const titleHtml = note.title ? `<p class="text-sm font-semibold ${isHidden ? 'text-slate-400' : ''}">${escapeHtml(note.title)}</p>` : '';
 
-                const content = `
-                    <div class="content-container">
-                        <p class="mt-1 whitespace-pre-wrap text-sm ${note.is_resolved ? 'text-slate-500 line-through' : 'text-slate-700 dark:text-slate-100'}" data-full-text="${fullContent}" data-truncated-text="${truncatedContent}" data-expanded="false">
-                            ${truncatedContent}
-                        </p>
-                        ${isLongContent ? '<button data-action="detail" class="mt-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">Détailler</button>' : ''}
-                    </div>
-                `;
-
-                const metaParts = [];
-
-                if (note.author) {
-                    metaParts.push(`Par ${escapeHtml(note.author)}`);
-                }
-
-                const formattedDate = formatDate(note.updated_at || note.created_at);
-                if (formattedDate) {
-                    metaParts.push(formattedDate);
-                }
-
-                const meta = metaParts.length
-                    ? `<p class="mt-2 text-xs text-slate-400 dark:text-slate-400">${metaParts.join(' • ')}</p>`
-                    : '';
-
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="min-w-0 flex-1">
-                            ${title}
-                            ${content}
-                            ${meta}
+                // For hidden notes, show only title and hide button
+                if (isHidden) {
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-slate-400 text-sm">visibility_off</span>
+                                <span class="text-sm text-slate-500 italic">${note.title ? escapeHtml(note.title) : 'Note sans titre'}</span>
+                            </div>
+                            <button data-action="toggle-visibility" class="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
+                                <span class="material-symbols-outlined text-sm">visibility</span> Développer
+                            </button>
                         </div>
-                        <span class="mt-0.5 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                            note.is_resolved
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-800/60 dark:text-emerald-200'
-                                : 'bg-amber-100 text-amber-700 dark:bg-amber-800/60 dark:text-amber-200'
-                        }">
-                            ${note.is_resolved ? 'Résolu' : 'À traiter'}
-                        </span>
-                    </div>
-                    <div class="mt-3 flex flex-wrap gap-2">
-                        <button data-action="toggle" class="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
-                            ${note.is_resolved ? 'Réouvrir' : 'Marquer comme résolu'}
-                        </button>
-                        <button data-action="edit" class="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
-                            Modifier
-                        </button>
-                        <button data-action="delete" class="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 dark:border-red-600 dark:text-red-300 dark:hover:bg-red-900/40">
-                            Supprimer
-                        </button>
-                    </div>
-                `;
+                    `;
+                } else {
+                    // Handle content display with show more/less functionality
+                    const isLongContent = note.content.length > 300;
+                    const truncatedContent = isLongContent ? note.content.substring(0, 300) + '...' : escapeHtml(note.content);
+                    const fullContent = escapeHtml(note.content);
 
-                const toggleButton = card.querySelector('[data-action="toggle"]');
+                    const content = `
+                        <div class="content-container">
+                            <p class="mt-1 whitespace-pre-wrap text-sm ${note.is_resolved ? 'text-slate-500 line-through' : 'text-slate-700 dark:text-slate-100'}" data-full-text="${fullContent}" data-truncated-text="${truncatedContent}" data-expanded="false">
+                                ${truncatedContent}
+                            </p>
+                            ${isLongContent ? '<button data-action="detail" class="mt-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">Détailler</button>' : ''}
+                        </div>
+                    `;
+
+                    // Render replies
+                    const repliesHtml = note.replies && note.replies.length ? `
+                        <div class="mt-4 space-y-2 border-t border-slate-100 pt-3 dark:border-slate-700">
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Réponses (${note.replies.length})</p>
+                            ${note.replies.map(reply => `
+                                <div class="rounded-md bg-slate-50 px-2 py-2 dark:bg-slate-800/50">
+                                    <p class="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-wrap">${escapeHtml(reply.content)}</p>
+                                    <div class="mt-1 flex items-center justify-between">
+                                        <p class="text-xs text-slate-400">
+                                            Par ${escapeHtml(reply.author)} • ${formatDate(reply.updated_at || reply.created_at)}
+                                        </p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '';
+
+                    const metaParts = [];
+                    if (note.author) {
+                        metaParts.push(`Par ${escapeHtml(note.author)}`);
+                    }
+                    const formattedDate = formatDate(note.updated_at || note.created_at);
+                    if (formattedDate) {
+                        metaParts.push(formattedDate);
+                    }
+                    const meta = metaParts.length
+                        ? `<p class="mt-2 text-xs text-slate-400 dark:text-slate-400">${metaParts.join(' • ')}</p>`
+                        : '';
+
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0 flex-1">
+                                ${titleHtml}
+                                ${content}
+                                ${meta}
+                                ${repliesHtml}
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                    note.is_resolved
+                                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-800/60 dark:text-emerald-200'
+                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-800/60 dark:text-amber-200'
+                                }">
+                                    ${note.is_resolved ? 'Résolu' : 'À traiter'}
+                                </span>
+                                ${note.replies_count > 0 ? `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-200">
+                                    ${note.replies_count} réponse${note.replies_count > 1 ? 's' : ''}
+                                </span>` : ''}
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button data-action="toggle" class="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
+                                ${note.is_resolved ? 'Réouvrir' : 'Marquer comme résolu'}
+                            </button>
+                            <button data-action="reply" class="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
+                                <span class="material-symbols-outlined text-sm">reply</span> Répondre
+                            </button>
+                            <button data-action="hide" class="rounded-md border border-orange-200 px-2 py-1 text-xs font-medium text-orange-600 transition hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400 dark:border-orange-600 dark:text-orange-300 dark:hover:bg-orange-900/40">
+                                <span class="material-symbols-outlined text-sm">visibility_off</span> Masquer
+                            </button>
+                            <button data-action="edit" class="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
+                                Modifier
+                            </button>
+                            <button data-action="delete" class="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 dark:border-red-600 dark:text-red-300 dark:hover:bg-red-900/40">
+                                Supprimer
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Event listeners for buttons
+                const toggleResolveButton = card.querySelector('[data-action="toggle"]');
+                const toggleVisibilityButton = card.querySelector('[data-action="toggle-visibility"]');
+                const hideButton = card.querySelector('[data-action="hide"]');
+                const replyButton = card.querySelector('[data-action="reply"]');
                 const editButton = card.querySelector('[data-action="edit"]');
                 const deleteButton = card.querySelector('[data-action="delete"]');
                 const detailButton = card.querySelector('[data-action="detail"]');
 
+                // Toggle visibility for hidden notes
+                if (toggleVisibilityButton) {
+                    toggleVisibilityButton.addEventListener('click', async () => {
+                        try {
+                            setStatus('Affichage de la note…');
+                            const response = await request('PATCH', endpoints.toggleHidden(note.id));
+
+                            const updated = response?.data;
+                            if (updated) {
+                                state.notes = state.notes.map((item) => (item.id === updated.id ? updated : item));
+                                renderNotes();
+                                setStatus('Note développée.', 'success');
+                            }
+                        } catch (error) {
+                            setStatus(error.message, 'error');
+                        }
+                    });
+                }
+
+                // Hide note
+                if (hideButton) {
+                    hideButton.addEventListener('click', async () => {
+                        try {
+                            setStatus('Masquage de la note…');
+                            const response = await request('PATCH', endpoints.toggleHidden(note.id));
+
+                            const updated = response?.data;
+                            if (updated) {
+                                state.notes = state.notes.map((item) => (item.id === updated.id ? updated : item));
+                                renderNotes();
+                                setStatus('Note masquée.', 'success');
+                            }
+                        } catch (error) {
+                            setStatus(error.message, 'error');
+                        }
+                    });
+                }
+
+                // Reply functionality
+                if (replyButton) {
+                    replyButton.addEventListener('click', () => {
+                        showReplyForm(card, note);
+                    });
+                }
+
+                // Detail toggle
                 if (detailButton) {
                     detailButton.addEventListener('click', () => {
                         const contentElement = card.querySelector('.content-container p');
                         const isExpanded = contentElement.getAttribute('data-expanded') === 'true';
 
                         if (isExpanded) {
-                            // Collapse to truncated version
                             contentElement.textContent = contentElement.getAttribute('data-truncated-text');
                             contentElement.setAttribute('data-expanded', 'false');
                             detailButton.textContent = 'Détailler';
                         } else {
-                            // Expand to full content
                             contentElement.textContent = contentElement.getAttribute('data-full-text');
                             contentElement.setAttribute('data-expanded', 'true');
                             detailButton.textContent = 'Réduire';
@@ -337,52 +437,59 @@
                     });
                 }
 
-                toggleButton.addEventListener('click', async () => {
-                    try {
-                        setStatus('Mise à jour de la note…');
-                        const response = await request('PATCH', endpoints.update(note.id), {
-                            is_resolved: !note.is_resolved,
-                        });
+                // Toggle resolved status
+                if (toggleResolveButton) {
+                    toggleResolveButton.addEventListener('click', async () => {
+                        try {
+                            setStatus('Mise à jour de la note…');
+                            const response = await request('PATCH', endpoints.update(note.id), {
+                                is_resolved: !note.is_resolved,
+                            });
 
-                        const updated = response?.data;
-                        if (updated) {
-                            state.notes = state.notes.map((item) => (item.id === updated.id ? updated : item));
-                            renderNotes();
-                            setStatus(updated.is_resolved ? 'Note marquée comme résolue.' : 'Note réouverte.', 'success');
-                        } else {
-                            throw new Error();
+                            const updated = response?.data;
+                            if (updated) {
+                                state.notes = state.notes.map((item) => (item.id === updated.id ? updated : item));
+                                renderNotes();
+                                setStatus(updated.is_resolved ? 'Note marquée comme résolue.' : 'Note réouverte.', 'success');
+                            }
+                        } catch (error) {
+                            setStatus(error.message, 'error');
                         }
-                    } catch (error) {
-                        setStatus(error.message, 'error');
-                    }
-                });
+                    });
+                }
 
-                editButton.addEventListener('click', () => {
-                    state.editingNoteId = note.id;
-                    titleInput.value = note.title ?? '';
-                    contentInput.value = note.content;
-                    submitButton.querySelector('span:last-child').textContent = 'Mettre à jour';
-                    cancelButton.classList.remove('hidden');
-                    setStatus('Modification de la note en cours.', 'info');
-                    contentInput.focus();
-                });
+                // Edit note
+                if (editButton) {
+                    editButton.addEventListener('click', () => {
+                        state.editingNoteId = note.id;
+                        titleInput.value = note.title ?? '';
+                        contentInput.value = note.content;
+                        submitButton.querySelector('span:last-child').textContent = 'Mettre à jour';
+                        cancelButton.classList.remove('hidden');
+                        setStatus('Modification de la note en cours.', 'info');
+                        contentInput.focus();
+                    });
+                }
 
-                deleteButton.addEventListener('click', async () => {
-                    const confirmation = window.confirm('Supprimer définitivement cette note ?');
-                    if (!confirmation) {
-                        return;
-                    }
+                // Delete note
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', async () => {
+                        const confirmation = window.confirm('Supprimer définitivement cette note ?');
+                        if (!confirmation) {
+                            return;
+                        }
 
-                    try {
-                        setStatus('Suppression de la note…');
-                        await request('DELETE', endpoints.remove(note.id));
-                        state.notes = state.notes.filter((item) => item.id !== note.id);
-                        renderNotes();
-                        setStatus('Note supprimée.', 'success');
-                    } catch (error) {
-                        setStatus(error.message, 'error');
-                    }
-                });
+                        try {
+                            setStatus('Suppression de la note…');
+                            await request('DELETE', endpoints.remove(note.id));
+                            state.notes = state.notes.filter((item) => item.id !== note.id);
+                            renderNotes();
+                            setStatus('Note supprimée.', 'success');
+                        } catch (error) {
+                            setStatus(error.message, 'error');
+                        }
+                    });
+                }
 
                 notesList.appendChild(card);
             });
@@ -514,6 +621,87 @@
             setStatus('Modification annulée.', 'info');
         });
 
+        function showReplyForm(card, note) {
+            // Remove any existing reply form
+            const existingForm = card.querySelector('.reply-form');
+            if (existingForm) {
+                return;
+            }
+
+            const replyFormHtml = `
+                <div class="reply-form mt-3 border-t border-slate-200 pt-3 space-y-2 dark:border-slate-700">
+                    <textarea
+                        placeholder="Votre réponse..."
+                        class="w-full px-2 py-2 text-xs border border-slate-200 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800"
+                        rows="2"></textarea>
+                    <div class="flex items-center justify-end gap-2">
+                        <button
+                            type="button"
+                            class="cancel-reply px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-md transition dark:text-slate-300 dark:hover:bg-slate-700">
+                            Annuler
+                        </button>
+                        <button
+                            type="button"
+                            class="submit-reply px-2 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-md transition focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Répondre
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Insert reply form after the buttons container
+            const buttonsContainer = card.querySelector('.mt-3.flex');
+            buttonsContainer.insertAdjacentHTML('afterend', replyFormHtml);
+
+            const replyTextarea = card.querySelector('.reply-form textarea');
+            const cancelReplyBtn = card.querySelector('.cancel-reply');
+            const submitReplyBtn = card.querySelector('.submit-reply');
+
+            replyTextarea.focus();
+
+            cancelReplyBtn.addEventListener('click', () => {
+                const form = card.querySelector('.reply-form');
+                if (form) {
+                    form.remove();
+                }
+            });
+
+            submitReplyBtn.addEventListener('click', async () => {
+                const content = replyTextarea.value.trim();
+                if (!content) {
+                    replyTextarea.focus();
+                    return;
+                }
+
+                submitReplyBtn.disabled = true;
+                submitReplyBtn.textContent = 'Envoi...';
+
+                try {
+                    setStatus('Création de la réponse…');
+                    const response = await request('POST', endpoints.storeReply(note.id), { content });
+
+                    const created = response?.data;
+                    if (created) {
+                        // Update note with new reply
+                        const existingReplies = note.replies || [];
+                        const updatedNote = {
+                            ...note,
+                            replies: [...existingReplies, created],
+                            replies_count: (note.replies_count || 0) + 1
+                        };
+                        state.notes = state.notes.map((item) => (item.id === updatedNote.id ? updatedNote : item));
+                        renderNotes();
+                        setStatus('Réponse ajoutée.', 'success');
+                    }
+                } catch (error) {
+                    setStatus(error.message, 'error');
+                } finally {
+                    submitReplyBtn.disabled = false;
+                    submitReplyBtn.textContent = 'Répondre';
+                }
+            });
+        }
+
         function togglePanel(force) {
             const shouldOpen = typeof force === 'boolean' ? force : !state.isOpen;
             state.isOpen = shouldOpen;
@@ -521,8 +709,17 @@
             if (state.isOpen) {
                 panel.classList.remove('hidden');
                 toggleButton.setAttribute('aria-expanded', 'true');
+                // Force reflow
+                panel.offsetHeight;
+                panel.classList.remove('scale-95', 'opacity-0');
+                panel.classList.add('scale-100', 'opacity-100');
             } else {
-                panel.classList.add('hidden');
+                panel.classList.remove('scale-100', 'opacity-100');
+                panel.classList.add('scale-95', 'opacity-0');
+                // Delay hiding to allow animation to complete
+                setTimeout(() => {
+                    panel.classList.add('hidden');
+                }, 300);
                 toggleButton.setAttribute('aria-expanded', 'false');
             }
         }

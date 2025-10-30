@@ -26,6 +26,9 @@ Route::prefix('superadmin')
                 Route::get('/', [PageNoteController::class, 'index'])->name('index');
                 Route::post('/', [PageNoteController::class, 'store'])->name('store');
                 Route::patch('/{pageNote}', [PageNoteController::class, 'update'])->name('update');
+                Route::patch('/{pageNote}/toggle-hidden', [PageNoteController::class, 'toggleHidden'])->name('toggle-hidden');
+                Route::post('/{pageNote}/replies', [PageNoteController::class, 'storeReply'])->name('replies.store');
+                Route::delete('/replies/{pageNoteReply}', [PageNoteController::class, 'destroyReply'])->name('replies.destroy');
                 Route::delete('/{pageNote}', [PageNoteController::class, 'destroy'])->name('destroy');
             });
     });
