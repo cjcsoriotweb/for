@@ -38,7 +38,7 @@
       <div class="mb-1">
         
               <form method="post"
-                  action="{{ route('formateur.formation.chapter.add.post', [$formation]) }}"
+                  action="{{ route('formateur.formation.chapter.store', [$formation]) }}"
                   class="inline">
                   @csrf
                   <button
@@ -65,7 +65,7 @@
         <p class="text-gray-500 mb-8 max-w-sm mx-auto">
           Commencez par créer votre premier chapitre pour structurer votre formation.
         </p>
-        <form action="{{ route('formateur.formation.chapter.add.post', $formation) }}" method="POST" class="inline">
+        <form action="{{ route('formateur.formation.chapter.store', $formation) }}" method="POST" class="inline">
           @csrf
           <button
             class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
@@ -110,7 +110,7 @@
                   Modifier
                 </a>
                 <form method="post"
-                  action="{{ route('formateur.formation.chapter.lesson.add.post', [$formation, $chapter]) }}"
+                  action="{{ route('formateur.formation.chapter.lesson.add', [$formation, $chapter]) }}"
                   class="inline">
                   @csrf
                   <button
@@ -139,7 +139,7 @@
               Aucune leçon dans ce chapitre.
             </p>
             <form method="post"
-              action="{{ route('formateur.formation.chapter.lesson.add.post', [$formation, $chapter]) }}"
+              action="{{ route('formateur.formation.chapter.lesson.add', [$formation, $chapter]) }}"
               class="inline">
               @csrf
               <button
