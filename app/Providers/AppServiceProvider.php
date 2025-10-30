@@ -81,7 +81,6 @@ class AppServiceProvider extends ServiceProvider
             'meta-header' => 'components.ui.layout.meta-header',
 
             'layout.header' => 'components.app.layout.header',
-            'layout.page-notes' => 'components.app.notes.page-notes',
             'organisateur.layout' => 'components.organisateur.layouts.app',
         ];
 

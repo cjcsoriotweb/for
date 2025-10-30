@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Clean\Admin\AdminPageController;
-use App\Http\Controllers\Clean\Admin\PageNoteController;
 use App\Http\Controllers\Clean\Admin\SuperadminTestController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -16,19 +15,6 @@ Route::prefix('superadmin')
         Route::get('/formations', [AdminPageController::class, 'formationsIndex'])->name('formations.index');
         Route::get('/support', [AdminPageController::class, 'supportIndex'])->name('support.index');
         Route::get('/ai-trainers', [AdminPageController::class, 'aiIndex'])->name('ai.index');
-        Route::get('/page-notes-overview', [PageNoteController::class, 'overview'])->name('page-notes.overview');
         Route::get('/tests', [SuperadminTestController::class, 'index'])->name('tests.index');
         Route::post('/tests/run', [SuperadminTestController::class, 'run'])->name('tests.run');
-
-        Route::prefix('page-notes')
-            ->name('page-notes.')
-            ->group(function (): void {
-                Route::get('/', [PageNoteController::class, 'index'])->name('index');
-                Route::post('/', [PageNoteController::class, 'store'])->name('store');
-                Route::patch('/{pageNote}', [PageNoteController::class, 'update'])->name('update');
-                Route::patch('/{pageNote}/toggle-hidden', [PageNoteController::class, 'toggleHidden'])->name('toggle-hidden');
-                Route::post('/{pageNote}/replies', [PageNoteController::class, 'storeReply'])->name('replies.store');
-                Route::delete('/replies/{pageNoteReply}', [PageNoteController::class, 'destroyReply'])->name('replies.destroy');
-                Route::delete('/{pageNote}', [PageNoteController::class, 'destroy'])->name('destroy');
-            });
     });

@@ -28,23 +28,29 @@ class ChatWidget extends Component
     public string $contextLabel = '';
     public string $contextPath = '';
 
+    public bool $showLauncher = true;
+
     protected $listeners = [
         'support-ticket-refresh' => 'loadTickets',
+        'support-toggle' => 'toggle',
+        'support-open' => 'open',
     ];
 
-    public function mount(): void
+    public function mount(bool $showLauncher = true): void
     {
+        $this->showLauncher = $showLauncher;
         [$this->contextLabel, $this->contextPath] = $this->resolveContext();
         $this->loadTickets();
     }
 
     public function toggle(): void
     {
-        $this->isOpen = ! $this->isOpen;
-
         if ($this->isOpen) {
-            $this->loadTickets();
+            $this->isOpen = false;
+            return;
         }
+
+        $this->open();
     }
 
     public function showNewTicket(): void
@@ -220,6 +226,15 @@ class ChatWidget extends Component
     public function render()
     {
         return view('livewire.support.chat-widget');
+    }
+
+    public function open(): void
+    {
+        if (! $this->isOpen) {
+            $this->isOpen = true;
+        }
+
+        $this->loadTickets();
     }
 
     private function ticketListResource(SupportTicket $ticket): array

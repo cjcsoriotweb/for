@@ -1,21 +1,23 @@
 <div id="chat" class="fixed bottom-6 right-6 z-40" x-data="{ focusMessage() { $nextTick(() => document.getElementById('support-message-input')?.focus()); } }">
-    <button
-        wire:click="toggle"
-        type="button"
-        class="flex items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 h-14 w-14"
-        aria-haspopup="dialog"
-        aria-expanded="{{ $isOpen ? 'true' : 'false' }}"
-        aria-controls="support-chat-panel"
-    >
-        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="9" r="2.75" />
-            <path d="M19.5 12V9a7.5 7.5 0 0 0-15 0v3" />
-            <path d="M4.5 12v3a2.25 2.25 0 0 0 2.25 2.25H8.1" />
-            <path d="M19.5 12v3a2.25 2.25 0 0 1-2.25 2.25H15.9" />
-            <path d="M8.25 19.5a3.75 3.75 0 0 1 7.5 0" />
-        </svg>
-    </button>
+    @if ($showLauncher)
+        <button
+            wire:click="toggle"
+            type="button"
+            class="flex items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 h-14 w-14"
+            aria-haspopup="dialog"
+            aria-expanded="{{ $isOpen ? 'true' : 'false' }}"
+            aria-controls="support-chat-panel"
+        >
+            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="9" r="2.75" />
+                <path d="M19.5 12V9a7.5 7.5 0 0 0-15 0v3" />
+                <path d="M4.5 12v3a2.25 2.25 0 0 0 2.25 2.25H8.1" />
+                <path d="M19.5 12v3a2.25 2.25 0 0 1-2.25 2.25H15.9" />
+                <path d="M8.25 19.5a3.75 3.75 0 0 1 7.5 0" />
+            </svg>
+        </button>
+    @endif
 
     @if ($isOpen)
         <div

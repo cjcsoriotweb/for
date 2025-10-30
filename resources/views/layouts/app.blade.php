@@ -39,8 +39,7 @@
 
   <!-- Bottom widget from layouts/app.blade -->
   @auth
-  <x-layout.page-notes />
-  <livewire:support.chat-widget />
+  <livewire:support.chat-widget :show-launcher="false" />
   @endauth
 
   @stack('modals') @livewireScripts @stack('scripts')
