@@ -17,22 +17,14 @@ class FormationsList extends Component
 
     public $perPage = 5;
 
-    public $formations;
-
     protected $paginationTheme = 'tailwind';
-
-    public function mount()
-    {
-        $this->loadFormations();
-    }
 
     public function updatedSearch()
     {
         $this->resetPage();
-        $this->loadFormations();
     }
 
-    public function loadFormations()
+    protected function formationsQuery()
     {
         $query = Formation::withCount(['learners', 'lessons'])
             ->with([
@@ -57,55 +49,64 @@ class FormationsList extends Component
             });
         }
 
-        $this->formations = $query->paginate($this->perPage);
+        return $query;
+    }
 
+    protected function shapeFormationData($formation)
+    {
         // Shape data for the view to keep Blade templates presentation-only.
-        $this->formations->each(function ($formation) {
-            $formation->video_count = $formation->lessons->where('lessonable_type', 'App\\Models\\VideoContent')->count();
-            $formation->quiz_count = $formation->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
-            $formation->text_count = $formation->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
+        $formation->video_count = $formation->lessons->where('lessonable_type', 'App\\Models\\VideoContent')->count();
+        $formation->quiz_count = $formation->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
+        $formation->text_count = $formation->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
 
-            $formation->card_lessons_count = $formation->lessons_count ?? 0;
-            $formation->card_learners_count = $formation->learners_count ?? 0;
-            $formation->card_description = Str::limit((string) $formation->description, 180);
-            $formation->card_completion_percentage = min(100, $formation->completion_percentage ?? 75);
-            $formation->card_created_label = $formation->created_at instanceof Carbon
-                ? $formation->created_at->diffForHumans()
-                : null;
-            $formation->card_is_active = (bool) $formation->active;
+        $formation->card_lessons_count = $formation->lessons_count ?? 0;
+        $formation->card_learners_count = $formation->learners_count ?? 0;
+        $formation->card_description = Str::limit((string) $formation->description, 180);
+        $formation->card_completion_percentage = min(100, $formation->completion_percentage ?? 75);
+        $formation->card_created_label = $formation->created_at instanceof Carbon
+            ? $formation->created_at->diffForHumans()
+            : null;
+        $formation->card_is_active = (bool) $formation->active;
 
-            // Calculate total duration in minutes.
-            $totalDuration = 0;
+        // Calculate total duration in minutes.
+        $totalDuration = 0;
 
-            foreach ($formation->lessons as $lesson) {
-                switch ($lesson->lessonable_type) {
-                    case 'App\\Models\\VideoContent':
-                        $totalDuration += $lesson->lessonable->duration_minutes ?? 0;
-                        break;
-                    case 'App\\Models\\TextContent':
-                        $totalDuration += $lesson->lessonable->estimated_read_time ?? 0;
-                        break;
-                    case 'App\\Models\\Quiz':
-                        $questionCount = $lesson->lessonable->quizQuestions()->count();
-                        $totalDuration += max($questionCount * 2, 5);
-                        break;
-                }
+        foreach ($formation->lessons as $lesson) {
+            switch ($lesson->lessonable_type) {
+                case 'App\\Models\\VideoContent':
+                    $totalDuration += $lesson->lessonable->duration_minutes ?? 0;
+                    break;
+                case 'App\\Models\\TextContent':
+                    $totalDuration += $lesson->lessonable->estimated_read_time ?? 0;
+                    break;
+                case 'App\\Models\\Quiz':
+                    $questionCount = $lesson->lessonable->quizQuestions()->count();
+                    $totalDuration += max($questionCount * 2, 5);
+                    break;
             }
+        }
 
-            $formation->total_duration_minutes = $totalDuration;
-        });
+        $formation->total_duration_minutes = $totalDuration;
+
+        return $formation;
     }
 
     public function clearSearch()
     {
         $this->search = '';
-        $this->loadFormations();
+        $this->resetPage();
     }
 
     public function render()
     {
+        $formations = $this->formationsQuery()
+            ->paginate($this->perPage)
+            ->through(function ($formation) {
+                return $this->shapeFormationData($formation);
+            });
+
         return view('livewire.formateur.formations.formations-list', [
-            'formations' => $this->formations,
+            'formations' => $formations,
         ]);
     }
 }
