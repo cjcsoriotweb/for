@@ -6,7 +6,7 @@
     <title>@yield('title', config('app.name') . ' · Tutoriel')</title>
     <link rel="stylesheet" href="https://unpkg.com/fullpage.js/dist/fullpage.min.css">
     @stack('tutorial-styles')
-    <x-header/>
+    <x-meta-header/>
 </head>
 <body class="bg-slate-900 text-white min-h-screen">
     <header class="fixed inset-x-0 top-0 z-50 bg-slate-900/80 backdrop-blur border-b border-slate-800">
