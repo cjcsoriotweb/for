@@ -38,6 +38,6 @@ class FormationChapterController
     public function editChapter(Formation $formation, Chapter $chapter)
     {
         // Logic to edit a chapter of the formation
-        return view('in-application.formateur.Formation.Chapter.ChapterEdit', compact('formation', 'chapter'));
+        return view('out-application.formateur.formation.chapter.ChapterEdit', compact('formation', 'chapter'));
     }
 }

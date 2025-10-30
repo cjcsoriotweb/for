@@ -26,7 +26,7 @@
                 <!-- Horizontal scrollable row layout -->
                 <div class="flex space-x-4 sm:space-x-6 md:space-x-8 overflow-x-auto pb-4 px-4 scrollbar-hide ">
                     @foreach ($items as $item)
-                        <x-forms.ui.select-plateform-card
+                        <x-forms.shared.select-plateform-card
                             :item="$item"
                             :route="$route"
                             :delay="$loop->index * 0.15"
