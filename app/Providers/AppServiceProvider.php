@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
             'input' => 'components.ui.forms.input',
             'input-error' => 'components.ui.forms.input-error',
             'label' => 'components.ui.forms.label',
-            'checkbox' => 'components.ui.forms.checkbox',
+            'checkbox' => 'components.checkbox',
             'form-section' => 'components.ui.forms.form-section',
             'validation-errors' => 'components.ui.forms.validation-errors',
             'action-section' => 'components.ui.surfaces.action-section',
@@ -64,7 +64,6 @@ class AppServiceProvider extends ServiceProvider
             'welcome' => 'components.ui.cards.welcome',
             'authentication-card' => 'components.ui.auth.authentication-card',
             'auth.form-page' => 'components.ui.auth.form-page',
-            'meta-header' => 'components.ui.layout.meta-header',
             'admin.layout' => 'components.admin.layouts.app',
             'admin.global-layout' => 'components.admin.layouts.global',
             'eleve.notification-messages' => 'components.eleve.dashboard.notification-messages',
@@ -74,6 +73,10 @@ class AppServiceProvider extends ServiceProvider
             'eleve.formation-choice' => 'components.eleve.formation.choice',
             'eleve.formation-continue' => 'components.eleve.formation.continue',
             'eleve.formation-header' => 'components.eleve.formation.header',
+            
+            'header' => 'components.app.layout.header',
+            'meta-header' => 'components.ui.layout.meta-header',
+
             'layout.header' => 'components.app.layout.header',
             'layout.page-notes' => 'components.app.notes.page-notes',
             'organisateur.layout' => 'components.organisateur.layouts.app',

@@ -78,7 +78,7 @@
                                     <x-checkbox
                                         id="{{ $rememberId }}"
                                         name="{{ $rememberName }}"
-                                        @checked($rememberChecked)
+                                        :checked="$rememberChecked"
                                         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                     />
                                     <span class="ml-2 text-sm text-gray-700">{{ $rememberLabel }}</span>
