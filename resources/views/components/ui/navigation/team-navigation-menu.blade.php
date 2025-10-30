@@ -80,13 +80,11 @@
                                 <div class="border-t border-gray-200"></div>
 
                                 <!-- Authentication -->
-                                <form method="POST" action="{{ route('logout') }}" x-data>
-                                    @csrf
-
+                                <x-forms.auth.logout x-data>
                                     <x-dropdown-link href="{{ route('logout') }}" @click.prevent="$root.submit();">
                                         {{ __('Deconnexion') }}
                                     </x-dropdown-link>
-                                </form>
+                                </x-forms.auth.logout>
                             </x-slot>
                         </x-dropdown>
                     </div>
@@ -185,13 +183,11 @@
                 @endif
 
                 <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}" x-data>
-                    @csrf
-
+                <x-forms.auth.logout x-data>
                     <x-responsive-nav-link href="{{ route('logout') }}" @click.prevent="$root.submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
-                </form>
+                </x-forms.auth.logout>
 
                 <!-- Team Management -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures() && isset($team))

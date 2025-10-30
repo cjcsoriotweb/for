@@ -70,7 +70,7 @@
 
           <div class="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($organisations as $application)
-            <x-account.application.switch :application="$application" />
+            <x-forms.account.switch-application :application="$application" />
             @endforeach
           </div>
         </div>

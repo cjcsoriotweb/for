@@ -82,11 +82,7 @@
                         <!-- Logout -->
                         <div
                             class="border-t border-slate-200 pt-1 dark:border-slate-700">
-                            <form
-                                method="POST"
-                                action="{{ route('logout') }}"
-                                class="inline">
-                                @csrf
+                            <x-forms.auth.logout class="inline">
                                 <button
                                     type="submit"
                                     class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
@@ -94,7 +90,7 @@
                                         class="material-symbols-outlined text-base mr-3">logout</span>
                                     {{ __("Déconnexion") }}
                                 </button>
-                            </form>
+                            </x-forms.auth.logout>
                         </div>
                     </div>
                 </div>

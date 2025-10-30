@@ -67,9 +67,7 @@
           <!-- User Menu -->
           <div class="hidden sm:flex sm:items-center sm:ml-6 gap-3">
             @if ($canSwitchSpaces)
-              <form method="POST" action="{{ route('user.switch', $team) }}" class="inline-flex">
-                @csrf
-                <input type="hidden" name="team_id" value="{{ $team->id }}">
+              <x-forms.account.switch-team :team="$team" class="inline-flex">
                 <button
                   type="submit"
                   class="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white/90 p-2 text-gray-600 transition hover:border-sky-300 hover:text-sky-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
@@ -87,7 +85,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18H5.25m0 0L8 20.75M5.25 18l2.75-2.75M7.5 6h11.25m0 0L16 3.25M18.75 6l-2.75 2.75" />
                   </svg>
                 </button>
-              </form>
+              </x-forms.account.switch-team>
             @endif
 
             <div name="trigger">
