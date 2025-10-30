@@ -64,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
             'welcome' => 'components.ui.cards.welcome',
             'authentication-card' => 'components.ui.auth.authentication-card',
             'auth.form-page' => 'components.ui.auth.form-page',
-            'header' => 'components.ui.layout.header',
+            'meta-header' => 'components.ui.layout.meta-header',
             'admin.layout' => 'components.admin.layouts.app',
             'admin.global-layout' => 'components.admin.layouts.global',
             'eleve.notification-messages' => 'components.eleve.dashboard.notification-messages',
