@@ -28,7 +28,7 @@
                         method="POST"
                         action="{{
                             route(
-                                'formateur.formation.chapter.lesson.define.post',
+                                'formation.chapter.lesson.define.store',
                                 [$formation, $chapter, $lesson]
                             )
                         }}"

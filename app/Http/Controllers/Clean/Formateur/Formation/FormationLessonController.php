@@ -61,22 +61,22 @@ class FormationLessonController
 
     public function showDefineLesson(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
-        return view('in-application.formateur.Formation.Chapter.Lesson.Define', compact('formation', 'chapter', 'lesson'));
+        return view('out-application.formateur.formation.chapter.lesson.define', compact('formation', 'chapter', 'lesson'));
     }
 
     public function createQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
-        return view('in-application.formateur.Formation.Chapter.Lesson.CreateQuiz', compact('formation', 'chapter', 'lesson'));
+        return view('in-application.formateur.formation.chapter.lesson.create-quiz', compact('formation', 'chapter', 'lesson'));
     }
 
     public function createVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
-        return view('in-application.formateur.Formation.Chapter.Lesson.CreateVideo', compact('formation', 'chapter', 'lesson'));
+        return view('in-application.formateur.formation.chapter.lesson.create-video', compact('formation', 'chapter', 'lesson'));
     }
 
     public function createText(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
-        return view('in-application.formateur.Formation.Chapter.Lesson.CreateText', compact('formation', 'chapter', 'lesson'));
+        return view('in-application.formateur.formation.chapter.lesson.create-text', compact('formation', 'chapter', 'lesson'));
     }
 
     public function storeQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
