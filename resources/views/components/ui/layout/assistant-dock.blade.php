@@ -9,7 +9,7 @@
         ->implode(',');
 @endphp
 
-<div class="assistant-dock pointer-events-none fixed bottom-6 right-6 z-[1200] flex flex-col items-end space-y-2"
+<div class="assistant-dock pointer-events-none fixed bottom-6 left-1/2 -translate-x-1/2 z-[1200] flex flex-col items-end space-y-2"
   data-dock-initial-notifications="{{ $initialNotifications }}">
   <div data-dock-tooltip
     class="pointer-events-none origin-right rounded-full border border-emerald-500/60 bg-emerald-500/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-lg transition duration-150 ease-out opacity-0 translate-y-2 scale-95 dark:border-emerald-400/60 dark:bg-emerald-500/80">
