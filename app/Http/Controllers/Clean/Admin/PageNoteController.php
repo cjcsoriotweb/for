@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Clean\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PageNote;
-use App\Models\PageNoteReply;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class PageNoteController extends Controller
 {
@@ -45,42 +43,12 @@ class PageNoteController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'path' => ['required', 'string', 'max:255'],
-        ]);
-
-        $notes = PageNote::query()
-            ->with(['user:id,name', 'replies.user:id,name'])
-            ->where('path', $validated['path'])
-            ->latest()
-            ->get();
-
-        return response()->json([
-            'data' => $notes->map(fn (PageNote $note) => $this->transformNote($note)),
-        ]);
+        abort(404);
     }
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'path' => ['required', 'string', 'max:255'],
-            'title' => ['nullable', 'string', 'max:255'],
-            'content' => ['required', 'string'],
-        ]);
-
-        $note = PageNote::create([
-            'user_id' => Auth::id(),
-            'path' => $validated['path'],
-            'title' => $validated['title'] ?? null,
-            'content' => $validated['content'],
-            'is_resolved' => false,
-        ]);
-
-        $note->load('user:id,name');
-
-        return response()->json([
-            'data' => $this->transformNote($note),
-        ], 201);
+        abort(404);
     }
 
     public function update(PageNote $pageNote, Request $request): JsonResponse
@@ -104,48 +72,17 @@ class PageNoteController extends Controller
 
     public function toggleHidden(PageNote $pageNote): JsonResponse
     {
-        $pageNote->update([
-            'is_hidden' => ! $pageNote->is_hidden,
-        ]);
-
-        $pageNote->load('user:id,name');
-
-        return response()->json([
-            'data' => $this->transformNote($pageNote),
-        ]);
+        abort(404);
     }
 
     public function storeReply(PageNote $pageNote, Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'content' => ['required', 'string'],
-        ]);
-
-        $reply = PageNoteReply::create([
-            'page_note_id' => $pageNote->id,
-            'user_id' => Auth::id(),
-            'content' => $validated['content'],
-        ]);
-
-        $reply->load('user:id,name');
-
-        return response()->json([
-            'data' => $this->transformReply($reply),
-        ], 201);
+        abort(404);
     }
 
     public function destroyReply(PageNoteReply $pageNoteReply): JsonResponse
     {
-        // Vérifier que l'utilisateur est autorisé à supprimer cette réponse
-        if ($pageNoteReply->user_id !== Auth::id()) {
-            abort(403, 'Non autorisé à supprimer cette réponse.');
-        }
-
-        $pageNoteReply->delete();
-
-        return response()->json([
-            'message' => 'Réponse supprimée',
-        ]);
+        abort(404);
     }
 
     public function destroy(PageNote $pageNote): JsonResponse
@@ -161,6 +98,13 @@ class PageNoteController extends Controller
     {
         return [
             'id' => $note->id,
+            'team_id' => $note->team_id,
+            'path' => $note->path,
+            'route_name' => $note->route_name,
+            'full_url' => $note->full_url,
+            'model_type' => $note->model_type,
+            'model_id' => $note->model_id,
+            'context_hash' => $note->context_hash,
             'title' => $note->title,
             'content' => $note->content,
             'is_resolved' => $note->is_resolved,

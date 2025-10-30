@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Claim;
+use App\Policies\ClaimPolicy;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -87,6 +90,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Blade::anonymousComponentNamespace('components.ui', 'ui');
+
+        // Register policies
+        Gate::policy(Claim::class, ClaimPolicy::class);
 
         // Register Blade component aliases for class-based components
         Blade::component('organisateur.parts.breadcrumb', \App\View\Components\Organisateur\Parts\Breadcrumb::class);

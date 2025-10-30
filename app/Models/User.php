@@ -97,6 +97,16 @@ class User extends Authenticatable
         return $this->hasMany(SupportTicketMessage::class, 'user_id');
     }
 
+    public function claims()
+    {
+        return $this->hasMany(Claim::class, 'user_id');
+    }
+
+    public function claimUpdates()
+    {
+        return $this->hasMany(ClaimUpdate::class, 'user_id');
+    }
+
     public function aiConversations()
     {
         return $this->hasMany(AiConversation::class, 'user_id');

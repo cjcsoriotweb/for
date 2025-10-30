@@ -67,4 +67,9 @@ class Team extends JetstreamTeam
     {
         return $this->formationsByTeam();
     }
+
+    public function claims()
+    {
+        return $this->hasMany(Claim::class);
+    }
 }

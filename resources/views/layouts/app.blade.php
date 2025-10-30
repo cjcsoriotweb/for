@@ -39,9 +39,7 @@
 
   <!-- Bottom widget from layouts/app.blade -->
   @auth
-  @if(auth()->user()->superadmin)
   <x-layout.page-notes />
-  @endif
   <livewire:support.chat-widget />
   @endauth
 
