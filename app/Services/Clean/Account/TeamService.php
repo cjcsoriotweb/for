@@ -36,6 +36,10 @@ class TeamService
                 'route' => route('application.admin.index', ['team' => $team]),
             ];
 
+
+        }
+
+        if ($user->formateur) {
             $destinations[] = [
                 'key' => 'formateur',
                 'badge' => __('Formateur'),
@@ -46,7 +50,6 @@ class TeamService
                 'route' => route('formateur.home', ['team' => $team]),
             ];
         }
-
         if ($user->hasTeamRole($team, 'manager')) {
             $destinations[] = [
                 'key' => 'manager',
