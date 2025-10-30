@@ -1,10 +1,10 @@
 <!-- Conteneur principal du dock -->
-<div class="dock-container relative">
+<div class="dock-container fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
   {{ $slot }}
 
   <!-- Menu iframe qui s'ouvre au dessus du dock -->
   <div id="dock-menu"
-       class="fixed bottom-20 left-1/2 transform -translate-x-1/2 hidden z-[1500]">
+       class="absolute bottom-20 left-1/2 transform -translate-x-1/2 hidden z-[1500]">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-600 overflow-hidden"
          style="width: 600px; height: 500px;">
 
