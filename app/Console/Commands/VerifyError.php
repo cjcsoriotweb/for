@@ -98,22 +98,13 @@ class VerifyError extends Command
     {
         $limit = 3; // Limite fixe: 3 dernières erreurs
         $onlyUnresolved = $this->option('unresolved');
-        $codeFilter = $this->option('code');
+
+        $errors = $errorService->getUnresolvedErrors($limit);
 
         if ($onlyUnresolved) {
-            $errors = $errorService->getUnresolvedErrors($limit);
-            $this->info("🔍 3 dernières erreurs non résolues");
+            $this->info('🔍 3 dernières erreurs non résolues');
         } else {
-            $query = \App\Models\WebsiteError::with('user')->orderBy('created_at', 'desc');
-
-            if ($codeFilter) {
-                $query->where('error_code', (int) $codeFilter);
-                $this->info("🔍 3 dernières erreurs {$codeFilter}");
-            } else {
-                $this->info("🔍 3 dernières erreurs");
-            }
-
-            $errors = $query->limit($limit)->get();
+            $this->info('🔍 3 dernières erreurs');
         }
 
         if ($errors->isEmpty()) {
@@ -123,28 +114,32 @@ class VerifyError extends Command
         }
 
         $this->line('='.str_repeat('=', 80));
-        $tableData = $errors->map(function ($error) {
+
+        // Parser les messages d'erreur pour afficher les données structurées
+        $tableData = $errors->map(function ($note) {
+            $content = $note->content ?: '';
+            $data = $this->parseErrorMessage($content);
+
             return [
-                $error->id,
-                $error->error_code,
-                $error->message,
-                $this->shortenUrl($error->url),
-                $error->user ? $error->user->name : 'N/A',
-                $error->ip_address,
-                $error->created_at->format('Y-m-d H:i:s'),
-                $error->isResolved() ? '✅' : '❌',
+                $note->id,
+                $data['code'] ?? 0,
+                $data['message'] ?? substr($content, 0, 50).'...',
+                $this->shortenUrl($note->path ?: '/'),
+                $note->user ? $note->user->name : 'N/A',
+                'N/A', // Plus d'IP dans les notes
+                $note->created_at->format('Y-m-d H:i:s'),
+                $note->is_resolved ? '✅' : '❌',
             ];
         });
 
         $this->table(
             ['ID', 'Code', 'Message', 'URL', 'Utilisateur', 'IP', 'Date', 'Résolu'],
-            $tableData
+            $tableData->toArray()
         );
 
-        $totalUnresolved = $errors->where('resolved_at', null)->count();
-        if ($totalUnresolved > 0) {
+        if ($errors->count() > 0) {
             $this->newLine();
-            $this->warn("💡 {$totalUnresolved} erreur(s) non résolue(s). Utilisez --resolve=ID ou --delete=ID.");
+            $this->warn("💡 {$errors->count()} erreur(s) non résolue(s). Utilisez --resolve=ID ou --delete=ID.");
         }
     }
 
@@ -170,6 +165,31 @@ class VerifyError extends Command
         } else {
             $this->error("❌ Impossible de supprimer l'erreur #{$errorId} (elle n'existe pas).");
         }
+    }
+
+    /**
+     * Parse error message to extract structured data
+     */
+    private function parseErrorMessage(string $message): array
+    {
+        $data = [];
+
+        // Extract error code
+        if (preg_match('/\*\*Code d\'erreur:\*\* (\d+)/', $message, $matches)) {
+            $data['code'] = (int) $matches[1];
+        }
+
+        // Extract error message
+        if (preg_match('/\*\*Message:\*\* ([^\n]+)/', $message, $matches)) {
+            $data['message'] = $matches[1];
+        }
+
+        // Extract URL
+        if (preg_match('/\*\*URL:\*\* ([^\n]+)/', $message, $matches)) {
+            $data['url'] = $matches[1];
+        }
+
+        return $data;
     }
 
     /**

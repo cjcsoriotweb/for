@@ -255,9 +255,21 @@
                 }`;
 
                 const title = note.title ? `<p class="text-sm font-semibold">${escapeHtml(note.title)}</p>` : '';
-                const content = `<p class="mt-1 whitespace-pre-wrap text-sm ${
-                    note.is_resolved ? 'text-slate-500 line-through' : 'text-slate-700 dark:text-slate-100'
-                }">${escapeHtml(note.content)}</p>`;
+
+                // Handle content display with show more/less functionality
+                const isLongContent = note.content.length > 300;
+                const truncatedContent = isLongContent ? note.content.substring(0, 300) + '...' : escapeHtml(note.content);
+                const fullContent = escapeHtml(note.content);
+
+                const content = `
+                    <div class="content-container">
+                        <p class="mt-1 whitespace-pre-wrap text-sm ${note.is_resolved ? 'text-slate-500 line-through' : 'text-slate-700 dark:text-slate-100'}" data-full-text="${fullContent}" data-truncated-text="${truncatedContent}" data-expanded="false">
+                            ${truncatedContent}
+                        </p>
+                        ${isLongContent ? '<button data-action="detail" class="mt-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">Détailler</button>' : ''}
+                    </div>
+                `;
+
                 const metaParts = [];
 
                 if (note.author) {
@@ -304,6 +316,26 @@
                 const toggleButton = card.querySelector('[data-action="toggle"]');
                 const editButton = card.querySelector('[data-action="edit"]');
                 const deleteButton = card.querySelector('[data-action="delete"]');
+                const detailButton = card.querySelector('[data-action="detail"]');
+
+                if (detailButton) {
+                    detailButton.addEventListener('click', () => {
+                        const contentElement = card.querySelector('.content-container p');
+                        const isExpanded = contentElement.getAttribute('data-expanded') === 'true';
+
+                        if (isExpanded) {
+                            // Collapse to truncated version
+                            contentElement.textContent = contentElement.getAttribute('data-truncated-text');
+                            contentElement.setAttribute('data-expanded', 'false');
+                            detailButton.textContent = 'Détailler';
+                        } else {
+                            // Expand to full content
+                            contentElement.textContent = contentElement.getAttribute('data-full-text');
+                            contentElement.setAttribute('data-expanded', 'true');
+                            detailButton.textContent = 'Réduire';
+                        }
+                    });
+                }
 
                 toggleButton.addEventListener('click', async () => {
                     try {
@@ -543,8 +575,25 @@
             });
         });
 
+        // Check if widget should auto-open from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const shouldAutoOpen = urlParams.get('open-notes') === '1';
+
         // Initial load
         loadNotes();
+
+        // Auto-open widget if requested via URL parameter
+        if (shouldAutoOpen) {
+            // Clean the URL to remove the parameter
+            const url = new URL(window.location);
+            url.searchParams.delete('open-notes');
+            window.history.replaceState({}, '', url);
+
+            // Wait for notes to load, then open widget
+            setTimeout(() => {
+                togglePanel(true);
+            }, 300);
+        }
     })();
 </script>
 @endpush

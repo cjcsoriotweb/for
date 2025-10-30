@@ -109,15 +109,13 @@
                                             <span class="material-symbols-outlined text-base">link</span>
                                             {{ __('Ouvrir') }}
                                         </a>
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center gap-1 rounded-full border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 transition hover:border-indigo-400 hover:bg-indigo-100 dark:border-indigo-500/50 dark:bg-indigo-500/10 dark:text-indigo-200 dark:hover:bg-indigo-500/20"
-                                            data-open-page-notes
-                                            data-open-page-notes-path="{{ $path->path }}"
+                                        <a
+                                            href="{{ url($path->path) }}?open-notes=1"
+                                            class="inline-flex items-center gap-1 rounded-full border border-slate-200 px-2 py-1 font-medium text-slate-500 transition hover:border-indigo-200 hover:text-indigo-600 dark:border-slate-600 dark:text-slate-300 dark:hover:border-indigo-500/70 dark:hover:text-indigo-200"
                                         >
                                             <span class="material-symbols-outlined text-base">note_alt</span>
-                                            {{ __('Widget') }}
-                                        </button>
+                                            {{ __('Ouvrir en grand') }}
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -178,15 +176,13 @@
                                     {{ $note->user->name }}
                                 </span>
                             @endif
-                            <button
-                                type="button"
+                            <a
+                                href="{{ url($note->path) }}?open-notes=1"
                                 class="inline-flex items-center gap-1 rounded-full border border-slate-200 px-2 py-1 font-medium text-slate-500 transition hover:border-indigo-200 hover:text-indigo-600 dark:border-slate-600 dark:text-slate-300 dark:hover:border-indigo-500/70 dark:hover:text-indigo-200"
-                                data-open-page-notes
-                                data-open-page-notes-path="{{ $note->path }}"
                             >
                                 <span class="material-symbols-outlined text-base">note_alt</span>
-                                {{ __('Ouvrir dans le widget') }}
-                            </button>
+                                {{ __('Ouvrir en grand') }}
+                            </a>
                         </div>
                     </article>
                 @empty
@@ -198,4 +194,3 @@
         </div>
     </div>
 </x-admin.global-layout>
-
