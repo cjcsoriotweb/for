@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Clean\Account\AccountPageController;
 use App\Http\Controllers\Clean\Account\AccountInvitationController;
+use App\Http\Controllers\Clean\Tutorial\TutorialController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mon-compte')
@@ -15,4 +16,8 @@ Route::prefix('mon-compte')
         Route::post('/switch/team/{team:id}', [AccountPageController::class, 'switch'])->name('switch');
         Route::patch('/invitations/{invitation}/accept', [AccountInvitationController::class, 'accept'])
             ->name('invitation.accept');
+
+        // Tutorial routes
+        Route::get('/tutoriels', [TutorialController::class, 'index'])->name('tutorials.index');
+        Route::get('/tutoriels/{tutorial}', [TutorialController::class, 'show'])->name('tutorials.show');
     });
