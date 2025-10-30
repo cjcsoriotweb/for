@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Clean\Account\AccountPageController;
 use App\Http\Controllers\Clean\Account\AccountInvitationController;
-use App\Http\Controllers\Clean\Tutorial\TutorialController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mon-compte')
@@ -17,7 +16,25 @@ Route::prefix('mon-compte')
         Route::patch('/invitations/{invitation}/accept', [AccountInvitationController::class, 'accept'])
             ->name('invitation.accept');
 
-        // Tutorial routes
-        Route::get('/tutoriels', [TutorialController::class, 'index'])->name('tutorials.index');
-        Route::get('/tutoriels/{tutorial}', [TutorialController::class, 'show'])->name('tutorials.show');
+        // Dock iframe routes
+        Route::get('/assistant-chat', function () {
+            return view('in-application.user.dock.assistant-chat');
+        })->name('dock.assistant-chat');
+
+        Route::get('/tutoriels', function () {
+            return view('in-application.user.tutorials.index');
+        })->name('dock.tutorials');
+
+        Route::get('/professeur', function () {
+            return view('in-application.user.dock.professeur');
+        })->name('dock.professeur');
+
+        Route::get('/support', function () {
+            return view('in-application.user.dock.support');
+        })->name('dock.support');
+
+        Route::get('/recherche', function () {
+            return view('in-application.user.dock.recherche');
+        })->name('dock.recherche');
+
     });
