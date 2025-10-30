@@ -38,9 +38,9 @@
     </div>
 
     @forelse($formations as $formation)
-      @include('in-application.admin.formations.parts.placeholder.detail-one-of-foreach-formations')
+      @include('in-application.admin.formations.components.formation-item')
     @empty
-      @include('in-application.admin.formations.parts.placeholder.foreach-no-formation')
+      @include('in-application.admin.formations.components.empty-state')
     @endforelse
   </section>
 </div>

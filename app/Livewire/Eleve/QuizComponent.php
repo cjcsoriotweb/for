@@ -15,7 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-class QuizComponentO extends Component
+class QuizComponent extends Component
 {
     private const STEP_INIT = 0;
 
@@ -113,8 +113,8 @@ class QuizComponentO extends Component
         $this->step = self::STEP_RUNNING;
     }
 
-    /** Toggle une réponse selon le type de la question */
-    public function selectReponse(int $choiceId): void
+    /** Toggle choice selection based on question type */
+    public function selectChoice(int $choiceId): void
     {
         $choice = QuizChoice::query()
             ->select(['id', 'question_id', 'question_id']) // on prend les deux au cas où
@@ -213,7 +213,7 @@ class QuizComponentO extends Component
         }
     }
 
-    public function dIntCountdown(): void
+    public function decrementCountdown(): void
     {
         if ($this->countdown > 0) {
             $this->countdown--;

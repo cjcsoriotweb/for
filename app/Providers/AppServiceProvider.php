@@ -63,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
             'select-plateform' => 'components.ui.cards.select-plateform',
             'welcome' => 'components.ui.cards.welcome',
             'authentication-card' => 'components.ui.auth.authentication-card',
+            'auth.form-page' => 'components.ui.auth.form-page',
             'header' => 'components.ui.layout.header',
             'admin.layout' => 'components.admin.layouts.app',
             'admin.global-layout' => 'components.admin.layouts.global',
