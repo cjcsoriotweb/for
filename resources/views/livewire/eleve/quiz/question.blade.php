@@ -19,7 +19,7 @@ $isMulti = $q ? in_array(strtolower($q->type), ['multiple_choice','multiple_choi
           </svg>
           <div class="flex flex-col items-start">
             <span class="text-xs text-gray-500 dark:text-gray-400">Temps restant</span>
-            <span class="text-2xl font-bold text-[#111418] dark:text-white" wire:poll.1s="dIntCountdown">
+            <span class="text-2xl font-bold text-[#111418] dark:text-white" wire:poll.1s="decrementCountdown">
               {{ $countdown }}
             </span>
           </div>
@@ -41,8 +41,8 @@ $isMulti = $q ? in_array(strtolower($q->type), ['multiple_choice','multiple_choi
             @foreach($q->quizChoices as $choice)
             @php $selected = $this->isSelected($choice->id, $q->id); @endphp
 
-            <label @if($selected) wire:click="unSelectReponse({{ $q->id }}, {{ $choice->id }})" @else
-              wire:click="selectReponse({{ $choice->id }})" @endif role="{{ $isMulti ? 'checkbox' : 'radio' }}"
+            <label @if($selected) wire:click="unselectChoice({{ $q->id }}, {{ $choice->id }})" @else
+              wire:click="selectChoice({{ $choice->id }})" @endif role="{{ $isMulti ? 'checkbox' : 'radio' }}"
               aria-checked="{{ $selected ? 'true' : 'false' }}"
               @class([ 'flex items-center gap-4 rounded-lg border p-4 cursor-pointer transition' , $selected
               ? 'border-blue-700 bg-blue-600 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-600'

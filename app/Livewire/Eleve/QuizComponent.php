@@ -167,8 +167,8 @@ class QuizComponent extends Component
         }
     }
 
-    /** Désélection : enlève un seul choix en multiple, ou vide en single */
-    public function unSelectReponse(int $questionId, ?int $choiceId = null): void
+    /** Unselect: remove choice from multiple selection, or clear single selection */
+    public function unselectChoice(int $questionId, ?int $choiceId = null): void
     {
         $q = $this->questions->firstWhere('id', (int) $questionId);
         if (! $q) {
