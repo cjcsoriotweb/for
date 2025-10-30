@@ -36,6 +36,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions) {
         // Policies / Gate::authorize() -> AuthorizationException (403)
         $exceptions->render(function (AuthorizationException $e, $request) {
+            // Log 403 error
+            app(\App\Services\WebsiteErrorService::class)->logError(
+                403,
+                $e->getMessage(),
+                $request->fullUrl(),
+                $e,
+                $request
+            );
+
             return response()->view('errors.403', [
                 'message' => $e->getMessage(),
             ], 403);
@@ -44,12 +53,45 @@ return Application::configure(basePath: dirname(__DIR__))
         // Autres 403 (middleware can:, AccessDeniedHttpException, etc.)
         $exceptions->render(function (HttpExceptionInterface $e, $request) {
             if ($e->getStatusCode() === 403) {
+                // Log 403 error
+                app(\App\Services\WebsiteErrorService::class)->logError(
+                    403,
+                    $e->getMessage(),
+                    $request->fullUrl(),
+                    $e,
+                    $request
+                );
+
                 return response()->view('errors.403', [
                     'message' => method_exists($e, 'getMessage') ? $e->getMessage() : null,
                 ], 403);
             }
 
             return null;
+        });
+
+        // Capture automatique des erreurs générales
+        $exceptions->render(function (Throwable $e, $request) {
+            // Ne pas logger les erreurs de debug/404 (déjà gérées par Laravel)
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+                return null;
+            }
+
+            // Ne pas logger les erreurs Http déjà gérées (403)
+            if ($e instanceof HttpExceptionInterface) {
+                return null;
+            }
+
+            // Log toutes les autres erreurs non gérées (500, InvalidArgumentException, etc.)
+            app(\App\Services\WebsiteErrorService::class)->logError(
+                500,
+                $e->getMessage(),
+                $request->fullUrl(),
+                $e,
+                $request
+            );
+
+            return null; // Continuer avec le rendu normal de Laravel
         });
     })
     ->create();

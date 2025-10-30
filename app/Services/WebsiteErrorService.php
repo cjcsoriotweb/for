@@ -139,6 +139,20 @@ class WebsiteErrorService
     }
 
     /**
+     * Delete an error permanently
+     */
+    public function deleteError(int $errorId): bool
+    {
+        $error = WebsiteError::find($errorId);
+
+        if ($error) {
+            return $error->delete();
+        }
+
+        return false;
+    }
+
+    /**
      * Clean up old resolved errors
      */
     public function cleanupOldResolvedErrors(int $daysToKeep = 30): int

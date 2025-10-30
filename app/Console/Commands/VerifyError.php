@@ -14,11 +14,11 @@ class VerifyError extends Command
      */
     protected $signature = 'verifyerror
                             {--stats : Afficher les statistiques des erreurs}
-                            {--list : Lister les erreurs récentes (défaut)}
+                            {--list : Lister les 3 dernières erreurs (défaut)}
                             {--unresolved : Lister uniquement les erreurs non résolues}
                             {--resolve= : Marquer une erreur comme résolue (ID requis)}
+                            {--delete= : Supprimer définitivement une erreur (ID requis)}
                             {--code= : Filtrer par code d\'erreur (ex: 404, 500)}
-                            {--limit=10 : Nombre maximum d\'erreurs à afficher}
                             {--days=7 : Nombre de jours à analyser pour les stats}';
 
     /**
@@ -39,6 +39,8 @@ class VerifyError extends Command
             $this->showStatistics($errorService);
         } elseif ($this->option('resolve')) {
             $this->resolveError($errorService, (int) $this->option('resolve'));
+        } elseif ($this->option('delete')) {
+            $this->deleteError($errorService, (int) $this->option('delete'));
         } else {
             $this->listErrors($errorService);
         }
@@ -94,21 +96,21 @@ class VerifyError extends Command
      */
     private function listErrors(WebsiteErrorService $errorService): void
     {
-        $limit = (int) $this->option('limit');
+        $limit = 3; // Limite fixe: 3 dernières erreurs
         $onlyUnresolved = $this->option('unresolved');
         $codeFilter = $this->option('code');
 
         if ($onlyUnresolved) {
             $errors = $errorService->getUnresolvedErrors($limit);
-            $this->info("🔍 Erreurs non résolues (limite: {$limit})");
+            $this->info("🔍 3 dernières erreurs non résolues");
         } else {
             $query = \App\Models\WebsiteError::with('user')->orderBy('created_at', 'desc');
 
             if ($codeFilter) {
                 $query->where('error_code', (int) $codeFilter);
-                $this->info("🔍 Erreurs {$codeFilter} (limite: {$limit})");
+                $this->info("🔍 3 dernières erreurs {$codeFilter}");
             } else {
-                $this->info("🔍 Toutes les erreurs récentes (limite: {$limit})");
+                $this->info("🔍 3 dernières erreurs");
             }
 
             $errors = $query->limit($limit)->get();
@@ -142,7 +144,7 @@ class VerifyError extends Command
         $totalUnresolved = $errors->where('resolved_at', null)->count();
         if ($totalUnresolved > 0) {
             $this->newLine();
-            $this->warn("💡 {$totalUnresolved} erreur(s) non résolue(s). Utilisez --resolve=ID pour les marquer comme résolues.");
+            $this->warn("💡 {$totalUnresolved} erreur(s) non résolue(s). Utilisez --resolve=ID ou --delete=ID.");
         }
     }
 
@@ -155,6 +157,18 @@ class VerifyError extends Command
             $this->info("✅ Erreur #{$errorId} marquée comme résolue.");
         } else {
             $this->error("❌ Impossible de marquer l'erreur #{$errorId} comme résolue (elle n'existe pas ou est déjà résolue).");
+        }
+    }
+
+    /**
+     * Delete an error
+     */
+    private function deleteError(WebsiteErrorService $errorService, int $errorId): void
+    {
+        if ($errorService->deleteError($errorId)) {
+            $this->info("🗑️ Erreur #{$errorId} supprimée définitivement.");
+        } else {
+            $this->error("❌ Impossible de supprimer l'erreur #{$errorId} (elle n'existe pas).");
         }
     }
 
