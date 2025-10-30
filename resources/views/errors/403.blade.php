@@ -204,12 +204,7 @@
                             Accueil
                         </a>
 
-                        <form
-                            method="POST"
-                            action="{{ route('logout') }}"
-                            class="inline"
-                        >
-                            @csrf
+                        <x-forms.auth.logout class="inline">
                             <button
                                 type="submit"
                                 class="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
@@ -229,7 +224,7 @@
                                 </svg>
                                 Déconnexion
                             </button>
-                        </form>
+                        </x-forms.auth.logout>
                         @endguest
                     </div>
 

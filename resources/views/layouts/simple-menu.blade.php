@@ -91,8 +91,7 @@
                 <!-- Bouton pour fermer sans choisir -->
                 @if(auth())
                 <div class="text-center pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
+                    <x-forms.auth.logout class="inline">
                         <button type="submit"
                             class="group inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 hover:scale-105">
                             <svg class="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-200"
@@ -102,7 +101,7 @@
                             </svg>
                             {{ __('Déconnexion') }}
                         </button>
-                    </form>
+                    </x-forms.auth.logout>
                 </div>
                 @endif
             </div>
