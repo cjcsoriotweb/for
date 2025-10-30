@@ -20,6 +20,17 @@
 
   <div
     class="pointer-events-auto flex items-center gap-2 rounded-3xl border border-slate-200/70 bg-white/90 px-3 py-2 shadow-2xl backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/80">
+    <button type="button" data-dock-title="Recherche page" data-dock-target="page-search"
+      class="dock-action relative flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-500 text-white shadow-md transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900"
+      aria-label="Recherche page" title="Recherche page">
+      <span data-dock-indicator
+        class="absolute -top-1 -right-1 h-3 w-3 scale-0 rounded-full bg-rose-500 shadow ring-2 ring-white transition-transform duration-150 ease-out dark:ring-slate-900"></span>
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M21 21l-4.35-4.35"></path>
+      </svg>
+    </button>
     <button type="button" data-dock-title="Assistant IA" data-dock-target="assistant"
       class="dock-action relative flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-md transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-900 focus-visible:ring-offset-white dark:bg-slate-100 dark:text-slate-900 dark:focus-visible:ring-slate-100 dark:focus-visible:ring-offset-slate-900"
       aria-label="Ouvrir l'assistant IA" title="Assistant IA">
@@ -149,10 +160,48 @@
               action.addEventListener('click', () => {
                 window.assistantDockNotify('assistant', false);
 
+                // Open the AI chat (assistant)
+                if (window.Livewire && typeof window.Livewire.dispatch === 'function') {
+                  window.Livewire.dispatch('assistant-toggle');
+                } else {
+                  window.dispatchEvent(new CustomEvent('assistant-toggle'));
+                }
+              });
+            }
+
+            if (target === 'bug') {
+              action.addEventListener('click', () => {
+                window.assistantDockNotify('bug', false);
+
+                // Open the support ticket widget
                 if (window.Livewire && typeof window.Livewire.dispatch === 'function') {
                   window.Livewire.dispatch('support-toggle');
                 } else {
                   window.dispatchEvent(new CustomEvent('support-toggle'));
+                }
+              });
+            }
+
+            if (target === 'tutor') {
+              action.addEventListener('click', () => {
+                window.assistantDockNotify('tutor', false);
+
+                // Open the tutor chat (same chat IA, but can be specialized by component)
+                if (window.Livewire && typeof window.Livewire.dispatch === 'function') {
+                  window.Livewire.dispatch('tutor-toggle');
+                } else {
+                  window.dispatchEvent(new CustomEvent('tutor-toggle'));
+                }
+              });
+            }
+
+            if (target === 'page-search') {
+              action.addEventListener('click', () => {
+                window.assistantDockNotify('page-search', false);
+                if (window.Livewire && typeof window.Livewire.dispatch === 'function') {
+                  window.Livewire.dispatch('page-search-toggle');
+                } else {
+                  window.dispatchEvent(new CustomEvent('page-search-toggle'));
                 }
               });
             }

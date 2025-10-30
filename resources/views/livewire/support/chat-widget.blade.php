@@ -19,6 +19,19 @@
         </button>
     @endif
 
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
     @if ($isOpen)
         <div
             id="support-chat-panel"
@@ -92,8 +105,37 @@
                                 >
                                     {{ __('Annuler') }}
                                 </button>
-                            @endif
-                        </div>
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const dispatchToLivewire = () => {
+                document.querySelectorAll('[wire\\:id]').forEach((el) => {
+                    try { window.Livewire.find(el.getAttribute('wire:id')).call('toggle'); } catch (e) {}
+                });
+            };
+
+            window.addEventListener('support-toggle', dispatchToLivewire);
+        })();
+    </script>
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+</div>
                     </div>
 
                     @if (! $showNewTicketForm && ! $activeTicket)
@@ -111,8 +153,22 @@
                                         <span class="mt-1 inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
                                             {{ $ticket['origin_label'] }}
                                         </span>
-                                    @endif
-                                    <span class="mt-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+<span class="mt-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                                         <span class="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-200">
                                             {{ $ticket['status_label'] }}
                                         </span>
@@ -125,8 +181,22 @@
                                 </p>
                             @endforelse
                         </div>
-                    @endif
-                </div>
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+</div>
 
                 <div class="flex-1 overflow-y-auto px-4 py-3 bg-white dark:bg-slate-900">
                     @if ($showNewTicketForm)
@@ -207,10 +277,38 @@
                                                 </a>
                                             @else
                                                 {{ $activeTicket['origin']['label'] }}
-                                            @endif
-                                        </p>
-                                    @endif
-                                    <span class="mt-1 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+</p>
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+<span class="mt-1 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
                                         {{ $activeTicket['status_label'] }}
                                     </span>
                                 </div>
@@ -248,10 +346,38 @@
                                                     </a>
                                                 @else
                                                     {{ $messageItem['context_label'] }}
-                                                @endif
-                                            </span>
-                                        @endif
-                                    </div>
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+</span>
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+</div>
                                 @endforeach
                             </div>
 
@@ -305,9 +431,38 @@
                                 {{ __('Creer un ticket') }}
                             </button>
                         </div>
-                    @endif
-                </div>
+    @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
+</div>
             </div>
         </div>
     @endif
+
+    <script>
+        (function () {
+            if (window.__supportWidgetBound) { return; }
+            window.__supportWidgetBound = true;
+
+            const toggleViaEvent = () => {
+                try { window.Livewire.find(@this.__instance.id).call('toggle'); } catch (e) {}
+            };
+
+            window.addEventListener('support-toggle', toggleViaEvent);
+        })();
+    </script>
+
 </div>
+

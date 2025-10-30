@@ -7,6 +7,16 @@
 
             <livewire:ai.trainer-manager />
 
+            <div class="rounded-3xl border border-emerald-200/70 bg-emerald-50 p-4 text-emerald-900 dark:border-emerald-700/40 dark:bg-emerald-900/20 dark:text-emerald-100">
+                <p class="text-sm">
+                    {{ __('Configuration du modele par defaut:') }}
+                    <strong>{{ config('ai.default_driver') }}</strong>
+                    — {{ __('modele') }}
+                    <strong>{{ config('ai.drivers.'.config('ai.default_driver').'.model') }}</strong>
+                </p>
+                <p class="mt-2 text-xs opacity-80">{{ __('Modifiez via config/ai.php ou .env (AI_DRIVER, AI_OLLAMA_MODEL).') }}</p>
+            </div>
+
 
         </section>
 
@@ -24,6 +34,7 @@
 
     
             <livewire:ai.trainer-tester />
+            <livewire:ai.chat-widget :show-launcher="false" />
 
         </aside>
     </div>
