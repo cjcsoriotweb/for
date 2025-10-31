@@ -8,6 +8,7 @@ use Livewire\Component;
 class PageSearch extends Component
 {
     public bool $isOpen = false;
+
     public string $src = '';
 
     public function mount(): void
@@ -26,4 +27,3 @@ class PageSearch extends Component
         return view('livewire.tools.page-search');
     }
 }
-

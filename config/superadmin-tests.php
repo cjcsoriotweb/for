@@ -15,4 +15,3 @@ return [
         base_path('tests/Superadmin'),
     ],
 ];
-

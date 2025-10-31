@@ -6,6 +6,7 @@ use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
 use RuntimeException;
+
 use function app;
 
 class OpenAiClient

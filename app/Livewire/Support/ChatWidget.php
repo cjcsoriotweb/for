@@ -12,6 +12,7 @@ use Livewire\Component;
 class ChatWidget extends Component
 {
     public bool $isOpen = false;
+
     public bool $showNewTicketForm = false;
 
     public ?int $activeTicketId = null;
@@ -23,9 +24,11 @@ class ChatWidget extends Component
     public ?array $activeTicket = null;
 
     public string $subject = '';
+
     public string $message = '';
 
     public string $contextLabel = '';
+
     public string $contextPath = '';
 
     public bool $showLauncher = true;
@@ -47,6 +50,7 @@ class ChatWidget extends Component
     {
         if ($this->isOpen) {
             $this->isOpen = false;
+
             return;
         }
 
@@ -266,7 +270,7 @@ class ChatWidget extends Component
                 'label' => $ticket->origin_label,
                 'path' => $ticket->origin_path,
             ],
-            'messages' => $ticket->messages->map(function (SupportTicketMessage $message) use ($ticket) {
+            'messages' => $ticket->messages->map(function (SupportTicketMessage $message) {
                 return [
                     'id' => $message->id,
                     'content' => $message->content,
@@ -301,7 +305,7 @@ class ChatWidget extends Component
         $fullUrl = request()->fullUrl() ?? '/';
         $path = Str::limit($fullUrl, 255, '');
 
-        $source = Str::lower($routeName . ' ' . request()->path());
+        $source = Str::lower($routeName.' '.request()->path());
 
         $label = match (true) {
             str_contains($source, 'quiz') => 'Quiz',

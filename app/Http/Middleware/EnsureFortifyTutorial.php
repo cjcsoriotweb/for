@@ -8,9 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureFortifyTutorial
 {
-    public function __construct(private readonly EnsureTutorialIsSeen $tutorialMiddleware)
-    {
-    }
+    public function __construct(private readonly EnsureTutorialIsSeen $tutorialMiddleware) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -23,4 +21,3 @@ class EnsureFortifyTutorial
         return $next($request);
     }
 }
-

@@ -12,6 +12,7 @@ use Livewire\Component;
 class TicketInbox extends Component
 {
     public string $statusFilter = SupportTicket::STATUS_OPEN;
+
     public string $search = '';
 
     public ?int $activeTicketId = null;
@@ -135,7 +136,7 @@ class TicketInbox extends Component
                 $query->where('status', $this->statusFilter);
             })
             ->when($this->search !== '', function ($query): void {
-                $term = '%' . Str::lower($this->search) . '%';
+                $term = '%'.Str::lower($this->search).'%';
                 $query->where(function ($inner) use ($term): void {
                     $inner
                         ->whereRaw('LOWER(subject) like ?', [$term])

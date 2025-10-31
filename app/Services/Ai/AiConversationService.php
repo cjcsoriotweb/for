@@ -18,8 +18,6 @@ class AiConversationService
 {
     /**
      * Resolve the AI trainer to use for a given formation.
-     *
-     * @return AiTrainer|null
      */
     public function resolveTrainer(?Formation $formation = null, ?int $trainerId = null): ?AiTrainer
     {

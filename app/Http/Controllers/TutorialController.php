@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Team;
 use App\Services\FormationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TutorialController extends Controller
@@ -86,8 +86,8 @@ class TutorialController extends Controller
 
     private function sanitizeKey(string $tutorial): string
     {
-        if (!preg_match('/^[A-Za-z0-9._-]+$/', $tutorial)) {
-            throw new NotFoundHttpException();
+        if (! preg_match('/^[A-Za-z0-9._-]+$/', $tutorial)) {
+            throw new NotFoundHttpException;
         }
 
         return $tutorial;
@@ -95,10 +95,10 @@ class TutorialController extends Controller
 
     private function resolveView(string $tutorialKey): string
     {
-        $view = 'tutorials.' . $tutorialKey;
+        $view = 'tutorials.'.$tutorialKey;
 
-        if (!View::exists($view)) {
-            throw new NotFoundHttpException();
+        if (! View::exists($view)) {
+            throw new NotFoundHttpException;
         }
 
         return $view;
@@ -106,7 +106,7 @@ class TutorialController extends Controller
 
     private function resolveTransitionView(string $tutorialKey): string
     {
-        $specificView = 'tutorials.' . $tutorialKey . '-transition';
+        $specificView = 'tutorials.'.$tutorialKey.'-transition';
 
         if (View::exists($specificView)) {
             return $specificView;
@@ -116,7 +116,7 @@ class TutorialController extends Controller
             return 'tutorials.transition';
         }
 
-        throw new NotFoundHttpException();
+        throw new NotFoundHttpException;
     }
 
     private function resolveContextData(string $tutorialKey, Request $request): array

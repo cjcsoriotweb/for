@@ -53,7 +53,7 @@ class FormationChoice extends Component
             $progressPercent = (int) ($progress['progress_percent'] ?? 0);
             $canAfford = $formationEnrollmentService->canTeamAffordFormation($team, $formation);
 
-            $canJoin = !$isEnrolled && $canAfford;
+            $canJoin = ! $isEnrolled && $canAfford;
 
             return [
                 'id' => $formation->id,

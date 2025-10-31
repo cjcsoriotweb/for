@@ -30,8 +30,11 @@ class SupportTicket extends Model
     ];
 
     public const STATUS_OPEN = 'open';
+
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_RESOLVED = 'resolved';
+
     public const STATUS_CLOSED = 'closed';
 
     /**

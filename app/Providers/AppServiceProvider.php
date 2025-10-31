@@ -76,7 +76,7 @@ class AppServiceProvider extends ServiceProvider
             'eleve.formation-choice' => 'components.eleve.formation.choice',
             'eleve.formation-continue' => 'components.eleve.formation.continue',
             'eleve.formation-header' => 'components.eleve.formation.header',
-            
+
             'header' => 'components.app.layout.header',
             'meta-header' => 'components.ui.layout.meta-header',
 

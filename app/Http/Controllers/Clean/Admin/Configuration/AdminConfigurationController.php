@@ -65,4 +65,3 @@ class AdminConfigurationController extends Controller
             ->with('ok', 'Credit ajoute.');
     }
 }
-

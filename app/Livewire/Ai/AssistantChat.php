@@ -5,19 +5,13 @@ namespace App\Livewire\Ai;
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
 use App\Models\AiTrainer;
-use App\Models\Formation;
 use App\Services\Ai\AiConversationService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Throwable;
 
-class FormationChat extends Component
+class AssistantChat extends Component
 {
-    public bool $isOpen = false;
-
-    public ?int $formationId = null;
-
     public ?int $trainerId = null;
 
     public ?int $conversationId = null;
@@ -37,22 +31,12 @@ class FormationChat extends Component
 
     public bool $awaitingResponse = false;
 
-    public ?string $formationTitle = null;
-
     public ?string $error = null;
 
-    public function mount(?int $formationId = null, ?int $trainerId = null, bool $open = false): void
+    public function mount(?int $trainerId = null): void
     {
-        $this->formationId = $formationId;
         $this->trainerId = $trainerId;
-        $this->isOpen = $open;
-
         $this->hydrateConversation();
-    }
-
-    public function toggle(): void
-    {
-        $this->isOpen = ! $this->isOpen;
     }
 
     public function sendMessage(): void
@@ -60,7 +44,9 @@ class FormationChat extends Component
         $user = Auth::user();
 
         if (! $user) {
-            abort(403);
+            $this->error = 'Vous devez être connecté pour utiliser l\'assistant IA.';
+
+            return;
         }
 
         $this->validate([
@@ -72,7 +58,7 @@ class FormationChat extends Component
         $this->error = null;
 
         if (! $this->hasTrainer || ! $this->conversationId) {
-            $this->error = __('Le formateur IA est indisponible pour cette formation.');
+            $this->error = __('L\'assistant IA est indisponible.');
 
             return;
         }
@@ -84,14 +70,10 @@ class FormationChat extends Component
         try {
             $conversation = AiConversation::query()->findOrFail($this->conversationId);
             $trainer = AiTrainer::query()->findOrFail($conversation->ai_trainer_id);
-            $formation = $this->formationId ? Formation::query()->find($this->formationId) : null;
 
             $context = [
-                'label' => $this->formationTitle
-                    ? Str::limit($this->formationTitle, 120, '')
-                    : 'Formation',
+                'label' => 'Assistant IA',
                 'path' => url()->current(),
-                'formation_id' => $formation?->id,
             ];
 
             $this->service()->appendMessage(
@@ -102,13 +84,17 @@ class FormationChat extends Component
                 $context
             );
 
+            $oldMessage = $this->message;
             $this->message = '';
 
             $this->awaitingResponse = true;
 
+            // Clear any errors before generating response
+            $this->error = null;
+
             $this->service()->generateAssistantReply($conversation, $trainer);
         } catch (Throwable $exception) {
-            $this->error = $exception->getMessage();
+            $this->error = 'Erreur: '.$exception->getMessage();
             $this->awaitingResponse = false;
         } finally {
             $this->refreshMessages();
@@ -116,9 +102,16 @@ class FormationChat extends Component
         }
     }
 
+    public $listeners = ['messageReceived' => 'refreshMessages'];
+
+    public function poll()
+    {
+        $this->refreshMessages();
+    }
+
     public function render()
     {
-        return view('livewire.ai.formation-chat');
+        return view('livewire.ai.assistant-chat');
     }
 
     private function hydrateConversation(): void
@@ -130,13 +123,12 @@ class FormationChat extends Component
             $this->conversationId = null;
             $this->hasTrainer = false;
             $this->awaitingResponse = false;
+            $this->error = 'Vous devez être connecté pour utiliser l\'assistant IA.';
 
             return;
         }
 
-        $formation = $this->formationId ? Formation::query()->find($this->formationId) : null;
-        $this->formationTitle = $formation?->title;
-        $trainer = $this->service()->resolveTrainer($formation, $this->trainerId);
+        $trainer = $this->service()->resolveTrainer(null, $this->trainerId);
 
         if (! $trainer) {
             $this->hasTrainer = false;
@@ -146,27 +138,33 @@ class FormationChat extends Component
             $this->trainerName = '';
             $this->trainerDescription = null;
             $this->trainerAvatar = null;
-            $this->isOpen = false;
             $this->awaitingResponse = false;
+            $this->error = 'Aucun assistant IA n\'est configuré. Veuillez contacter l\'administrateur.';
 
             return;
         }
 
-        $conversation = $this->service()->getOrCreateConversation(
-            $trainer,
-            $user,
-            $formation,
-            $user->currentTeam
-        );
+        try {
+            $conversation = $this->service()->getOrCreateConversation(
+                $trainer,
+                $user,
+                null, // no formation
+                $user->currentTeam
+            );
 
-        $this->hasTrainer = true;
-        $this->conversationId = $conversation->id;
-        $this->trainerId = $trainer->id;
-        $this->trainerName = $trainer->name;
-        $this->trainerDescription = $trainer->description;
-        $this->trainerAvatar = $trainer->avatar_path ?: 'images/ai-trainer-placeholder.svg';
+            $this->hasTrainer = true;
+            $this->conversationId = $conversation->id;
+            $this->trainerId = $trainer->id;
+            $this->trainerName = $trainer->name;
+            $this->trainerDescription = $trainer->description;
+            $this->trainerAvatar = $trainer->avatar_path ?: 'images/ai-trainer-placeholder.svg';
+            $this->error = null;
 
-        $this->refreshMessages();
+            $this->refreshMessages();
+        } catch (\Throwable $exception) {
+            $this->hasTrainer = false;
+            $this->error = 'Erreur lors de la création de la conversation: '.$exception->getMessage();
+        }
     }
 
     private function refreshMessages(): void

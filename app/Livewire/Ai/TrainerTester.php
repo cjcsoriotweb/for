@@ -16,10 +16,13 @@ class TrainerTester extends Component
     public array $trainers = [];
 
     public ?int $trainerId = null;
+
     public string $message = '';
 
     public ?string $response = null;
+
     public ?array $usage = null;
+
     public ?string $error = null;
 
     public function mount(): void

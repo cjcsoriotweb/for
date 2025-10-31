@@ -29,6 +29,7 @@ class AiConversation extends Model
     ];
 
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_ARCHIVED = 'archived';
 
     public function trainer(): BelongsTo

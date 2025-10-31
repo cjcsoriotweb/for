@@ -36,7 +36,6 @@ class TeamService
                 'route' => route('application.admin.index', ['team' => $team]),
             ];
 
-
         }
 
         if ($user->formateur) {
@@ -89,7 +88,7 @@ class TeamService
     public function acceptInvitation(User $user, TeamInvitation $invitation): Team
     {
         if (strcasecmp($invitation->email, $user->email) !== 0) {
-            throw new AuthorizationException(__("Vous ne pouvez pas accepter cette invitation."));
+            throw new AuthorizationException(__('Vous ne pouvez pas accepter cette invitation.'));
         }
 
         $team = $invitation->team;

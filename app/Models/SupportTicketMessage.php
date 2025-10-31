@@ -75,7 +75,7 @@ class SupportTicketMessage extends Model
 
     public function isFromOwner(): bool
     {
-        return !$this->is_support;
+        return ! $this->is_support;
     }
 
     public function markAsRead(): void

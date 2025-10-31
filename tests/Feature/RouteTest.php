@@ -25,11 +25,11 @@ class RouteTest extends TestCase
                 // Filtrer uniquement les routes GET web (pas API, pas console)
                 return in_array('GET', $route->methods())
                     && $route->getDomain() === null
-                    && !str_starts_with($route->uri(), 'api/')
-                    && !str_starts_with($route->uri(), 'storage/')
-                    && !str_starts_with($route->uri(), 'livewire/')
-                    && !str_starts_with($route->uri(), '_debugbar/')
-                    && !str_starts_with($route->uri(), 'sanctum/');
+                    && ! str_starts_with($route->uri(), 'api/')
+                    && ! str_starts_with($route->uri(), 'storage/')
+                    && ! str_starts_with($route->uri(), 'livewire/')
+                    && ! str_starts_with($route->uri(), '_debugbar/')
+                    && ! str_starts_with($route->uri(), 'sanctum/');
             });
 
         $this->assertGreaterThan(0, $routes->count(), 'Aucune route web GET trouvée');
@@ -47,12 +47,13 @@ class RouteTest extends TestCase
             $resolvedUri = $this->resolveRouteParameters($uri);
 
             if ($resolvedUri === false) {
-                $skippedRoutes[] = $uri . " ({$routeName})";
+                $skippedRoutes[] = $uri." ({$routeName})";
+
                 continue;
             }
 
             // Construire l'URL avec le paramètre test
-            $testUrl = $resolvedUri . (str_contains($resolvedUri, '?') ? '&' : '?') . 'test=1';
+            $testUrl = $resolvedUri.(str_contains($resolvedUri, '?') ? '&' : '?').'test=1';
 
             try {
                 $response = $this->get($testUrl);
@@ -63,14 +64,14 @@ class RouteTest extends TestCase
                 $isFatalError = str_contains($responseContent, 'Fatal error') || str_contains($responseContent, 'Parse error');
 
                 if ($isViewError || $isFatalError) {
-                    $failedRoutes[] = $resolvedUri . " ({$routeName}) - View/Error: " . ($isViewError ? 'View not found' : 'Fatal error');
-                } elseif (!in_array($response->getStatusCode(), [200, 302, 403, 404])) {
-                    $failedRoutes[] = $resolvedUri . " ({$routeName}) - Status: {$response->getStatusCode()}";
+                    $failedRoutes[] = $resolvedUri." ({$routeName}) - View/Error: ".($isViewError ? 'View not found' : 'Fatal error');
+                } elseif (! in_array($response->getStatusCode(), [200, 302, 403, 404])) {
+                    $failedRoutes[] = $resolvedUri." ({$routeName}) - Status: {$response->getStatusCode()}";
                 } else {
                     $testedRoutes++;
                 }
             } catch (\Exception $e) {
-                $failedRoutes[] = $resolvedUri . " ({$routeName}) - Exception: " . $e->getMessage();
+                $failedRoutes[] = $resolvedUri." ({$routeName}) - Exception: ".$e->getMessage();
             }
         }
 
@@ -80,8 +81,8 @@ class RouteTest extends TestCase
         echo "\n=== Rapport du test des routes ===\n";
         echo "Total routes GET web: {$totalRoutes}\n";
         echo "Routes testées avec succès: {$testedRoutes}\n";
-        echo "Routes ignorées (paramètres dynamiques): " . count($skippedRoutes) . "\n";
-        echo "Routes échouées: " . count($failedRoutes) . "\n";
+        echo 'Routes ignorées (paramètres dynamiques): '.count($skippedRoutes)."\n";
+        echo 'Routes échouées: '.count($failedRoutes)."\n";
 
         if (count($failedRoutes) > 0) {
             echo "\nRoutes échouées:\n";
@@ -91,7 +92,7 @@ class RouteTest extends TestCase
         }
 
         // Le test réussit si aucune route n'a échoué
-        $this->assertEmpty($failedRoutes, count($failedRoutes) . ' route(s) ont échoué le test avec le paramètre test');
+        $this->assertEmpty($failedRoutes, count($failedRoutes).' route(s) ont échoué le test avec le paramètre test');
     }
 
     private function resolveRouteParameters(string $uri): string|false
@@ -114,7 +115,7 @@ class RouteTest extends TestCase
         ];
 
         // Si pas de paramètres dynamiques, retourner l'URI telle quelle
-        if (!preg_match('/\{[^}]+\}/', $uri)) {
+        if (! preg_match('/\{[^}]+\}/', $uri)) {
             return $uri;
         }
 

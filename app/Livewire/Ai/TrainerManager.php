@@ -14,26 +14,38 @@ use Livewire\WithPagination;
 
 class TrainerManager extends Component
 {
-    use WithPagination;
     use WithFileUploads;
+    use WithPagination;
 
     protected string $paginationTheme = 'tailwind';
 
     public int $perPage = 6;
 
     public string $name = '';
+
     public string $model = 'gpt-4o-mini';
+
     public string $provider = 'openai';
+
     public ?string $description = null;
+
     public ?string $prompt = null;
+
     public ?string $avatarPath = null;
+
     public ?\Livewire\Features\SupportFileUploads\TemporaryUploadedFile $avatarUpload = null;
+
     public float $temperature = 0.7;
+
     public bool $isDefault = false;
+
     public bool $isActive = true;
+
     public bool $showForm = false;
+
     /** @var array<int, string> */
     public array $providerOptions = [];
+
     public ?int $editingTrainerId = null;
 
     public function mount(): void
@@ -269,7 +281,7 @@ class TrainerManager extends Component
 
             $storedPath = $this->avatarUpload->store('ai-trainers', 'public');
             $this->avatarUpload = null;
-            $this->avatarPath = 'storage/' . ltrim($storedPath, '/');
+            $this->avatarPath = 'storage/'.ltrim($storedPath, '/');
 
             return $this->avatarPath;
         }

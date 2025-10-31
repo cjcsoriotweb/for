@@ -8,14 +8,20 @@ use Livewire\Component;
 class ChatWidget extends Component
 {
     public bool $showLauncher = false;
+
     public int $notifications = 0;
+
     public bool $enable = true;
+
     public bool $locked = false;
+
     public bool $wizz = false;
+
     public bool $isOpen = false;
+
     public string $mode = 'assistant'; // 'assistant' or 'tutor'
 
-    public function toggle(string $mode = null): void
+    public function toggle(?string $mode = null): void
     {
         if (! $this->enable) {
             return;

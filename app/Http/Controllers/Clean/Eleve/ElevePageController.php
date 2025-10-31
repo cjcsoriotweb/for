@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Clean\Eleve;
 use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Formation;
+use App\Models\FormationCompletionDocument;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\Team;
-use App\Models\User;
-use App\Models\FormationCompletionDocument;
 use App\Models\TextContent;
 use App\Models\TextContentAttachment;
+use App\Models\User;
 use App\Services\Clean\Account\AccountService;
 use App\Services\Formation\StudentFormationService;
 use App\Services\FormationEnrollmentService;
@@ -131,8 +131,8 @@ class ElevePageController extends Controller
             })
             ->filter()
             ->sortBy([
-                fn($item) => $item['chapter_position'],
-                fn($item) => $item['lesson_position'],
+                fn ($item) => $item['chapter_position'],
+                fn ($item) => $item['lesson_position'],
             ])
             ->values();
 
@@ -207,8 +207,8 @@ class ElevePageController extends Controller
             })
             ->filter()
             ->sortBy([
-                fn($item) => $item['chapter_position'],
-                fn($item) => $item['lesson_position'],
+                fn ($item) => $item['chapter_position'],
+                fn ($item) => $item['lesson_position'],
             ])
             ->values();
 
@@ -680,7 +680,7 @@ class ElevePageController extends Controller
         // Rediriger vers la formation si le quiz est réussi
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de ' . round($score, 1) . '%.');
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de '.round($score, 1).'%.');
         }
 
         // Retourner seulement les données nécessaires pour les quiz échoués (pas de vue complète)
@@ -817,4 +817,3 @@ class ElevePageController extends Controller
         ]);
     }
 }
-

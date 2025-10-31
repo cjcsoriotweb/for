@@ -15,6 +15,7 @@ use Symfony\Component\Process\Process;
 class SuperadminTestController extends Controller
 {
     private const STATUS_PASSED = 'passed';
+
     private const STATUS_FAILED = 'failed';
 
     public function __construct(
@@ -71,13 +72,13 @@ class SuperadminTestController extends Controller
             ->sortBy(fn ($file) => $file->getFilename())
             ->map(fn ($file) => [
                 'name' => Str::headline(Str::replaceLast('.php', '', $file->getFilename())),
-                'path' => trim(str_replace(base_path() . DIRECTORY_SEPARATOR, '', $file->getPathname()), DIRECTORY_SEPARATOR),
+                'path' => trim(str_replace(base_path().DIRECTORY_SEPARATOR, '', $file->getPathname()), DIRECTORY_SEPARATOR),
             ])
             ->values();
     }
 
     /**
-     * @param array{name: string, path: string} $test
+     * @param  array{name: string, path: string}  $test
      * @return array{name: string, path: string, status: string, output: string, duration: float}
      */
     private function runTest(array $test): array
@@ -101,14 +102,14 @@ class SuperadminTestController extends Controller
             'name' => $test['name'],
             'path' => $test['path'],
             'status' => $status,
-            'output' => trim($process->getOutput() . PHP_EOL . $process->getErrorOutput()),
+            'output' => trim($process->getOutput().PHP_EOL.$process->getErrorOutput()),
             'duration' => $duration,
         ];
     }
 
     private function phpBinary(): string
     {
-        $finder = new PhpExecutableFinder();
+        $finder = new PhpExecutableFinder;
 
         return $finder->find(false) ?: PHP_BINARY;
     }
