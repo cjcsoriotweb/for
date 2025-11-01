@@ -30,7 +30,7 @@
 
   <!-- Overlay pour fermer en cliquant dehors -->
   <div id="dock-overlay"
-       class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1499]"
+       class="fixed inset-0 bg-transparent hidden z-[1499]"
        onclick="closeDockMenu()">
   </div>
 </div>
