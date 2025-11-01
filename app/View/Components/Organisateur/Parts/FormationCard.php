@@ -21,7 +21,7 @@ class FormationCard extends Component
 
     public function render(): View
     {
-        return view('clean.organisateur.parts.formation-card', [
+        return view('in-application.organisateur.parts.formation-card', [
             'formation' => $this->formation,
             'team' => $this->team,
         ]);

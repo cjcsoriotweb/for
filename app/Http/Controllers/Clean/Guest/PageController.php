@@ -7,11 +7,12 @@ class PageController
     public function index()
     {
         return redirect()->route('user.dashboard');
-        return view('clean.guest.hello');
+
+        return view('out-application.guest.hello');
     }
 
     public function policy()
     {
-        return view('clean.guest.policy');
+        return view('out-application.guest.policy');
     }
 }

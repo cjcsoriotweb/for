@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Clean\Admin\AdminPageController;
+use App\Http\Controllers\Clean\Admin\SuperadminTestController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -13,5 +14,9 @@ Route::prefix('superadmin')
         Route::get('/users', [AdminPageController::class, 'usersIndex'])->name('users.index');
         Route::get('/formations', [AdminPageController::class, 'formationsIndex'])->name('formations.index');
         Route::get('/support', [AdminPageController::class, 'supportIndex'])->name('support.index');
-        Route::get('/ai-trainers', [AdminPageController::class, 'aiIndex'])->name('ai.index');
+        Route::get('/ai', function () {
+            return view('out-application.superadmin.superadmin-ia-page');
+        })->name('ai.index');
+        Route::get('/tests', [SuperadminTestController::class, 'index'])->name('tests.index');
+        Route::post('/tests/run', [SuperadminTestController::class, 'run'])->name('tests.run');
     });

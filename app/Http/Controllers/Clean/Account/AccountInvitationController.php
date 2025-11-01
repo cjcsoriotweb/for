@@ -27,7 +27,6 @@ class AccountInvitationController extends Controller
 
         return redirect()
             ->route('user.dashboard')
-            ->with('status', __("Invitation acceptee."));
+            ->with('status', __('Invitation acceptee.'));
     }
 }
-

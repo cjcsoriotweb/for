@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('text_content_attachments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('text_content_id')->constrained('text_contents')   // references id on text_contents
-      ->cascadeOnDelete();  
+                ->cascadeOnDelete();
             $table->string('name');
             $table->string('file_path');
             $table->string('mime_type')->nullable();

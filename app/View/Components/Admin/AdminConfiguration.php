@@ -19,7 +19,7 @@ class AdminConfiguration extends Component
 
     public function render(): View
     {
-        return view('clean.admin.partials.configuration.index', [
+        return view('in-application.admin.partials.configuration.index', [
             'team' => $this->team,
         ]);
     }

@@ -25,7 +25,7 @@ class RechargeController extends Controller
                 ->with('error', 'Accès non autorisé.');
         }
 
-        return view('clean.organisateur.recharge', compact('team'));
+        return view('in-application.organisateur.recharge', compact('team'));
     }
 
     public function createCheckoutSession(Request $request, Team $team)
@@ -150,7 +150,7 @@ class RechargeController extends Controller
 
             $amount = ($payment->amount ?? 0) / 100;
 
-            return view('clean.organisateur.recharge-success', [
+            return view('in-application.organisateur.recharge-success', [
                 'team' => $team,
                 'amount' => $amount,
                 'session' => $session,

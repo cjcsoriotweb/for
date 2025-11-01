@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Clean\Eleve;
 use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Formation;
+use App\Models\FormationCompletionDocument;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\Team;
-use App\Models\User;
-use App\Models\FormationCompletionDocument;
 use App\Models\TextContent;
 use App\Models\TextContentAttachment;
+use App\Models\User;
 use App\Services\Clean\Account\AccountService;
 use App\Services\Formation\StudentFormationService;
 use App\Services\FormationEnrollmentService;
@@ -56,7 +56,7 @@ class ElevePageController extends Controller
         // Paginer les formations pour l'API
         $formationsPaginees = $this->studentFormationService->paginateFormationCurrentByStudent($team, $user, 10);
 
-        return view('clean.eleve.home', compact(
+        return view('in-application.eleve.home', compact(
             'team',
             'formationsWithProgress',
             'formationsPaginees'
@@ -131,12 +131,12 @@ class ElevePageController extends Controller
             })
             ->filter()
             ->sortBy([
-                fn($item) => $item['chapter_position'],
-                fn($item) => $item['lesson_position'],
+                fn ($item) => $item['chapter_position'],
+                fn ($item) => $item['lesson_position'],
             ])
             ->values();
 
-        return view('clean.eleve.formation.show', compact(
+        return view('in-application.eleve.formation.show', compact(
             'team',
             'studentFormationService',
             'formationWithProgress',
@@ -207,12 +207,12 @@ class ElevePageController extends Controller
             })
             ->filter()
             ->sortBy([
-                fn($item) => $item['chapter_position'],
-                fn($item) => $item['lesson_position'],
+                fn ($item) => $item['chapter_position'],
+                fn ($item) => $item['lesson_position'],
             ])
             ->values();
 
-        return view('clean.eleve.formation.congratulation', compact(
+        return view('in-application.eleve.formation.congratulation', compact(
             'team',
             'formationWithProgress',
             'formationDocuments',
@@ -432,7 +432,7 @@ class ElevePageController extends Controller
         $formationDocuments = $formation->completionDocuments()->get();
         $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
 
-        return view('clean.eleve.lesson.show', compact(
+        return view('in-application.eleve.lesson.show', compact(
             'team',
             'formation',
             'chapter',
@@ -587,7 +587,7 @@ class ElevePageController extends Controller
                 ->with('info', 'Vous avez atteint le nombre maximum de tentatives pour ce quiz. Vous pouvez continuer avec la formation.');
         }
 
-        return view('clean.eleve.lesson.quiz', compact(
+        return view('in-application.eleve.lesson.quiz', compact(
             'team',
             'formation',
             'chapter',
@@ -680,7 +680,7 @@ class ElevePageController extends Controller
         // Rediriger vers la formation si le quiz est réussi
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de ' . round($score, 1) . '%.');
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de '.round($score, 1).'%.');
         }
 
         // Retourner seulement les données nécessaires pour les quiz échoués (pas de vue complète)
@@ -722,7 +722,7 @@ class ElevePageController extends Controller
         // Récupérer les informations du quiz
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
-        return view('clean.eleve.lesson.quiz-results', compact(
+        return view('in-application.eleve.lesson.quiz-results', compact(
             'team',
             'formation',
             'chapter',
@@ -817,4 +817,3 @@ class ElevePageController extends Controller
         ]);
     }
 }
-

@@ -25,3 +25,16 @@ Homestead.yaml
 Thumbs.db
 
 !public/build/
+
+
+# --- VS Code ---
+.vscode/
+!.vscode/extensions.json   # (optionnel) on garde les recommandations d’extensions
+# .vscode/launch.json et settings.json sont souvent perso → ignorés
+
+# --- Laravel Vite ---
+/public/build/
+/public/hot
+
+# --- Laravel Mix (ancien) ---
+/public/mix-manifest.json

@@ -53,7 +53,7 @@ class FormationChoice extends Component
             $progressPercent = (int) ($progress['progress_percent'] ?? 0);
             $canAfford = $formationEnrollmentService->canTeamAffordFormation($team, $formation);
 
-            $canJoin = !$isEnrolled && $canAfford;
+            $canJoin = ! $isEnrolled && $canAfford;
 
             return [
                 'id' => $formation->id,
@@ -84,7 +84,7 @@ class FormationChoice extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.eleve.FormationChoice', [
+        return view('components.eleve.formation.choice', [
             'team' => $this->team,
             'formations' => $this->formations,
         ]);

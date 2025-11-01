@@ -72,7 +72,7 @@ class OrganisateurService
 
         $lessons = $formation->lessons()
             ->with([
-                'chapter' => fn ($query) => $query->orderBy('position'),
+                'chapter' => fn ($query) => $query->orderBy('chapters.position'),
                 'learners' => fn ($query) => $query->whereIn('user_id', $studentIds),
             ])
             ->orderBy('position')
@@ -337,7 +337,7 @@ class OrganisateurService
 
         $lessons = $formation->lessons()
             ->with([
-                'chapter' => fn ($query) => $query->orderBy('position'),
+                'chapter' => fn ($query) => $query->orderBy('chapters.position'),
                 'learners' => fn ($query) => $query->where('user_id', $student->id),
             ])
             ->orderBy('position')

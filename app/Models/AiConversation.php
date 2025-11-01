@@ -12,7 +12,6 @@ class AiConversation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ai_trainer_id',
         'user_id',
         'formation_id',
         'team_id',
@@ -29,11 +28,14 @@ class AiConversation extends Model
     ];
 
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_ARCHIVED = 'archived';
 
-    public function trainer(): BelongsTo
+    // Relation avec AiTrainer supprimée - trainers sont maintenant dans config/ai.php
+
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(AiTrainer::class, 'ai_trainer_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function owner(): BelongsTo

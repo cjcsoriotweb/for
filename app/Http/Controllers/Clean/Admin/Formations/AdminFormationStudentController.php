@@ -55,7 +55,7 @@ class AdminFormationStudentController extends Controller
             ? (int) round(($completedLessons / $totalLessons) * 100)
             : 0;
 
-        return view('clean.admin.formations.student-progress', [
+        return view('in-application.admin.formations.student-progress', [
             'team' => $team,
             'formation' => $formation,
             'student' => $student,

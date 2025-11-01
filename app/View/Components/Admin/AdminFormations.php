@@ -39,7 +39,7 @@ class AdminFormations extends Component
 
     public function render(): View
     {
-        return view('clean.admin.formations.listFormations', [
+        return view('in-application.admin.formations.list-formations', [
             'team' => $this->team,
             'activeCount' => $this->activeCount,
             'totalCount' => $this->totalCount,

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\User;
+use Illuminate\Console\Command;
 
 class MakeSuperAdmin extends Command
 {
@@ -31,6 +31,7 @@ class MakeSuperAdmin extends Command
 
         if (! $user) {
             $this->error('❌ Aucun utilisateur trouvé avec cet e-mail.');
+
             return 1;
         }
 
@@ -42,6 +43,7 @@ class MakeSuperAdmin extends Command
         // $user->assignRole('superadmin');
 
         $this->info("✅ L’utilisateur {$user->name} ({$user->email}) est maintenant super admin !");
+
         return 0;
     }
 }

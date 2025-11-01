@@ -36,6 +36,9 @@ class TeamService
                 'route' => route('application.admin.index', ['team' => $team]),
             ];
 
+        }
+
+        if ($user->formateur) {
             $destinations[] = [
                 'key' => 'formateur',
                 'badge' => __('Formateur'),
@@ -46,7 +49,6 @@ class TeamService
                 'route' => route('formateur.home', ['team' => $team]),
             ];
         }
-
         if ($user->hasTeamRole($team, 'manager')) {
             $destinations[] = [
                 'key' => 'manager',
@@ -86,7 +88,7 @@ class TeamService
     public function acceptInvitation(User $user, TeamInvitation $invitation): Team
     {
         if (strcasecmp($invitation->email, $user->email) !== 0) {
-            throw new AuthorizationException(__("Vous ne pouvez pas accepter cette invitation."));
+            throw new AuthorizationException(__('Vous ne pouvez pas accepter cette invitation.'));
         }
 
         $team = $invitation->team;
@@ -116,7 +118,7 @@ class TeamService
         $role = $user->teamRole($team)?->key;
         $autoRedirectUrl = count($destinations) === 1 ? $destinations[0]['route'] : null;
 
-        return view('clean.account.switch-team', [
+        return view('out-application.account.switch-team', [
             'team' => $team,
             'destinations' => $destinations,
             'selectedRole' => $role,

@@ -16,7 +16,7 @@ class ActionButtons extends Component
 
     public function render(): View
     {
-        return view('clean.organisateur.parts.action-buttons', [
+        return view('in-application.organisateur.parts.action-buttons', [
             'buttons' => $this->buttons,
         ]);
     }

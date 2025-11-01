@@ -27,7 +27,7 @@ class AdminConfigurationController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('clean.admin.AdminCreditsPage', [
+        return view('in-application.admin.admin-credits-page', [
             'organisations' => $organisations,
             'team' => $team,
             'transactions' => $transactions,
@@ -65,4 +65,3 @@ class AdminConfigurationController extends Controller
             ->with('ok', 'Credit ajoute.');
     }
 }
-

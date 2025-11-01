@@ -39,7 +39,7 @@ class StatsCards extends Component
 
     public function render(): View
     {
-        return view('clean.organisateur.parts.stats-cards', [
+        return view('in-application.organisateur.parts.stats-cards', [
             'stats' => $this->stats,
             'type' => $this->type,
             'team' => $this->team,

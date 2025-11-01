@@ -20,20 +20,16 @@ class FormateurOwner
             return abort(403);
         }
 
-
-
         if (! Auth::user()->superadmin) {
             if (! Auth::user()->formateur) {
                 return abort(403);
-                
+
             }
 
-            if(!$request->formation->user_id == Auth::user()->id){
+            if ($request->formation->user_id != Auth::user()->id) {
                 return abort(403);
             }
         }
-
-     
 
         return $next($request);
     }

@@ -27,7 +27,7 @@ class StudentCard extends Component
 
     public function render(): View
     {
-        return view('clean.organisateur.parts.student-card', [
+        return view('in-application.organisateur.parts.student-card', [
             'summary' => $this->summary,
             'formation' => $this->formation,
             'team' => $this->team,

@@ -13,7 +13,7 @@ class FormationCompletionDocumentController extends Controller
 {
     public function index(Formation $formation)
     {
-        return view('clean.formateur.Formation.FormationCompletionDocuments', compact('formation'));
+        return view('out-application.formateur.formation.formation-completion-documents', compact('formation'));
     }
 
     public function store(StoreFormationCompletionDocumentRequest $request, Formation $formation): RedirectResponse

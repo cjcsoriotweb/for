@@ -13,9 +13,6 @@ return new class extends Migration
     {
         Schema::create('ai_conversations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ai_trainer_id')
-                ->constrained('ai_trainers')
-                ->cascadeOnDelete();
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
@@ -33,7 +30,6 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
 
-            $table->index(['ai_trainer_id', 'status']);
             $table->index(['user_id', 'formation_id']);
         });
     }
