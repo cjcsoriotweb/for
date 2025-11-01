@@ -39,6 +39,19 @@ class TicketReporter extends Component
 
         $this->loadRecentTickets();
 
+        // Check if a specific ticket is requested via query parameter
+        $requestedTicketId = request()->query('ticket');
+        if ($requestedTicketId && is_numeric($requestedTicketId)) {
+            $ticketId = (int) $requestedTicketId;
+            // Verify the ticket belongs to the user
+            $ticketExists = collect($this->recentTickets)->contains('id', $ticketId);
+            if ($ticketExists) {
+                $this->selectTicket($ticketId);
+                return;
+            }
+        }
+
+        // Otherwise, select the first ticket if available
         if ($this->activeTicketId === null && count($this->recentTickets) > 0) {
             $firstTicket = $this->recentTickets[0]['id'] ?? null;
             if ($firstTicket) {

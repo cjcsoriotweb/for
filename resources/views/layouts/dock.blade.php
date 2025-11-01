@@ -16,25 +16,21 @@
 </head>
 <body class="h-full bg-transparent text-white">
     <div class="flex h-full flex-col bg-transparent">
-        <div class="flex-1 overflow-hidden px-4 py-6 sm:px-6 sm:py-8">
-            <div class="mx-auto flex h-full w-full max-w-5xl">
-                    @hasSection('dock-header')
-                        <header class="border-b border-white/10 px-6 py-5 sm:px-8">
-                            @yield('dock-header')
-                        </header>
-                    @endif
+        @hasSection('dock-header')
+            <header class="border-b border-white/10 px-6 py-5 sm:px-8">
+                @yield('dock-header')
+            </header>
+        @endif
 
-                    <main class="flex-1 overflow-hidden">
-                        @yield('dock-content')
-                    </main>
+        <main class="flex-1 overflow-hidden">
+            @yield('dock-content')
+        </main>
 
-                    @hasSection('dock-footer')
-                        <footer class="border-t border-white/10 px-6 py-5 sm:px-8">
-                            @yield('dock-footer')
-                        </footer>
-                    @endif
-                </div>
-        </div>
+        @hasSection('dock-footer')
+            <footer class="border-t border-white/10 px-6 py-5 sm:px-8">
+                @yield('dock-footer')
+            </footer>
+        @endif
     </div>
 
     @livewireScriptConfig
