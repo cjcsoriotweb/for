@@ -8,6 +8,7 @@ use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Models\User;
+use App\Services\Ai\ChatCompletionClient;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -105,7 +106,7 @@ class AiConversationService
             throw new RuntimeException(sprintf('Provider [%s] is not configured.', $trainer->provider));
         }
 
-        $client = OpenAiClient::fromConfig($providerConfig);
+        $client = ChatCompletionClient::fromConfig($providerConfig);
 
         $historyLimit = max(config('ai.conversation.history_limit', 30), 1);
 
@@ -138,7 +139,7 @@ class AiConversationService
         }
 
         $payload = [
-            'model' => $trainer->model ?: Arr::get($providerConfig, 'default_model', 'gpt-4o-mini'),
+            'model' => $trainer->model ?: Arr::get($providerConfig, 'default_model', 'llama3'),
             'messages' => $messages,
         ];
 
@@ -192,8 +193,8 @@ class AiConversationService
         $trainer = AiTrainer::query()->where('slug', $slug)->first();
 
         if (! $trainer && is_array($config)) {
-            $provider = $config['provider'] ?? config('ai.default_driver', 'openai');
-            $model = $config['model'] ?? config("ai.providers.$provider.default_model", 'gpt-4o-mini');
+            $provider = $config['provider'] ?? config('ai.default_driver', 'ollama');
+            $model = $config['model'] ?? config("ai.providers.$provider.default_model", 'llama3');
 
             $settings = isset($config['settings']) && is_array($config['settings'])
                 ? $config['settings']

@@ -3,7 +3,7 @@
 namespace App\Livewire\Ai;
 
 use App\Models\AiTrainer;
-use App\Services\Ai\OpenAiClient;
+use App\Services\Ai\ChatCompletionClient;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -69,7 +69,7 @@ class TrainerTester extends Component
                 throw new RuntimeException(sprintf('Provider [%s] is not configured.', $trainer->provider));
             }
 
-            $client = OpenAiClient::fromConfig($providerConfig);
+            $client = ChatCompletionClient::fromConfig($providerConfig);
 
             $messages = [];
 
@@ -86,7 +86,7 @@ class TrainerTester extends Component
             ];
 
             $payload = [
-                'model' => $trainer->model ?: Arr::get($providerConfig, 'default_model', 'gpt-4o-mini'),
+                'model' => $trainer->model ?: Arr::get($providerConfig, 'default_model', 'llama3'),
                 'messages' => $messages,
             ];
 

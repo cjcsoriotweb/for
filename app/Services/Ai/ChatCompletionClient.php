@@ -9,7 +9,7 @@ use RuntimeException;
 
 use function app;
 
-class OpenAiClient
+class ChatCompletionClient
 {
     private HttpFactory $http;
 
@@ -21,7 +21,7 @@ class OpenAiClient
         ?HttpFactory $http = null
     ) {
         if ($this->requiresApiKey && $this->apiKey === '') {
-            throw new RuntimeException('OPENAI_API_KEY is not configured.');
+            throw new RuntimeException('AI provider API key is not configured.');
         }
 
         $this->http = $http ?: app(HttpFactory::class);
@@ -30,9 +30,9 @@ class OpenAiClient
     public static function fromConfig(array $config): self
     {
         $apiKey = Arr::get($config, 'api_key', '');
-        $baseUrl = rtrim(Arr::get($config, 'base_url', 'https://api.openai.com/v1'), '/');
+        $baseUrl = rtrim(Arr::get($config, 'base_url', 'http://localhost:11434/api'), '/');
         $chatEndpoint = Arr::get($config, 'chat_endpoint', '/chat/completions');
-        $requiresApiKey = (bool) Arr::get($config, 'requires_api_key', true);
+        $requiresApiKey = (bool) Arr::get($config, 'requires_api_key', false);
 
         return new self($apiKey, $baseUrl, $chatEndpoint, $requiresApiKey);
     }
