@@ -43,7 +43,9 @@ class AssistantChat extends Component
     }
 
     public function render()
+    
     {
+
         return view('livewire.ai.assistant-chat');
     }
 
@@ -67,6 +69,7 @@ class AssistantChat extends Component
         if ($this->awaitingResponse) {
             return;
         }
+
 
         $user = $this->user();
 

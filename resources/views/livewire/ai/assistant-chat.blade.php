@@ -1,13 +1,13 @@
 <div>
-    @php
+@php
     $trainerName = $trainer['name'] ?: __('Assistant IA');
     $trainerDescription = $trainer['description'] ?? null;
     $trainerAvatar = $trainer['avatar'] ?? null;
 @endphp
 
 @if ($hasTrainer)
-    <div class="flex h-full flex-1 flex-col" wire:poll.1s="test">
-        <header class="border-b border-slate-200 bg-white px-6 py-4">
+    <div class="flex h-full flex-1 flex-col" >
+        <header wire:poll.1s="refreshMessages" class="border-b border-slate-200 bg-white px-6 py-4">
             <div class="flex items-center gap-3">
                 @if ($trainerAvatar)
                     <img src="{{ asset($trainerAvatar) }}" alt="{{ $trainerName }}" class="h-10 w-10 rounded-full object-cover">
