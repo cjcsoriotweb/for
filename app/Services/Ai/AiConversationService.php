@@ -4,11 +4,9 @@ namespace App\Services\Ai;
 
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
-use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\Team;
 use App\Models\User;
-use App\Services\Ai\ChatCompletionClient;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -18,55 +16,79 @@ use RuntimeException;
 class AiConversationService
 {
     /**
-     * Resolve the AI trainer to use for a given formation.
+     * (Optionnel) Créer/retourner une conversation active SANS trainer,
+     * en stockant le prompt brut dans metadata.
      */
-    public function resolveTrainer(?Formation $formation = null, ?int $trainerId = null): ?AiTrainer
+    public function getOrCreateConversationRaw(User $user, ?Formation $formation = null, ?Team $team = null, string $systemPrompt = ''): AiConversation
     {
-        $query = AiTrainer::query()->active();
-
-        if ($trainerId) {
-            $trainer = $query->whereKey($trainerId)->first();
-            if ($trainer) {
-                return $trainer;
-            }
-        }
-
-        if ($formation) {
-            $formation->loadMissing('aiTrainers');
-
-            /** @var Collection<int, AiTrainer> $linkedTrainers */
-            $linkedTrainers = $formation->aiTrainers->filter->is_active;
-
-            $primary = $linkedTrainers->first(fn (AiTrainer $trainer) => (bool) $trainer->pivot?->is_primary);
-
-            if ($primary) {
-                return $primary;
-            }
-
-            if ($linkedTrainers->isNotEmpty()) {
-                return $linkedTrainers->first();
-            }
-        }
-
-        return $this->resolveDefaultSiteTrainer()
-            ?? $query->orderByDesc('is_default')->orderBy('name')->first();
-    }
-
-    public function getOrCreateConversation(AiTrainer $trainer, User $user, ?Formation $formation = null, ?Team $team = null): AiConversation
-    {
-        return DB::transaction(function () use ($trainer, $user, $formation, $team) {
+        return DB::transaction(function () use ($user, $formation, $team, $systemPrompt) {
             $conversation = AiConversation::query()->firstOrCreate(
                 [
-                    'ai_trainer_id' => $trainer->id,
                     'user_id' => $user->id,
                     'formation_id' => $formation?->id,
                 ],
                 [
                     'team_id' => $team?->id,
                     'status' => AiConversation::STATUS_ACTIVE,
+                    'metadata' => [
+                        'system_prompt' => $systemPrompt,
+                    ],
                     'last_message_at' => now(),
                 ]
             );
+
+            // S’assure que le prompt courant est présent en metadata (sans écraser si vide).
+            if ($systemPrompt !== '') {
+                $metadata = $conversation->metadata ?? [];
+                if (($metadata['system_prompt'] ?? '') !== $systemPrompt) {
+                    $metadata['system_prompt'] = $systemPrompt;
+                    $conversation->forceFill(['metadata' => $metadata])->save();
+                }
+            }
+
+            $this->syncUserContext($conversation, $user);
+
+            return $conversation->fresh();
+        });
+    }
+
+    /**
+     * (Optionnel) Démarrer une nouvelle conversation (archive les actives semblables).
+     */
+    public function startNewConversationRaw(User $user, ?Formation $formation = null, ?Team $team = null, string $systemPrompt = ''): AiConversation
+    {
+        return DB::transaction(function () use ($user, $formation, $team, $systemPrompt) {
+            $query = AiConversation::query()
+                ->where('user_id', $user->id);
+
+            $query = $formation
+                ? $query->where('formation_id', $formation->id)
+                : $query->whereNull('formation_id');
+
+            $query = $team
+                ? $query->where('team_id', $team->id)
+                : $query->whereNull('team_id');
+
+            /** @var Collection<int, AiConversation> $existing */
+            $existing = $query->get();
+
+            foreach ($existing as $conversation) {
+                if ($conversation->status === AiConversation::STATUS_ACTIVE) {
+                    $conversation->archive();
+                }
+            }
+
+            $conversation = AiConversation::query()->create([
+                'user_id' => $user->id,
+                'formation_id' => $formation?->id,
+                'team_id' => $team?->id,
+                'status' => AiConversation::STATUS_ACTIVE,
+                'metadata' => array_replace(
+                    $existing->first()?->metadata ?? [],
+                    ['system_prompt' => $systemPrompt]
+                ),
+                'last_message_at' => now(),
+            ]);
 
             $this->syncUserContext($conversation, $user);
 
@@ -99,46 +121,6 @@ class AiConversationService
         });
     }
 
-    public function startNewConversation(AiTrainer $trainer, User $user, ?Formation $formation = null, ?Team $team = null): AiConversation
-    {
-        return DB::transaction(function () use ($trainer, $user, $formation, $team) {
-            $query = AiConversation::query()
-                ->where('ai_trainer_id', $trainer->id)
-                ->where('user_id', $user->id);
-
-            $query = $formation
-                ? $query->where('formation_id', $formation->id)
-                : $query->whereNull('formation_id');
-
-            $query = $team
-                ? $query->where('team_id', $team->id)
-                : $query->whereNull('team_id');
-
-            /** @var Collection<int, AiConversation> $existing */
-            $existing = $query->get();
-
-            foreach ($existing as $conversation) {
-                if ($conversation->status === AiConversation::STATUS_ACTIVE) {
-                    $conversation->archive();
-                }
-            }
-
-            $conversation = AiConversation::query()->create([
-                'ai_trainer_id' => $trainer->id,
-                'user_id' => $user->id,
-                'formation_id' => $formation?->id,
-                'team_id' => $team?->id,
-                'status' => AiConversation::STATUS_ACTIVE,
-                'metadata' => $existing->first()?->metadata ?? [],
-                'last_message_at' => now(),
-            ]);
-
-            $this->syncUserContext($conversation, $user);
-
-            return $conversation->fresh();
-        });
-    }
-
     public function syncUserContext(AiConversation $conversation, User $user): void
     {
         $context = trim((string) $user->getIaContext());
@@ -151,7 +133,6 @@ class AiConversationService
                 Arr::forget($metadata, 'user_context');
                 $conversation->forceFill(['metadata' => $metadata])->save();
             }
-
             return;
         }
 
@@ -199,21 +180,29 @@ class AiConversationService
     }
 
     /**
-     * Generate an assistant reply using the configured provider.
+     * Génère la réponse de l’assistant à partir d’un prompt BRUT.
      *
-     * @param  array<int, array<string, string>>  $pendingMessages
+     * @param  array<int, array{role:string, content:string}>  $pendingMessages
      */
-    public function generateAssistantReply(AiConversation $conversation, AiTrainer $trainer, array $pendingMessages = []): AiConversationMessage
+    public function generateAssistantReply(AiConversation $conversation, string $systemPrompt, array $pendingMessages = []): AiConversationMessage
     {
-        $providerConfig = config('ai.providers.'.$trainer->provider);
+        // Provider & modèle depuis la config (avec overrides possibles dans metadata)
+        $provider = Arr::get($conversation->metadata, 'provider', config('ai.default_driver', 'ollama'));
+        $providerConfig = config("ai.providers.$provider");
 
         if (! $providerConfig) {
-            throw new RuntimeException(sprintf('Provider [%s] is not configured.', $trainer->provider));
+            throw new RuntimeException(sprintf('Provider [%s] is not configured.', (string) $provider));
         }
 
         $client = ChatCompletionClient::fromConfig($providerConfig);
 
-        $historyLimit = max(config('ai.conversation.history_limit', 30), 1);
+        $model = Arr::get(
+            $conversation->metadata,
+            'model',
+            Arr::get($providerConfig, 'default_model', 'llama3')
+        );
+
+        $historyLimit = max((int) config('ai.conversation.history_limit', 30), 1);
 
         $history = $conversation->messages()
             ->latest('id')
@@ -224,15 +213,16 @@ class AiConversationService
 
         $messages = [];
 
-        if ($trainer->prompt) {
+        // 1) Prompt système brut
+        if (trim($systemPrompt) !== '') {
             $messages[] = [
                 'role' => AiConversationMessage::ROLE_SYSTEM,
-                'content' => $trainer->prompt,
+                'content' => $systemPrompt,
             ];
         }
 
+        // 2) Contexte utilisateur
         $userContext = Arr::get($conversation->metadata, 'user_context.content');
-
         if (is_string($userContext) && trim($userContext) !== '') {
             $messages[] = [
                 'role' => AiConversationMessage::ROLE_SYSTEM,
@@ -240,14 +230,14 @@ class AiConversationService
             ];
         }
 
+        // 3) Contexte de session
         $sessionContext = Arr::get($conversation->metadata, 'session', []);
-
         if (is_array($sessionContext) && $sessionContext !== []) {
             $sessionDetails = [];
 
             $originLabel = Arr::get($sessionContext, 'origin_label');
             if (is_string($originLabel) && trim($originLabel) !== '') {
-                $sessionDetails[] = 'Page courante de l\'utilisateur : '.$originLabel;
+                $sessionDetails[] = "Page courante de l'utilisateur : ".$originLabel;
             }
 
             $originUrl = Arr::get($sessionContext, 'origin_url');
@@ -257,7 +247,7 @@ class AiConversationService
 
             $lastTicket = Arr::get($sessionContext, 'last_ticket_id');
             if ($lastTicket) {
-                $sessionDetails[] = 'Dernier ticket support cree : #'.$lastTicket;
+                $sessionDetails[] = 'Dernier ticket support créé : #'.$lastTicket;
             }
 
             if ($sessionDetails !== []) {
@@ -268,29 +258,39 @@ class AiConversationService
             }
         }
 
+        // 4) Règle de création de ticket (toujours ajoutée)
         $messages[] = [
             'role' => AiConversationMessage::ROLE_SYSTEM,
-            'content' => "Si tu ne disposes pas de l'information demandee, indique-le clairement. Propose à l'utilisateur de créer un ticket support. Si l'utilisateur confirme qu'il souhaite une demande, termine ta réponse par [[CREATE_TICKET]] suivi d'un bref résumé (max 400 caractères) de la demande. N'utilise JAMAIS la balise sans consentement explicite.",
+            'content' => "Si tu ne disposes pas de l'information demandée, indique-le clairement. Propose à l'utilisateur de créer un ticket support. Si l'utilisateur confirme qu'il souhaite une demande, termine ta réponse par [[CREATE_TICKET]] suivi d'un bref résumé (max 400 caractères) de la demande. N'utilise JAMAIS la balise sans consentement explicite.",
         ];
 
-        /** @var AiConversationMessage $message */
-        foreach ($history as $message) {
+        // 5) Historique
+        /** @var AiConversationMessage $msg */
+        foreach ($history as $msg) {
             $messages[] = [
-                'role' => $message->role,
-                'content' => $message->content,
+                'role' => $msg->role,
+                'content' => $msg->content,
             ];
         }
 
+        // 6) Éventuels messages en attente
         foreach ($pendingMessages as $pending) {
             $messages[] = $pending;
         }
 
+        // Payload modèle
         $payload = [
-            'model' => $trainer->model ?: Arr::get($providerConfig, 'default_model', 'llama3'),
+            'model' => $model,
             'messages' => $messages,
         ];
 
-        $temperature = Arr::get($trainer->settings, 'temperature', Arr::get($providerConfig, 'temperature'));
+        // Température (override metadata.settings.temperature > config)
+        $temperature = Arr::get(
+            $conversation->metadata,
+            'settings.temperature',
+            Arr::get($providerConfig, 'temperature')
+        );
+
         if ($temperature !== null) {
             $payload['temperature'] = (float) $temperature;
         }
@@ -301,7 +301,7 @@ class AiConversationService
         $content = Arr::get($choice, 'message.content');
 
         if (! is_string($content) || trim($content) === '') {
-            throw new RuntimeException('La reponse du modele est vide.');
+            throw new RuntimeException('La réponse du modèle est vide.');
         }
 
         $usage = Arr::get($response, 'usage', []);
@@ -312,82 +312,9 @@ class AiConversationService
             'prompt_tokens' => Arr::get($usage, 'prompt_tokens'),
             'completion_tokens' => Arr::get($usage, 'completion_tokens'),
             'metadata' => [
-                'provider' => $trainer->provider,
+                'provider' => $provider,
                 'model' => $payload['model'],
             ],
         ]);
-    }
-
-    private function resolveDefaultSiteTrainer(): ?AiTrainer
-    {
-        $config = config('ai.default_site_trainer');
-        $slug = null;
-
-        if (is_array($config)) {
-            $slug = $config['slug'] ?? null;
-        }
-
-        if (! is_string($slug) || trim($slug) === '') {
-            $slug = config('ai.default_trainer_slug');
-        }
-
-        $slug = is_string($slug) ? trim($slug) : '';
-
-        if ($slug === '') {
-            return null;
-        }
-
-        $trainer = AiTrainer::query()->where('slug', $slug)->first();
-
-        if (! $trainer && is_array($config)) {
-            $provider = $config['provider'] ?? config('ai.default_driver', 'ollama');
-            $model = $config['model'] ?? config("ai.providers.$provider.default_model", 'llama3');
-
-            $settings = isset($config['settings']) && is_array($config['settings'])
-                ? $config['settings']
-                : [];
-
-            if (! array_key_exists('temperature', $settings)) {
-                $settings['temperature'] = (float) config("ai.providers.$provider.temperature", 0.7);
-            } else {
-                $settings['temperature'] = (float) $settings['temperature'];
-            }
-
-            $trainer = AiTrainer::query()->firstOrCreate(
-                ['slug' => $slug],
-                [
-                    'name' => $config['name'] ?? 'Assistant IA',
-                    'provider' => $provider,
-                    'model' => $model,
-                    'description' => $config['description'] ?? null,
-                    'prompt' => $config['prompt'] ?? null,
-                    'avatar_path' => $config['avatar_path'] ?? null,
-                    'is_default' => true,
-                    'is_active' => true,
-                    'settings' => $settings,
-                ]
-            );
-        }
-
-        if (! $trainer) {
-            return null;
-        }
-
-        $updates = [];
-
-        if (! $trainer->is_active) {
-            $updates['is_active'] = true;
-        }
-
-        if (! $trainer->is_default) {
-            $updates['is_default'] = true;
-        }
-
-        if ($updates !== []) {
-            $trainer->forceFill($updates)->save();
-            $trainer->refresh();
-        }
-
-        return $trainer;
     }
 }

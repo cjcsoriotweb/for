@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ai_trainer_id')
                 ->constrained('ai_trainers')
+                ->nullable()
                 ->cascadeOnDelete();
             $table->foreignId('user_id')
                 ->constrained('users')

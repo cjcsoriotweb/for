@@ -4,7 +4,6 @@ namespace App\Livewire\Ai;
 
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
-use App\Models\AiTrainer;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketMessage;
 use App\Services\Ai\AiConversationService;
@@ -18,8 +17,6 @@ use Throwable;
 
 class AssistantChat extends Component
 {
-    public ?int $trainerId = null;
-
     public ?int $conversationId = null;
 
     /** @var array<int, array<string, mixed>> */
@@ -27,14 +24,11 @@ class AssistantChat extends Component
 
     public string $message = '';
 
-    /** @var array{name: string, description: ?string, avatar: ?string} */
-    public array $trainer = [
-        'name' => '',
-        'description' => null,
-        'avatar' => null,
-    ];
-
-    public bool $hasTrainer = false;
+    /**
+     * Prompt “brut” utilisé comme système/persona.
+     * Peut être injecté via mount($prompt) ou via ?prompt=... (query string).
+     */
+    public string $systemPrompt = '';
 
     public bool $awaitingResponse = false;
 
@@ -44,18 +38,20 @@ class AssistantChat extends Component
 
     public ?string $originLabel = null;
 
-    public function mount(?int $trainerId = null): void
+    public function mount(?string $prompt = null): void
     {
         $this->originUrl = $this->sanitizeOriginUrl(request()->query('origin'));
         $this->originLabel = $this->sanitizeOriginLabel(request()->query('origin_label'));
-        $this->trainerId = $trainerId;
+
+        // Priorité: argument -> query string -> vide
+   
+        $this->systemPrompt = $prompt;
+
         $this->initializeConversation();
     }
 
     public function render()
-    
     {
-
         return view('livewire.ai.assistant-chat');
     }
 
@@ -80,12 +76,10 @@ class AssistantChat extends Component
             return;
         }
 
-
         $user = $this->user();
 
         if (! $user) {
-            $this->error = __('Vous devez etre connecte pour utiliser l\'assistant IA.');
-
+            $this->error = __('Vous devez être connecté pour utiliser l’assistant IA.');
             return;
         }
 
@@ -95,14 +89,17 @@ class AssistantChat extends Component
             'message' => __('Message'),
         ]);
 
-        if (! $this->conversationId || ! $this->hasTrainer) {
-            $this->error = __('L\'assistant IA est indisponible.');
+        if (! $this->conversationId) {
+            $this->error = __('L’assistant IA est indisponible.');
+            return;
+        }
 
+        if (trim($this->systemPrompt) === '') {
+            $this->error = __('Aucun prompt n’est défini pour l’assistant.');
             return;
         }
 
         $content = trim($this->message);
-
         if ($content === '') {
             return;
         }
@@ -112,17 +109,17 @@ class AssistantChat extends Component
 
         try {
             $conversation = AiConversation::query()->findOrFail($this->conversationId);
-            $trainer = AiTrainer::query()->findOrFail($conversation->ai_trainer_id);
 
+            // Contexte User + Session
             $this->service()->syncUserContext($conversation, $user);
             $this->service()->syncSessionContext($conversation, $this->sessionContext());
             $conversation->refresh();
 
-            $metadata = $conversation->metadata ?? [];
+            // Ajout du message utilisateur
             $context = [
                 'label' => 'Assistant IA',
                 'path' => url()->current(),
-                'user_context_hash' => $metadata['user_context']['hash'] ?? null,
+                'user_context_hash' => ($conversation->metadata['user_context']['hash'] ?? null) ?: null,
             ];
 
             $this->service()->appendMessage(
@@ -135,8 +132,10 @@ class AssistantChat extends Component
 
             $this->message = '';
 
-            $assistantMessage = $this->service()->generateAssistantReply($conversation, $trainer);
+            // Génération via prompt brut
+            $assistantMessage = $this->service()->generateAssistantReply($conversation, $this->systemPrompt);
 
+            // Actions éventuelles (ex: création ticket)
             $this->handleAssistantActions($assistantMessage, $conversation, $user);
 
             $this->refreshMessages();
@@ -157,25 +156,26 @@ class AssistantChat extends Component
         $user = $this->user();
 
         if (! $user) {
-            $this->error = __('Vous devez etre connecte pour utiliser l\'assistant IA.');
-
+            $this->error = __('Vous devez être connecté pour utiliser l’assistant IA.');
             return;
         }
 
-        if (! $this->trainerId) {
-            $this->error = __('Aucun assistant IA selectionne.');
-
+        if (trim($this->systemPrompt) === '') {
+            $this->error = __('Aucun prompt n’est défini pour l’assistant.');
             return;
         }
 
         try {
-            $trainer = AiTrainer::query()->findOrFail($this->trainerId);
-            $conversation = $this->service()->startNewConversation(
-                $trainer,
-                $user,
-                formation: null,
-                team: $user->currentTeam
-            );
+            // Crée une nouvelle conversation “sans trainer”, en stockant le prompt brut dans metadata
+            $conversation = AiConversation::query()->create([
+                'user_id' => $user->getAuthIdentifier(),
+                // si votre table a une colonne team_id / formation_id, adaptez ici :
+                'team_id' => optional($user->currentTeam)->id,
+                'metadata' => [
+                    'system_prompt' => $this->systemPrompt,
+                    'origin' => $this->sessionContext(),
+                ],
+            ]);
 
             $this->service()->syncSessionContext($conversation, $this->sessionContext());
             $conversation->refresh();
@@ -184,10 +184,20 @@ class AssistantChat extends Component
             $this->messages = [];
             $this->message = '';
             $this->error = null;
+
+            // Optionnel : insérer un message système avec le prompt pour traçabilité
+            $this->service()->appendMessage(
+                $conversation,
+                AiConversationMessage::ROLE_SYSTEM,
+                '[[SYSTEM_PROMPT]]' . "\n" . $this->systemPrompt,
+                null,
+                ['label' => 'Assistant IA', 'path' => url()->current()]
+            );
+
             $this->refreshMessages();
         } catch (Throwable $exception) {
             report($exception);
-            $this->error = __('Impossible de demarrer une nouvelle conversation : :message', ['message' => $exception->getMessage()]);
+            $this->error = __('Impossible de démarrer une nouvelle conversation : :message', ['message' => $exception->getMessage()]);
         }
     }
 
@@ -197,46 +207,59 @@ class AssistantChat extends Component
 
         if (! $user) {
             $this->resetConversationState();
-            $this->error = __('Vous devez etre connecte pour utiliser l\'assistant IA.');
-
-            return;
-        }
-
-        $trainer = $this->service()->resolveTrainer(null, $this->trainerId);
-
-        if (! $trainer) {
-            $this->resetConversationState();
-            $this->error = __('Aucun assistant IA n\'est configure. Veuillez contacter l\'administrateur.');
-
+            $this->error = __('Vous devez être connecté pour utiliser l’assistant IA.');
             return;
         }
 
         try {
-            $conversation = $this->service()->getOrCreateConversation(
-                $trainer,
-                $user,
-                formation: null,
-                team: $user->currentTeam
-            );
+            // On tente de retrouver une conversation ouverte avec le même contexte (team + origin),
+            // sinon on en crée une nouvelle.
+            $conversation = AiConversation::query()
+                ->where('user_id', $user->getAuthIdentifier())
+                ->when(optional($user->currentTeam)->id, fn ($q, $teamId) => $q->where('team_id', $teamId))
+                ->latest('id')
+                ->first();
+
+            if (! $conversation) {
+                $conversation = AiConversation::query()->create([
+                    'user_id' => $user->getAuthIdentifier(),
+                    'team_id' => optional($user->currentTeam)->id,
+                    'metadata' => [
+                        'system_prompt' => $this->systemPrompt,
+                        'origin' => $this->sessionContext(),
+                    ],
+                ]);
+
+                // Message système optionnel pour journaliser le prompt initial
+                if (trim($this->systemPrompt) !== '') {
+                    $this->service()->appendMessage(
+                        $conversation,
+                        AiConversationMessage::ROLE_SYSTEM,
+                        '[[SYSTEM_PROMPT]]' . "\n" . $this->systemPrompt,
+                        null,
+                        ['label' => 'Assistant IA', 'path' => url()->current()]
+                    );
+                }
+            } else {
+                // Si une conversation existe déjà, on s’assure que le prompt courant est en metadata
+                $metadata = $conversation->metadata ?? [];
+                if (($metadata['system_prompt'] ?? '') !== $this->systemPrompt && trim($this->systemPrompt) !== '') {
+                    $metadata['system_prompt'] = $this->systemPrompt;
+                    $conversation->forceFill(['metadata' => $metadata])->save();
+                }
+            }
 
             $this->service()->syncUserContext($conversation, $user);
             $this->service()->syncSessionContext($conversation, $this->sessionContext());
             $conversation->refresh();
 
             $this->conversationId = $conversation->id;
-            $this->trainerId = $trainer->id;
-            $this->trainer = [
-                'name' => $trainer->name,
-                'description' => $trainer->description,
-                'avatar' => $trainer->avatar_path ?: 'images/ai-trainer-placeholder.svg',
-            ];
-            $this->hasTrainer = true;
             $this->error = null;
             $this->messages = $this->loadMessages();
         } catch (Throwable $exception) {
             report($exception);
             $this->resetConversationState();
-            $this->error = __('Erreur lors de la creation de la conversation : :message', ['message' => $exception->getMessage()]);
+            $this->error = __('Erreur lors de la création de la conversation : :message', ['message' => $exception->getMessage()]);
         }
     }
 
@@ -267,8 +290,8 @@ class AssistantChat extends Component
     private function authorFor(AiConversationMessage $message): string
     {
         return match ($message->role) {
-            AiConversationMessage::ROLE_ASSISTANT => $this->trainer['name'] ?: __('Assistant IA'),
-            AiConversationMessage::ROLE_SYSTEM => __('Systeme'),
+            AiConversationMessage::ROLE_ASSISTANT => __('Assistant IA'),
+            AiConversationMessage::ROLE_SYSTEM => __('Système'),
             default => __('Vous'),
         };
     }
@@ -313,7 +336,7 @@ class AssistantChat extends Component
             ->map(function (AiConversationMessage $message) {
                 $label = match ($message->role) {
                     AiConversationMessage::ROLE_ASSISTANT => 'Assistant',
-                    AiConversationMessage::ROLE_SYSTEM => 'Systeme',
+                    AiConversationMessage::ROLE_SYSTEM => 'Système',
                     default => 'Utilisateur',
                 };
 
@@ -329,7 +352,7 @@ class AssistantChat extends Component
         $bodySections = [];
 
         if ($summary !== '') {
-            $bodySections[] = "Resume de l'assistant :\n".$summary;
+            $bodySections[] = "Résumé de l'assistant :\n".$summary;
         }
 
         if ($history !== '') {
@@ -340,7 +363,7 @@ class AssistantChat extends Component
 
         $body = implode("\n\n", $bodySections);
 
-        $subjectSource = $summary !== '' ? $summary : __('Demande d\'assistance via l\'assistant IA');
+        $subjectSource = $summary !== '' ? $summary : __('Demande d’assistance via l’assistant IA');
         $subject = Str::limit($subjectSource, 120, '...');
 
         $ticket = null;
@@ -372,7 +395,7 @@ class AssistantChat extends Component
         $sessionContext['last_ticket_id'] = $ticket->id;
         $this->service()->syncSessionContext($conversation, $sessionContext);
 
-        $confirmation = __('Un ticket support a �t� cr�� pour vous (r�f�rence : #:id). Un membre de l\'�quipe vous r�pondra prochainement.', ['id' => $ticket->id]);
+        $confirmation = __('Un ticket support a été créé pour vous (référence : #:id). Un membre de l’équipe vous répondra prochainement.', ['id' => $ticket->id]);
 
         $this->service()->appendMessage(
             $conversation,
@@ -386,17 +409,15 @@ class AssistantChat extends Component
             ]
         );
     }
-private function resetConversationState(): void
+
+    private function resetConversationState(): void
     {
         $this->conversationId = null;
-        $this->hasTrainer = false;
         $this->messages = [];
-        $this->trainer = [
-            'name' => '',
-            'description' => null,
-            'avatar' => null,
-        ];
         $this->awaitingResponse = false;
+        $this->message = '';
+        $this->systemPrompt = $this->systemPrompt ?: '';
+        $this->error = null;
     }
 
     private function sanitizeOriginUrl(?string $url): ?string
@@ -450,6 +471,3 @@ private function resetConversationState(): void
         return app(AiConversationService::class);
     }
 }
-
-
-

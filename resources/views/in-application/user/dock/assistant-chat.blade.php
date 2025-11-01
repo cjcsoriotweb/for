@@ -5,5 +5,5 @@
 
 
 @section('dock-content')
-    @livewire('ai.assistant-chat')
+    @livewire('ai.assistant-chat', ['prompt'=>'soit mechant'])
 @endsection

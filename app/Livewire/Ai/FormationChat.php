@@ -83,7 +83,6 @@ class FormationChat extends Component
 
         try {
             $conversation = AiConversation::query()->findOrFail($this->conversationId);
-            $trainer = AiTrainer::query()->findOrFail($conversation->ai_trainer_id);
             $formation = $this->formationId ? Formation::query()->find($this->formationId) : null;
 
             $context = [
@@ -106,7 +105,7 @@ class FormationChat extends Component
 
             $this->awaitingResponse = true;
 
-            $this->service()->generateAssistantReply($conversation, $trainer);
+            $this->service()->generateAssistantReply($conversation);
         } catch (Throwable $exception) {
             $this->error = $exception->getMessage();
             $this->awaitingResponse = false;
