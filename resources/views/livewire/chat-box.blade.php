@@ -1,8 +1,40 @@
-<div x-data="chatBox()" x-init="init()" class="h-full w-full flex flex-col">
+<div 
+    x-data="chatBox()" 
+    x-init="init(); this.isOpen = false;" 
+    x-on:keydown.window.escape="isOpen && toggle()"
+    class="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+>
+    <!-- Widget réduit -->
+    <button
+        type="button"
+        x-show="!isOpen"
+        x-transition
+        x-cloak
+        @click="toggle()"
+        class="text-left bg-blue-600 text-white rounded-2xl shadow-2xl px-4 py-3 flex items-start gap-3 w-64 sm:w-72 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+    >
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white shadow-inner">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 13h5m1 8l-4-4H7a3 3 0 01-3-3V7a3 3 0 013-3h10a3 3 0 013 3v6a3 3 0 01-3 3h-1v6z" />
+            </svg>
+        </div>
+        <div class="flex flex-col">
+            <span class="inline-flex w-fit items-center rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
+                {{ __('Assistant') }}
+            </span>
+            <span class="mt-2 text-sm font-semibold">{{ $title }}</span>
+            <p class="mt-1 text-xs text-white/90">
+                {{ __('Discutez avec votre assistant Evolubat pour obtenir de l\'aide immediatement.') }}
+            </p>
+        </div>
+    </button>
+
     <!-- Fenêtre de chat -->
     <div 
         x-show="isOpen"
-        class="bg-white h-full w-full flex flex-col"
+        x-transition
+        x-cloak
+        class="bg-white rounded-2xl shadow-2xl flex flex-col w-72 sm:w-96 h-[32rem] overflow-hidden"
     >
         <!-- Header -->
         <div class="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
@@ -10,6 +42,16 @@
                 <h3 class="font-semibold">{{ $trainerName }}</h3>
                 <p class="text-xs text-blue-100">{{ $trainerDescription }}</p>
             </div>
+            <button 
+                type="button" 
+                class="rounded-full p-1 hover:bg-blue-500 transition"
+                @click="toggle()"
+                aria-label="{{ __('Fermer le chat') }}"
+            >
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
 
         <!-- Messages -->
