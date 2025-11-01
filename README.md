@@ -56,6 +56,12 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+## Front-end Assets (no build step)
+
+- Tailwind CSS est désormais servi via le CDN officiel (`cdn.tailwindcss.com`) avec configuration inline dans `resources/views/components/ui/layout/meta-header.blade.php`.
+- Axios et le bundle PowerGrid sont chargés côté navigateur (axios via jsDelivr, `powergrid.js` exposé par Laravel) : aucune étape de build n'est nécessaire.
+- Les commandes `npm run dev` / `npm run build` ont été retirées ; redémarrez simplement vos services PHP/queue et videz le cache navigateur si vous modifiez le style.
+
 ## AI Assistant Architecture
 
 Ce projet intègre un système d'assistant IA simplifié utilisant Ollama avec streaming en temps réel.
