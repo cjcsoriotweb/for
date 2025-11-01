@@ -99,19 +99,19 @@ class ToolExecutor
     private function formatTicketCreation(array $result): string
     {
         $ticketId = $result['ticket_id'] ?? null;
-        $ticketUrl = $ticketId ? url("/mon-compte/support?ticket={$ticketId}") : null;
-        
+        $ticketUrl = $result['ticket_url'] ?? ($ticketId ? url("/mon-compte/support?ticket={$ticketId}") : null);
+
         $response = sprintf(
-            "✅ **Ticket créé avec succès !**\n\n📋 Numéro: %s\n📝 Sujet: %s\n📊 Statut: %s",
+            "Ticket cree avec succes !\n\n- Numero: %s\n- Sujet: %s\n- Statut: %s",
             $result['ticket_number'] ?? 'N/A',
             $result['subject'] ?? 'N/A',
             $result['status'] ?? 'N/A'
         );
-        
+
         if ($ticketUrl) {
-            $response .= "\n\n🔗 [Voir le ticket]({$ticketUrl})";
+            $response .= "\n\n- [Voir le ticket]({$ticketUrl})";
         }
-        
+
         return $response;
     }
 

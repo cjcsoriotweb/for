@@ -74,7 +74,7 @@
                         <div class="flex flex-wrap gap-2 max-w-[80%]">
                             <template x-for="(button, btnIndex) in message.buttons" :key="btnIndex">
                                 <button
-                                    @click="sendSuggestedMessage(button)"
+                                    @click="handleButtonClick(button, message)"
                                     type="button"
                                     class="bg-white hover:bg-blue-50 text-blue-600 border border-blue-300 rounded-lg px-3 py-1.5 text-sm transition-colors"
                                     x-text="button"
@@ -196,6 +196,7 @@ function chatBox() {
         isStreaming: false,
         error: null,
         isLoadingConversation: false,
+        currentToolResults: [],
 
         async init() {
             // Si pas de conversation, en créer une automatiquement lors de l'ouverture
@@ -277,6 +278,7 @@ function chatBox() {
             // Démarrer le streaming
             this.isStreaming = true;
             this.currentResponse = '';
+            this.currentToolResults = [];
 
             try {
                 const response = await fetch('/mon-compte/ai/stream', {
@@ -324,20 +326,27 @@ function chatBox() {
                                     this.currentResponse += data.content;
                                     this.scrollToBottom();
                                 } else if (data.type === 'tool_result') {
-                                    // Les outils ont été exécutés, remplacer le contenu actuel
+                                    // Les outils ont \té exécutés, remplacer le contenu actuel
                                     this.currentResponse = data.content;
+                                    this.currentToolResults = Array.isArray(data.tool_results) ? data.tool_results : [];
                                     this.scrollToBottom();
                                 } else if (data.type === 'done') {
                                     // Extraire les boutons du message final
                                     const { content, buttons } = this.extractButtons(this.currentResponse);
-                                    
+                                    const ticketUrl = this.getTicketUrlFromToolResults();
+                                    const finalButtons = ticketUrl && !buttons.includes('Consulter le ticket')
+                                        ? [...buttons, 'Consulter le ticket']
+                                        : buttons;
+
                                     // Ajouter le message complet
                                     this.messages.push({
                                         role: 'assistant',
                                         content: content,
-                                        buttons: buttons,
+                                        buttons: finalButtons,
+                                        ticketUrl: ticketUrl,
                                     });
                                     this.currentResponse = '';
+                                    this.currentToolResults = [];
                                 } else if (data.type === 'error') {
                                     this.error = data.message;
                                 }
@@ -354,6 +363,39 @@ function chatBox() {
                 this.isStreaming = false;
                 this.scrollToBottom();
             }
+        },
+
+        getTicketUrlFromToolResults() {
+            if (!Array.isArray(this.currentToolResults)) {
+                return null;
+            }
+
+            for (const entry of this.currentToolResults) {
+                if (!entry || typeof entry !== 'object') {
+                    continue;
+                }
+
+                const result = entry.result || {};
+
+                if (typeof result.ticket_url === 'string' && result.ticket_url.length > 0) {
+                    return result.ticket_url;
+                }
+
+                if (result.ticket && typeof result.ticket.ticket_url === 'string' && result.ticket.ticket_url.length > 0) {
+                    return result.ticket.ticket_url;
+                }
+            }
+
+            return null;
+        },
+
+        handleButtonClick(label, message) {
+            if (label === 'Consulter le ticket' && message?.ticketUrl) {
+                window.open(message.ticketUrl, '_blank');
+                return;
+            }
+
+            this.sendSuggestedMessage(label);
         },
 
         extractButtons(content) {

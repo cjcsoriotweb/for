@@ -134,6 +134,7 @@ class AiController extends Controller
                     $updateData = json_encode([
                         'type' => 'tool_result',
                         'content' => $processedResponse,
+                        'tool_results' => $toolResult['tool_results'],
                     ]);
                     echo "data: {$updateData}\n\n";
                     
