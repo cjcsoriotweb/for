@@ -12,36 +12,44 @@ class AiTrainerSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Ollama trainer as default
-        $trainer = AiTrainer::firstOrCreate(
-            ['slug' => 'assistant-ia-generaliste'],
-            [
-                'name' => 'Assistant IA Generaliste',
-                'provider' => 'ollama',
-                'model' => 'llama3',
-                'description' => 'Assistant IA polyvalent utilisant Ollama pour une utilisation locale.',
-                'prompt' => <<<'PROMPT'
-Tu es un assistant IA polyvalent et amical. Tu aides les utilisateurs avec diverses questions et demandes.
-Tu réponds de manière claire, précise et utile. Tu t'adaptes au niveau de l'utilisateur et fournis des informations pertinentes.
+        $default = config('ai.default_site_trainer');
+        $default = is_array($default) ? $default : [];
 
-Règles importantes :
-- Réponds toujours en français à moins que l'utilisateur te demande explicitement d'autres langues
-- Sois pédagogique et explique les concepts complexes simplement
-- Si tu ne sais pas quelque chose, dis-le honnêtement
-- Sois positif et encourageant
-PROMPT,
+        $defaultSlug = $default['slug'] ?? config('ai.default_trainer_slug', 'assistant-ia-generaliste');
+        $provider = $default['provider'] ?? config('ai.default_driver', 'openai');
+        $model = $default['model'] ?? config("ai.providers.$provider.default_model", 'gpt-4o-mini');
+
+        $defaultSettings = isset($default['settings']) && is_array($default['settings'])
+            ? $default['settings']
+            : [];
+
+        if (! array_key_exists('temperature', $defaultSettings)) {
+            $defaultSettings['temperature'] = (float) config("ai.providers.$provider.temperature", 0.7);
+        } else {
+            $defaultSettings['temperature'] = (float) $defaultSettings['temperature'];
+        }
+
+        $trainer = AiTrainer::firstOrCreate(
+            ['slug' => $defaultSlug],
+            [
+                'name' => $default['name'] ?? 'Assistant IA',
+                'provider' => $provider,
+                'model' => $model,
+                'description' => $default['description'] ?? null,
+                'prompt' => $default['prompt'] ?? null,
+                'avatar_path' => $default['avatar_path'] ?? null,
                 'is_default' => true,
                 'is_active' => true,
+                'settings' => $defaultSettings,
             ]
         );
 
-        // Also create OpenAI trainer as alternative
         AiTrainer::firstOrCreate(
             ['slug' => 'ia-formateur-generaliste'],
             [
                 'name' => 'Formateur IA (OpenAI)',
                 'provider' => 'openai',
-                'model' => 'gpt-4o-mini',
+                'model' => config('ai.providers.openai.default_model', 'gpt-4o-mini'),
                 'description' => 'Assistant pedagogique utilisant OpenAI pour des formations.',
                 'prompt' => <<<'PROMPT'
 Tu es un formateur virtuel expérimenté utilisant OpenAI. Tu dois répondre avec clarté, concision et pédagogie aux apprenants des formations FOR.
@@ -55,6 +63,9 @@ Règles pédagogiques :
 PROMPT,
                 'is_default' => false,
                 'is_active' => true,
+                'settings' => [
+                    'temperature' => (float) config('ai.providers.openai.temperature', 0.7),
+                ],
             ]
         );
 

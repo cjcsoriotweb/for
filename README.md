@@ -75,3 +75,10 @@ php artisan db:seed --class=AiTrainerSeeder
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+
+
+
+## A ajouter :
+php artisan db:seed --class=AiTrainerSeeder

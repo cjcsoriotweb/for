@@ -47,14 +47,8 @@ class AiConversationService
             }
         }
 
-        $defaultSlug = config('ai.default_trainer_slug');
-
-        $trainer = $query
-            ->where('slug', $defaultSlug)
-            ->first()
+        return $this->resolveDefaultSiteTrainer()
             ?? $query->orderByDesc('is_default')->orderBy('name')->first();
-
-        return $trainer;
     }
 
     public function getOrCreateConversation(AiTrainer $trainer, User $user, ?Formation $formation = null, ?Team $team = null): AiConversation
@@ -174,5 +168,78 @@ class AiConversationService
                 'model' => $payload['model'],
             ],
         ]);
+    }
+
+    private function resolveDefaultSiteTrainer(): ?AiTrainer
+    {
+        $config = config('ai.default_site_trainer');
+        $slug = null;
+
+        if (is_array($config)) {
+            $slug = $config['slug'] ?? null;
+        }
+
+        if (! is_string($slug) || trim($slug) === '') {
+            $slug = config('ai.default_trainer_slug');
+        }
+
+        $slug = is_string($slug) ? trim($slug) : '';
+
+        if ($slug === '') {
+            return null;
+        }
+
+        $trainer = AiTrainer::query()->where('slug', $slug)->first();
+
+        if (! $trainer && is_array($config)) {
+            $provider = $config['provider'] ?? config('ai.default_driver', 'openai');
+            $model = $config['model'] ?? config("ai.providers.$provider.default_model", 'gpt-4o-mini');
+
+            $settings = isset($config['settings']) && is_array($config['settings'])
+                ? $config['settings']
+                : [];
+
+            if (! array_key_exists('temperature', $settings)) {
+                $settings['temperature'] = (float) config("ai.providers.$provider.temperature", 0.7);
+            } else {
+                $settings['temperature'] = (float) $settings['temperature'];
+            }
+
+            $trainer = AiTrainer::query()->firstOrCreate(
+                ['slug' => $slug],
+                [
+                    'name' => $config['name'] ?? 'Assistant IA',
+                    'provider' => $provider,
+                    'model' => $model,
+                    'description' => $config['description'] ?? null,
+                    'prompt' => $config['prompt'] ?? null,
+                    'avatar_path' => $config['avatar_path'] ?? null,
+                    'is_default' => true,
+                    'is_active' => true,
+                    'settings' => $settings,
+                ]
+            );
+        }
+
+        if (! $trainer) {
+            return null;
+        }
+
+        $updates = [];
+
+        if (! $trainer->is_active) {
+            $updates['is_active'] = true;
+        }
+
+        if (! $trainer->is_default) {
+            $updates['is_default'] = true;
+        }
+
+        if ($updates !== []) {
+            $trainer->forceFill($updates)->save();
+            $trainer->refresh();
+        }
+
+        return $trainer;
     }
 }
