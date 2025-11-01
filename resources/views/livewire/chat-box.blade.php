@@ -477,7 +477,7 @@ function chatBox() {
                 this.scrollToBottom();
             } catch (error) {
                 console.error('Failed to load conversation', error);
-                this.error = 'Impossible de charger la conversation sélectionnée';
+                this.error = 'Impossible de charger la conversation sï¿½lectionnï¿½e';
             }
         },
 
@@ -523,7 +523,7 @@ function chatBox() {
             }
 
             if (this.isSuperAdmin && !this.selectedUserId) {
-                this.error = 'Veuillez sélectionner un utilisateur pour créer une conversation.';
+                this.error = 'Veuillez sï¿½lectionner un utilisateur pour crï¿½er une conversation.';
                 return;
             }
 
@@ -672,8 +672,7 @@ function chatBox() {
                     }
 
                     const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('
-');
+                    const lines = chunk.split('\n');
 
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
