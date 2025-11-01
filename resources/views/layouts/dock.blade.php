@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-    @stack('head')
+    <x-meta-header />
     <style>
         html, body {
             background: transparent !important;

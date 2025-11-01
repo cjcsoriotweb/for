@@ -79,7 +79,9 @@
           let url = '';
           switch (slotName) {
             case 'chatia':
-              url = '/mon-compte/assistant-chat';
+              const originUrl = window.location.href;
+              const originLabel = document.title || 'Page courante';
+              url = '/mon-compte/assistant-chat?origin=' + encodeURIComponent(originUrl) + '&origin_label=' + encodeURIComponent(originLabel);
               break;
             case 'tutorial':
               url = '/mon-compte/tutoriels';

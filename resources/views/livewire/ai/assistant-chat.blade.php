@@ -1,13 +1,14 @@
 <div class="flex h-full flex-col text-white">
 
 @if ($hasTrainer)
-    <section class="flex flex-1 flex-col min-h-0" wire:poll.4s="pollMessages">
-        <div class="flex flex-1 flex-col min-h-0 px-4 pt-6 pb-4 sm:px-6 sm:pt-8 sm:pb-6">
-            <div class="flex flex-wrap items-center justify-between gap-3 pb-4">
-                <div class="min-w-0">
-                    <p class="text-sm font-semibold text-slate-100">{{ $trainer['name'] }}</p>
+    <div class="flex flex-1 flex-col min-h-0">
+        <header class="border-b border-white/10 px-6 py-5 sm:px-8">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="min-w-0 space-y-1">
+                    <p class="text-xs uppercase tracking-[0.35em] text-slate-400">{{ __('Assistant IA') }}</p>
+                    <p class="text-lg font-semibold text-slate-100 sm:text-xl">{{ $trainer['name'] }}</p>
                     @if (! empty($trainer['description']))
-                        <p class="mt-1 text-xs text-slate-400">{{ $trainer['description'] }}</p>
+                        <p class="text-sm text-slate-300">{{ $trainer['description'] }}</p>
                     @endif
                 </div>
                 <button
@@ -22,7 +23,11 @@
                     <span>{{ __('Nouvelle conversation') }}</span>
                 </button>
             </div>
-            <div id="assistantChatMessages" class="flex flex-1 flex-col space-y-4 overflow-y-auto pb-4 pr-2">
+        </header>
+
+        <section class="flex flex-1 flex-col min-h-0 px-6 py-6 sm:px-8 sm:pb-8" wire:poll.4s="pollMessages">
+            <div class="flex flex-1 flex-col min-h-0">
+                <div id="assistantChatMessages" class="flex flex-1 flex-col space-y-4 overflow-y-auto pb-4 pr-1 sm:pr-2">
                 @if ($awaitingResponse)
                     <div class="flex items-center gap-2 self-start rounded-3xl bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200 shadow-lg shadow-emerald-900/50 backdrop-blur">
                         <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -56,41 +61,41 @@
                         </div>
                     </div>
                 @endforelse
+                </div>
+
+                <div class="mt-6 rounded-3xl border border-white/10 bg-slate-950/70 p-4 shadow-xl shadow-slate-950/60 backdrop-blur">
+                    @if ($error)
+                        <div class="mb-3 rounded-2xl border border-rose-300/40 bg-rose-400/10 px-3 py-2 text-sm text-rose-100">
+                            <p>{{ $error }}</p>
+                        </div>
+                    @endif
+
+                    <form wire:submit.prevent="sendMessage" class="flex flex-col gap-3 sm:flex-row">
+                        <textarea
+                            wire:model.defer="message"
+                            rows="2"
+                            class="flex-1 resize-none rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50"
+                            placeholder="{{ __('Saisissez votre message ici...') }}"
+                            autocomplete="off"
+                            aria-label="{{ __('Votre message') }}"></textarea>
+
+                        <button type="submit"
+                                class="inline-flex items-center justify-center gap-2 rounded-3xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-60"
+                                wire:loading.attr="disabled"
+                                wire:target="sendMessage">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path d="m3 10 18-7-7 18-2-7-7-4Z"></path>
+                            </svg>
+                            <span>{{ __('Envoyer') }}</span>
+                        </button>
+                    </form>
+
+                    @error('message')
+                        <p class="text-sm text-rose-200">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
-
-            <div class="mt-6 rounded-3xl border border-white/10 bg-slate-950/70 p-4 shadow-xl shadow-slate-950/60 backdrop-blur">
-                @if ($error)
-                    <div class="mb-3 rounded-2xl border border-rose-300/40 bg-rose-400/10 px-3 py-2 text-sm text-rose-100">
-                        <p>{{ $error }}</p>
-                    </div>
-                @endif
-
-                <form wire:submit.prevent="sendMessage" class="flex flex-col gap-3 sm:flex-row">
-                    <textarea
-                        wire:model.defer="message"
-                        rows="2"
-                        class="flex-1 resize-none rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50"
-                        placeholder="{{ __('Saisissez votre message ici...') }}"
-                        autocomplete="off"
-                        aria-label="{{ __('Votre message') }}"></textarea>
-
-                    <button type="submit"
-                            class="inline-flex items-center justify-center gap-2 rounded-3xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-60"
-                            wire:loading.attr="disabled"
-                            wire:target="sendMessage">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                            <path d="m3 10 18-7-7 18-2-7-7-4Z"></path>
-                        </svg>
-                        <span>{{ __('Envoyer') }}</span>
-                    </button>
-                </form>
-
-                @error('message')
-                    <p class="text-sm text-rose-200">{{ $message }}</p>
-                @enderror
-            </div>
-        </div>
-    </section>
+        </section>
     @once
         @push('scripts')
             <script>
@@ -117,6 +122,7 @@
             </script>
         @endpush
     @endonce
+    </div>
 @else
     <div class="flex flex-1 items-center justify-center px-6 pb-6">
         <div class="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 px-8 py-10 text-center shadow-xl shadow-slate-950/40 backdrop-blur">
