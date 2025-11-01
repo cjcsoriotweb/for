@@ -39,11 +39,11 @@ class ToolExecutor
                     if (json_last_error() === JSON_ERROR_NONE) {
                         $parameters = $decoded;
                     } else {
-                        // Log l'erreur de parsing JSON
+                        // Log l'erreur de parsing JSON (sans exposer les données sensibles)
                         \Illuminate\Support\Facades\Log::warning('Tool parameter JSON parsing failed', [
                             'tool' => $toolName,
-                            'json' => $parametersJson,
                             'error' => json_last_error_msg(),
+                            'json_length' => strlen($parametersJson),
                         ]);
                     }
                 }

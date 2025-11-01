@@ -317,7 +317,7 @@ function chatBox() {
         extractButtons(content) {
             // Extraire les boutons du format [BUTTONS]...[/BUTTONS]
             // Utilise un regex strict pour éviter les injections
-            const buttonRegex = /\[BUTTONS\]\s*((?:^-\s*.+$\s*)+)\[\/BUTTONS\]/im;
+            const buttonRegex = /\[BUTTONS\]\s*((?:- [^\n<>]+\n?)+)\s*\[\/BUTTONS\]/i;
             const match = content.match(buttonRegex);
             
             if (!match) {
@@ -333,8 +333,12 @@ function chatBox() {
                 .map(line => {
                     // Nettoyer et sanitiser le texte du bouton
                     const text = line.substring(1).trim();
-                    // Limiter la longueur et supprimer les caractères HTML potentiellement dangereux
-                    return text.substring(0, 100).replace(/[<>]/g, '');
+                    // Limiter la longueur et encoder les caractères potentiellement dangereux
+                    return text.substring(0, 100)
+                        .replace(/[<>'"&]/g, char => {
+                            const entities = {'<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '&': '&amp;'};
+                            return entities[char] || char;
+                        });
                 })
                 .filter(button => button.length > 0 && button.length <= 100);
             

@@ -23,6 +23,11 @@ class TicketTools
     private const MAX_TICKET_LIMIT = 50;
 
     /**
+     * Limite par défaut de tickets à retourner.
+     */
+    private const DEFAULT_TICKET_LIMIT = 10;
+
+    /**
      * Définition des outils disponibles pour l'IA.
      *
      * @return array<string, array<string, mixed>>
@@ -190,7 +195,7 @@ class TicketTools
     private static function listUserTickets(array $parameters, User $user): array
     {
         $status = $parameters['status'] ?? 'all';
-        $limit = max(self::MIN_TICKET_LIMIT, min((int)($parameters['limit'] ?? 10), self::MAX_TICKET_LIMIT));
+        $limit = max(self::MIN_TICKET_LIMIT, min((int)($parameters['limit'] ?? self::DEFAULT_TICKET_LIMIT), self::MAX_TICKET_LIMIT));
 
         $query = SupportTicket::query()
             ->where('user_id', $user->id)
