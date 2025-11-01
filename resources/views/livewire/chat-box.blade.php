@@ -1,34 +1,15 @@
-<div x-data="chatBox()" x-init="init()" class="fixed w-full z-50">
-    <!-- Bouton toggle -->
-    <button 
-        @click="toggle()"
-        type="button"
-        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-3 shadow-lg transition-all"
-        x-show="!isOpen"
-    >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-        </svg>
-        <span>{{ $title }}</span>
-    </button>
-
+<div x-data="chatBox()" x-init="init()" class="h-full w-full flex flex-col">
     <!-- Fenêtre de chat -->
     <div 
         x-show="isOpen"
-        x-transition
-        class="bg-white rounded-lg shadow-2xl w-96 h-[600px] flex flex-col"
+        class="bg-white h-full w-full flex flex-col"
     >
         <!-- Header -->
-        <div class="bg-blue-600 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+        <div class="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
             <div>
                 <h3 class="font-semibold">{{ $trainerName }}</h3>
                 <p class="text-xs text-blue-100">{{ $trainerDescription }}</p>
             </div>
-            <button @click="toggle()" type="button" class="text-white hover:text-blue-100">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
         </div>
 
         <!-- Messages -->
