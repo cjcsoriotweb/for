@@ -58,6 +58,15 @@
                 </div>
             </template>
 
+            <!-- Indicateur de chargement conversation -->
+            <template x-if="isLoadingConversation">
+                <div class="flex justify-center">
+                    <div class="bg-blue-100 rounded-lg px-4 py-2 text-blue-700 text-sm">
+                        Création de la conversation...
+                    </div>
+                </div>
+            </template>
+
             <!-- Indicateur de chargement -->
             <template x-if="isStreaming && !currentResponse">
                 <div class="flex justify-start">
@@ -85,14 +94,14 @@
                 <input 
                     type="text"
                     x-model="message"
-                    :disabled="isStreaming"
+                    :disabled="isStreaming || isLoadingConversation"
                     placeholder="Votre message..."
-                    class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                     maxlength="{{ config('ai.max_message_length', 2000) }}"
                 />
                 <button 
                     type="submit"
-                    :disabled="!message.trim() || isStreaming"
+                    :disabled="!message.trim() || isStreaming || isLoadingConversation"
                     class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,17 +124,65 @@ function chatBox() {
         currentResponse: '',
         isStreaming: false,
         error: null,
+        isLoadingConversation: false,
 
-        init() {
-            // Initialisation
+        async init() {
+            // Si pas de conversation, en créer une automatiquement lors de l'ouverture
+            if (this.isOpen && !this.conversationId) {
+                await this.createConversation();
+            }
         },
 
-        toggle() {
+        async toggle() {
             this.isOpen = !this.isOpen;
+            
+            // Créer une conversation si nécessaire lors de l'ouverture
+            if (this.isOpen && !this.conversationId) {
+                await this.createConversation();
+            }
+        },
+
+        async createConversation() {
+            if (this.isLoadingConversation) return;
+            
+            this.isLoadingConversation = true;
+            this.error = null;
+
+            try {
+                const response = await fetch('/mon-compte/ai/conversations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
+                    body: JSON.stringify({
+                        trainer: this.trainer,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.conversation) {
+                    this.conversationId = data.conversation.id;
+                } else {
+                    this.error = data.message || 'Impossible de créer la conversation';
+                }
+            } catch (e) {
+                this.error = 'Erreur lors de la création de la conversation : ' + e.message;
+            } finally {
+                this.isLoadingConversation = false;
+            }
         },
 
         async sendMessage() {
             if (!this.message.trim() || this.isStreaming) {
+                return;
+            }
+
+            // Vérifier qu'une conversation existe
+            if (!this.conversationId) {
+                this.error = 'Conversation non initialisée. Veuillez réessayer.';
+                await this.createConversation();
                 return;
             }
 
@@ -161,6 +218,11 @@ function chatBox() {
                 });
 
                 if (!response.ok) {
+                    // Gérer les erreurs spécifiques
+                    if (response.status === 404 || response.status === 422) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Erreur de validation');
+                    }
                     throw new Error('Erreur réseau');
                 }
 

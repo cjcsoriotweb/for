@@ -18,6 +18,10 @@ Route::prefix('mon-compte')
 
         // AI streaming endpoint
         Route::post('/ai/stream', [AiController::class, 'stream'])->name('ai.stream');
+        
+        // AI conversation management
+        Route::post('/ai/conversations', [AiController::class, 'createConversation'])->name('ai.conversations.create');
+        Route::get('/ai/conversations', [AiController::class, 'listConversations'])->name('ai.conversations.list');
 
         // Dock iframe routes
         Route::get('/assistant-chat', function () {

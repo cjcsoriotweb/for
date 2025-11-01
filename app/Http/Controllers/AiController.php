@@ -34,7 +34,7 @@ class AiController extends Controller
         $validator = Validator::make($request->all(), [
             'message' => ['required', 'string', 'max:' . config('ai.max_message_length', 2000)],
             'trainer' => ['nullable', 'string', 'in:' . $availableTrainers],
-            'conversation_id' => ['nullable', 'integer', 'exists:ai_conversations,id'],
+            'conversation_id' => ['required', 'integer', 'exists:ai_conversations,id'],
         ]);
 
         if ($validator->fails()) {
@@ -65,31 +65,17 @@ class AiController extends Controller
             ], 404);
         }
 
-        // Récupérer ou créer la conversation
-        if ($conversationId) {
-            $conversation = AiConversation::query()
-                ->where('id', $conversationId)
-                ->where('user_id', $user->id)
-                ->first();
+        // Récupérer la conversation (doit exister)
+        $conversation = AiConversation::query()
+            ->where('id', $conversationId)
+            ->where('user_id', $user->id)
+            ->first();
 
-            if (!$conversation) {
-                return response()->json([
-                    'error' => true,
-                    'message' => 'Conversation non trouvée',
-                ], 404);
-            }
-        } else {
-            // Créer une nouvelle conversation
-            $conversation = AiConversation::create([
-                'user_id' => $user->id,
-                'team_id' => $user->currentTeam?->id,
-                'status' => AiConversation::STATUS_ACTIVE,
-                'metadata' => [
-                    'trainer' => $trainerSlug,
-                    'model' => $trainer['model'],
-                ],
-                'last_message_at' => now(),
-            ]);
+        if (!$conversation) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Conversation non trouvée. Veuillez créer une conversation d\'abord.',
+            ], 404);
         }
 
         // Sauvegarder le message utilisateur
@@ -241,5 +227,95 @@ class AiController extends Controller
         }
 
         return $trainers;
+    }
+
+    /**
+     * Créer une nouvelle conversation.
+     */
+    public function createConversation(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'trainer' => ['nullable', 'string', 'in:' . implode(',', $this->getAvailableTrainers())],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Authentification requise',
+            ], 401);
+        }
+
+        $trainerSlug = $request->input('trainer', config('ai.default_trainer_slug'));
+        $trainer = config("ai.trainers.$trainerSlug");
+
+        if (!$trainer) {
+            return response()->json([
+                'error' => true,
+                'message' => "Trainer '$trainerSlug' non trouvé",
+            ], 404);
+        }
+
+        $conversation = AiConversation::create([
+            'user_id' => $user->id,
+            'team_id' => $user->currentTeam?->id,
+            'status' => AiConversation::STATUS_ACTIVE,
+            'metadata' => [
+                'trainer' => $trainerSlug,
+                'model' => $trainer['model'],
+            ],
+            'last_message_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'conversation' => [
+                'id' => $conversation->id,
+                'trainer' => $trainerSlug,
+                'created_at' => $conversation->created_at->toIso8601String(),
+            ],
+        ]);
+    }
+
+    /**
+     * Lister les conversations de l'utilisateur.
+     */
+    public function listConversations(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Authentification requise',
+            ], 401);
+        }
+
+        $conversations = AiConversation::query()
+            ->where('user_id', $user->id)
+            ->where('status', AiConversation::STATUS_ACTIVE)
+            ->orderBy('last_message_at', 'desc')
+            ->limit(50)
+            ->get()
+            ->map(function ($conversation) {
+                return [
+                    'id' => $conversation->id,
+                    'trainer' => $conversation->metadata['trainer'] ?? 'default',
+                    'message_count' => $conversation->messages()->count(),
+                    'last_message_at' => $conversation->last_message_at?->toIso8601String(),
+                    'created_at' => $conversation->created_at->toIso8601String(),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'conversations' => $conversations,
+        ]);
     }
 }
