@@ -7,7 +7,7 @@
 
 @if ($hasTrainer)
     <div class="flex flex-1 flex-col min-h-0">
-        <header wire:poll.1s="refreshMessages" class="border-b border-slate-200 bg-white px-6 py-4">
+        <header class="border-b border-slate-200 bg-white px-6 py-4">
             <div class="flex items-center gap-3">
                 @if ($trainerAvatar)
                     <img src="{{ asset($trainerAvatar) }}" alt="{{ $trainerName }}" class="h-10 w-10 rounded-full object-cover">
@@ -40,32 +40,8 @@
                     </div>
                 @endif
 
-                @foreach ($messages as $msg)
-                    <div class="flex {{ $msg['role'] === 'assistant' ? 'justify-start' : 'justify-end' }}" wire:key="message-{{ $msg['id'] }}">
-                        <div class="max-w-full rounded-xl px-4 py-3 shadow-sm {{ $msg['role'] === 'assistant' ? 'bg-white' : 'bg-emerald-500' }}">
-                            <div class="mb-1 flex items-center justify-between text-xs {{ $msg['role'] === 'assistant' ? 'text-slate-500' : 'text-white/80' }}">
-                                <span class="font-medium">{{ $msg['author'] }}</span>
-                                <span>{{ $msg['created_at_human'] }}</span>
-                            </div>
-                            <div class="prose prose-sm max-w-none break-words {{ $msg['role'] === 'assistant' ? 'text-slate-900 prose-a:text-emerald-600' : 'text-white prose-a:text-white/90' }}">
-                                {!! nl2br(e($msg['content'])) !!}
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-
-                @if (empty($messages))
-                    <div class="py-10 text-center text-slate-500">
-                        <svg class="mx-auto mb-4 h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                        </svg>
-                        <p class="mb-2 text-lg font-medium">{{ __('Commencez une conversation') }}</p>
-                        <p class="text-sm">{{ __('Posez votre première question pour lancer le dialogue.') }}</p>
-                    </div>
-                @endif
-            </div>
-
-            <footer class="border-t border-slate-200 bg-white p-4 shrink-0">
+                
+            <footer class="p-4 shrink-0">
                 @if ($error)
                     <div class="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
                         <p class="text-sm text-red-700">{{ $error }}</p>
@@ -101,6 +77,32 @@
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </footer>
+
+                @foreach ($messages as $msg)
+                    <div class="flex {{ $msg['role'] === 'assistant' ? 'justify-start' : 'justify-end' }}" wire:key="message-{{ $msg['id'] }}">
+                        <div class="max-w-full rounded-xl px-4 py-3 shadow-sm {{ $msg['role'] === 'assistant' ? 'bg-white' : 'bg-emerald-500' }}">
+                            <div class="mb-1 flex items-center justify-between text-xs {{ $msg['role'] === 'assistant' ? 'text-slate-500' : 'text-white/80' }}">
+                                <span class="font-medium">{{ $msg['author'] }}</span>
+                                <span>{{ $msg['created_at_human'] }}</span>
+                            </div>
+                            <div class="prose prose-sm max-w-none break-words {{ $msg['role'] === 'assistant' ? 'text-slate-900 prose-a:text-emerald-600' : 'text-white prose-a:text-white/90' }}">
+                                {!! nl2br(e($msg['content'])) !!}
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+
+                @if (empty($messages))
+                    <div class="py-10 text-center text-slate-500">
+                        <svg class="mx-auto mb-4 h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        <p class="mb-2 text-lg font-medium">{{ __('Commencez une conversation') }}</p>
+                        <p class="text-sm">{{ __('Posez votre première question pour lancer le dialogue.') }}</p>
+                    </div>
+                @endif
+            </div>
+
         </section>
     </div>
 @else

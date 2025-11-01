@@ -87,7 +87,8 @@
               url = '/mon-compte/professeur';
               break;
             case 'support':
-              url = '/mon-compte/support';
+              const currentLocation = window.location.href;
+              url = '/mon-compte/support?origin=' + encodeURIComponent(currentLocation) + '&origin_label=Dock%20Signaler%20un%20bug';
               break;
             case 'search':
               url = '/mon-compte/recherche';
