@@ -18,7 +18,6 @@
     <div class="flex h-full flex-col bg-transparent">
         <div class="flex-1 overflow-hidden px-4 py-6 sm:px-6 sm:py-8">
             <div class="mx-auto flex h-full w-full max-w-5xl">
-                <div class="flex w-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/85 shadow-2xl shadow-slate-950/60 backdrop-blur">
                     @hasSection('dock-header')
                         <header class="border-b border-white/10 px-6 py-5 sm:px-8">
                             @yield('dock-header')
@@ -35,7 +34,6 @@
                         </footer>
                     @endif
                 </div>
-            </div>
         </div>
     </div>
 

@@ -1,4 +1,4 @@
-<div x-data="chatBox()" x-init="init()" class="fixed bottom-4 right-4 z-50">
+<div x-data="chatBox()" x-init="init()" class="fixed w-full z-50">
     <!-- Bouton toggle -->
     <button 
         @click="toggle()"
@@ -96,7 +96,7 @@
                     x-model="message"
                     :disabled="isStreaming || isLoadingConversation"
                     placeholder="Votre message..."
-                    class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 text-black"
                     maxlength="{{ config('ai.max_message_length', 2000) }}"
                 />
                 <button 
