@@ -181,7 +181,7 @@ class TicketTools
             'ticket_number' => "#{$ticket->id}",
             'subject' => $ticket->subject,
             'status' => $ticket->status,
-            'ticket_url' => url(\"/mon-compte/support?ticket={$ticket->id}\"),
+            'ticket_url' => url("/mon-compte/support?ticket={$ticket->id}"),
             'message' => "Ticket créé avec succès. Numéro: #{$ticket->id}",
         ];
     }
@@ -296,7 +296,7 @@ class TicketTools
                 'created_at' => $ticket->created_at->format('d/m/Y H:i'),
                 'has_response' => $hasResponse,
                 'can_close' => in_array($ticket->status, [SupportTicket::STATUS_PENDING, SupportTicket::STATUS_RESOLVED]),
-                'url' => url(\"/mon-compte/support?ticket={$ticket->id}\"),
+                'ticket_url' => url("/mon-compte/support?ticket={$ticket->id}"),
                 'messages' => $messages->toArray(),
             ],
         ];
@@ -347,7 +347,7 @@ class TicketTools
             'message' => 'Message ajouté au ticket avec succès',
             'ticket_id' => $ticket->id,
             'ticket_status' => $ticket->fresh()->status,
-            'ticket_url' => url(\"/mon-compte/support?ticket={$ticket->id}\"),
+            'ticket_url' => url("/mon-compte/support?ticket={$ticket->id}"),
         ];
     }
 

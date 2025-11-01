@@ -39,8 +39,8 @@
         <!-- Header -->
         <div class="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
             <div>
-                <h3 class="font-semibold">{{ $trainerName }}</h3>
-                <p class="text-xs text-blue-100">{{ $trainerDescription }}</p>
+                <h3 class="font-semibold" x-text="trainerMeta?.name ?? 'Assistant'"></h3>
+                <p class="text-xs text-blue-100" x-text="trainerMeta?.description ?? ''"></p>
             </div>
             <button 
                 type="button" 
@@ -53,6 +53,22 @@
                 </svg>
             </button>
         </div>
+
+        <template x-if="hasTrainerChoice">
+            <div class="bg-blue-50 px-4 py-2 text-xs text-blue-900 flex items-center gap-2">
+                <span class="font-semibold">{{ __('Assistant :') }}</span>
+                <select
+                    x-ref="trainerSelector"
+                    x-model="selectedTrainer"
+                    @change="changeTrainer(selectedTrainer)"
+                    class="flex-1 rounded-lg border border-blue-200 bg-white/80 px-2 py-1 text-xs text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                    <template x-for="slug in Object.keys(trainers || {})" :key="slug">
+                        <option :value="slug" x-text="trainers[slug]?.name ?? slug"></option>
+                    </template>
+                </select>
+            </div>
+        </template>
 
         <!-- Messages -->
         <div 
@@ -148,6 +164,25 @@
                     >
                         📞 {{ __('Demander à être rappelé par téléphone') }}
                     </button>
+                    <template x-if="hasTrainerChoice">
+                        <div class="mt-4 border-t border-blue-100 pt-3">
+                            <p class="text-xs font-semibold text-blue-700 mb-2">{{ __("Changer d'assistant IA") }}</p>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="slug in Object.keys(trainers || {})" :key="'trainer-switch-' + slug">
+                                    <button
+                                        x-show="slug !== trainer"
+                                        type="button"
+                                        class="flex items-center gap-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs text-blue-700 transition hover:bg-blue-50"
+                                        @click="changeTrainer(slug)"
+                                        :title="trainers[slug]?.description || ''"
+                                    >
+                                        <span class="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                                        <span x-text="trainers[slug]?.name ?? slug"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
                 </div>
             </template>
 
@@ -189,6 +224,9 @@ function chatBox() {
     return {
         isOpen: @js($isOpen),
         trainer: @js($trainer),
+        selectedTrainer: @js($trainer),
+        trainers: @js($trainerOptions),
+        trainerMeta: @js($currentTrainerMeta),
         conversationId: @js($conversationId),
         messages: [],
         message: '',
@@ -197,9 +235,13 @@ function chatBox() {
         error: null,
         isLoadingConversation: false,
         currentToolResults: [],
+        hasTrainerChoice: false,
 
         async init() {
-            // Si pas de conversation, en créer une automatiquement lors de l'ouverture
+            this.trainerMeta = this.trainers?.[this.trainer] ?? this.trainerMeta ?? { name: 'Assistant', description: '' };
+            this.selectedTrainer = this.trainer;
+            this.hasTrainerChoice = Object.keys(this.trainers || {}).length > 1;
+
             if (this.isOpen && !this.conversationId) {
                 await this.createConversation();
             }
@@ -207,16 +249,17 @@ function chatBox() {
 
         async toggle() {
             this.isOpen = !this.isOpen;
-            
-            // Créer une conversation si nécessaire lors de l'ouverture
+
             if (this.isOpen && !this.conversationId) {
                 await this.createConversation();
             }
         },
 
         async createConversation() {
-            if (this.isLoadingConversation) return;
-            
+            if (this.isLoadingConversation) {
+                return;
+            }
+
             this.isLoadingConversation = true;
             this.error = null;
 
@@ -237,12 +280,35 @@ function chatBox() {
                 if (data.success && data.conversation) {
                     this.conversationId = data.conversation.id;
                 } else {
-                    this.error = data.message || 'Impossible de créer la conversation';
+                    this.error = data.message || 'Impossible de creer la conversation';
                 }
             } catch (e) {
-                this.error = 'Erreur lors de la création de la conversation : ' + e.message;
+                this.error = 'Erreur lors de la creation de la conversation : ' + e.message;
             } finally {
                 this.isLoadingConversation = false;
+            }
+        },
+
+        async changeTrainer(slug) {
+            if (!slug || slug === this.trainer || !(this.trainers || {})[slug]) {
+                return;
+            }
+
+            this.trainer = slug;
+            this.selectedTrainer = slug;
+            this.trainerMeta = this.trainers[slug];
+            this.messages = [];
+            this.currentResponse = '';
+            this.currentToolResults = [];
+            this.conversationId = null;
+            this.error = null;
+
+            if (this.$refs.trainerSelector) {
+                this.$refs.trainerSelector.value = slug;
+            }
+
+            if (this.isOpen) {
+                await this.createConversation();
             }
         },
 
@@ -256,18 +322,18 @@ function chatBox() {
                 return;
             }
 
-            // Vérifier qu'une conversation existe
             if (!this.conversationId) {
-                this.error = 'Conversation non initialisée. Veuillez réessayer.';
+                this.error = 'Conversation non initialisee. Veuillez reessayer.';
                 await this.createConversation();
-                return;
+                if (!this.conversationId) {
+                    return;
+                }
             }
 
             const userMessage = this.message.trim();
             this.message = '';
             this.error = null;
 
-            // Ajouter le message utilisateur
             this.messages.push({
                 role: 'user',
                 content: userMessage,
@@ -275,7 +341,6 @@ function chatBox() {
 
             this.scrollToBottom();
 
-            // Démarrer le streaming
             this.isStreaming = true;
             this.currentResponse = '';
             this.currentToolResults = [];
@@ -296,12 +361,11 @@ function chatBox() {
                 });
 
                 if (!response.ok) {
-                    // Gérer les erreurs spécifiques
                     if (response.status === 404 || response.status === 422) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Erreur de validation');
                     }
-                    throw new Error('Erreur réseau');
+                    throw new Error('Erreur reseau');
                 }
 
                 const reader = response.body.getReader();
@@ -309,8 +373,10 @@ function chatBox() {
 
                 while (true) {
                     const { done, value } = await reader.read();
-                    
-                    if (done) break;
+
+                    if (done) {
+                        break;
+                    }
 
                     const chunk = decoder.decode(value, { stream: true });
                     const lines = chunk.split('\n');
@@ -326,19 +392,16 @@ function chatBox() {
                                     this.currentResponse += data.content;
                                     this.scrollToBottom();
                                 } else if (data.type === 'tool_result') {
-                                    // Les outils ont \té exécutés, remplacer le contenu actuel
                                     this.currentResponse = data.content;
                                     this.currentToolResults = Array.isArray(data.tool_results) ? data.tool_results : [];
                                     this.scrollToBottom();
                                 } else if (data.type === 'done') {
-                                    // Extraire les boutons du message final
                                     const { content, buttons } = this.extractButtons(this.currentResponse);
                                     const ticketUrl = this.getTicketUrlFromToolResults();
                                     const finalButtons = ticketUrl && !buttons.includes('Consulter le ticket')
                                         ? [...buttons, 'Consulter le ticket']
                                         : buttons;
 
-                                    // Ajouter le message complet
                                     this.messages.push({
                                         role: 'assistant',
                                         content: content,
@@ -352,7 +415,6 @@ function chatBox() {
                                 }
                             } catch (parseError) {
                                 console.error('JSON parse error:', parseError, 'Line:', line);
-                                // Continue avec la ligne suivante en cas d'erreur de parsing
                             }
                         }
                     }
@@ -397,7 +459,6 @@ function chatBox() {
 
             this.sendSuggestedMessage(label);
         },
-
         extractButtons(content) {
             // Extraire les boutons du format [BUTTONS]...[/BUTTONS]
             // Utilise un regex strict pour éviter les injections

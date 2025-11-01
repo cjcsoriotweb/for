@@ -36,10 +36,26 @@ class ChatBox extends Component
     public function render()
     {
         $trainerConfig = config("ai.trainers.{$this->trainer}");
+        $trainersConfig = config('ai.trainers', []);
+
+        $trainerOptions = [];
+        foreach ($trainersConfig as $slug => $config) {
+            $trainerOptions[$slug] = [
+                'name' => $config['name'] ?? ucfirst($slug),
+                'description' => $config['description'] ?? '',
+            ];
+        }
+
+        $currentTrainerMeta = $trainerOptions[$this->trainer] ?? [
+            'name' => $trainerConfig['name'] ?? 'Assistant',
+            'description' => $trainerConfig['description'] ?? '',
+        ];
 
         return view('livewire.chat-box', [
             'trainerName' => $trainerConfig['name'] ?? 'Assistant',
             'trainerDescription' => $trainerConfig['description'] ?? '',
+            'trainerOptions' => $trainerOptions,
+            'currentTrainerMeta' => $currentTrainerMeta,
         ]);
     }
 }
