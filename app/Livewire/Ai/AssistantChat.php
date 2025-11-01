@@ -179,7 +179,7 @@ class AssistantChat extends Component
         }
 
         return AiConversationMessage::query()
-            ->where('ai_conversation_id', $this->conversationId)
+            ->where('conversation_id', $this->conversationId)
             ->orderBy('created_at')
             ->orderBy('id')
             ->get()
@@ -228,4 +228,3 @@ class AssistantChat extends Component
         return app(AiConversationService::class);
     }
 }
-

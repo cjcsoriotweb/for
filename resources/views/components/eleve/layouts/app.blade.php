@@ -85,6 +85,7 @@
       {{ $slot }}
     </main>
   </div>
+  <x-ui.layout.assistant-dock />
   @auth
     <livewire:support.chat-widget />
   @endauth
