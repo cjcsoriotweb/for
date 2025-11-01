@@ -5,6 +5,6 @@
 >
     <div class="space-y-8">
         <livewire:support.ticket-inbox />
-        <livewire:ai.trainer-tester />
+        {{-- Trainer tester removed - use chat-box component instead --}}
     </div>
 </x-admin.global-layout>

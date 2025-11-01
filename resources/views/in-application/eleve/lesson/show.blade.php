@@ -17,6 +17,6 @@
     </div>
 
     @auth
-        <livewire:ai.formation-chat :formation-id="$formation->id" />
+        <livewire:chat-box :trainer="'default'" :title="__('Assistant Formation')" />
     @endauth
 </x-eleve-layout>

@@ -5,5 +5,5 @@
 
 
 @section('dock-content')
-    @livewire('ai.assistant-chat', ['prompt'=>'soit mechant'])
+    @livewire('chat-box', ['trainer' => 'default', 'title' => __('Assistant IA'), 'isOpen' => true])
 @endsection
