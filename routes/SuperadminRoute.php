@@ -14,7 +14,7 @@ Route::prefix('superadmin')
         Route::get('/users', [AdminPageController::class, 'usersIndex'])->name('users.index');
         Route::get('/formations', [AdminPageController::class, 'formationsIndex'])->name('formations.index');
         Route::get('/support', [AdminPageController::class, 'supportIndex'])->name('support.index');
-        Route::get('/ai-trainers', [AdminPageController::class, 'aiIndex'])->name('ai.index');
+        // Route superadmin IA supprimée - trainers sont maintenant dans config/ai.php
         Route::get('/tests', [SuperadminTestController::class, 'index'])->name('tests.index');
         Route::post('/tests/run', [SuperadminTestController::class, 'run'])->name('tests.run');
     });
