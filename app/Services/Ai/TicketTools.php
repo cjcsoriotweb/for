@@ -180,10 +180,11 @@ class TicketTools
     private static function listUserTickets(array $parameters, User $user): array
     {
         $status = $parameters['status'] ?? 'all';
-        $limit = min((int)($parameters['limit'] ?? 10), 50);
+        $limit = max(1, min((int)($parameters['limit'] ?? 10), 50)); // Validate limit is between 1 and 50
 
         $query = SupportTicket::query()
             ->where('user_id', $user->id)
+            ->with('messages')
             ->orderBy('last_message_at', 'desc')
             ->orderBy('created_at', 'desc')
             ->limit($limit);
@@ -193,7 +194,11 @@ class TicketTools
         }
 
         $tickets = $query->get()->map(function (SupportTicket $ticket) {
-            $lastMessage = $ticket->messages()->latest('created_at')->first();
+            $messages = $ticket->messages;
+            $lastMessage = $messages->sortByDesc('created_at')->first();
+            $supportMessages = $messages->where('is_support', true);
+            $hasResponse = $supportMessages->isNotEmpty();
+            $lastSupportMessage = $supportMessages->sortByDesc('created_at')->first();
             
             return [
                 'id' => $ticket->id,
@@ -203,9 +208,14 @@ class TicketTools
                 'status_label' => self::getStatusLabel($ticket->status),
                 'created_at' => $ticket->created_at->format('d/m/Y H:i'),
                 'last_message_at' => $ticket->last_message_at?->format('d/m/Y H:i'),
-                'has_response' => $ticket->messages()->where('is_support', true)->exists(),
-                'message_count' => $ticket->messages()->count(),
+                'has_response' => $hasResponse,
+                'message_count' => $messages->count(),
                 'last_message_preview' => $lastMessage ? substr($lastMessage->content, 0, 100) : null,
+                'last_support_message' => $lastSupportMessage ? [
+                    'content' => $lastSupportMessage->content,
+                    'created_at' => $lastSupportMessage->created_at->format('d/m/Y H:i'),
+                    'preview' => substr($lastSupportMessage->content, 0, 150),
+                ] : null,
             ];
         });
 

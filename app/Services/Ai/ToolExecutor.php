@@ -38,6 +38,13 @@ class ToolExecutor
                     $decoded = json_decode($parametersJson, true);
                     if (json_last_error() === JSON_ERROR_NONE) {
                         $parameters = $decoded;
+                    } else {
+                        // Log l'erreur de parsing JSON
+                        \Log::warning('Tool parameter JSON parsing failed', [
+                            'tool' => $toolName,
+                            'json' => $parametersJson,
+                            'error' => json_last_error_msg(),
+                        ]);
                     }
                 }
                 
@@ -134,17 +141,38 @@ class ToolExecutor
                 default => '⚪',
             };
             
-            $responseInfo = $ticket['has_response'] ? ' ✉️' : '';
+            $ticketUrl = url("/mon-compte/support#ticket-{$ticket['id']}");
             
-            $lines[] = sprintf(
-                "%s **%s** - %s%s\n   %s\n   *Dernier message: %s*",
+            $ticketInfo = sprintf(
+                "%s **%s** - %s\n   📊 %s",
                 $statusEmoji,
                 $ticket['number'],
                 $ticket['subject'],
-                $responseInfo,
-                $ticket['status_label'],
-                $ticket['last_message_at'] ?? $ticket['created_at']
+                $ticket['status_label']
             );
+            
+            // Ajouter info sur la réponse admin
+            if ($ticket['has_response']) {
+                $lastSupportMsg = $ticket['last_support_message'];
+                if ($lastSupportMsg) {
+                    $ticketInfo .= sprintf(
+                        "\n   ✉️ **Admin a répondu** (*%s*)\n   💬 \"%s...\"",
+                        $lastSupportMsg['created_at'],
+                        $lastSupportMsg['preview']
+                    );
+                } else {
+                    $ticketInfo .= "\n   ✉️ **Admin a répondu**";
+                }
+            } else {
+                $ticketInfo .= "\n   ⏳ En attente de réponse";
+            }
+            
+            $ticketInfo .= sprintf(
+                "\n   🔗 [Voir le ticket](%s)",
+                $ticketUrl
+            );
+            
+            $lines[] = $ticketInfo;
         }
 
         return implode("\n\n", $lines);
@@ -167,23 +195,42 @@ class ToolExecutor
         $messages = $ticket['messages'] ?? [];
         $messageCount = count($messages);
         
+        $ticketUrl = url("/mon-compte/support#ticket-{$ticket['id']}");
+        
         $lines = [
             sprintf("📋 **Ticket %s**", $ticket['number'] ?? 'N/A'),
             sprintf("📝 %s", $ticket['subject'] ?? 'N/A'),
             sprintf("📊 Statut: %s", $ticket['status_label'] ?? 'N/A'),
             sprintf("📅 Créé: %s", $ticket['created_at'] ?? 'N/A'),
+            sprintf("🔗 [Voir sur la page support](%s)", $ticketUrl),
             "",
             sprintf("💬 **Messages** (%d) :", $messageCount),
         ];
 
-        foreach ($messages as $msg) {
-            $author = $msg['is_support'] ? '🎧 Support' : '👤 Vous';
-            $lines[] = sprintf(
-                "\n%s - *%s*\n%s",
-                $author,
-                $msg['created_at'],
-                $msg['content']
-            );
+        // Séparer les messages admin des messages utilisateur
+        $adminMessages = array_filter($messages, fn($msg) => $msg['is_support']);
+        $userMessages = array_filter($messages, fn($msg) => !$msg['is_support']);
+        
+        if (!empty($adminMessages)) {
+            $lines[] = "\n**🎧 Réponses du support:**";
+            foreach ($adminMessages as $msg) {
+                $lines[] = sprintf(
+                    "*%s*\n%s",
+                    $msg['created_at'],
+                    $msg['content']
+                );
+            }
+        }
+        
+        if (!empty($userMessages)) {
+            $lines[] = "\n**👤 Vos messages:**";
+            foreach ($userMessages as $msg) {
+                $lines[] = sprintf(
+                    "*%s*\n%s",
+                    $msg['created_at'],
+                    $msg['content']
+                );
+            }
         }
 
         return implode("\n", $lines);
