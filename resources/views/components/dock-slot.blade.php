@@ -2,7 +2,6 @@
     // Stocker les slots pour accès JavaScript
     $hasToolbar = isset($toolbar);
     $hasChatia = isset($chatia);
-    $hasTutorial = isset($tutorial);
     $hasTutor = isset($tutor);
     $hasSearch = isset($search);
     $hasSupport = isset($bug) || isset($support);
@@ -44,21 +43,6 @@
   </button>
   @endif
 
-  <!-- Bouton Tutoriels -->
-  @if($hasTutorial)
-  <button type="button"
-          data-dock-target="tutorial"
-          data-dock-action="show-slot"
-          data-dock-slot="tutorial"
-          class="dock-action relative flex h-11 w-11 items-center justify-center rounded-2xl bg-green-500 text-white shadow-md hover:-translate-y-1 hover:shadow-lg focus-visible:ring-green-500">
-      <span data-dock-indicator class="absolute -top-1 -right-1 h-3 w-3 scale-0 rounded-full bg-rose-500 shadow ring-2 ring-white transition-transform duration-150 ease-out dark:ring-slate-900"></span>
-      <span data-dock-badge class="absolute -top-1 -right-1 hidden min-w-[1.25rem] rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold leading-5 text-white shadow"></span>
-      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 14l9-5-9-5-9 5 9 5z"></path><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479l-6.16 3.422L5.839 17.057a12.083 12.083 0 01.665-6.479L12 14z"></path><path d="M12 14l0 7"></path>
-      </svg>
-  </button>
-  @endif
-
   <!-- Bouton Support -->
   @if($hasSupport)
   <button type="button"
@@ -77,16 +61,10 @@
 @endif
 
 <!-- Contenu des slots (cachés par défaut) -->
-<div class="dock-slots hidden" data-slots-available="{{ $hasChatia ? 'chatia ' : '' }}{{ $hasTutorial ? 'tutorial ' : '' }}{{ $hasTutor ? 'tutor ' : '' }}{{ $hasSupport ? 'support ' : '' }}{{ $hasSearch ? 'search ' : '' }}">
+<div class="dock-slots hidden" data-slots-available="{{ $hasChatia ? 'chatia ' : '' }}{{ $hasTutor ? 'tutor ' : '' }}{{ $hasSupport ? 'support ' : '' }}{{ $hasSearch ? 'search ' : '' }}">
   @if($hasChatia)
   <div class="dock-slot-content" data-slot-name="chatia">
     {{ $chatia }}
-  </div>
-  @endif
-
-  @if($hasTutorial)
-  <div class="dock-slot-content" data-slot-name="tutorial">
-    {{ $tutorial }}
   </div>
   @endif
 

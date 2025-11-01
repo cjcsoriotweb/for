@@ -10,7 +10,6 @@ Route::prefix('mon-compte')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [AccountPageController::class, 'dashboard'])
-            ->middleware('tutorial:mon-compte')
             ->name('dashboard');
         Route::post('/switch/team/{team:id}', [AccountPageController::class, 'switch'])->name('switch');
         Route::patch('/invitations/{invitation}/accept', [AccountInvitationController::class, 'accept'])
@@ -20,10 +19,6 @@ Route::prefix('mon-compte')
         Route::get('/assistant-chat', function () {
             return view('in-application.user.dock.assistant-chat');
         })->name('dock.assistant-chat');
-
-        Route::get('/tutoriels', function () {
-            return view('in-application.user.tutorials.index');
-        })->name('dock.tutorials');
 
         Route::get('/professeur', function () {
             return view('in-application.user.dock.professeur');
