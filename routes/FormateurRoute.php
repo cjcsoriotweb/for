@@ -25,8 +25,7 @@ Route::prefix('formateur')
             Route::get('/formation/{formation}/edit', [FormateurFormationController::class, 'editFormation'])->name('formation.edit');
             Route::get('/formation/{formation}/pricing', [FormateurFormationController::class, 'editPricing'])->name('formation.pricing.edit');
             Route::get('/formation/{formation}/chapters', [FormateurFormationController::class, 'manageChapters'])->name('formation.chapters.index');
-            Route::get('/formation/{formation}/ai', [FormateurFormationController::class, 'editAi'])->name('formation.ai.edit');
-            Route::put('/formation/{formation}/ai', [FormateurFormationController::class, 'updateAi'])->name('formation.ai.update');
+            // Routes IA supprimées - trainers sont maintenant dans config/ai.php
             Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
             Route::put('/formation/{formation}/pricing', [FormateurFormationController::class, 'updatePricing'])->name('formation.pricing.update');
             Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');

@@ -9,6 +9,5 @@ Route::prefix('')
     ->group(function () {
         Route::get('/', [PageController::class, 'index'])->name('index');
         Route::get('/policy', [PageController::class, 'policy'])
-            ->middleware('tutorial:policy')
             ->name('policy');
     });

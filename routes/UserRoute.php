@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiController;
 use App\Http\Controllers\Clean\Account\AccountInvitationController;
 use App\Http\Controllers\Clean\Account\AccountPageController;
 use Illuminate\Support\Facades\Route;
@@ -10,20 +11,22 @@ Route::prefix('mon-compte')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [AccountPageController::class, 'dashboard'])
-            ->middleware('tutorial:mon-compte')
             ->name('dashboard');
         Route::post('/switch/team/{team:id}', [AccountPageController::class, 'switch'])->name('switch');
         Route::patch('/invitations/{invitation}/accept', [AccountInvitationController::class, 'accept'])
             ->name('invitation.accept');
 
+        // AI streaming endpoint
+        Route::post('/ai/stream', [AiController::class, 'stream'])->name('ai.stream');
+        
+        // AI conversation management
+        Route::post('/ai/conversations', [AiController::class, 'createConversation'])->name('ai.conversations.create');
+        Route::get('/ai/conversations', [AiController::class, 'listConversations'])->name('ai.conversations.list');
+
         // Dock iframe routes
         Route::get('/assistant-chat', function () {
             return view('in-application.user.dock.assistant-chat');
         })->name('dock.assistant-chat');
-
-        Route::get('/tutoriels', function () {
-            return view('in-application.user.tutorials.index');
-        })->name('dock.tutorials');
 
         Route::get('/professeur', function () {
             return view('in-application.user.dock.professeur');

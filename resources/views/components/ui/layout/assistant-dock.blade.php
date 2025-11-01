@@ -6,10 +6,6 @@
       <iframe src="{{ route('user.dock.assistant-chat') }}" class="w-full h-full border-0"></iframe>
     </x-slot:chatia>
 
-    <x-slot:tutorial>
-      <iframe src="{{ route('user.dock.tutorials') }}" class="w-full h-full border-0"></iframe>
-    </x-slot:tutorial>
-
     <x-slot:tutor>
       <iframe src="{{ route('user.dock.professeur') }}" class="w-full h-full border-0"></iframe>
     </x-slot:tutor>
