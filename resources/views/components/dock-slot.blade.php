@@ -17,7 +17,6 @@
   <!-- Bouton Assistant IA -->
   @if($hasChatia)
   <button type="button"
-          data-dock-title="Assistant IA"
           data-dock-target="chatia"
           data-dock-action="show-slot"
           data-dock-slot="chatia"
@@ -33,7 +32,6 @@
   <!-- Bouton Professeur -->
   @if($hasTutor)
   <button type="button"
-          data-dock-title="Professeur virtuel"
           data-dock-target="tutor"
           data-dock-action="show-slot"
           data-dock-slot="tutor"
@@ -49,7 +47,6 @@
   <!-- Bouton Tutoriels -->
   @if($hasTutorial)
   <button type="button"
-          data-dock-title="Tutoriels"
           data-dock-target="tutorial"
           data-dock-action="show-slot"
           data-dock-slot="tutorial"
@@ -65,7 +62,6 @@
   <!-- Bouton Support -->
   @if($hasSupport)
   <button type="button"
-          data-dock-title="Signaler un bug"
           data-dock-target="support"
           data-dock-action="show-slot"
           data-dock-slot="support"

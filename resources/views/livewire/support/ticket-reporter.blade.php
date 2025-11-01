@@ -18,83 +18,7 @@
 
     <div class="flex-1 overflow-y-auto px-6 pb-6">
         <div class="space-y-6">
-            <div class="rounded-2xl border border-white/10 bg-white/5 shadow-xl shadow-slate-950/40 backdrop-blur">
-                <div class="flex items-center gap-3 border-b border-white/10 px-6 py-4">
-                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-sky-400/20 text-sky-200">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376 7.907-13.68c.564-.976 1.986-.97 2.543.01l7.763 13.68c.55.968-.147 2.19-1.27 2.19H3.02c-1.11 0-1.807-1.194-1.32-2.2Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75h.007v.007H12v-.007Z" />
-                        </svg>
-                    </span>
-                    <div>
-                        <h2 class="text-base font-semibold text-white">Nouveau signalement</h2>
-                        <p class="text-xs text-slate-300">Expliquez ce qui s est passe, nous analysons generalement sous 24h.</p>
-                    </div>
-                </div>
-
-                <form wire:submit.prevent="submit" class="space-y-5 px-6 py-6">
-                    @if ($sent)
-                        <div class="rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200 shadow-inner shadow-emerald-500/20">
-                            Merci ! Votre ticket est bien enregistre. Nous revenons vers vous des que possible.
-                        </div>
-                    @endif
-
-                    <div class="space-y-2">
-                        <label for="subject" class="text-sm font-medium text-slate-200">Sujet</label>
-                        <input
-                            id="subject"
-                            type="text"
-                            wire:model.defer="subject"
-                            autocomplete="off"
-                            class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                            placeholder="Exemple : Erreur lors de la validation d un quiz"
-                        />
-                        @error('subject')
-                            <p class="text-sm text-rose-300">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="description" class="text-sm font-medium text-slate-200">Description detaillee</label>
-                        <textarea
-                            id="description"
-                            rows="5"
-                            wire:model.defer="description"
-                            class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                            placeholder="Decrivez les etapes pour reproduire le bug, les messages d erreur, ou ajoutez des details utiles."
-                        ></textarea>
-                        @error('description')
-                            <p class="text-sm text-rose-300">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-300">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-sky-200">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-3A2.25 2.25 0 0 0 8.25 5.25V9m-3 3h13.5m-11.25 3v3A2.25 2.25 0 0 0 9.75 20.25h4.5A2.25 2.25 0 0 0 16.5 18v-3" />
-                                </svg>
-                            </span>
-                            <span>Le lien de la page actuelle est joint pour aider l equipe.</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span wire:loading.delay.inline wire:target="submit" class="text-slate-400">Envoi...</span>
-                            <button
-                                type="submit"
-                                wire:loading.attr="disabled"
-                                wire:target="submit"
-                                class="inline-flex items-center gap-2 rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:bg-sky-700/60"
-                            >
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 12 5-9m0 0 5 9m-5-9v13.5m0 0L9 21m2-3.5 2 3.5" />
-                                </svg>
-                                Envoyer
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
+          
             <div class="rounded-2xl border border-white/10 bg-white/5 shadow-xl shadow-slate-950/40 backdrop-blur">
                 <div class="flex items-center justify-between gap-3 border-b border-white/10 px-6 py-4">
                     <div>
@@ -216,6 +140,83 @@
                             @endif
                         </div>
                     </div>
+                      <div class="rounded-2xl border border-white/10 bg-white/5 shadow-xl shadow-slate-950/40 backdrop-blur">
+                <div class="flex items-center gap-3 border-b border-white/10 px-6 py-4">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-sky-400/20 text-sky-200">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376 7.907-13.68c.564-.976 1.986-.97 2.543.01l7.763 13.68c.55.968-.147 2.19-1.27 2.19H3.02c-1.11 0-1.807-1.194-1.32-2.2Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75h.007v.007H12v-.007Z" />
+                        </svg>
+                    </span>
+                    <div>
+                        <h2 class="text-base font-semibold text-white">Nouveau signalement</h2>
+                        <p class="text-xs text-slate-300">Expliquez ce qui s est passe, nous analysons generalement sous 24h.</p>
+                    </div>
+                </div>
+
+                <form wire:submit.prevent="submit" class="space-y-5 px-6 py-6">
+                    @if ($sent)
+                        <div class="rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200 shadow-inner shadow-emerald-500/20">
+                            Merci ! Votre ticket est bien enregistre. Nous revenons vers vous des que possible.
+                        </div>
+                    @endif
+
+                    <div class="space-y-2">
+                        <label for="subject" class="text-sm font-medium text-slate-200">Sujet</label>
+                        <input
+                            id="subject"
+                            type="text"
+                            wire:model.defer="subject"
+                            autocomplete="off"
+                            class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
+                            placeholder="Exemple : Erreur lors de la validation d un quiz"
+                        />
+                        @error('subject')
+                            <p class="text-sm text-rose-300">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="description" class="text-sm font-medium text-slate-200">Description detaillee</label>
+                        <textarea
+                            id="description"
+                            rows="5"
+                            wire:model.defer="description"
+                            class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
+                            placeholder="Decrivez les etapes pour reproduire le bug, les messages d erreur, ou ajoutez des details utiles."
+                        ></textarea>
+                        @error('description')
+                            <p class="text-sm text-rose-300">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-300">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-sky-200">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-3A2.25 2.25 0 0 0 8.25 5.25V9m-3 3h13.5m-11.25 3v3A2.25 2.25 0 0 0 9.75 20.25h4.5A2.25 2.25 0 0 0 16.5 18v-3" />
+                                </svg>
+                            </span>
+                            <span>Le lien de la page actuelle est joint pour aider l equipe.</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span wire:loading.delay.inline wire:target="submit" class="text-slate-400">Envoi...</span>
+                            <button
+                                type="submit"
+                                wire:loading.attr="disabled"
+                                wire:target="submit"
+                                class="inline-flex items-center gap-2 rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:bg-sky-700/60"
+                            >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 12 5-9m0 0 5 9m-5-9v13.5m0 0L9 21m2-3.5 2 3.5" />
+                                </svg>
+                                Envoyer
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
                 </div>
             </div>
         </div>

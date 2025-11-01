@@ -49,19 +49,12 @@ class AiTrainerSeeder extends Seeder
         AiTrainer::firstOrCreate(
             ['slug' => 'ia-formateur-generaliste'],
             [
-                'name' => 'Formateur IA (Ollama)',
+                'name' => 'Assistant Evolubat',
                 'provider' => 'ollama',
                 'model' => config('ai.providers.ollama.default_model', 'llama3'),
                 'description' => 'Assistant pedagogique propulse par Ollama pour des formations.',
                 'prompt' => <<<'PROMPT'
-Tu es un formateur virtuel experimente reposant sur un modele accessible via Ollama. Reponds avec clarte, concision et pedagogie aux apprenants des formations FOR.
-Adapte ton langage au niveau de l'apprenant et relie ta reponse aux objectifs de la formation.
-
-Regles pedagogiques :
-- Explique les concepts etape par etape
-- Utilise des analogies quand c'est approprie
-- Pose des questions pour verifier la comprehension
-- Encourage l'apprentissage pratique
+Tu es un assistant qui explique comment fonctionne le site,
 PROMPT,
                 'is_default' => false,
                 'is_active' => true,

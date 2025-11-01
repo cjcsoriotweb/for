@@ -9,10 +9,14 @@
     @livewireStyles
     <x-meta-header/>
 </head>
-<body class="min-h-full bg-slate-950">
-    <x-dock.frame>
-        @livewire('ai.assistant-chat')
-    </x-dock.frame>
+<body class="h-full">
+    <div class="flex h-full flex-col text-white">
+        <div class="flex-1 overflow-hidden px-4 py-4 sm:px-6 sm:py-6">
+            <div class="mx-auto h-full w-full max-w-5xl">
+                @livewire('ai.assistant-chat')
+            </div>
+        </div>
+    </div>
     @livewireScriptConfig
     @livewireScripts
 </body>
