@@ -113,6 +113,11 @@ class OllamaClient
         $startTime = microtime(true);
 
         try {
+            // Note: Pour un vrai streaming, ce générateur devrait être utilisé
+            // directement dans un StreamedResponse Laravel, pas appelé ici.
+            // Cette méthode est gardée pour compatibilité mais le streaming
+            // réel est géré dans AiController::stream()
+            
             $response = $this->http
                 ->timeout($this->timeout)
                 ->withHeaders(['Accept' => 'text/event-stream'])
@@ -166,5 +171,41 @@ class OllamaClient
 
             throw $e;
         }
+    }
+
+    /**
+     * Effectue une requête streaming directement via HTTP et retourne la réponse brute.
+     * À utiliser dans un StreamedResponse pour un vrai streaming.
+     *
+     * @param  array<int, array{role: string, content: string}>  $messages
+     * @param  array<string, mixed>  $options
+     * @return resource
+     */
+    public function chatStreamRaw(array $messages, array $options = [])
+    {
+        $model = $options['model'] ?? $this->defaultModel;
+        $temperature = $options['temperature'] ?? 0.7;
+
+        $payload = [
+            'model' => $model,
+            'messages' => $messages,
+            'temperature' => (float) $temperature,
+            'stream' => true,
+        ];
+
+        $url = rtrim($this->baseUrl, '/') . '/v1/chat/completions';
+
+        // Utiliser cURL directement pour un vrai streaming
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: text/event-stream',
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+
+        return $ch;
     }
 }

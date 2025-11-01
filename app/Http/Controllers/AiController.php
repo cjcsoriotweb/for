@@ -28,10 +28,12 @@ class AiController extends Controller
      */
     public function stream(Request $request): Response
     {
-        // Validation
+        // Validation - les trainers disponibles sont mis en cache
+        $availableTrainers = implode(',', $this->getAvailableTrainers());
+        
         $validator = Validator::make($request->all(), [
             'message' => ['required', 'string', 'max:' . config('ai.max_message_length', 2000)],
-            'trainer' => ['nullable', 'string', 'in:' . implode(',', array_keys(config('ai.trainers', [])))],
+            'trainer' => ['nullable', 'string', 'in:' . $availableTrainers],
             'conversation_id' => ['nullable', 'integer', 'exists:ai_conversations,id'],
         ]);
 
@@ -102,27 +104,34 @@ class AiController extends Controller
 
         // Streamer la réponse
         return response()->stream(function () use ($conversation, $messages, $trainer, $user) {
-            try {
-                $fullResponse = '';
+            $fullResponse = '';
 
-                // Envoyer l'ID de conversation au début
-                echo "data: " . json_encode([
-                    'type' => 'conversation_id',
-                    'conversation_id' => $conversation->id,
-                ]) . "\n\n";
+            // Envoyer l'ID de conversation au début
+            $conversationData = json_encode([
+                'type' => 'conversation_id',
+                'conversation_id' => $conversation->id,
+            ]);
+            echo "data: {$conversationData}\n\n";
+            
+            if (ob_get_level() > 0) {
                 ob_flush();
-                flush();
+            }
+            flush();
 
+            try {
                 // Stream les chunks de réponse
                 foreach ($this->ollamaClient->chatStream($messages, $trainer) as $chunk) {
                     $fullResponse .= $chunk;
 
-                    echo "data: " . json_encode([
+                    $chunkData = json_encode([
                         'type' => 'chunk',
                         'content' => $chunk,
-                    ]) . "\n\n";
+                    ]);
+                    echo "data: {$chunkData}\n\n";
 
-                    ob_flush();
+                    if (ob_get_level() > 0) {
+                        ob_flush();
+                    }
                     flush();
                 }
 
@@ -139,26 +148,31 @@ class AiController extends Controller
                 $conversation->update(['last_message_at' => now()]);
 
                 // Envoyer le signal de fin
-                echo "data: " . json_encode([
-                    'type' => 'done',
-                ]) . "\n\n";
+                $doneData = json_encode(['type' => 'done']);
+                echo "data: {$doneData}\n\n";
 
-                ob_flush();
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
                 flush();
             } catch (\Throwable $e) {
                 // Envoyer l'erreur
-                echo "data: " . json_encode([
+                $errorData = json_encode([
                     'type' => 'error',
                     'message' => $e->getMessage(),
-                ]) . "\n\n";
+                ]);
+                echo "data: {$errorData}\n\n";
 
-                ob_flush();
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
                 flush();
             }
         }, 200, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
             'X-Accel-Buffering' => 'no',
+            'Connection' => 'keep-alive',
         ]);
     }
 
@@ -210,5 +224,22 @@ class AiController extends Controller
         }
 
         return $messages;
+    }
+
+    /**
+     * Retourne la liste des trainers disponibles (pour validation).
+     * Mise en cache statique pour éviter les appels répétés à config().
+     *
+     * @return array<string>
+     */
+    private function getAvailableTrainers(): array
+    {
+        static $trainers = null;
+
+        if ($trainers === null) {
+            $trainers = array_keys(config('ai.trainers', []));
+        }
+
+        return $trainers;
     }
 }

@@ -165,34 +165,39 @@ function chatBox() {
                 }
 
                 const reader = response.body.getReader();
-                const decoder = new TextDecoder();
+                const decoder = new TextDecoder('utf-8', { stream: true });
 
                 while (true) {
                     const { done, value } = await reader.read();
                     
                     if (done) break;
 
-                    const chunk = decoder.decode(value);
+                    const chunk = decoder.decode(value, { stream: true });
                     const lines = chunk.split('\n');
 
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
-                            const data = JSON.parse(line.substring(6));
+                            try {
+                                const data = JSON.parse(line.substring(6));
 
-                            if (data.type === 'conversation_id') {
-                                this.conversationId = data.conversation_id;
-                            } else if (data.type === 'chunk') {
-                                this.currentResponse += data.content;
-                                this.scrollToBottom();
-                            } else if (data.type === 'done') {
-                                // Ajouter le message complet
-                                this.messages.push({
-                                    role: 'assistant',
-                                    content: this.currentResponse,
-                                });
-                                this.currentResponse = '';
-                            } else if (data.type === 'error') {
-                                this.error = data.message;
+                                if (data.type === 'conversation_id') {
+                                    this.conversationId = data.conversation_id;
+                                } else if (data.type === 'chunk') {
+                                    this.currentResponse += data.content;
+                                    this.scrollToBottom();
+                                } else if (data.type === 'done') {
+                                    // Ajouter le message complet
+                                    this.messages.push({
+                                        role: 'assistant',
+                                        content: this.currentResponse,
+                                    });
+                                    this.currentResponse = '';
+                                } else if (data.type === 'error') {
+                                    this.error = data.message;
+                                }
+                            } catch (parseError) {
+                                console.error('JSON parse error:', parseError, 'Line:', line);
+                                // Continue avec la ligne suivante en cas d'erreur de parsing
                             }
                         }
                     }

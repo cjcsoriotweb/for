@@ -19,7 +19,8 @@ return new class extends Migration
         if (Schema::hasTable('ai_conversations')) {
             Schema::table('ai_conversations', function (Blueprint $table) {
                 if (Schema::hasColumn('ai_conversations', 'ai_trainer_id')) {
-                    $table->dropForeign(['ai_trainer_id']);
+                    // Supprimer la contrainte foreign key par son nom
+                    $table->dropForeign('ai_conversations_ai_trainer_id_foreign');
                     $table->dropColumn('ai_trainer_id');
                 }
             });
