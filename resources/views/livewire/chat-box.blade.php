@@ -61,6 +61,41 @@
                 </div>
             </template>
 
+            <!-- Suggestions de messages quand la conversation est vide -->
+            <template x-if="messages.length === 0 && !isStreaming && !isLoadingConversation && !error">
+                <div class="space-y-3">
+                    <p class="text-sm text-gray-500 text-center mb-4">{{ __('Comment puis-je vous aider ?') }}</p>
+                    <button 
+                        @click="sendSuggestedMessage('Voir mes tickets en cours')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        📋 {{ __('Voir mes tickets en cours') }}
+                    </button>
+                    <button 
+                        @click="sendSuggestedMessage('Comment rejoindre une application')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        📱 {{ __('Comment rejoindre une application') }}
+                    </button>
+                    <button 
+                        @click="sendSuggestedMessage('Comment contacter un administrateur')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        👤 {{ __('Comment contacter un administrateur') }}
+                    </button>
+                    <button 
+                        @click="sendSuggestedMessage('Demander à être rappelé par téléphone')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        📞 {{ __('Demander à être rappelé par téléphone') }}
+                    </button>
+                </div>
+            </template>
+
             <!-- Erreur -->
             <template x-if="error">
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -153,6 +188,11 @@ function chatBox() {
             } finally {
                 this.isLoadingConversation = false;
             }
+        },
+
+        sendSuggestedMessage(text) {
+            this.message = text;
+            this.sendMessage();
         },
 
         async sendMessage() {
