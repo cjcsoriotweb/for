@@ -18,7 +18,7 @@
             class="flex-1 overflow-y-auto p-4 space-y-4"
         >
             <template x-for="(message, index) in messages" :key="index">
-                <div class="flex" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
+                <div class="flex flex-col gap-2" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                     <div 
                         class="max-w-[80%] rounded-lg px-4 py-2"
                         :class="message.role === 'user' 
@@ -27,6 +27,19 @@
                     >
                         <div x-html="formatMessage(message.content)"></div>
                     </div>
+                    <!-- Boutons suggérés par l'IA -->
+                    <template x-if="message.role === 'assistant' && message.buttons && message.buttons.length > 0">
+                        <div class="flex flex-wrap gap-2 max-w-[80%]">
+                            <template x-for="(button, btnIndex) in message.buttons" :key="btnIndex">
+                                <button
+                                    @click="sendSuggestedMessage(button)"
+                                    type="button"
+                                    class="bg-white hover:bg-blue-50 text-blue-600 border border-blue-300 rounded-lg px-3 py-1.5 text-sm transition-colors"
+                                    x-text="button"
+                                ></button>
+                            </template>
+                        </div>
+                    </template>
                 </div>
             </template>
 
@@ -269,10 +282,14 @@ function chatBox() {
                                     this.currentResponse += data.content;
                                     this.scrollToBottom();
                                 } else if (data.type === 'done') {
+                                    // Extraire les boutons du message
+                                    const { content, buttons } = this.extractButtons(this.currentResponse);
+                                    
                                     // Ajouter le message complet
                                     this.messages.push({
                                         role: 'assistant',
-                                        content: this.currentResponse,
+                                        content: content,
+                                        buttons: buttons,
                                     });
                                     this.currentResponse = '';
                                 } else if (data.type === 'error') {
@@ -291,6 +308,30 @@ function chatBox() {
                 this.isStreaming = false;
                 this.scrollToBottom();
             }
+        },
+
+        extractButtons(content) {
+            // Extraire les boutons du format [BUTTONS]...[/BUTTONS]
+            const buttonRegex = /\[BUTTONS\]([\s\S]*?)\[\/BUTTONS\]/i;
+            const match = content.match(buttonRegex);
+            
+            if (!match) {
+                return { content: content, buttons: [] };
+            }
+            
+            // Extraire les boutons (lignes commençant par -)
+            const buttonsText = match[1];
+            const buttons = buttonsText
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.startsWith('-'))
+                .map(line => line.substring(1).trim())
+                .filter(button => button.length > 0);
+            
+            // Retirer la section [BUTTONS] du contenu
+            const cleanContent = content.replace(buttonRegex, '').trim();
+            
+            return { content: cleanContent, buttons: buttons };
         },
 
         formatMessage(content) {
