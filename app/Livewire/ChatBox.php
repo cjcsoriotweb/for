@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Throwable;
 
@@ -17,10 +16,6 @@ class ChatBox extends Component
     public bool $isOpen = false;
     public string $title = 'Assistant IA';
     public array $shortcodeTemplates = [];
-    public bool $isSuperAdmin = false;
-    public ?int $currentUserId = null;
-    public string $currentUserName = '';
-    public ?string $currentUserEmail = null;
 
     public function mount(?string $trainer = null, ?int $conversationId = null, string $title = 'Assistant IA'): void
     {
@@ -28,14 +23,6 @@ class ChatBox extends Component
         $this->conversationId = $conversationId;
         $this->title = $title;
         $this->shortcodeTemplates = $this->resolveShortcodeTemplates();
-
-        $authUser = Auth::user();
-        if ($authUser) {
-            $this->isSuperAdmin = (bool) $authUser->superadmin();
-            $this->currentUserId = $authUser->id;
-            $this->currentUserName = $authUser->name ?? '';
-            $this->currentUserEmail = $authUser->email;
-        }
 
         // Vérifier que le trainer existe
         $trainerConfig = config("ai.trainers.{$this->trainer}");
@@ -73,14 +60,6 @@ class ChatBox extends Component
             'trainerOptions' => $trainerOptions,
             'currentTrainerMeta' => $currentTrainerMeta,
             'shortcodeTemplates' => $this->shortcodeTemplates,
-            'isSuperAdmin' => $this->isSuperAdmin,
-            'currentUserId' => $this->currentUserId,
-            'currentUser' => [
-                'id' => $this->currentUserId,
-                'name' => $this->currentUserName,
-                'email' => $this->currentUserEmail,
-                'superadmin' => $this->isSuperAdmin,
-            ],
         ]);
     }
 

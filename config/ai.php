@@ -20,7 +20,7 @@ return [
     'trainers' => [
         'default' => [
             'slug' => 'default',
-            'name' => 'Assistant Evolubat',
+            'name' => 'IA Evolubat',
             'description' => 'Assistant généraliste professionnel en français',
             'model' => env('OLLAMA_DEFAULT_MODEL', 'llama3'),
             'temperature' => 0.7,
