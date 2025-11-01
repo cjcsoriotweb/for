@@ -55,8 +55,6 @@ class ChatBox extends Component
         ];
 
         return view('livewire.chat-box', [
-            'trainerName' => $trainerConfig['name'] ?? 'Assistant',
-            'trainerDescription' => $trainerConfig['description'] ?? '',
             'trainerOptions' => $trainerOptions,
             'currentTrainerMeta' => $currentTrainerMeta,
             'shortcodeTemplates' => $this->shortcodeTemplates,
