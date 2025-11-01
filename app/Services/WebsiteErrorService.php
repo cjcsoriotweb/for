@@ -22,7 +22,7 @@ class WebsiteErrorService
         $noteTitle = $this->formatErrorTitle($errorCode, $message);
 
         return PageNote::create([
-            'user_id' => $userId ?? 1, // Utilisateur système par défaut
+            'user_id' => $userId,
             'path' => $url,
             'title' => $noteTitle,
             'content' => $noteContent,

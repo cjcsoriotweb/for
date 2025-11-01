@@ -40,13 +40,14 @@ class QuizAttempt extends Model
 
     public function lesson()
     {
+        // Link attempts -> quizzes (quiz_attempts.quiz_id -> quizzes.id) and quizzes -> lessons (quizzes.lesson_id -> lessons.id)
         return $this->hasOneThrough(
             Lesson::class,
             Quiz::class,
-            'id',        // Foreign key on quiz_attempts table (quiz_id)
-            'id',        // Foreign key on lessons table (lesson_id)
-            'quiz_id',   // Local key on quiz_attempts table
-            'lesson_id'  // Local key on quizzes table
+            'id',        // quizzes.id matches quiz_attempts.quiz_id
+            'id',        // lessons.id matches quizzes.lesson_id
+            'quiz_id',   // local key on quiz_attempts table
+            'lesson_id'  // foreign key on quizzes table referencing lessons
         );
     }
 
