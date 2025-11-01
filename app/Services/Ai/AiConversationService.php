@@ -168,6 +168,36 @@ class AiConversationService
         $conversation->forceFill(['metadata' => $metadata])->save();
     }
 
+    public function syncSessionContext(AiConversation $conversation, array $session = []): void
+    {
+        if ($session === []) {
+            return;
+        }
+
+        $metadata = $conversation->metadata ?? [];
+        $existing = Arr::get($metadata, 'session', []);
+
+        if (! is_array($existing)) {
+            $existing = [];
+        }
+
+        foreach ($session as $key => $value) {
+            if ($value === null || (is_string($value) && trim($value) === '')) {
+                unset($existing[$key]);
+            } else {
+                $existing[$key] = is_string($value) ? trim($value) : $value;
+            }
+        }
+
+        if ($existing === []) {
+            Arr::forget($metadata, 'session');
+        } else {
+            $metadata['session'] = $existing;
+        }
+
+        $conversation->forceFill(['metadata' => $metadata])->save();
+    }
+
     /**
      * Generate an assistant reply using the configured provider.
      *
@@ -209,6 +239,39 @@ class AiConversationService
                 'content' => $userContext,
             ];
         }
+
+        $sessionContext = Arr::get($conversation->metadata, 'session', []);
+
+        if (is_array($sessionContext) && $sessionContext !== []) {
+            $sessionDetails = [];
+
+            $originLabel = Arr::get($sessionContext, 'origin_label');
+            if (is_string($originLabel) && trim($originLabel) !== '') {
+                $sessionDetails[] = 'Page courante de l\'utilisateur : '.$originLabel;
+            }
+
+            $originUrl = Arr::get($sessionContext, 'origin_url');
+            if (is_string($originUrl) && trim($originUrl) !== '') {
+                $sessionDetails[] = 'URL de la page : '.$originUrl;
+            }
+
+            $lastTicket = Arr::get($sessionContext, 'last_ticket_id');
+            if ($lastTicket) {
+                $sessionDetails[] = 'Dernier ticket support cree : #'.$lastTicket;
+            }
+
+            if ($sessionDetails !== []) {
+                $messages[] = [
+                    'role' => AiConversationMessage::ROLE_SYSTEM,
+                    'content' => implode("\n", $sessionDetails),
+                ];
+            }
+        }
+
+        $messages[] = [
+            'role' => AiConversationMessage::ROLE_SYSTEM,
+            'content' => "Si tu ne disposes pas de l'information demandee, indique-le clairement. Propose à l'utilisateur de créer un ticket support. Si l'utilisateur confirme qu'il souhaite une demande, termine ta réponse par [[CREATE_TICKET]] suivi d'un bref résumé (max 400 caractères) de la demande. N'utilise JAMAIS la balise sans consentement explicite.",
+        ];
 
         /** @var AiConversationMessage $message */
         foreach ($history as $message) {

@@ -10,6 +10,7 @@ use App\Models\SupportTicketMessage;
 use App\Services\Ai\AiConversationService;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -39,8 +40,14 @@ class AssistantChat extends Component
 
     public ?string $error = null;
 
+    public ?string $originUrl = null;
+
+    public ?string $originLabel = null;
+
     public function mount(?int $trainerId = null): void
     {
+        $this->originUrl = $this->sanitizeOriginUrl(request()->query('origin'));
+        $this->originLabel = $this->sanitizeOriginLabel(request()->query('origin_label'));
         $this->trainerId = $trainerId;
         $this->initializeConversation();
     }
@@ -108,6 +115,7 @@ class AssistantChat extends Component
             $trainer = AiTrainer::query()->findOrFail($conversation->ai_trainer_id);
 
             $this->service()->syncUserContext($conversation, $user);
+            $this->service()->syncSessionContext($conversation, $this->sessionContext());
             $conversation->refresh();
 
             $metadata = $conversation->metadata ?? [];
@@ -127,7 +135,9 @@ class AssistantChat extends Component
 
             $this->message = '';
 
-            $this->service()->generateAssistantReply($conversation, $trainer);
+            $assistantMessage = $this->service()->generateAssistantReply($conversation, $trainer);
+
+            $this->handleAssistantActions($assistantMessage, $conversation, $user);
 
             $this->refreshMessages();
         } catch (Throwable $exception) {
@@ -167,6 +177,9 @@ class AssistantChat extends Component
                 team: $user->currentTeam
             );
 
+            $this->service()->syncSessionContext($conversation, $this->sessionContext());
+            $conversation->refresh();
+
             $this->conversationId = $conversation->id;
             $this->messages = [];
             $this->message = '';
@@ -205,6 +218,10 @@ class AssistantChat extends Component
                 formation: null,
                 team: $user->currentTeam
             );
+
+            $this->service()->syncUserContext($conversation, $user);
+            $this->service()->syncSessionContext($conversation, $this->sessionContext());
+            $conversation->refresh();
 
             $this->conversationId = $conversation->id;
             $this->trainerId = $trainer->id;
@@ -256,7 +273,120 @@ class AssistantChat extends Component
         };
     }
 
-    private function resetConversationState(): void
+    private function handleAssistantActions(AiConversationMessage $assistantMessage, AiConversation $conversation, Authenticatable $user): void
+    {
+        $content = $assistantMessage->content ?? '';
+
+        if (! is_string($content) || ! Str::contains($content, '[[CREATE_TICKET]]')) {
+            return;
+        }
+
+        [$visibleContent, $ticketPayload] = explode('[[CREATE_TICKET]]', $content, 2);
+
+        $visibleContent = trim($visibleContent);
+        $ticketSummary = isset($ticketPayload) ? trim($ticketPayload) : '';
+
+        if ($visibleContent !== $content) {
+            $assistantMessage->forceFill([
+                'content' => $visibleContent,
+            ])->save();
+        }
+
+        $this->createSupportTicketFromAssistant($conversation, $user, $ticketSummary);
+    }
+
+    private function createSupportTicketFromAssistant(AiConversation $conversation, Authenticatable $user, string $summary): void
+    {
+        $userId = $user->getAuthIdentifier();
+
+        if (! $userId) {
+            return;
+        }
+
+        $summary = Str::limit(trim($summary), 500, '');
+
+        $history = $conversation->messages()
+            ->latest('id')
+            ->limit(8)
+            ->get()
+            ->sortBy('id')
+            ->map(function (AiConversationMessage $message) {
+                $label = match ($message->role) {
+                    AiConversationMessage::ROLE_ASSISTANT => 'Assistant',
+                    AiConversationMessage::ROLE_SYSTEM => 'Systeme',
+                    default => 'Utilisateur',
+                };
+
+                return sprintf(
+                    '%s (%s) : %s',
+                    $label,
+                    optional($message->created_at)->format('d/m/Y H:i'),
+                    trim($message->content)
+                );
+            })
+            ->implode("\n\n");
+
+        $bodySections = [];
+
+        if ($summary !== '') {
+            $bodySections[] = "Resume de l'assistant :\n".$summary;
+        }
+
+        if ($history !== '') {
+            $bodySections[] = "Extrait de la conversation :\n".$history;
+        }
+
+        $bodySections[] = sprintf('Conversation IA #%d.', $conversation->id);
+
+        $body = implode("\n\n", $bodySections);
+
+        $subjectSource = $summary !== '' ? $summary : __('Demande d\'assistance via l\'assistant IA');
+        $subject = Str::limit($subjectSource, 120, '...');
+
+        $ticket = null;
+
+        DB::transaction(function () use (&$ticket, $userId, $subject, $body) {
+            $ticket = SupportTicket::create([
+                'user_id' => $userId,
+                'subject' => $subject,
+                'status' => SupportTicket::STATUS_OPEN,
+                'origin_label' => $this->originLabel,
+                'origin_path' => $this->originUrl,
+            ]);
+
+            SupportTicketMessage::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => $userId,
+                'is_support' => false,
+                'content' => $body,
+                'context_label' => $this->originLabel ?? 'Assistant IA',
+                'context_path' => $this->originUrl ?? url()->current(),
+            ]);
+        });
+
+        if (! $ticket) {
+            return;
+        }
+
+        $sessionContext = $this->sessionContext();
+        $sessionContext['last_ticket_id'] = $ticket->id;
+        $this->service()->syncSessionContext($conversation, $sessionContext);
+
+        $confirmation = __('Un ticket support a été créé pour vous (référence : #:id). Un membre de l\'équipe vous répondra prochainement.', ['id' => $ticket->id]);
+
+        $this->service()->appendMessage(
+            $conversation,
+            AiConversationMessage::ROLE_SYSTEM,
+            $confirmation,
+            null,
+            [
+                'label' => 'Assistant IA',
+                'path' => url()->current(),
+                'support_ticket_id' => $ticket->id,
+            ]
+        );
+    }
+private function resetConversationState(): void
     {
         $this->conversationId = null;
         $this->hasTrainer = false;
@@ -269,6 +399,47 @@ class AssistantChat extends Component
         $this->awaitingResponse = false;
     }
 
+    private function sanitizeOriginUrl(?string $url): ?string
+    {
+        if (! is_string($url)) {
+            return null;
+        }
+
+        $trimmed = trim($url);
+
+        if ($trimmed === '' || ! filter_var($trimmed, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+
+        return Str::limit($trimmed, 500, '');
+    }
+
+    private function sanitizeOriginLabel(?string $label): ?string
+    {
+        if (! is_string($label)) {
+            return null;
+        }
+
+        $trimmed = trim($label);
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        return Str::limit($trimmed, 150, 'â€¦');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function sessionContext(): array
+    {
+        return array_filter([
+            'origin_url' => $this->originUrl,
+            'origin_label' => $this->originLabel,
+        ], fn ($value) => is_string($value) && $value !== '');
+    }
+
     private function user(): ?Authenticatable
     {
         return Auth::user();
@@ -279,3 +450,6 @@ class AssistantChat extends Component
         return app(AiConversationService::class);
     }
 }
+
+
+

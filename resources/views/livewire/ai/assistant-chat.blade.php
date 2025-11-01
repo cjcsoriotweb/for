@@ -10,6 +10,11 @@
                     @if (! empty($trainer['description']))
                         <p class="text-sm text-slate-300">{{ $trainer['description'] }}</p>
                     @endif
+                    @if ($originLabel)
+                        <p class="text-xs text-slate-400">
+                            {{ __('Page actuelle : :page', ['page' => $originLabel]) }}
+                        </p>
+                    @endif
                 </div>
                 <button
                     type="button"

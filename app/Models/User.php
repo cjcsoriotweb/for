@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\SupportTicket;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -169,6 +170,34 @@ class User extends Authenticatable
                     $formation->title,
                     $formation->id,
                     Str::ucfirst($status)
+                );
+            }
+        }
+
+        $tickets = $this->supportTickets()
+            ->whereIn('status', [SupportTicket::STATUS_OPEN, SupportTicket::STATUS_PENDING])
+            ->with(['messages' => function ($query) {
+                $query->latest('id')->take(1);
+            }])
+            ->orderByDesc('last_message_at')
+            ->limit(5)
+            ->get();
+
+        if ($tickets->isNotEmpty()) {
+            $segments[] = 'Tickets support actifs :';
+            foreach ($tickets as $ticket) {
+                $lastMessage = $ticket->messages->first();
+                $actor = $lastMessage ? ($lastMessage->is_support ? 'Support' : 'Utilisateur') : 'Aucun echange';
+                $lastAt = optional($ticket->last_message_at)->diffForHumans() ?? 'inconnue';
+                $subject = $ticket->subject ?: 'Sans objet';
+
+                $segments[] = sprintf(
+                    '- #%d "%s" (statut : %s, dernière réponse : %s - %s)',
+                    $ticket->id,
+                    $subject,
+                    Str::ucfirst($ticket->status ?? 'inconnu'),
+                    $actor,
+                    $lastAt
                 );
             }
         }
