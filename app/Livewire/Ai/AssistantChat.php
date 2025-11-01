@@ -53,7 +53,9 @@ class AssistantChat extends Component
     }
 
     public function render()
+    
     {
+
         return view('livewire.ai.assistant-chat');
     }
 
@@ -77,6 +79,7 @@ class AssistantChat extends Component
         if ($this->awaitingResponse) {
             return;
         }
+
 
         $user = $this->user();
 
@@ -245,12 +248,10 @@ class AssistantChat extends Component
 
         return AiConversationMessage::query()
             ->where('conversation_id', $this->conversationId)
-            ->orderBy('created_at')
-            ->orderBy('id')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->get()
             ->map(function (AiConversationMessage $message) {
-                $metadata = $message->metadata ?? [];
-
                 return [
                     'id' => $message->id,
                     'role' => $message->role,
@@ -258,8 +259,6 @@ class AssistantChat extends Component
                     'content' => $message->content,
                     'created_at' => optional($message->created_at)->toIso8601String(),
                     'created_at_human' => optional($message->created_at)->diffForHumans(),
-                    'segment_index' => (int) ($metadata['segment_index'] ?? 0),
-                    'segment_of' => $metadata['segment_of'] ?? null,
                 ];
             })
             ->all();
@@ -276,89 +275,24 @@ class AssistantChat extends Component
 
     private function handleAssistantActions(AiConversationMessage $assistantMessage, AiConversation $conversation, Authenticatable $user): void
     {
-        $messages = $this->segmentAssistantMessage($assistantMessage, $conversation);
+        $content = $assistantMessage->content ?? '';
 
-        foreach ($messages as $message) {
-            $content = $message->content ?? '';
-
-            if (! is_string($content) || ! Str::contains($content, '[[CREATE_TICKET]]')) {
-                continue;
-            }
-
-            [$visibleContent, $ticketPayload] = explode('[[CREATE_TICKET]]', $content, 2);
-
-            $visibleContent = trim($visibleContent);
-            $ticketSummary = isset($ticketPayload) ? trim($ticketPayload) : '';
-
-            if ($visibleContent === '') {
-                $message->delete();
-            } else {
-                $message->forceFill([
-                    'content' => $visibleContent,
-                ])->save();
-            }
-
-            $this->createSupportTicketFromAssistant($conversation, $user, $ticketSummary);
-
-            break;
-        }
-    }
-
-    /**
-     * @return array<int, AiConversationMessage>
-     */
-    private function segmentAssistantMessage(AiConversationMessage $assistantMessage, AiConversation $conversation): array
-    {
-        if ($assistantMessage->role !== AiConversationMessage::ROLE_ASSISTANT) {
-            return [$assistantMessage];
+        if (! is_string($content) || ! Str::contains($content, '[[CREATE_TICKET]]')) {
+            return;
         }
 
-        $rawContent = (string) ($assistantMessage->content ?? '');
-        $normalized = preg_replace("/\r\n|\r/", "\n", $rawContent);
-        $parts = array_values(array_filter(array_map('trim', preg_split("/\n{2,}/", $normalized)), fn ($part) => $part !== ''));
+        [$visibleContent, $ticketPayload] = explode('[[CREATE_TICKET]]', $content, 2);
 
-        if (count($parts) <= 1) {
-            $metadata = $assistantMessage->metadata ?? [];
-            $metadata['segment_index'] = (int) ($metadata['segment_index'] ?? 0);
+        $visibleContent = trim($visibleContent);
+        $ticketSummary = isset($ticketPayload) ? trim($ticketPayload) : '';
 
+        if ($visibleContent !== $content) {
             $assistantMessage->forceFill([
-                'content' => $parts[0] ?? $rawContent,
-                'metadata' => $metadata,
+                'content' => $visibleContent,
             ])->save();
-
-            return [$assistantMessage];
         }
 
-        $first = array_shift($parts);
-        $metadata = $assistantMessage->metadata ?? [];
-        $metadata['segment_index'] = 0;
-        $metadata['segment_count'] = count($parts) + 1;
-
-        $assistantMessage->forceFill([
-            'content' => $first,
-            'metadata' => $metadata,
-        ])->save();
-
-        $messages = [$assistantMessage];
-
-        foreach ($parts as $index => $segment) {
-            $segmentMetadata = [
-                'segment_of' => $assistantMessage->id,
-                'segment_index' => $index + 1,
-            ];
-
-            $timestamp = now()->addMilliseconds(($index + 1) * 500);
-
-            $messages[] = $conversation->messages()->create([
-                'role' => AiConversationMessage::ROLE_ASSISTANT,
-                'content' => $segment,
-                'metadata' => $segmentMetadata,
-                'created_at' => $timestamp,
-                'updated_at' => $timestamp,
-            ]);
-        }
-
-        return $messages;
+        $this->createSupportTicketFromAssistant($conversation, $user, $ticketSummary);
     }
 
     private function createSupportTicketFromAssistant(AiConversation $conversation, Authenticatable $user, string $summary): void
@@ -438,7 +372,7 @@ class AssistantChat extends Component
         $sessionContext['last_ticket_id'] = $ticket->id;
         $this->service()->syncSessionContext($conversation, $sessionContext);
 
-        $confirmation = __('Un ticket support a Ã©tÃ© crÃ©Ã© pour vous (rÃ©fÃ©rence : #:id). Un membre de l\'Ã©quipe vous rÃ©pondra prochainement.', ['id' => $ticket->id]);
+        $confirmation = __('Un ticket support a été créé pour vous (référence : #:id). Un membre de l\'équipe vous répondra prochainement.', ['id' => $ticket->id]);
 
         $this->service()->appendMessage(
             $conversation,
@@ -452,8 +386,7 @@ class AssistantChat extends Component
             ]
         );
     }
-
-    private function resetConversationState(): void
+private function resetConversationState(): void
     {
         $this->conversationId = null;
         $this->hasTrainer = false;
@@ -517,3 +450,6 @@ class AssistantChat extends Component
         return app(AiConversationService::class);
     }
 }
+
+
+
