@@ -13,6 +13,16 @@ use Illuminate\Support\Collection;
 class TicketTools
 {
     /**
+     * Limite minimum de tickets à retourner.
+     */
+    private const MIN_TICKET_LIMIT = 1;
+
+    /**
+     * Limite maximum de tickets à retourner.
+     */
+    private const MAX_TICKET_LIMIT = 50;
+
+    /**
      * Définition des outils disponibles pour l'IA.
      *
      * @return array<string, array<string, mixed>>
@@ -180,7 +190,7 @@ class TicketTools
     private static function listUserTickets(array $parameters, User $user): array
     {
         $status = $parameters['status'] ?? 'all';
-        $limit = max(1, min((int)($parameters['limit'] ?? 10), 50)); // Validate limit is between 1 and 50
+        $limit = max(self::MIN_TICKET_LIMIT, min((int)($parameters['limit'] ?? 10), self::MAX_TICKET_LIMIT));
 
         $query = SupportTicket::query()
             ->where('user_id', $user->id)

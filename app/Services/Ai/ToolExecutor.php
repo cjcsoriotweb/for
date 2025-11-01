@@ -40,7 +40,7 @@ class ToolExecutor
                         $parameters = $decoded;
                     } else {
                         // Log l'erreur de parsing JSON
-                        \Log::warning('Tool parameter JSON parsing failed', [
+                        \Illuminate\Support\Facades\Log::warning('Tool parameter JSON parsing failed', [
                             'tool' => $toolName,
                             'json' => $parametersJson,
                             'error' => json_last_error_msg(),
