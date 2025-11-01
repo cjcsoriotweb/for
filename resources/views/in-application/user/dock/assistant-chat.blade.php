@@ -7,11 +7,13 @@
     <title>Assistant IA - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css'])
     @livewireStyles
+    <x-meta-header/>
 </head>
 <body class="h-full bg-slate-100">
+
     <div class="flex h-full w-full overflow-hidden bg-slate-100 px-3 py-4">
         <div class="flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <livewire:ai.assistant-chat />
+            @livewire('ai.assistant-chat')
         </div>
     </div>
 

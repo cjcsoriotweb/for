@@ -34,7 +34,6 @@
 
     
             <livewire:ai.trainer-tester />
-            <livewire:ai.chat-widget :show-launcher="false" />
 
         </aside>
     </div>

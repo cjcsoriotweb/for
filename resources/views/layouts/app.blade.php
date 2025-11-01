@@ -41,12 +41,6 @@
   <x-ui.layout.assistant-dock :notifications="9" :enable="true" :locked="false" />
 
   <!-- Bottom widget from layouts/app.blade -->
-  @auth
-  <livewire:support.chat-widget :show-launcher="false" />
-  <livewire:ai.chat-widget :show-launcher="false" />
-  <livewire:tools.page-search />
-  @endauth
-
   @stack('modals') @livewireScripts @stack('scripts')
 </body>
 

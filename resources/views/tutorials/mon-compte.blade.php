@@ -5,22 +5,6 @@
 @section('header-title', __('Votre compte'))
 @section('header-subtitle', __("Découvrez comment fonctionne votre espace personnel"))
 
-@push('tutorial-styles')
-<style>
-    .tutorial-chat-preview {
-        position: relative;
-    }
-
-    .tutorial-chat-preview #chat {
-        position: absolute !important;
-        bottom: 1.5rem !important;
-        right: 1.5rem !important;
-        top: auto !important;
-        left: auto !important;
-    }
-</style>
-@endpush
-
 @section('content')
 <div class="section flex min-h-screen flex-col items-center justify-center bg-slate-900 px-6">
     <div class="pointer-events-none absolute inset-0">
@@ -101,20 +85,14 @@
         <p class="mt-4 text-base text-slate-300">
             {{ __("Tu peux contacter le support directement depuis Mon compte. Le bouton est accessible en bas a droite.") }}
         </p>
-        <div class="tutorial-chat-preview mx-auto mt-10 h-[28rem] w-full max-w-2xl rounded-3xl border border-slate-700/40 bg-slate-900/60 p-6 shadow-xl shadow-slate-900/40">
-            <div class="pointer-events-none absolute inset-0 rounded-3xl border border-slate-700/30"></div>
-            <div class="relative flex h-full flex-col justify-between">
-                <div class="space-y-4 text-left">
-                    <div class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-300">
-                        <span class="h-2 w-2 rounded-full bg-emerald-300"></span>
-                        {{ __('Support disponible') }}
-                    </div>
-                    <p class="text-sm text-slate-300">
-                        {{ __("Clique sur le bouton rond pour ouvrir la conversation avec l'equipe. Une fois ouvert, tu peux envoyer un message ou consulter l'historique de tes tickets.") }}
-                    </p>
-                </div>
-                <livewire:support.chat-widget />
+        <div class="mx-auto mt-10 w-full max-w-2xl rounded-3xl border border-slate-700/40 bg-slate-900/60 p-6 text-left shadow-xl shadow-slate-900/40">
+            <div class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-300">
+                <span class="h-2 w-2 rounded-full bg-emerald-300"></span>
+                {{ __('Support disponible') }}
             </div>
+            <p class="mt-4 text-sm text-slate-300">
+                {{ __("Depuis le dock, ouvre l'onglet Support pour discuter avec l'equipe ou consulter tes tickets. Tout reste accessible en bas de l'ecran.") }}
+            </p>
         </div>
     </div>
 </div>
