@@ -141,7 +141,7 @@ class ToolExecutor
                 default => '⚪',
             };
             
-            $ticketUrl = url("/mon-compte/support#ticket-{$ticket['id']}");
+            $ticketUrl = url("/mon-compte/support?ticket={$ticket['id']}");
             
             $ticketInfo = sprintf(
                 "%s **%s** - %s\n   📊 %s",
@@ -195,7 +195,7 @@ class ToolExecutor
         $messages = $ticket['messages'] ?? [];
         $messageCount = count($messages);
         
-        $ticketUrl = url("/mon-compte/support#ticket-{$ticket['id']}");
+        $ticketUrl = url("/mon-compte/support?ticket={$ticket['id']}");
         
         $lines = [
             sprintf("📋 **Ticket %s**", $ticket['number'] ?? 'N/A'),
