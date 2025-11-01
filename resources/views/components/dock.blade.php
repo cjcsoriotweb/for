@@ -1,105 +1,147 @@
-<!-- Conteneur principal du dock -->
-<div class="dock-container fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+<div class="dock-container fixed bottom-6 left-1/2 -translate-x-1/2 transform z-[1200]" data-dock-root>
   {{ $slot }}
 
-  <!-- Menu iframe qui s'ouvre au dessus du dock -->
-  <div id="dock-menu"
-       class="absolute bottom-20 left-1/2 transform -translate-x-1/2 hidden z-[1500]">
-    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-600 overflow-hidden"
-         style="width: min(90vw, 820px); height: min(85vh, 720px); max-height: calc(100vh - 140px);">
-      <button onclick="closeDockMenu()"
-              class="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
+  <div class="hidden" data-dock-modal>
+    <div class="fixed inset-0 z-[1190] bg-slate-950/60 backdrop-blur-sm" data-dock-overlay></div>
 
-      <!-- Contenu iframe -->
-      <iframe id="dock-iframe"
-              class="h-full w-full border-0"
-              src="">
-      </iframe>
+    <div class="fixed inset-0 z-[1191] flex flex-col pointer-events-none md:items-center md:justify-center">
+      <div class="pointer-events-auto mt-auto w-full px-3 pb-4 md:mt-0 md:w-auto md:px-0 md:pb-0">
+        <div
+          class="relative w-full rounded-3xl border border-slate-200/70 bg-white/95 text-slate-900 shadow-2xl dark:border-slate-700/60 dark:bg-slate-900/95 dark:text-slate-100 md:w-[820px] max-h-[90vh] md:max-h-[85vh] min-h-[60vh] flex flex-col"
+          data-dock-panel
+        >
+          <button
+            type="button"
+            data-dock-close
+            class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-slate-500 transition hover:bg-white hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-700"
+            aria-label="{{ __('Fermer le dock') }}"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M6 18 18 6"></path>
+            </svg>
+          </button>
+
+          <div class="flex-1 overflow-hidden">
+            <div data-dock-content class="h-full overflow-y-auto">
+              <!-- Slot content injected via script -->
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Fleche pointant vers le dock -->
-    <div class="absolute top-full left-1/2 transform -translate-x-1/2">
-      <div class="w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white dark:border-t-gray-800"></div>
-      <div class="w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-gray-200 dark:border-t-gray-600 absolute top-0 left-1/2 transform -translate-x-1/2 translate-y-px"></div>
-    </div>
-  </div>
-
-  <!-- Overlay pour fermer en cliquant dehors -->
-  <div id="dock-overlay"
-       class="fixed inset-0 bg-transparent hidden z-[1499]"
-       onclick="closeDockMenu()">
   </div>
 </div>
 
 <script>
-  function openDockMenu(url) {
-    const iframe = document.getElementById('dock-iframe');
-    if (!iframe || !url) {
+(function () {
+  function initializeDock(root) {
+    if (!root || root.dataset.dockReady === '1') {
+      return;
+    }
+    root.dataset.dockReady = '1';
+
+    const modal = root.querySelector('[data-dock-modal]');
+    const overlay = modal?.querySelector('[data-dock-overlay]');
+    const closeButtons = modal ? Array.from(modal.querySelectorAll('[data-dock-close]')) : [];
+    const modalContent = modal?.querySelector('[data-dock-content]');
+    const slotNodes = Array.from(root.querySelectorAll('.dock-slot-content'));
+    const slots = {};
+
+    if (!modal || !modalContent) {
       return;
     }
 
-    iframe.src = url;
-    document.getElementById('dock-menu').classList.remove('hidden');
-    document.getElementById('dock-overlay').classList.remove('hidden');
-    document.body.style.overflow = 'hidden'; // Empecher le scroll de la page
-  }
+    slotNodes.forEach((node) => {
+      const name = node.dataset.slotName;
+      if (!name) {
+        return;
+      }
+      slots[name] = node;
+      node.classList.add('hidden');
+      modalContent.appendChild(node);
+    });
 
-  function closeDockMenu() {
-    const iframe = document.getElementById('dock-iframe');
-    if (iframe) {
-      iframe.src = ''; // Reset iframe
+    const slotsWrapper = root.querySelector('.dock-slots');
+    if (slotsWrapper) {
+      slotsWrapper.remove();
     }
 
-    document.getElementById('dock-menu').classList.add('hidden');
-    document.getElementById('dock-overlay').classList.add('hidden');
-    document.body.style.overflow = ''; // Restaurer le scroll de la page
-  }
+    const lockScroll = () => {
+      document.documentElement.classList.add('overflow-hidden');
+      document.body.classList.add('overflow-hidden');
+    };
 
-  // Fermer avec la touche Echap
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape' && !document.getElementById('dock-menu').classList.contains('hidden')) {
-      closeDockMenu();
+    const unlockScroll = () => {
+      document.documentElement.classList.remove('overflow-hidden');
+      document.body.classList.remove('overflow-hidden');
+    };
+
+    const closeModal = () => {
+      if (modal.classList.contains('hidden')) {
+        return;
+      }
+      modal.classList.add('hidden');
+      unlockScroll();
+      window.dispatchEvent(new CustomEvent('dock:slot-closed'));
+    };
+
+    const openSlot = (slotName, trigger) => {
+      const target = slots[slotName];
+      if (!target) {
+        return;
+      }
+
+      Object.values(slots).forEach((node) => node.classList.add('hidden'));
+      target.classList.remove('hidden');
+
+      modal.classList.remove('hidden');
+      modalContent.scrollTop = 0;
+      lockScroll();
+      window.dispatchEvent(new CustomEvent('dock:slot-opened', {
+        detail: { slot: slotName, trigger: trigger || null },
+      }));
+    };
+
+    if (overlay) {
+      overlay.addEventListener('click', closeModal);
     }
-  });
 
-  // Initialiser les gestionnaires d'evenements pour les boutons du dock
-  document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener('click', function(event) {
-      const button = event.target.closest('[data-dock-action]');
-      if (button) {
-        const action = button.getAttribute('data-dock-action');
-        if (action === 'show-slot') {
-          const slotName = button.getAttribute('data-dock-slot');
+    closeButtons.forEach((button) => {
+      button.addEventListener('click', closeModal);
+    });
 
-          // Determiner l'URL selon le slot
-          let url = '';
-          switch (slotName) {
-            case 'chatia':
-              const originUrl = window.location.href;
-              const originLabel = document.title || 'Page courante';
-              url = '/mon-compte/assistant-chat?origin=' + encodeURIComponent(originUrl) + '&origin_label=' + encodeURIComponent(originLabel);
-              break;
-            case 'tutor':
-              url = '/mon-compte/professeur';
-              break;
-            case 'support':
-              const currentLocation = window.location.href;
-              url = '/mon-compte/support?origin=' + encodeURIComponent(currentLocation) + '&origin_label=Dock%20Signaler%20un%20bug';
-              break;
-            case 'search':
-              url = '/mon-compte/recherche';
-              break;
-          }
-
-          if (url) {
-            openDockMenu(url);
-          }
-        }
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
       }
     });
-  });
+
+    root.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-dock-action="show-slot"]');
+      if (!button) {
+        return;
+      }
+
+      const slotName = button.getAttribute('data-dock-slot');
+      if (!slotName) {
+        return;
+      }
+
+      event.preventDefault();
+      openSlot(slotName, button);
+    });
+  }
+
+  function bootstrapDock() {
+    document
+      .querySelectorAll('[data-dock-root]')
+      .forEach((root) => initializeDock(root));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrapDock);
+  } else {
+    bootstrapDock();
+  }
+})();
 </script>
