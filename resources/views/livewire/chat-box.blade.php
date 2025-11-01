@@ -281,6 +281,10 @@ function chatBox() {
                                 } else if (data.type === 'chunk') {
                                     this.currentResponse += data.content;
                                     this.scrollToBottom();
+                                } else if (data.type === 'tool_result') {
+                                    // Les outils ont été exécutés, remplacer le contenu actuel
+                                    this.currentResponse = data.content;
+                                    this.scrollToBottom();
                                 } else if (data.type === 'done') {
                                     // Extraire les boutons du message
                                     const { content, buttons } = this.extractButtons(this.currentResponse);
@@ -337,9 +341,15 @@ function chatBox() {
         formatMessage(content) {
             // Simple conversion Markdown -> HTML
             let html = content
+                // Links [text](url)
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800">$1</a>')
+                // Bold **text**
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                // Italic *text*
                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                // Inline code `text`
                 .replace(/`(.+?)`/g, '<code class="bg-gray-200 px-1 rounded">$1</code>')
+                // Line breaks
                 .replace(/\n/g, '<br>');
             
             return html;

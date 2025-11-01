@@ -128,6 +128,21 @@ class AiController extends Controller
                 $toolResult = $this->toolExecutor->parseAndExecuteTools($fullResponse, $user);
                 $processedResponse = $toolResult['content'];
                 
+                // Si des outils ont été utilisés, envoyer le contenu traité
+                if (!empty($toolResult['tool_results'])) {
+                    // Envoyer le contenu mis à jour (avec résultats des outils)
+                    $updateData = json_encode([
+                        'type' => 'tool_result',
+                        'content' => $processedResponse,
+                    ]);
+                    echo "data: {$updateData}\n\n";
+                    
+                    if (ob_get_level() > 0) {
+                        ob_flush();
+                    }
+                    flush();
+                }
+                
                 // Sauvegarder la réponse complète (avec résultats d'outils)
                 $conversation->messages()->create([
                     'role' => AiConversationMessage::ROLE_ASSISTANT,
