@@ -56,29 +56,87 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## AI Trainers
+## AI Assistant Architecture
 
-This project integrates an AI conversation bubble for learners and a superadmin testing tool. Configure the following environment variables before use:
+Ce projet intègre un système d'assistant IA simplifié utilisant Ollama avec streaming en temps réel.
 
-- `OLLAMA_BASE_URL` : base URL of your Ollama server (defaults to `http://localhost:11434/v1`).
-- `OLLAMA_CHAT_ENDPOINT` : optional chat endpoint, defaults to `/chat/completions`.
-- `OLLAMA_DEFAULT_MODEL` : optional, defaults to `llama3`.
-- `AI_DEFAULT_TRAINER_SLUG` : slug of the default AI trainer profile.
+### 🏗️ Architecture
 
-Run the new migrations and seeder to publish the default trainer profile:
+L'architecture IA a été refactorisée pour être simple et maintenable :
+
+- **Un seul client HTTP** : `App\Services\Ai\OllamaClient` pour communiquer avec Ollama
+- **Un seul endpoint API** : `POST /api/ai/stream` pour le streaming NDJSON
+- **Un seul composant Livewire** : `ChatBox` pour toutes les interfaces de chat
+- **Configuration statique** : Les trainers sont définis dans `config/ai.php` (pas de DB)
+
+### 🎓 Trainers disponibles
+
+Les trainers sont configurés dans `config/ai.php` :
+
+- **default** : Assistant Evolubat généraliste (français, professionnel)
+- **michel** : Professeur de maçonnerie (expert bâtiment, sécurité stricte)
+- **andreas** : Professeur de musique (pédagogique, motivant)
+
+### ⚙️ Configuration
+
+Variables d'environnement dans `.env` :
+
+```bash
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_DEFAULT_MODEL=llama3
+OLLAMA_TIMEOUT=60
+OLLAMA_TEMPERATURE=0.7
+AI_DEFAULT_TRAINER_SLUG=default
+```
+
+### 🚀 Utilisation
+
+#### Dans une vue Blade :
+
+```blade
+<livewire:chat-box 
+    trainer="michel" 
+    title="Assistance Maçonnerie" 
+/>
+```
+
+#### Via l'API (pour du JavaScript custom) :
+
+```javascript
+const response = await fetch('/api/ai/stream', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+    },
+    body: JSON.stringify({
+        message: 'Comment faire un enduit ?',
+        trainer: 'michel',
+        conversation_id: 123, // optionnel
+    }),
+});
+
+// Lire le stream NDJSON
+const reader = response.body.getReader();
+// ... (voir resources/views/livewire/chat-box.blade.php pour exemple complet)
+```
+
+### 🛡️ Garde-fous
+
+- Messages limités à 2000 caractères
+- Validation stricte des inputs
+- Refus explicite des contenus inappropriés
+- Logs en développement uniquement
+- Timeout configurable (60s par défaut)
+
+### 📦 Migrations
+
+Pour mettre à jour la base de données (suppression des anciennes tables trainers) :
 
 ```bash
 php artisan migrate
-php artisan db:seed --class=AiTrainerSeeder
 ```
 
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-
-
-
-
-## A ajouter :
-php artisan db:seed --class=AiTrainerSeeder

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Clean\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\SupportTicket;
 use App\Models\Team;
@@ -28,7 +27,7 @@ class AdminPageController extends Controller
             'formations' => Formation::count(),
             'invitations' => TeamInvitation::count(),
             'tickets' => SupportTicket::count(),
-            'ai_trainers' => AiTrainer::count(),
+            // ai_trainers removed - trainers are now in config/ai.php
         ];
 
         return view('out-application.superadmin.superadmin-overview-page', compact('stats'));
@@ -117,10 +116,7 @@ class AdminPageController extends Controller
         return view('out-application.superadmin.superadmin-support-page');
     }
 
-    public function aiIndex()
-    {
-        return view('out-application.superadmin.superadmin-ia-page');
-    }
+    // aiIndex method removed - AI trainers are now managed in config/ai.php
 
     public function home(Team $team, FormationService $formations)
     {

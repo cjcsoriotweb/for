@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Database\Factories\FormationFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
@@ -98,12 +97,7 @@ class Formation extends Model
         return $this->hasMany(FormationCompletionDocument::class);
     }
 
-    public function aiTrainers(): BelongsToMany
-    {
-        return $this->belongsToMany(AiTrainer::class, 'ai_trainer_formation')
-            ->withPivot(['is_primary'])
-            ->withTimestamps();
-    }
+    // aiTrainers relation removed - trainers are now managed in config/ai.php
 
     /**
      * Alias for completionDocuments to support scoped route bindings (documents/{document}).
