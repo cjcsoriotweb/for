@@ -321,13 +321,222 @@ function chatBox() {
             }
         },
 
+        ensureUserInList(user) {
+            if (!user || !user.id) {
+                return;
+            }
+
+            if (!(this.users || []).some(existing => existing.id === user.id)) {
+                this.users.push(user);
+                this.users.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            }
+        },
+
+        setSelectedUser(userId) {
+            if (userId === null || userId === undefined || userId === '') {
+                this.selectedUserId = null;
+                this.selectedUser = null;
+                this.impersonateUserId = null;
+                return;
+            }
+
+            const parsedId = Number(userId);
+            if (Number.isNaN(parsedId)) {
+                this.selectedUserId = null;
+                this.selectedUser = null;
+                this.impersonateUserId = null;
+                return;
+            }
+
+            this.selectedUserId = parsedId;
+            this.impersonateUserId = parsedId;
+            this.selectedUser = (this.users || []).find(user => user.id === parsedId) || null;
+        },
+
+        async refreshUsers() {
+            if (!this.isSuperAdmin) {
+                return;
+            }
+
+            this.isLoadingUsers = true;
+
+            try {
+                const params = new URLSearchParams();
+                if (this.userSearch) {
+                    params.set('search', this.userSearch);
+                }
+
+                const response = await fetch(`/mon-compte/ai/users?${params.toString()}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    this.users = Array.isArray(data.users) ? data.users : [];
+                    if (this.currentUser) {
+                        this.ensureUserInList(this.currentUser);
+                    }
+
+                    if (this.selectedUserId) {
+                        this.setSelectedUser(this.selectedUserId);
+                    } else if (this.users.length > 0) {
+                        this.setSelectedUser(this.users[0].id);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load users', error);
+            } finally {
+                this.isLoadingUsers = false;
+            }
+        },
+
+        async fetchConversations() {
+            if (this.isSuperAdmin && !this.selectedUserId) {
+                this.conversations = [];
+                return;
+            }
+
+            this.isLoadingConversations = true;
+
+            try {
+                const params = new URLSearchParams();
+                if (this.isSuperAdmin && this.selectedUserId) {
+                    params.set('user_id', this.selectedUserId);
+                }
+
+                const response = await fetch(`/mon-compte/ai/conversations?${params.toString()}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    this.conversations = Array.isArray(data.conversations) ? data.conversations : [];
+
+                    if (!this.conversationId && this.conversations.length > 0) {
+                        const firstConversation = this.conversations[0];
+                        this.selectedConversationId = firstConversation.id;
+                        await this.loadConversation(firstConversation.id);
+                    } else if (this.conversationId) {
+                        this.selectedConversationId = this.conversationId;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load conversations', error);
+            } finally {
+                this.isLoadingConversations = false;
+            }
+        },
+
+        formatConversationLabel(conversation) {
+            if (!conversation) {
+                return '';
+            }
+
+            const owner = conversation.user;
+            const ownerLabel = owner ? `${owner.name || 'Utilisateur'}${owner.superadmin ? ' (Superadmin)' : ''}` : 'Utilisateur';
+            const trainer = conversation.trainer ? conversation.trainer.toUpperCase() : 'DEFAULT';
+            return `#${conversation.id} - ${ownerLabel} - ${trainer}`;
+        },
+
+        async loadConversation(conversationId) {
+            if (!conversationId) {
+                this.messages = [];
+                this.conversationId = null;
+                this.selectedConversationId = null;
+                return;
+            }
+
+            this.error = null;
+
+            try {
+                const response = await fetch(`/mon-compte/ai/conversations/${conversationId}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    this.error = data.message || 'Impossible de charger la conversation';
+                    return;
+                }
+
+                const conversation = data.conversation || {};
+                this.conversationId = conversation.id;
+                this.selectedConversationId = conversation.id;
+                this.trainer = conversation.trainer || this.trainer;
+                this.selectedTrainer = this.trainer;
+
+                if (this.isSuperAdmin && conversation.user) {
+                    this.ensureUserInList(conversation.user);
+                    this.setSelectedUser(conversation.user.id);
+                }
+
+                this.messages = Array.isArray(data.messages)
+                    ? data.messages.map(message => ({
+                        role: message.role,
+                        content: message.content,
+                        created_at: message.created_at,
+                        user: message.user || null,
+                        buttons: message.buttons || [],
+                    }))
+                    : [];
+
+                this.scrollToBottom();
+            } catch (error) {
+                console.error('Failed to load conversation', error);
+                this.error = 'Impossible de charger la conversation sélectionnée';
+            }
+        },
+
+        async selectConversation(conversationId) {
+            if (!conversationId) {
+                return;
+            }
+
+            await this.loadConversation(conversationId);
+            if (!this.isOpen) {
+                this.isOpen = true;
+            }
+        },
+
+        async onUserSelect(event) {
+            const value = event?.target?.value ?? null;
+            this.setSelectedUser(value);
+            this.conversationId = null;
+            this.selectedConversationId = null;
+            this.messages = [];
+            await this.fetchConversations();
+        },
+
+        async onConversationSelect(event) {
+            const value = Number(event?.target?.value ?? 0);
+            if (!value || Number.isNaN(value)) {
+                return;
+            }
+
+            await this.selectConversation(value);
+        },
+
+        async startNewConversation() {
+            this.conversationId = null;
+            this.selectedConversationId = null;
+            this.messages = [];
+            await this.createConversation();
+        },
+
         async createConversation() {
             if (this.isLoadingConversation) {
                 return;
             }
 
+            if (this.isSuperAdmin && !this.selectedUserId) {
+                this.error = 'Veuillez sélectionner un utilisateur pour créer une conversation.';
+                return;
+            }
+
             this.isLoadingConversation = true;
             this.error = null;
+
+            const payload = {
+                trainer: this.trainer,
+            };
+
+            if (this.isSuperAdmin && this.selectedUserId) {
+                payload.user_id = this.selectedUserId;
+            }
 
             try {
                 const response = await fetch('/mon-compte/ai/conversations', {
@@ -336,15 +545,22 @@ function chatBox() {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
                     },
-                    body: JSON.stringify({
-                        trainer: this.trainer,
-                    }),
+                    body: JSON.stringify(payload),
                 });
 
                 const data = await response.json();
 
                 if (data.success && data.conversation) {
                     this.conversationId = data.conversation.id;
+                    this.selectedConversationId = data.conversation.id;
+
+                    if (this.isSuperAdmin && data.conversation.user) {
+                        this.ensureUserInList(data.conversation.user);
+                        this.setSelectedUser(data.conversation.user.id);
+                    }
+
+                    await this.loadConversation(data.conversation.id);
+                    await this.fetchConversations();
                 } else {
                     this.error = data.message || 'Impossible de creer la conversation';
                 }
@@ -400,9 +616,14 @@ function chatBox() {
             this.message = '';
             this.error = null;
 
+            const actorUser = this.isSuperAdmin
+                ? (this.selectedUser || this.currentUser)
+                : this.currentUser;
+
             this.messages.push({
                 role: 'user',
                 content: userMessage,
+                user: actorUser,
             });
 
             this.scrollToBottom();
@@ -410,6 +631,16 @@ function chatBox() {
             this.isStreaming = true;
             this.currentResponse = '';
             this.currentToolResults = [];
+
+            const payload = {
+                message: userMessage,
+                trainer: this.trainer,
+                conversation_id: this.conversationId,
+            };
+
+            if (this.isSuperAdmin && this.impersonateUserId) {
+                payload.acting_user_id = this.impersonateUserId;
+            }
 
             try {
                 const response = await fetch('/mon-compte/ai/stream', {
@@ -419,11 +650,7 @@ function chatBox() {
                         'Accept': 'text/event-stream',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
                     },
-                    body: JSON.stringify({
-                        message: userMessage,
-                        trainer: this.trainer,
-                        conversation_id: this.conversationId,
-                    }),
+                    body: JSON.stringify(payload),
                 });
 
                 if (!response.ok) {
@@ -445,7 +672,8 @@ function chatBox() {
                     }
 
                     const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n');
+                    const lines = chunk.split('
+');
 
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
@@ -473,6 +701,10 @@ function chatBox() {
                                         content: content,
                                         buttons: finalButtons,
                                         ticketUrl: ticketUrl,
+                                        user: {
+                                            name: this.trainerMeta?.name || 'Assistant',
+                                            superadmin: false,
+                                        },
                                     });
                                     this.currentResponse = '';
                                     this.currentToolResults = [];
@@ -485,6 +717,8 @@ function chatBox() {
                         }
                     }
                 }
+
+                this.fetchConversations();
             } catch (e) {
                 this.error = 'Une erreur est survenue : ' + e.message;
             } finally {
