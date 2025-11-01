@@ -76,10 +76,16 @@ class ChatBox extends Component
 
             try {
                 $html = trim(view($view, $data)->render());
+                // Ensure the HTML is properly UTF-8 encoded
+                $html = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
+                // Remove any remaining invalid UTF-8 sequences
+                $html = iconv('UTF-8', 'UTF-8//IGNORE', $html);
                 $sanitized = preg_replace("/\r?\n/", '', $html);
                 $templates[strtoupper((string) $name)] = is_string($sanitized) ? $sanitized : $html;
             } catch (Throwable $exception) {
                 report($exception);
+                // Fallback: skip this shortcode if it causes issues
+                continue;
             }
         }
 

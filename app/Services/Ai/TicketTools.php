@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 
 /**
- * Service pour les outils IA li+�s aux tickets de support.
+ * Service pour les outils IA liés aux tickets de support.
  */
 class TicketTools
 {
@@ -111,9 +111,147 @@ class TicketTools
     }
 
     /**
-     * Cr+�e un nouveau ticket de support.
+     * Liste les tickets de l'utilisateur.
      *
      * @param  array<string, mixed>  $parameters
      * @param  User  $user
      * @return array<string, mixed>
      */
+    private static function listUserTickets(array $parameters, User $user): array
+    {
+        $status = $parameters['status'] ?? 'all';
+        $limit = max(
+            self::MIN_TICKET_LIMIT,
+            min(self::MAX_TICKET_LIMIT, $parameters['limit'] ?? self::DEFAULT_TICKET_LIMIT)
+        );
+
+        $query = SupportTicket::query()
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit($limit);
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $tickets = $query->get()->map(function (SupportTicket $ticket) {
+            return [
+                'id' => $ticket->id,
+                'title' => $ticket->title,
+                'status' => $ticket->status,
+                'created_at' => $ticket->created_at->format('Y-m-d H:i:s'),
+            ];
+        });
+
+        return [
+            'success' => true,
+            'tickets' => $tickets->toArray(),
+            'count' => $tickets->count(),
+        ];
+    }
+
+    /**
+     * Récupère les détails d'un ticket.
+     *
+     * @param  array<string, mixed>  $parameters
+     * @param  User  $user
+     * @return array<string, mixed>
+     */
+    private static function getTicketDetails(array $parameters, User $user): array
+    {
+        $ticketId = $parameters['ticket_id'] ?? null;
+
+        if (!$ticketId) {
+            return [
+                'success' => false,
+                'error' => 'ID du ticket requis',
+            ];
+        }
+
+        $ticket = SupportTicket::query()
+            ->where('id', $ticketId)
+            ->where('user_id', $user->id)
+            ->with(['messages' => function ($query) {
+                $query->orderBy('created_at', 'asc');
+            }])
+            ->first();
+
+        if (!$ticket) {
+            return [
+                'success' => false,
+                'error' => 'Ticket non trouvé',
+            ];
+        }
+
+        $messages = $ticket->messages->map(function (SupportTicketMessage $message) {
+            return [
+                'id' => $message->id,
+                'message' => $message->message,
+                'is_support' => $message->is_support,
+                'created_at' => $message->created_at->format('Y-m-d H:i:s'),
+            ];
+        });
+
+        return [
+            'success' => true,
+            'ticket' => [
+                'id' => $ticket->id,
+                'title' => $ticket->title,
+                'status' => $ticket->status,
+                'created_at' => $ticket->created_at->format('Y-m-d H:i:s'),
+                'messages' => $messages->toArray(),
+            ],
+        ];
+    }
+
+    /**
+     * Ajoute un message à un ticket.
+     *
+     * @param  array<string, mixed>  $parameters
+     * @param  User  $user
+     * @return array<string, mixed>
+     */
+    private static function addTicketMessage(array $parameters, User $user): array
+    {
+        $ticketId = $parameters['ticket_id'] ?? null;
+        $message = trim($parameters['message'] ?? '');
+
+        if (!$ticketId) {
+            return [
+                'success' => false,
+                'error' => 'ID du ticket requis',
+            ];
+        }
+
+        if (empty($message)) {
+            return [
+                'success' => false,
+                'error' => 'Message requis',
+            ];
+        }
+
+        $ticket = SupportTicket::query()
+            ->where('id', $ticketId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$ticket) {
+            return [
+                'success' => false,
+                'error' => 'Ticket non trouvé',
+            ];
+        }
+
+        SupportTicketMessage::create([
+            'support_ticket_id' => $ticket->id,
+            'user_id' => $user->id,
+            'message' => $message,
+            'is_support' => false,
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'Message ajouté au ticket',
+        ];
+    }
+}
