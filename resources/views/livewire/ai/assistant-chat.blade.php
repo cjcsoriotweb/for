@@ -3,6 +3,25 @@
 @if ($hasTrainer)
     <section class="flex flex-1 flex-col min-h-0" wire:poll.4s="pollMessages">
         <div class="flex flex-1 flex-col min-h-0 px-4 pt-6 pb-4 sm:px-6 sm:pt-8 sm:pb-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-100">{{ $trainer['name'] }}</p>
+                    @if (! empty($trainer['description']))
+                        <p class="mt-1 text-xs text-slate-400">{{ $trainer['description'] }}</p>
+                    @endif
+                </div>
+                <button
+                    type="button"
+                    wire:click="startNewConversation"
+                    wire:loading.attr="disabled"
+                    wire:target="startNewConversation,sendMessage"
+                    class="inline-flex items-center gap-2 rounded-3xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-100 transition hover:border-emerald-400/80 hover:bg-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:cursor-not-allowed disabled:opacity-60">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    <span>{{ __('Nouvelle conversation') }}</span>
+                </button>
+            </div>
             <div id="assistantChatMessages" class="flex flex-1 flex-col space-y-4 overflow-y-auto pb-4 pr-2">
                 @if ($awaitingResponse)
                     <div class="flex items-center gap-2 self-start rounded-3xl bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200 shadow-lg shadow-emerald-900/50 backdrop-blur">

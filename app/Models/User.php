@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
@@ -110,5 +112,76 @@ class User extends Authenticatable
     public function aiConversations()
     {
         return $this->hasMany(AiConversation::class, 'user_id');
+    }
+
+    /**
+     * Provide a textual context summary for AI prompts.
+     */
+    public function getIaContext(): string
+    {
+        $relations = ['currentTeam', 'teams', 'ownedTeams', 'formations'];
+        if (method_exists($this, 'roles')) {
+            $relations[] = 'roles';
+        }
+
+        $this->loadMissing($relations);
+
+        $segments = [];
+
+        $segments[] = sprintf(
+            "Utilisateur connecte : %s (%s).",
+            $this->name ?? 'Inconnu',
+            $this->email ?? 'Email inconnu'
+        );
+
+        if ($this->currentTeam) {
+            $segments[] = sprintf(
+                'Equipe active : %s.',
+                $this->currentTeam->name
+            );
+        }
+
+        $allTeams = $this->allTeams()
+            ->pluck('name')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($allTeams->isNotEmpty()) {
+            $segments[] = 'Equipes accessibles :';
+            foreach ($allTeams as $teamName) {
+                $segments[] = sprintf('- %s', $teamName);
+            }
+        }
+
+        $formations = $this->formations()
+            ->select('formations.id', 'formations.title')
+            ->withPivot(['status', 'enrolled_at', 'completed_at'])
+            ->orderBy('formations.title')
+            ->get();
+
+        if ($formations->isNotEmpty()) {
+            $segments[] = 'Formations associees :';
+            foreach ($formations as $formation) {
+                $status = $formation->pivot?->status ?: 'inconnu';
+                $segments[] = sprintf(
+                    '- %s (ID : %d, statut : %s)',
+                    $formation->title,
+                    $formation->id,
+                    Str::ucfirst($status)
+                );
+            }
+        }
+
+        $roles = method_exists($this, 'roles') ? $this->roles->pluck('name')->filter()->unique()->values() : collect();
+
+        if ($roles instanceof Collection && $roles->isNotEmpty()) {
+            $segments[] = 'Roles applicatifs :';
+            foreach ($roles as $role) {
+                $segments[] = sprintf('- %s', Str::ucfirst($role));
+            }
+        }
+
+        return trim(collect($segments)->filter()->implode("\n"));
     }
 }

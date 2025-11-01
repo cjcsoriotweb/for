@@ -54,18 +54,24 @@ class AiConversationService
 
     public function getOrCreateConversation(AiTrainer $trainer, User $user, ?Formation $formation = null, ?Team $team = null): AiConversation
     {
-        return AiConversation::query()->firstOrCreate(
-            [
-                'ai_trainer_id' => $trainer->id,
-                'user_id' => $user->id,
-                'formation_id' => $formation?->id,
-            ],
-            [
-                'team_id' => $team?->id,
-                'status' => AiConversation::STATUS_ACTIVE,
-                'last_message_at' => now(),
-            ]
-        );
+        return DB::transaction(function () use ($trainer, $user, $formation, $team) {
+            $conversation = AiConversation::query()->firstOrCreate(
+                [
+                    'ai_trainer_id' => $trainer->id,
+                    'user_id' => $user->id,
+                    'formation_id' => $formation?->id,
+                ],
+                [
+                    'team_id' => $team?->id,
+                    'status' => AiConversation::STATUS_ACTIVE,
+                    'last_message_at' => now(),
+                ]
+            );
+
+            $this->syncUserContext($conversation, $user);
+
+            return $conversation->fresh();
+        });
     }
 
     public function appendMessage(
@@ -91,6 +97,75 @@ class AiConversationService
 
             return $message;
         });
+    }
+
+    public function startNewConversation(AiTrainer $trainer, User $user, ?Formation $formation = null, ?Team $team = null): AiConversation
+    {
+        return DB::transaction(function () use ($trainer, $user, $formation, $team) {
+            $query = AiConversation::query()
+                ->where('ai_trainer_id', $trainer->id)
+                ->where('user_id', $user->id);
+
+            $query = $formation
+                ? $query->where('formation_id', $formation->id)
+                : $query->whereNull('formation_id');
+
+            $query = $team
+                ? $query->where('team_id', $team->id)
+                : $query->whereNull('team_id');
+
+            /** @var Collection<int, AiConversation> $existing */
+            $existing = $query->get();
+
+            foreach ($existing as $conversation) {
+                if ($conversation->status === AiConversation::STATUS_ACTIVE) {
+                    $conversation->archive();
+                }
+            }
+
+            $conversation = AiConversation::query()->create([
+                'ai_trainer_id' => $trainer->id,
+                'user_id' => $user->id,
+                'formation_id' => $formation?->id,
+                'team_id' => $team?->id,
+                'status' => AiConversation::STATUS_ACTIVE,
+                'metadata' => $existing->first()?->metadata ?? [],
+                'last_message_at' => now(),
+            ]);
+
+            $this->syncUserContext($conversation, $user);
+
+            return $conversation->fresh();
+        });
+    }
+
+    public function syncUserContext(AiConversation $conversation, User $user): void
+    {
+        $context = trim((string) $user->getIaContext());
+        $metadata = $conversation->metadata ?? [];
+        $hash = $context === '' ? null : sha1($context);
+        $currentHash = Arr::get($metadata, 'user_context.hash');
+
+        if ($hash === null) {
+            if ($currentHash !== null) {
+                Arr::forget($metadata, 'user_context');
+                $conversation->forceFill(['metadata' => $metadata])->save();
+            }
+
+            return;
+        }
+
+        if ($currentHash === $hash) {
+            return;
+        }
+
+        $metadata['user_context'] = [
+            'hash' => $hash,
+            'content' => $context,
+            'updated_at' => now()->toIso8601String(),
+        ];
+
+        $conversation->forceFill(['metadata' => $metadata])->save();
     }
 
     /**
@@ -123,6 +198,15 @@ class AiConversationService
             $messages[] = [
                 'role' => AiConversationMessage::ROLE_SYSTEM,
                 'content' => $trainer->prompt,
+            ];
+        }
+
+        $userContext = Arr::get($conversation->metadata, 'user_context.content');
+
+        if (is_string($userContext) && trim($userContext) !== '') {
+            $messages[] = [
+                'role' => AiConversationMessage::ROLE_SYSTEM,
+                'content' => $userContext,
             ];
         }
 

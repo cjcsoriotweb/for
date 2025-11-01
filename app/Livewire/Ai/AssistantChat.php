@@ -104,9 +104,14 @@ class AssistantChat extends Component
             $conversation = AiConversation::query()->findOrFail($this->conversationId);
             $trainer = AiTrainer::query()->findOrFail($conversation->ai_trainer_id);
 
+            $this->service()->syncUserContext($conversation, $user);
+            $conversation->refresh();
+
+            $metadata = $conversation->metadata ?? [];
             $context = [
                 'label' => 'Assistant IA',
                 'path' => url()->current(),
+                'user_context_hash' => $metadata['user_context']['hash'] ?? null,
             ];
 
             $this->service()->appendMessage(
@@ -127,6 +132,46 @@ class AssistantChat extends Component
             $this->error = __('Erreur : :message', ['message' => $exception->getMessage()]);
         } finally {
             $this->awaitingResponse = false;
+        }
+    }
+
+    public function startNewConversation(): void
+    {
+        if ($this->awaitingResponse) {
+            return;
+        }
+
+        $user = $this->user();
+
+        if (! $user) {
+            $this->error = __('Vous devez etre connecte pour utiliser l\'assistant IA.');
+
+            return;
+        }
+
+        if (! $this->trainerId) {
+            $this->error = __('Aucun assistant IA selectionne.');
+
+            return;
+        }
+
+        try {
+            $trainer = AiTrainer::query()->findOrFail($this->trainerId);
+            $conversation = $this->service()->startNewConversation(
+                $trainer,
+                $user,
+                formation: null,
+                team: $user->currentTeam
+            );
+
+            $this->conversationId = $conversation->id;
+            $this->messages = [];
+            $this->message = '';
+            $this->error = null;
+            $this->refreshMessages();
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->error = __('Impossible de demarrer une nouvelle conversation : :message', ['message' => $exception->getMessage()]);
         }
     }
 
