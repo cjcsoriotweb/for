@@ -163,7 +163,7 @@ class TicketTools
             'subject' => $subject,
             'status' => SupportTicket::STATUS_OPEN,
             'origin_label' => 'Assistant IA',
-            'origin_path' => '/mon-compte/assistant-chat',
+            'origin_path' => 'dock/assistant-ia',
         ]);
 
         SupportTicketMessage::create([
@@ -172,7 +172,7 @@ class TicketTools
             'is_support' => false,
             'content' => $message,
             'context_label' => 'Assistant IA',
-            'context_path' => '/mon-compte/assistant-chat',
+            'context_path' => 'dock/assistant-ia',
         ]);
 
         return [
@@ -337,7 +337,7 @@ class TicketTools
             'is_support' => false,
             'content' => $message,
             'context_label' => 'Assistant IA',
-            'context_path' => '/mon-compte/assistant-chat',
+            'context_path' => 'dock/assistant-ia',
         ]);
 
         return [

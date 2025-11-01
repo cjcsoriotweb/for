@@ -23,21 +23,4 @@ Route::prefix('mon-compte')
         Route::post('/ai/conversations', [AiController::class, 'createConversation'])->name('ai.conversations.create');
         Route::get('/ai/conversations', [AiController::class, 'listConversations'])->name('ai.conversations.list');
 
-        // Dock iframe routes
-        Route::get('/assistant-chat', function () {
-            return view('in-application.user.dock.assistant-chat');
-        })->name('dock.assistant-chat');
-
-        Route::get('/professeur', function () {
-            return view('in-application.user.dock.professeur');
-        })->name('dock.professeur');
-
-        Route::get('/support', function () {
-            return view('in-application.user.dock.support');
-        })->name('dock.support');
-
-        Route::get('/recherche', function () {
-            return view('in-application.user.dock.recherche');
-        })->name('dock.recherche');
-
     });
