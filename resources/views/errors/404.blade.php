@@ -8,8 +8,7 @@
             404 — {{ $siteName ?? config("app.name", "Application") }}
         </title>
 
-        {{-- Tailwind CDN (simple & autonome). En prod, passez plutôt par @vite. --}}
-        <script src="https://cdn.tailwindcss.com"></script>
+        <x-meta-header />
 
         <meta name="robots" content="noindex,follow" />
     </head>

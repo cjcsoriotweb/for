@@ -5,7 +5,7 @@
         <meta charset="utf-8" />
         <title>403 — Accès interdit</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        @vite(['resources/css/app.css','resources/js/app.js'])
+        <x-meta-header />
         <style>
             @keyframes float {
                 0%,
