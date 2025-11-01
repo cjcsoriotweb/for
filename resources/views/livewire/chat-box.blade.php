@@ -286,7 +286,7 @@ function chatBox() {
                                     this.currentResponse = data.content;
                                     this.scrollToBottom();
                                 } else if (data.type === 'done') {
-                                    // Extraire les boutons du message
+                                    // Extraire les boutons du message final
                                     const { content, buttons } = this.extractButtons(this.currentResponse);
                                     
                                     // Ajouter le message complet
@@ -321,6 +321,10 @@ function chatBox() {
             const match = content.match(buttonRegex);
             
             if (!match) {
+                // Debug: log when no buttons are found
+                if (content.includes('[BUTTONS]')) {
+                    console.warn('BUTTONS tag found but regex did not match. Content:', content);
+                }
                 return { content: content, buttons: [] };
             }
             
@@ -341,6 +345,9 @@ function chatBox() {
                         });
                 })
                 .filter(button => button.length > 0 && button.length <= 100);
+            
+            // Debug: log extracted buttons
+            console.log('Extracted buttons:', buttons);
             
             // Retirer la section [BUTTONS] du contenu
             const cleanContent = content.replace(buttonRegex, '').trim();
