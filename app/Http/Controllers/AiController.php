@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Contrôleur unique pour les interactions IA.
@@ -26,7 +27,7 @@ class AiController extends Controller
      *
      * @throws ValidationException
      */
-    public function stream(Request $request): Response
+    public function stream(Request $request): Response|StreamedResponse
     {
         // Validation - les trainers disponibles sont mis en cache
         $availableTrainers = implode(',', $this->getAvailableTrainers());
