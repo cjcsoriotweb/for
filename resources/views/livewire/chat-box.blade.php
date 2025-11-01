@@ -1,34 +1,15 @@
-<div x-data="chatBox()" x-init="init()" class="fixed w-full z-50">
-    <!-- Bouton toggle -->
-    <button 
-        @click="toggle()"
-        type="button"
-        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-3 shadow-lg transition-all"
-        x-show="!isOpen"
-    >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-        </svg>
-        <span>{{ $title }}</span>
-    </button>
-
+<div x-data="chatBox()" x-init="init()" class="h-full w-full flex flex-col">
     <!-- Fenêtre de chat -->
     <div 
         x-show="isOpen"
-        x-transition
-        class="bg-white rounded-lg shadow-2xl w-96 h-[600px] flex flex-col"
+        class="bg-white h-full w-full flex flex-col"
     >
         <!-- Header -->
-        <div class="bg-blue-600 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+        <div class="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
             <div>
                 <h3 class="font-semibold">{{ $trainerName }}</h3>
                 <p class="text-xs text-blue-100">{{ $trainerDescription }}</p>
             </div>
-            <button @click="toggle()" type="button" class="text-white hover:text-blue-100">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
         </div>
 
         <!-- Messages -->
@@ -37,7 +18,7 @@
             class="flex-1 overflow-y-auto p-4 space-y-4"
         >
             <template x-for="(message, index) in messages" :key="index">
-                <div class="flex" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
+                <div class="flex flex-col gap-2" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                     <div 
                         class="max-w-[80%] rounded-lg px-4 py-2"
                         :class="message.role === 'user' 
@@ -46,6 +27,19 @@
                     >
                         <div x-html="formatMessage(message.content)"></div>
                     </div>
+                    <!-- Boutons suggérés par l'IA -->
+                    <template x-if="message.role === 'assistant' && message.buttons && message.buttons.length > 0">
+                        <div class="flex flex-wrap gap-2 max-w-[80%]">
+                            <template x-for="(button, btnIndex) in message.buttons" :key="btnIndex">
+                                <button
+                                    @click="sendSuggestedMessage(button)"
+                                    type="button"
+                                    class="bg-white hover:bg-blue-50 text-blue-600 border border-blue-300 rounded-lg px-3 py-1.5 text-sm transition-colors"
+                                    x-text="button"
+                                ></button>
+                            </template>
+                        </div>
+                    </template>
                 </div>
             </template>
 
@@ -77,6 +71,41 @@
                             <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                         </div>
                     </div>
+                </div>
+            </template>
+
+            <!-- Suggestions de messages quand la conversation est vide -->
+            <template x-if="messages.length === 0 && !isStreaming && !isLoadingConversation && !error">
+                <div class="space-y-3">
+                    <p class="text-sm text-gray-500 text-center mb-4">{{ __('Comment puis-je vous aider ?') }}</p>
+                    <button 
+                        @click="sendSuggestedMessage('Voir mes tickets en cours')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        📋 {{ __('Voir mes tickets en cours') }}
+                    </button>
+                    <button 
+                        @click="sendSuggestedMessage('Comment rejoindre une application')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        📱 {{ __('Comment rejoindre une application') }}
+                    </button>
+                    <button 
+                        @click="sendSuggestedMessage('Comment contacter un administrateur')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        👤 {{ __('Comment contacter un administrateur') }}
+                    </button>
+                    <button 
+                        @click="sendSuggestedMessage('Demander à être rappelé par téléphone')"
+                        type="button"
+                        class="w-full text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-3 text-sm transition-colors border border-blue-200"
+                    >
+                        📞 {{ __('Demander à être rappelé par téléphone') }}
+                    </button>
                 </div>
             </template>
 
@@ -174,6 +203,11 @@ function chatBox() {
             }
         },
 
+        sendSuggestedMessage(text) {
+            this.message = text;
+            this.sendMessage();
+        },
+
         async sendMessage() {
             if (!this.message.trim() || this.isStreaming) {
                 return;
@@ -247,11 +281,19 @@ function chatBox() {
                                 } else if (data.type === 'chunk') {
                                     this.currentResponse += data.content;
                                     this.scrollToBottom();
+                                } else if (data.type === 'tool_result') {
+                                    // Les outils ont été exécutés, remplacer le contenu actuel
+                                    this.currentResponse = data.content;
+                                    this.scrollToBottom();
                                 } else if (data.type === 'done') {
+                                    // Extraire les boutons du message final
+                                    const { content, buttons } = this.extractButtons(this.currentResponse);
+                                    
                                     // Ajouter le message complet
                                     this.messages.push({
                                         role: 'assistant',
-                                        content: this.currentResponse,
+                                        content: content,
+                                        buttons: buttons,
                                     });
                                     this.currentResponse = '';
                                 } else if (data.type === 'error') {
@@ -272,12 +314,59 @@ function chatBox() {
             }
         },
 
+        extractButtons(content) {
+            // Extraire les boutons du format [BUTTONS]...[/BUTTONS]
+            // Utilise un regex strict pour éviter les injections
+            const buttonRegex = /\[BUTTONS\]\s*((?:- [^\n<>]+\n?)+)\s*\[\/BUTTONS\]/i;
+            const match = content.match(buttonRegex);
+            
+            if (!match) {
+                // Debug: log when no buttons are found
+                if (content.includes('[BUTTONS]')) {
+                    console.warn('BUTTONS tag found but regex did not match. Content:', content);
+                }
+                return { content: content, buttons: [] };
+            }
+            
+            // Extraire les boutons (lignes commençant par -)
+            const buttonsText = match[1];
+            const buttons = buttonsText
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.startsWith('-'))
+                .map(line => {
+                    // Nettoyer et sanitiser le texte du bouton
+                    const text = line.substring(1).trim();
+                    // Limiter la longueur et encoder les caractères potentiellement dangereux
+                    return text.substring(0, 100)
+                        .replace(/[<>'"&]/g, char => {
+                            const entities = {'<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '&': '&amp;'};
+                            return entities[char] || char;
+                        });
+                })
+                .filter(button => button.length > 0 && button.length <= 100);
+            
+            // Debug: log extracted buttons
+            console.log('Extracted buttons:', buttons);
+            
+            // Retirer la section [BUTTONS] du contenu
+            const cleanContent = content.replace(buttonRegex, '').trim();
+            
+            return { content: cleanContent, buttons: buttons };
+        },
+
         formatMessage(content) {
             // Simple conversion Markdown -> HTML
             let html = content
+                // Links [text](url)
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800">$1</a>')
+                // Bold **text**
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                // Italic *text*
                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                // Inline code `text`
                 .replace(/`(.+?)`/g, '<code class="bg-gray-200 px-1 rounded">$1</code>')
+                // Line breaks
                 .replace(/\n/g, '<br>');
             
             return html;

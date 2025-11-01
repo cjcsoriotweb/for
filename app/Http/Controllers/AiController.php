@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
 use App\Services\Ai\OllamaClient;
+use App\Services\Ai\ToolExecutor;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
@@ -18,7 +19,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AiController extends Controller
 {
     public function __construct(
-        private readonly OllamaClient $ollamaClient
+        private readonly OllamaClient $ollamaClient,
+        private readonly ToolExecutor $toolExecutor
     ) {}
 
     /**
@@ -122,13 +124,34 @@ class AiController extends Controller
                     flush();
                 }
 
-                // Sauvegarder la réponse complète
+                // Exécuter les outils si présents dans la réponse
+                $toolResult = $this->toolExecutor->parseAndExecuteTools($fullResponse, $user);
+                $processedResponse = $toolResult['content'];
+                
+                // Si des outils ont été utilisés, envoyer le contenu traité
+                if (!empty($toolResult['tool_results'])) {
+                    // Envoyer le contenu mis à jour (avec résultats des outils)
+                    $updateData = json_encode([
+                        'type' => 'tool_result',
+                        'content' => $processedResponse,
+                    ]);
+                    echo "data: {$updateData}\n\n";
+                    
+                    if (ob_get_level() > 0) {
+                        ob_flush();
+                    }
+                    flush();
+                }
+                
+                // Sauvegarder la réponse complète (avec résultats d'outils)
                 $conversation->messages()->create([
                     'role' => AiConversationMessage::ROLE_ASSISTANT,
-                    'content' => $fullResponse,
+                    'content' => $processedResponse,
                     'metadata' => [
                         'trainer' => $trainer['slug'],
                         'model' => $trainer['model'],
+                        'tools_used' => !empty($toolResult['tool_results']),
+                        'tool_results' => $toolResult['tool_results'],
                     ],
                 ]);
 
@@ -180,7 +203,15 @@ class AiController extends Controller
             'content' => $trainer['system_prompt'],
         ];
 
-        // 2. Contexte utilisateur (si disponible)
+        // 2. Ajouter les définitions d'outils si le trainer les utilise
+        if ($trainer['use_tools'] ?? false) {
+            $messages[] = [
+                'role' => 'system',
+                'content' => ToolExecutor::getToolsPrompt(),
+            ];
+        }
+
+        // 3. Contexte utilisateur (si disponible)
         $user = $conversation->user;
         if ($user && method_exists($user, 'getIaContext')) {
             $userContext = trim((string) $user->getIaContext());
@@ -192,7 +223,7 @@ class AiController extends Controller
             }
         }
 
-        // 3. Historique des messages (limité)
+        // 4. Historique des messages (limité)
         $historyLimit = config('ai.history_limit', 30);
         $history = $conversation->messages()
             ->latest('id')
