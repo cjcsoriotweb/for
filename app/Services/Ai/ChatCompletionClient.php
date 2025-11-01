@@ -30,7 +30,7 @@ class ChatCompletionClient
     public static function fromConfig(array $config): self
     {
         $apiKey = Arr::get($config, 'api_key', '');
-        $baseUrl = rtrim(Arr::get($config, 'base_url', 'http://localhost:11434/api'), '/');
+        $baseUrl = rtrim(Arr::get($config, 'base_url', 'http://localhost:11434/v1'), '/');
         $chatEndpoint = Arr::get($config, 'chat_endpoint', '/chat/completions');
         $requiresApiKey = (bool) Arr::get($config, 'requires_api_key', false);
 

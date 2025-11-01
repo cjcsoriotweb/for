@@ -12,12 +12,14 @@ class AiTrainerSeeder extends Seeder
      */
     public function run(): void
     {
-        $default = config('ai.default_site_trainer');
-        $default = is_array($default) ? $default : [];
+        $default = config('ai.default_site_trainer', []);
+        if (! is_array($default)) {
+            $default = [];
+        }
 
         $defaultSlug = $default['slug'] ?? config('ai.default_trainer_slug', 'assistant-ia-generaliste');
-        $provider = $default['provider'] ?? config('ai.default_driver', 'openai');
-        $model = $default['model'] ?? config("ai.providers.$provider.default_model", 'gpt-4o-mini');
+        $provider = $default['provider'] ?? config('ai.default_driver', 'ollama');
+        $model = $default['model'] ?? config("ai.providers.$provider.default_model", 'llama3');
 
         $defaultSettings = isset($default['settings']) && is_array($default['settings'])
             ? $default['settings']
@@ -47,24 +49,24 @@ class AiTrainerSeeder extends Seeder
         AiTrainer::firstOrCreate(
             ['slug' => 'ia-formateur-generaliste'],
             [
-                'name' => 'Formateur IA (OpenAI)',
-                'provider' => 'openai',
-                'model' => config('ai.providers.openai.default_model', 'gpt-4o-mini'),
-                'description' => 'Assistant pedagogique utilisant OpenAI pour des formations.',
+                'name' => 'Formateur IA (Ollama)',
+                'provider' => 'ollama',
+                'model' => config('ai.providers.ollama.default_model', 'llama3'),
+                'description' => 'Assistant pedagogique propulse par Ollama pour des formations.',
                 'prompt' => <<<'PROMPT'
-Tu es un formateur virtuel expérimenté utilisant OpenAI. Tu dois répondre avec clarté, concision et pédagogie aux apprenants des formations FOR.
-Tu adaptes ton langage au niveau de l'apprenant et relies ta réponse aux objectifs de la formation.
+Tu es un formateur virtuel experimente reposant sur un modele accessible via Ollama. Reponds avec clarte, concision et pedagogie aux apprenants des formations FOR.
+Adapte ton langage au niveau de l'apprenant et relie ta reponse aux objectifs de la formation.
 
-Règles pédagogiques :
-- Explique les concepts étape par étape
-- Utilise des analogies quand c'est approprié
-- Pose des questions pour vérifier la compréhension
+Regles pedagogiques :
+- Explique les concepts etape par etape
+- Utilise des analogies quand c'est approprie
+- Pose des questions pour verifier la comprehension
 - Encourage l'apprentissage pratique
 PROMPT,
                 'is_default' => false,
                 'is_active' => true,
                 'settings' => [
-                    'temperature' => (float) config('ai.providers.openai.temperature', 0.7),
+                    'temperature' => (float) config('ai.providers.ollama.temperature', 0.7),
                 ],
             ]
         );

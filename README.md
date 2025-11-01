@@ -60,10 +60,10 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 This project integrates an AI conversation bubble for learners and a superadmin testing tool. Configure the following environment variables before use:
 
-- `OPENAI_API_KEY` : ChatGPT API key.
-- `OPENAI_BASE_URL` : optional, defaults to `https://api.openai.com/v1`.
-- `OPENAI_DEFAULT_MODEL` : optional, defaults to `gpt-4o-mini`.
-- `AI_DEFAULT_TRAINER` : slug of the default AI trainer profile.
+- `OLLAMA_BASE_URL` : base URL of your Ollama server (defaults to `http://localhost:11434/v1`).
+- `OLLAMA_CHAT_ENDPOINT` : optional chat endpoint, defaults to `/chat/completions`.
+- `OLLAMA_DEFAULT_MODEL` : optional, defaults to `llama3`.
+- `AI_DEFAULT_TRAINER_SLUG` : slug of the default AI trainer profile.
 
 Run the new migrations and seeder to publish the default trainer profile:
 

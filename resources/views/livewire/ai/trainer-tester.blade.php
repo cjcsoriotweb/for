@@ -57,7 +57,7 @@
 
         <div class="flex items-center justify-between">
             <p class="text-xs text-slate-400 dark:text-slate-500">
-                {{ __('La cle API ChatGPT doit etre configuree dans OPENAI_API_KEY.') }}
+                {{ __("Assurez-vous que le serveur Ollama indique dans OLLAMA_BASE_URL est joignable.") }}
             </p>
             <button
                 type="submit"

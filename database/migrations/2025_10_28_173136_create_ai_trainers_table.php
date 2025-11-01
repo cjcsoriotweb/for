@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('provider')->default('openai');
-            $table->string('model')->default('gpt-4o-mini');
+            $table->string('provider')->default('ollama');
+            $table->string('model')->default('llama3');
             $table->text('description')->nullable();
             $table->longText('prompt')->nullable();
             $table->string('avatar_path')->nullable();

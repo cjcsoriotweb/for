@@ -23,9 +23,9 @@ class TrainerManager extends Component
 
     public string $name = '';
 
-    public string $model = 'gpt-4o-mini';
+    public string $model = 'llama3';
 
-    public string $provider = 'openai';
+    public string $provider = 'ollama';
 
     public ?string $description = null;
 
@@ -52,7 +52,7 @@ class TrainerManager extends Component
     {
         $this->ensureAuthorized();
         $this->providerOptions = $this->resolveProviderOptions();
-        $this->provider = $this->providerOptions[0] ?? 'openai';
+        $this->provider = $this->providerOptions[0] ?? 'ollama';
     }
 
     public function updated($property): void
@@ -133,8 +133,8 @@ class TrainerManager extends Component
     private function resetForm(): void
     {
         $this->name = '';
-        $this->model = 'gpt-4o-mini';
-        $this->provider = $this->providerOptions[0] ?? 'openai';
+        $this->model = 'llama3';
+        $this->provider = $this->providerOptions[0] ?? 'ollama';
         $this->description = null;
         $this->prompt = null;
         $this->avatarPath = null;
