@@ -66,7 +66,8 @@
     $url = asset($src);
 @endphp
 
-<img
+<a href="{{url('')}}">
+    <img
     src="{{ $url }}"
     alt="{{ $label }}"
     loading="lazy"
@@ -77,3 +78,5 @@
         'style' => $style,
     ]) }}
 />
+
+</a>

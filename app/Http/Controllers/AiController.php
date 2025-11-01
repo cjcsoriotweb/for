@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
+use App\Models\User;
 use App\Services\Ai\OllamaClient;
 use App\Services\Ai\ToolExecutor;
 use Illuminate\Http\Request;
@@ -69,10 +70,14 @@ class AiController extends Controller
         }
 
         // Récupérer la conversation (doit exister)
-        $conversation = AiConversation::query()
-            ->where('id', $conversationId)
-            ->where('user_id', $user->id)
-            ->first();
+        $conversationQuery = AiConversation::query()
+            ->where('id', $conversationId);
+
+        if (! $user->superadmin()) {
+            $conversationQuery->where('user_id', $user->id);
+        }
+
+        $conversation = $conversationQuery->first();
 
         if (!$conversation) {
             return response()->json([
@@ -81,11 +86,22 @@ class AiController extends Controller
             ], 404);
         }
 
+        $messageAuthorId = $user->id;
+
+        if ($user->superadmin() && $request->filled('acting_user_id')) {
+            $actingUserId = (int) $request->input('acting_user_id');
+            $actingUser = User::query()->find($actingUserId);
+
+            if ($actingUser) {
+                $messageAuthorId = $actingUser->id;
+            }
+        }
+
         // Sauvegarder le message utilisateur
         $conversation->messages()->create([
             'role' => AiConversationMessage::ROLE_USER,
             'content' => $message,
-            'user_id' => $user->id,
+            'user_id' => $messageAuthorId,
         ]);
 
         // Préparer les messages pour l'IA
@@ -269,6 +285,7 @@ class AiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'trainer' => ['nullable', 'string', 'in:' . implode(',', $this->getAvailableTrainers())],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
         if ($validator->fails()) {
@@ -288,6 +305,18 @@ class AiController extends Controller
 
         $trainerSlug = $request->input('trainer', config('ai.default_trainer_slug'));
         $trainer = config("ai.trainers.$trainerSlug");
+        $targetUser = $user;
+
+        if ($user->superadmin() && $request->filled('user_id')) {
+            $targetUser = User::query()->find($request->input('user_id'));
+
+            if (! $targetUser) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Utilisateur cible introuvable',
+                ], 404);
+            }
+        }
 
         if (!$trainer) {
             return response()->json([
@@ -297,8 +326,8 @@ class AiController extends Controller
         }
 
         $conversation = AiConversation::create([
-            'user_id' => $user->id,
-            'team_id' => $user->currentTeam?->id,
+            'user_id' => $targetUser->id,
+            'team_id' => $targetUser->currentTeam?->id,
             'status' => AiConversation::STATUS_ACTIVE,
             'metadata' => [
                 'trainer' => $trainerSlug,
@@ -313,6 +342,12 @@ class AiController extends Controller
                 'id' => $conversation->id,
                 'trainer' => $trainerSlug,
                 'created_at' => $conversation->created_at->toIso8601String(),
+                'user' => [
+                    'id' => $targetUser->id,
+                    'name' => $targetUser->name,
+                    'email' => $targetUser->email,
+                    'superadmin' => (bool) $targetUser->superadmin(),
+                ],
             ],
         ]);
     }
@@ -330,25 +365,163 @@ class AiController extends Controller
             ], 401);
         }
 
-        $conversations = AiConversation::query()
-            ->where('user_id', $user->id)
+        $scope = $request->query('scope', 'self');
+        $targetUserId = $user->id;
+
+        if ($user->superadmin() && $request->filled('user_id')) {
+            $targetUserId = (int) $request->query('user_id');
+        }
+
+        $conversationQuery = AiConversation::query()
             ->where('status', AiConversation::STATUS_ACTIVE)
             ->orderBy('last_message_at', 'desc')
-            ->limit(50)
+            ->with(['user:id,name,email,superadmin']);
+
+        if (! $user->superadmin() || $scope !== 'all') {
+            $conversationQuery->where('user_id', $targetUserId);
+        }
+
+        $conversations = $conversationQuery
+            ->limit(100)
             ->get()
-            ->map(function ($conversation) {
+            ->map(function (AiConversation $conversation) {
+                $owner = $conversation->user;
+
                 return [
                     'id' => $conversation->id,
                     'trainer' => $conversation->metadata['trainer'] ?? 'default',
                     'message_count' => $conversation->messages()->count(),
                     'last_message_at' => $conversation->last_message_at?->toIso8601String(),
                     'created_at' => $conversation->created_at->toIso8601String(),
+                    'user' => $owner ? [
+                        'id' => $owner->id,
+                        'name' => $owner->name,
+                        'email' => $owner->email,
+                        'superadmin' => (bool) $owner->superadmin(),
+                    ] : null,
                 ];
             });
 
         return response()->json([
             'success' => true,
             'conversations' => $conversations,
+        ]);
+    }
+
+    /**
+     * Afficher le détail d'une conversation et son historique.
+     */
+    public function showConversation(Request $request, AiConversation $conversation)
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Authentification requise',
+            ], 401);
+        }
+
+        if (! $user->superadmin() && $conversation->user_id !== $user->id) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Accès refusé',
+            ], 403);
+        }
+
+        $conversation->loadMissing([
+            'user:id,name,email,superadmin',
+            'messages.author:id,name,email,superadmin',
+        ]);
+
+        $messages = $conversation->messages()
+            ->orderBy('id')
+            ->limit(200)
+            ->get()
+            ->map(function (AiConversationMessage $message) {
+                $author = $message->author;
+
+                return [
+                    'id' => $message->id,
+                    'role' => $message->role,
+                    'content' => $message->content,
+                    'created_at' => $message->created_at?->toIso8601String(),
+                    'user' => $author ? [
+                        'id' => $author->id,
+                        'name' => $author->name,
+                        'email' => $author->email,
+                        'superadmin' => (bool) $author->superadmin(),
+                    ] : null,
+                ];
+            });
+
+        $owner = $conversation->user;
+
+        return response()->json([
+            'success' => true,
+            'conversation' => [
+                'id' => $conversation->id,
+                'trainer' => $conversation->metadata['trainer'] ?? 'default',
+                'status' => $conversation->status,
+                'created_at' => $conversation->created_at?->toIso8601String(),
+                'last_message_at' => $conversation->last_message_at?->toIso8601String(),
+                'user' => $owner ? [
+                    'id' => $owner->id,
+                    'name' => $owner->name,
+                    'email' => $owner->email,
+                    'superadmin' => (bool) $owner->superadmin(),
+                ] : null,
+            ],
+            'messages' => $messages,
+        ]);
+    }
+
+    /**
+     * Liste des utilisateurs (réservé superadmin) pour piloter les conversations.
+     */
+    public function listUsers(Request $request)
+    {
+        $user = $request->user();
+        if (! $user || ! $user->superadmin()) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Accès superadmin requis',
+            ], 403);
+        }
+
+        $search = trim((string) $request->query('search', ''));
+
+        $usersQuery = User::query()
+            ->select(['id', 'name', 'email', 'superadmin'])
+            ->withCount([
+                'aiConversations as active_conversations_count' => function ($query) {
+                    $query->where('status', AiConversation::STATUS_ACTIVE);
+                },
+            ])
+            ->orderBy('name');
+
+        if ($search !== '') {
+            $usersQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        $users = $usersQuery
+            ->limit(100)
+            ->get()
+            ->map(function (User $user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'superadmin' => (bool) $user->superadmin(),
+                    'active_conversations_count' => (int) $user->active_conversations_count,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'users' => $users,
         ]);
     }
 }

@@ -222,28 +222,79 @@
 <script>
 function chatBox() {
     return {
+
         isOpen: @js($isOpen),
+
         trainer: @js($trainer),
+
         selectedTrainer: @js($trainer),
+
         trainers: @js($trainerOptions),
+
         trainerMeta: @js($currentTrainerMeta),
+
         conversationId: @js($conversationId),
+
+        selectedConversationId: @js($conversationId),
+
         messages: [],
+
         message: '',
+
         currentResponse: '',
+
         isStreaming: false,
+
         error: null,
+
         isLoadingConversation: false,
+
+        isLoadingConversations: false,
+
+        isLoadingUsers: false,
+
         currentToolResults: [],
+
         hasTrainerChoice: false,
+
         shortcodeTemplates: @js($shortcodeTemplates),
+
+        isSuperAdmin: @js($isSuperAdmin),
+
+        currentUser: @js($currentUser),
+
+        currentUserId: @js($currentUserId),
+
+        users: [],
+
+        userSearch: '',
+
+        selectedUserId: @js($currentUserId),
+
+        impersonateUserId: @js($currentUserId),
+
+        selectedUser: @js($currentUser),
+
+        conversations: [],
 
         async init() {
             this.trainerMeta = this.trainers?.[this.trainer] ?? this.trainerMeta ?? { name: 'Assistant', description: '' };
             this.selectedTrainer = this.trainer;
             this.hasTrainerChoice = Object.keys(this.trainers || {}).length > 1;
 
-            if (this.isOpen && !this.conversationId) {
+            if (!this.isSuperAdmin && this.currentUser) {
+                this.users = [this.currentUser];
+            }
+
+            if (this.isSuperAdmin) {
+                await this.refreshUsers();
+            }
+
+            await this.fetchConversations();
+
+            if (this.conversationId) {
+                await this.loadConversation(this.conversationId);
+            } else if (this.isOpen && !this.isSuperAdmin) {
                 await this.createConversation();
             }
         },
@@ -251,7 +302,21 @@ function chatBox() {
         async toggle() {
             this.isOpen = !this.isOpen;
 
-            if (this.isOpen && !this.conversationId) {
+            if (!this.isOpen) {
+                return;
+            }
+
+            if (this.isSuperAdmin && this.users.length === 0) {
+                await this.refreshUsers();
+            }
+
+            if (this.isSuperAdmin && this.conversations.length === 0) {
+                await this.fetchConversations();
+            }
+
+            if (this.conversationId) {
+                await this.loadConversation(this.conversationId);
+            } else if (!this.isSuperAdmin) {
                 await this.createConversation();
             }
         },

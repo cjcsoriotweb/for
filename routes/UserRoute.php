@@ -22,5 +22,7 @@ Route::prefix('mon-compte')
         // AI conversation management
         Route::post('/ai/conversations', [AiController::class, 'createConversation'])->name('ai.conversations.create');
         Route::get('/ai/conversations', [AiController::class, 'listConversations'])->name('ai.conversations.list');
+        Route::get('/ai/conversations/{conversation}', [AiController::class, 'showConversation'])->name('ai.conversations.show');
+        Route::get('/ai/users', [AiController::class, 'listUsers'])->name('ai.users');
 
     });
