@@ -6,7 +6,9 @@ use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
 use App\Models\AiTrainer;
 use App\Services\Ai\AiConversationService;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Throwable;
 
@@ -21,11 +23,12 @@ class AssistantChat extends Component
 
     public string $message = '';
 
-    public string $trainerName = '';
-
-    public ?string $trainerDescription = null;
-
-    public ?string $trainerAvatar = null;
+    /** @var array{name: string, description: ?string, avatar: ?string} */
+    public array $trainer = [
+        'name' => '',
+        'description' => null,
+        'avatar' => null,
+    ];
 
     public bool $hasTrainer = false;
 
@@ -36,15 +39,39 @@ class AssistantChat extends Component
     public function mount(?int $trainerId = null): void
     {
         $this->trainerId = $trainerId;
-        $this->hydrateConversation();
+        $this->initializeConversation();
+    }
+
+    public function render()
+    {
+        return view('livewire.ai.assistant-chat');
+    }
+
+    #[On('assistant-message-updated')]
+    public function refreshMessages(): void
+    {
+        $this->messages = $this->loadMessages();
+    }
+
+    public function pollMessages(): void
+    {
+        if ($this->awaitingResponse) {
+            return;
+        }
+
+        $this->refreshMessages();
     }
 
     public function sendMessage(): void
     {
-        $user = Auth::user();
+        if ($this->awaitingResponse) {
+            return;
+        }
+
+        $user = $this->user();
 
         if (! $user) {
-            $this->error = 'Vous devez être connecté pour utiliser l\'assistant IA.';
+            $this->error = __('Vous devez etre connecte pour utiliser l\'assistant IA.');
 
             return;
         }
@@ -55,17 +82,20 @@ class AssistantChat extends Component
             'message' => __('Message'),
         ]);
 
-        $this->error = null;
-
-        if (! $this->hasTrainer || ! $this->conversationId) {
+        if (! $this->conversationId || ! $this->hasTrainer) {
             $this->error = __('L\'assistant IA est indisponible.');
 
             return;
         }
 
-        if ($this->awaitingResponse) {
+        $content = trim($this->message);
+
+        if ($content === '') {
             return;
         }
+
+        $this->error = null;
+        $this->awaitingResponse = true;
 
         try {
             $conversation = AiConversation::query()->findOrFail($this->conversationId);
@@ -79,51 +109,31 @@ class AssistantChat extends Component
             $this->service()->appendMessage(
                 $conversation,
                 AiConversationMessage::ROLE_USER,
-                $this->message,
+                $content,
                 $user,
                 $context
             );
 
-            $oldMessage = $this->message;
             $this->message = '';
 
-            $this->awaitingResponse = true;
-
-            // Clear any errors before generating response
-            $this->error = null;
-
             $this->service()->generateAssistantReply($conversation, $trainer);
-        } catch (Throwable $exception) {
-            $this->error = 'Erreur: '.$exception->getMessage();
-            $this->awaitingResponse = false;
-        } finally {
+
             $this->refreshMessages();
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->error = __('Erreur : :message', ['message' => $exception->getMessage()]);
+        } finally {
             $this->awaitingResponse = false;
         }
     }
 
-    public $listeners = ['messageReceived' => 'refreshMessages'];
-
-    public function poll()
+    private function initializeConversation(): void
     {
-        $this->refreshMessages();
-    }
-
-    public function render()
-    {
-        return view('livewire.ai.assistant-chat');
-    }
-
-    private function hydrateConversation(): void
-    {
-        $user = Auth::user();
+        $user = $this->user();
 
         if (! $user) {
-            $this->messages = [];
-            $this->conversationId = null;
-            $this->hasTrainer = false;
-            $this->awaitingResponse = false;
-            $this->error = 'Vous devez être connecté pour utiliser l\'assistant IA.';
+            $this->resetConversationState();
+            $this->error = __('Vous devez etre connecte pour utiliser l\'assistant IA.');
 
             return;
         }
@@ -131,15 +141,8 @@ class AssistantChat extends Component
         $trainer = $this->service()->resolveTrainer(null, $this->trainerId);
 
         if (! $trainer) {
-            $this->hasTrainer = false;
-            $this->messages = [];
-            $this->conversationId = null;
-            $this->trainerId = null;
-            $this->trainerName = '';
-            $this->trainerDescription = null;
-            $this->trainerAvatar = null;
-            $this->awaitingResponse = false;
-            $this->error = 'Aucun assistant IA n\'est configuré. Veuillez contacter l\'administrateur.';
+            $this->resetConversationState();
+            $this->error = __('Aucun assistant IA n\'est configure. Veuillez contacter l\'administrateur.');
 
             return;
         }
@@ -148,62 +151,76 @@ class AssistantChat extends Component
             $conversation = $this->service()->getOrCreateConversation(
                 $trainer,
                 $user,
-                null, // no formation
-                $user->currentTeam
+                formation: null,
+                team: $user->currentTeam
             );
 
-            $this->hasTrainer = true;
             $this->conversationId = $conversation->id;
             $this->trainerId = $trainer->id;
-            $this->trainerName = $trainer->name;
-            $this->trainerDescription = $trainer->description;
-            $this->trainerAvatar = $trainer->avatar_path ?: 'images/ai-trainer-placeholder.svg';
+            $this->trainer = [
+                'name' => $trainer->name,
+                'description' => $trainer->description,
+                'avatar' => $trainer->avatar_path ?: 'images/ai-trainer-placeholder.svg',
+            ];
+            $this->hasTrainer = true;
             $this->error = null;
-
-            $this->refreshMessages();
-        } catch (\Throwable $exception) {
-            $this->hasTrainer = false;
-            $this->error = 'Erreur lors de la création de la conversation: '.$exception->getMessage();
+            $this->messages = $this->loadMessages();
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->resetConversationState();
+            $this->error = __('Erreur lors de la creation de la conversation : :message', ['message' => $exception->getMessage()]);
         }
     }
 
-    private function refreshMessages(): void
+    private function loadMessages(): array
     {
         if (! $this->conversationId) {
-            $this->messages = [];
-
-            return;
+            return [];
         }
 
-        $conversation = AiConversation::query()->find($this->conversationId);
+        return AiConversationMessage::query()
+            ->where('ai_conversation_id', $this->conversationId)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get()
+            ->map(function (AiConversationMessage $message) {
+                return [
+                    'id' => $message->id,
+                    'role' => $message->role,
+                    'author' => $this->authorFor($message),
+                    'content' => $message->content,
+                    'created_at' => optional($message->created_at)->toIso8601String(),
+                    'created_at_human' => optional($message->created_at)->diffForHumans(),
+                ];
+            })
+            ->all();
+    }
 
-        if (! $conversation) {
-            $this->messages = [];
+    private function authorFor(AiConversationMessage $message): string
+    {
+        return match ($message->role) {
+            AiConversationMessage::ROLE_ASSISTANT => $this->trainer['name'] ?: __('Assistant IA'),
+            AiConversationMessage::ROLE_SYSTEM => __('Systeme'),
+            default => __('Vous'),
+        };
+    }
 
-            return;
-        }
+    private function resetConversationState(): void
+    {
+        $this->conversationId = null;
+        $this->hasTrainer = false;
+        $this->messages = [];
+        $this->trainer = [
+            'name' => '',
+            'description' => null,
+            'avatar' => null,
+        ];
+        $this->awaitingResponse = false;
+    }
 
-        $orderedMessages = $conversation->messages()
-            ->orderByDesc('created_at')
-            ->orderByDesc('id')
-            ->get();
-
-        $this->messages = $orderedMessages->map(function (AiConversationMessage $message) {
-            $author = match ($message->role) {
-                AiConversationMessage::ROLE_ASSISTANT => $this->trainerName,
-                AiConversationMessage::ROLE_SYSTEM => 'Systeme',
-                default => __('Vous'),
-            };
-
-            return [
-                'id' => $message->id,
-                'role' => $message->role,
-                'author' => $author,
-                'content' => $message->content,
-                'created_at' => optional($message->created_at)->toIso8601String(),
-                'created_at_human' => optional($message->created_at)->diffForHumans(),
-            ];
-        })->all();
+    private function user(): ?Authenticatable
+    {
+        return Auth::user();
     }
 
     private function service(): AiConversationService
@@ -211,3 +228,4 @@ class AssistantChat extends Component
         return app(AiConversationService::class);
     }
 }
+
