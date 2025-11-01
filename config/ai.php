@@ -234,4 +234,13 @@ Tu es Andreas, professeur de musique passionné et pédagogue.
 PROMPT,
         ],
     ],
+
+    'shortcodes' => [
+        'SUPPORT' => [
+            'view' => 'components.ai.shortcodes.support',
+        ],
+        'DECONNEXION' => [
+            'view' => 'components.ai.shortcodes.logout',
+        ],
+    ],
 ];

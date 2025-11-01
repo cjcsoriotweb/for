@@ -236,6 +236,7 @@ function chatBox() {
         isLoadingConversation: false,
         currentToolResults: [],
         hasTrainerChoice: false,
+        shortcodeTemplates: @js($shortcodeTemplates),
 
         async init() {
             this.trainerMeta = this.trainers?.[this.trainer] ?? this.trainerMeta ?? { name: 'Assistant', description: '' };
@@ -500,9 +501,30 @@ function chatBox() {
             return { content: cleanContent, buttons: buttons };
         },
 
+        applyShortcodes(content) {
+            if (typeof content !== 'string' || !content.includes('[')) {
+                return content;
+            }
+
+            const templates = this.shortcodeTemplates || {};
+
+            return content.replace(/\[([A-Z0-9_]+)\]/gi, (match, key) => {
+                const templateKey = key.toUpperCase();
+                const template = templates[templateKey];
+
+                return typeof template === 'string' && template.length > 0 ? template : match;
+            });
+        },
+
         formatMessage(content) {
+            if (typeof content !== 'string') {
+                return '';
+            }
+
+            const withShortcodes = this.applyShortcodes(content);
+
             // Simple conversion Markdown -> HTML
-            let html = content
+            let html = withShortcodes
                 // Links [text](url)
                 .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800">$1</a>')
                 // Bold **text**
