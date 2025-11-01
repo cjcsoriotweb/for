@@ -44,9 +44,28 @@
                 @endif
 
                 @forelse ($messages as $msg)
-                    <div class="flex {{ $msg['role'] === 'assistant' ? 'justify-start' : 'justify-end' }}" wire:key="message-{{ $msg['id'] }}">
-                        <div class="max-w-2xl rounded-3xl px-4 py-3 shadow-lg shadow-slate-950/50 backdrop-blur {{ $msg['role'] === 'assistant' ? 'bg-slate-900/80 text-slate-100' : 'bg-emerald-500/90 text-white' }}">
-                            <div class="mb-1 flex items-center justify-between text-[11px] uppercase tracking-wider {{ $msg['role'] === 'assistant' ? 'text-slate-300' : 'text-emerald-50/80' }}">
+                    @php
+                        $isAssistant = $msg['role'] === 'assistant';
+                        $wrapperClasses = $isAssistant
+                            ? 'justify-start'
+                            : 'justify-end';
+                        $bubbleClasses = $isAssistant
+                            ? 'bg-slate-900/80 text-slate-100'
+                            : 'bg-emerald-500/90 text-white';
+                        $metaClasses = $isAssistant
+                            ? 'text-slate-300'
+                            : 'text-emerald-50/80';
+                    @endphp
+                    <div
+                        class="flex {{ $wrapperClasses }}"
+                        wire:key="message-{{ $msg['id'] }}"
+                        data-message-id="{{ $msg['id'] }}"
+                        data-role="{{ $msg['role'] }}"
+                        data-segment-index="{{ $msg['segment_index'] ?? 0 }}"
+                        @if (! $isAssistant) data-revealed="1" @endif
+                    >
+                        <div class="max-w-2xl rounded-3xl px-4 py-3 shadow-lg shadow-slate-950/50 backdrop-blur transition-all duration-500 ease-out {{ $bubbleClasses }} {{ $isAssistant ? 'opacity-0 translate-y-3' : 'opacity-100' }}">
+                            <div class="mb-1 flex items-center justify-between text-[11px] uppercase tracking-wider {{ $metaClasses }}">
                                 <span class="font-semibold">{{ $msg['author'] }}</span>
                                 <span>{{ $msg['created_at_human'] }}</span>
                             </div>
