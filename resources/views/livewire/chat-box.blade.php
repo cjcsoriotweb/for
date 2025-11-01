@@ -146,7 +146,7 @@ function chatBox() {
             this.currentResponse = '';
 
             try {
-                const response = await fetch('/api/ai/stream', {
+                const response = await fetch('/mon-compte/ai/stream', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

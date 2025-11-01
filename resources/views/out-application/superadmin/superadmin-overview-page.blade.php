@@ -30,9 +30,9 @@
             'route' => route('superadmin.ai.index'),
             'icon' => 'smart_toy',
             'label' => __('Formateurs IA'),
-            'stat' => number_format($stats->get('ai_trainers', 0)),
-            'description' => __('Configurez les profils IA et testez leurs prompts.'),
-            'cta' => __('Gérer l\'IA'),
+            'stat' => count(config('ai.trainers', [])),
+            'description' => __('Consultez les profils IA configurés.'),
+            'cta' => __('Voir l\'IA'),
         ],
         [
             'route' => route('superadmin.teams.index', ['focus' => 'invitations']),
