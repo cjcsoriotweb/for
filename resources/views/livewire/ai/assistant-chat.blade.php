@@ -1,4 +1,4 @@
-<div>
+<div class="flex h-full flex-col min-h-0">
 @php
     $trainerName = $trainer['name'] ?: __('Assistant IA');
     $trainerDescription = $trainer['description'] ?? null;
@@ -6,7 +6,7 @@
 @endphp
 
 @if ($hasTrainer)
-    <div class="flex h-full flex-1 flex-col" >
+    <div class="flex flex-1 flex-col min-h-0">
         <header wire:poll.1s="refreshMessages" class="border-b border-slate-200 bg-white px-6 py-4">
             <div class="flex items-center gap-3">
                 @if ($trainerAvatar)
@@ -28,8 +28,8 @@
             </div>
         </header>
 
-        <section class="flex flex-1 flex-col overflow-hidden" wire:poll.4s="pollMessages">
-            <div class="flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4">
+        <section class="flex flex-1 flex-col overflow-hidden min-h-0" wire:poll.4s="pollMessages">
+            <div class="flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 min-h-0">
                 @if ($awaitingResponse)
                     <div class="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-600">
                         <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -65,7 +65,7 @@
                 @endif
             </div>
 
-            <footer class="border-t border-slate-200 bg-white p-4">
+            <footer class="border-t border-slate-200 bg-white p-4 shrink-0">
                 @if ($error)
                     <div class="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
                         <p class="text-sm text-red-700">{{ $error }}</p>
@@ -104,7 +104,7 @@
         </section>
     </div>
 @else
-    <div class="flex h-full flex-1 items-center justify-center bg-slate-50">
+    <div class="flex flex-1 items-center justify-center bg-slate-50">
         <div class="max-w-md rounded-2xl border border-slate-200 bg-white px-8 py-10 text-center shadow-sm">
             @if ($error)
                 <svg class="mx-auto mb-4 h-16 w-16 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

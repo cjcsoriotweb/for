@@ -183,8 +183,8 @@ class AssistantChat extends Component
 
         return AiConversationMessage::query()
             ->where('conversation_id', $this->conversationId)
-            ->orderBy('created_at')
-            ->orderBy('id')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->get()
             ->map(function (AiConversationMessage $message) {
                 return [
