@@ -203,7 +203,14 @@
                                 <div class="rounded-xl border {{ $notification->is_read ? 'border-gray-200 bg-gray-50' : 'border-amber-200 bg-amber-50' }} p-4">
                                     <div class="flex items-start justify-between gap-2">
                                         <span class="font-semibold text-gray-900">{{ $notification->title }}</span>
-                                        <span class="text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                            <button type="button"
+                                                wire:click="markNotificationAsRead('{{ $notification->id }}')"
+                                                class="text-xs text-amber-700 hover:text-amber-900 underline">
+                                                Marquer comme lu
+                                            </button>
+                                        </div>
                                     </div>
                                     @if($notification->message)
                                         <div class="text-sm text-gray-600 mt-2 whitespace-pre-line">{{ $notification->message }}</div>

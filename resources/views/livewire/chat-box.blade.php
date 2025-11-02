@@ -9,6 +9,7 @@
                 class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 wire:loading.attr="disabled"
                 maxlength="1000"
+                data-chat-input="{{ $this->getId() }}"
             >
         </form>
     </div>
@@ -33,6 +34,35 @@
                         messagesContainer.scrollTop = 0;
                     }
                 }, 100);
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('livewire:load', () => {
+            if (window.__chatInputFocusHooked) {
+                return;
+            }
+
+            window.__chatInputFocusHooked = true;
+            window.__chatFocusedInputs = {};
+
+            Livewire.hook('message.sent', (component) => {
+                const input = document.querySelector(`input[data-chat-input="${component.id}"]`);
+                if (input && document.activeElement === input) {
+                    window.__chatFocusedInputs[component.id] = true;
+                }
+            });
+
+            Livewire.hook('message.processed', (component) => {
+                if (window.__chatFocusedInputs[component.id]) {
+                    const input = document.querySelector(`input[data-chat-input="${component.id}"]`);
+                    if (input) {
+                        const length = input.value.length;
+                        input.focus({ preventScroll: true });
+                        input.setSelectionRange(length, length);
+                    }
+                    delete window.__chatFocusedInputs[component.id];
+                }
             });
         });
     </script>

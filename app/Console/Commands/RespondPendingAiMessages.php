@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\AiTrainer;
 use App\Models\Chat;
 use App\Models\User;
+use App\Notifications\ChatAiReplied;
 use App\Services\Ai\OllamaClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -164,6 +165,8 @@ class RespondPendingAiMessages extends Command
                     responseMeta: $responseMeta,
                     isFallback: false
                 );
+
+                $this->notifyUserOfReply($assistantMessage, $message);
 
                 $this->info(sprintf(
                     'Conversation user:%d-ai:%d : reponse IA envoyee (message %d -> %d)',
@@ -464,6 +467,8 @@ class RespondPendingAiMessages extends Command
             isFallback: true
         );
 
+        $this->notifyUserOfReply($assistantMessage, $message);
+
         $this->info(sprintf(
             'Conversation user:%d-ai:%d : reponse fallback envoyee (message %d -> %d) [raison: %s]',
             $message->sender_user_id,
@@ -499,5 +504,28 @@ class RespondPendingAiMessages extends Command
     private function defaultFallbackMessage(): string
     {
         return "Bonjour {user_name}, notre assistant IA est indisponible pour le moment. Nous avons bien recu votre message #{message_id} et un membre de l'equipe vous repondra prochainement.";
+    }
+
+    /**
+     * Envoie une notification a l'utilisateur lorsque l'assistant repond.
+     */
+    private function notifyUserOfReply(Chat $assistantMessage, Chat $sourceMessage): void
+    {
+        $recipient = $sourceMessage->sender;
+        if (! $recipient || (int) $recipient->id === (int) $assistantMessage->sender_user_id) {
+            return;
+        }
+
+        try {
+            $assistantMessage->loadMissing('senderIa');
+            $recipient->notifyNow(new ChatAiReplied($assistantMessage, $sourceMessage));
+        } catch (Throwable $e) {
+            Log::warning('assistants:respond-pending - notification IA impossible', [
+                'assistant_message_id' => $assistantMessage->id,
+                'source_message_id' => $sourceMessage->id,
+                'recipient_id' => $recipient->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

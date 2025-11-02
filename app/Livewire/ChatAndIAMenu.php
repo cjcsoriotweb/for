@@ -109,6 +109,31 @@ class ChatAndIAMenu extends Component
         $this->notifications = 0;
     }
 
+    public function markNotificationAsRead(string $notificationId): void
+    {
+        if (! Auth::check()) {
+            return;
+        }
+
+        $user = Auth::user();
+
+        $notification = $user->notifications()
+            ->where('id', $notificationId)
+            ->first();
+
+        if (! $notification) {
+            return;
+        }
+
+        if (! $notification->read_at) {
+            $notification->markAsRead();
+        }
+
+        $notification->delete();
+
+        $this->notifications = $this->unreadNotificationsCount;
+    }
+
     public function loadPendingContacts()
     {
         // Forcer le rechargement des pending contacts
@@ -335,6 +360,11 @@ class ChatAndIAMenu extends Component
     {
         return $this->userNotifications->map(function ($notification) {
             $data = $notification->data ?? [];
+            if (! is_array($data)) {
+                $data = (array) $data;
+            }
+
+            $type = $data['type'] ?? null;
             $title = $data['title'] ?? ($data['subject'] ?? null);
 
             if (! $title) {
@@ -342,13 +372,30 @@ class ChatAndIAMenu extends Component
             }
 
             $message = $data['message'] ?? ($data['body'] ?? null);
+            if (($type ?? '') === 'chat_ai_reply') {
+                $assistantName = $data['assistant_name'] ?? 'Assistant IA';
+
+                if (! $title) {
+                    $title = sprintf('Reponse de %s', $assistantName);
+                }
+
+                if (! $message) {
+                    $excerpt = $data['assistant_message_excerpt'] ?? null;
+                    $message = $excerpt
+                        ? sprintf('"%s"', $excerpt)
+                        : 'Un assistant IA vous a repondu.';
+                }
+            }
 
             return (object) [
                 'id' => $notification->id,
+                'type' => $type ?? $notification->type,
                 'title' => $title,
                 'message' => $message,
                 'created_at' => $notification->created_at,
                 'is_read' => (bool) $notification->read_at,
+                'contact' => $data['contact'] ?? null,
+                'payload' => $data,
             ];
         });
     }
