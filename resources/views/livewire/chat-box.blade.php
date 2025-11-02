@@ -1,4 +1,4 @@
-<div class="w-full h-full flex flex-col bg-gray-50 relative" @if($isActive) wire:poll.5s="refreshMessages" @endif>
+<div class="w-full h-full flex flex-col bg-gray-50 relative">
     <!-- Formulaire d'envoi - Position absolue en haut pour être toujours visible -->
     <div class="bg-white border-b p-3 shadow-lg z-[100] flex-shrink-0">
         <form wire:submit.prevent="sendMessage">
@@ -38,7 +38,7 @@
     </script>
 
     <!-- Zone des messages -->
-    <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 pt-4">
+    <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 pt-4" @if($isActive) wire:poll.5s="refreshMessages" @endif>
         @forelse ($messages as $index => $message)
             <div class="flex {{ $message['is_mine'] ? 'justify-end' : 'justify-start' }}">
                 <div class="max-w-[75%] rounded-lg px-3 py-2 {{ $message['is_mine'] ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border' }} {{ ($index === 0 || $index === count($messages) - 1) ? 'opacity-75' : '' }}">
@@ -66,4 +66,14 @@
             </div>
         @endif
     </div>
+
+    @if($contactType === 'ai' && $awaitingAiResponse)
+        <div class="px-4 py-2 text-sm text-gray-500 flex items-center gap-2">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            Assistant en train d'écrire...
+        </div>
+    @endif
 </div>

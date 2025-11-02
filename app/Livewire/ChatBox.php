@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Chat;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -21,6 +22,8 @@ class ChatBox extends Component
     public $isSending = false;
 
     public $isActive = false;
+
+    public $awaitingAiResponse = false;
 
     protected $listeners = [
         'activate-chat-polling' => 'activatePolling',
@@ -68,6 +71,10 @@ class ChatBox extends Component
 
             Chat::create($chatData);
 
+            if ($this->contactType === 'ai') {
+                $this->awaitingAiResponse = true;
+            }
+
             $this->loadMessages();
             $this->message = '';
 
@@ -96,6 +103,7 @@ class ChatBox extends Component
             $this->applyContactFilter($query, $user);
 
             $chats = $query->get();
+            $this->awaitingAiResponse = $this->determineAwaitingStatus($chats, $user);
 
             $this->messages = $chats->map(function ($chat) use ($user) {
                 return [
@@ -114,6 +122,7 @@ class ChatBox extends Component
 
         } catch (\Exception $e) {
             $this->messages = [];
+            $this->awaitingAiResponse = false;
         }
     }
 
@@ -124,6 +133,26 @@ class ChatBox extends Component
         }
 
         $this->loadMessages();
+    }
+
+    private function determineAwaitingStatus($chats, $user): bool
+    {
+        if ($this->contactType !== 'ai') {
+            return false;
+        }
+
+        $latest = $chats->first();
+        if (! $latest) {
+            return false;
+        }
+
+        if ($latest->sender_user_id !== $user->id || $latest->sender_ia_id !== null) {
+            return false;
+        }
+
+        $metadata = $latest->metadata ?? [];
+
+        return empty(Arr::get($metadata, 'ai.reply_message_id'));
     }
 
     private function applyContactFilter($query, $user)

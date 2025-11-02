@@ -146,3 +146,7 @@ php artisan migrate
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+##
+* 	* 	* 	* 	* 	/usr/local/bin/php /home/ * /repositories/for/artisan schedule:run >> /dev/null 2>&1
