@@ -41,6 +41,7 @@ class ChatBox extends Component
 
     public function sendMessage()
     {
+
         $text = trim($this->message);
         if (empty($text)) {
             return;

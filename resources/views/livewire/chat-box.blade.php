@@ -1,10 +1,10 @@
 <div class="w-full h-full flex flex-col bg-gray-50 relative">
     <!-- Formulaire d'envoi - Position absolue en haut pour être toujours visible -->
-    <div class="bg-white border-b p-3 shadow-lg z-[100] flex-shrink-0" wire:ignore> 
+    <div class="bg-white border-b p-3 shadow-lg z-[100] flex-shrink-0"> 
         <form wire:submit.prevent="sendMessage">
             <input
                 type="text"
-                wire:model="message"
+                wire:model.live="message"
                 placeholder="Tapez votre message et appuyez sur Entrée..."
                 class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 wire:loading.attr="disabled" wire:target="sendMessage"
