@@ -58,11 +58,11 @@ class ChatBox extends Component
 
             // Déterminer le destinataire selon le type
             if ($this->contactType === 'ai') {
-                $chatData['receiver_ia_id'] = str_replace('ai_', '', $this->contactId);
+                $chatData['receiver_ia_id'] = (int) str_replace('ai_', '', $this->contactId);
             } elseif ($this->contactType === 'user') {
-                $chatData['receiver_user_id'] = str_replace('user_', '', $this->contactId);
+                $chatData['receiver_user_id'] = (int) str_replace('user_', '', $this->contactId);
             } elseif ($this->contactType === 'admin') {
-                $chatData['receiver_user_id'] = str_replace('admin_', '', $this->contactId);
+                $chatData['receiver_user_id'] = (int) str_replace('admin_', '', $this->contactId);
             }
 
             Chat::create($chatData);
@@ -89,7 +89,7 @@ class ChatBox extends Component
 
         try {
             $query = Chat::query()
-                ->with(['sender'])
+                ->with(['sender', 'senderIa'])
                 ->orderBy('created_at', 'desc');
 
             $this->applyContactFilter($query, $user);
@@ -98,10 +98,11 @@ class ChatBox extends Component
 
             $this->messages = $chats->map(function ($chat) use ($user) {
                 return [
-                    'sender' => $chat->sender,
+                    'sender' => $chat->senderIa ?: $chat->sender,
                     'content' => $chat->content,
                     'created_at' => $chat->created_at,
                     'is_mine' => $chat->sender_user_id === $user->id,
+                    'is_ai' => $chat->sender_ia_id !== null,
                 ];
             })->toArray();
 
@@ -119,14 +120,14 @@ class ChatBox extends Component
     {
         // Filtrer selon le type de contact
         if ($this->contactType === 'ai') {
-            $aiId = str_replace('ai_', '', $this->contactId);
+            $aiId = (int) str_replace('ai_', '', $this->contactId);
             $query->where(function ($q) use ($user, $aiId) {
                 $q->where(function ($subQ) use ($user, $aiId) {
                     $subQ->where('sender_user_id', $user->id)
                         ->where('receiver_ia_id', $aiId);
                 })->orWhere(function ($subQ) use ($user, $aiId) {
-                    $subQ->where('sender_user_id', $aiId)
-                        ->where('receiver_user_id', $user->id);
+                    $subQ->where('receiver_user_id', $user->id)
+                        ->where('sender_ia_id', $aiId);
                 });
             });
         } elseif ($this->contactType === 'user') {

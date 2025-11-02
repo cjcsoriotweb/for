@@ -12,6 +12,7 @@ class Chat extends Model
 
     protected $fillable = [
         'sender_user_id',
+        'sender_ia_id',
         'receiver_ia_id',
         'receiver_user_id',
         'content',
@@ -37,6 +38,11 @@ class Chat extends Model
         return $this->belongsTo(AiTrainer::class, 'receiver_ia_id');
     }
 
+    public function senderIa(): BelongsTo
+    {
+        return $this->belongsTo(AiTrainer::class, 'sender_ia_id');
+    }
+
     public function receiverUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'receiver_user_id');
@@ -45,7 +51,10 @@ class Chat extends Model
     // Scopes
     public function scopeWithIa($query, $aiId)
     {
-        return $query->where('receiver_ia_id', $aiId);
+        return $query->where(function ($q) use ($aiId) {
+            $q->where('receiver_ia_id', $aiId)
+                ->orWhere('sender_ia_id', $aiId);
+        });
     }
 
     public function scopeWithUser($query, $userId)
@@ -69,7 +78,7 @@ class Chat extends Model
             return $query->where(function ($q) use ($userId, $receiverId) {
                 $q->where('sender_user_id', $userId)->where('receiver_ia_id', $receiverId);
             })->orWhere(function ($q) use ($userId, $receiverId) {
-                $q->where('sender_user_id', $receiverId)->where('receiver_user_id', $userId);
+                $q->where('sender_ia_id', $receiverId)->where('receiver_user_id', $userId);
             });
         } else {
             return $query->where(function ($q) use ($userId, $receiverId) {
@@ -83,7 +92,7 @@ class Chat extends Model
     // Helper methods
     public function isFromIa(): bool
     {
-        return $this->receiver_ia_id !== null;
+        return $this->sender_ia_id !== null;
     }
 
     public function isToIa(): bool

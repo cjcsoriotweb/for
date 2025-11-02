@@ -10,6 +10,9 @@ return [
 
     'max_message_length' => 2000,
 
+    'fallback_message' => env('AI_FALLBACK_MESSAGE', "Bonjour {user_name}, notre assistant IA est indisponible pour le moment. Nous avons bien recu votre message #{message_id} et un membre de l'equipe vous repondra prochainement."),
+    'fallback_sender_user_id' => env('AI_FALLBACK_SENDER_USER_ID'),
+
     'default_trainer_slug' => env('AI_DEFAULT_TRAINER_SLUG', 'default'),
 
     // Legacy fallback. Trainers are now managed in the ai_trainers table.
