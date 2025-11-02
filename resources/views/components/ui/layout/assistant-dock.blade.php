@@ -6,6 +6,7 @@
 
 @php
     use App\Models\AiTrainer;
+    use App\Models\Formation;
 
     if (! $enable || ! auth()->check()) {
         return;
@@ -17,6 +18,23 @@
         ->orderBy('sort_order')
         ->orderBy('name')
         ->get();
+
+    // Ajouter le trainer spécifique à la formation si on est sur une page de formation
+    $currentRoute = request()->route();
+    if ($currentRoute && str_contains($currentRoute->getName(), 'eleve.formation')) {
+        $formationId = $currentRoute->parameter('formation');
+        if ($formationId && is_numeric($formationId)) {
+            $formation = Formation::find($formationId);
+            if ($formation && $formation->primaryTrainer) {
+                // Vérifier que ce trainer n'est pas déjà dans la liste
+                $trainerExists = $trainers->contains('id', $formation->primaryTrainer->id);
+                if (! $trainerExists) {
+                    // Placer le trainer de formation en haut de la liste
+                    $trainers->prepend($formation->primaryTrainer);
+                }
+            }
+        }
+    }
 @endphp
 
 <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-4">
@@ -63,7 +81,3 @@
         </script>
     @endpush
 @endonce
-
-
-
-
