@@ -1,4 +1,4 @@
-<div class="fixed bottom-6 right-6 z-50" wire:poll.15s="loadPendingContacts" wire:loading.class="animate-pulse bg-blue-50 rounded-lg">
+<div class="fixed bottom-6 right-6 z-50" wire:poll.5s="loadPendingContacts" wire:loading.class="animate-pulse bg-blue-50 rounded-lg">
     <div class="flex flex-col items-end gap-3">
         <!-- Bouton Assistants IA -->
         <button wire:click="toggleDrawer('ia')" aria-label="Ouvrir le menu des assistants IA"

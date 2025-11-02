@@ -12,6 +12,7 @@ return [
 
     'fallback_message' => env('AI_FALLBACK_MESSAGE', "Bonjour {user_name}, notre assistant IA est indisponible pour le moment. Nous avons bien recu votre message #{message_id} et un membre de l'equipe vous repondra prochainement."),
     'fallback_sender_user_id' => env('AI_FALLBACK_SENDER_USER_ID'),
+    'fallback_min_age' => (int) env('AI_FALLBACK_MIN_AGE', 0),
 
     'default_trainer_slug' => env('AI_DEFAULT_TRAINER_SLUG', 'default'),
 

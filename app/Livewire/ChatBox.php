@@ -101,7 +101,7 @@ class ChatBox extends Component
                     'sender' => $chat->senderIa ?: $chat->sender,
                     'content' => $chat->content,
                     'created_at' => $chat->created_at,
-                    'is_mine' => $chat->sender_user_id === $user->id,
+                    'is_mine' => $chat->sender_user_id === $user->id && $chat->sender_ia_id === null,
                     'is_ai' => $chat->sender_ia_id !== null,
                 ];
             })->toArray();

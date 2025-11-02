@@ -18,7 +18,7 @@ class RespondPendingAiMessages extends Command
      */
     protected $signature = 'assistants:respond-pending
                             {--message= : Message a envoyer (placeholders: user_name, conversation_id, message_id, message_created_at)}
-                            {--min-age=5 : Delai minimal (en minutes) avant de traiter un message}
+                            {--min-age= : Delai minimal (en minutes) avant de traiter un message}
                             {--limit=50 : Nombre maximum de conversations a traiter par execution}
                             {--dry-run : Afficher les actions sans enregistrer de reponse}';
 
@@ -40,7 +40,11 @@ class RespondPendingAiMessages extends Command
     public function handle(): int
     {
         $messageTemplate = (string) ($this->option('message') ?: config('ai.fallback_message', $this->defaultMessage()));
-        $minAgeMinutes = (int) max(0, $this->option('min-age') ?? 5);
+        $minAgeOption = $this->option('min-age');
+        $minAgeMinutes = $minAgeOption === null || $minAgeOption === ''
+            ? (int) config('ai.fallback_min_age', 0)
+            : (int) $minAgeOption;
+        $minAgeMinutes = max(0, $minAgeMinutes);
         $limit = (int) max(1, $this->option('limit') ?? 50);
         $dryRun = (bool) $this->option('dry-run');
 
