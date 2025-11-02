@@ -15,6 +15,10 @@ use Throwable;
 
 class ChatBox extends Component
 {
+    protected $listeners = [
+        // Accept both Livewire.emit('launchAssistant', slug) and Livewire.dispatch('launchAssistant', { slug })
+        'launchAssistant' => 'onLaunchAssistant',
+    ];
     public string $trainer = 'default';
     public ?int $conversationId = null;
     public bool $isOpen = false;
@@ -65,6 +69,33 @@ class ChatBox extends Component
         $this->isOpen = ! $this->isOpen;
 
         if ($this->isOpen) {
+            $this->ensureConversation();
+        }
+    }
+
+    /**
+     * Handle a global request to launch/open an assistant.
+     * Payload can be a string slug or an object containing { slug }.
+     */
+    public function onLaunchAssistant($payload = null): void
+    {
+        $slug = null;
+
+        if (is_array($payload) && array_key_exists('slug', $payload)) {
+            $slug = $payload['slug'];
+        } elseif (is_object($payload) && property_exists($payload, 'slug')) {
+            $slug = $payload->slug;
+        } elseif (is_string($payload)) {
+            $slug = $payload;
+        }
+
+        if (! is_string($slug) || trim($slug) === '') {
+            return;
+        }
+
+        // Only open if this component instance corresponds to the requested trainer
+        if ($slug === $this->trainer) {
+            $this->isOpen = true;
             $this->ensureConversation();
         }
     }

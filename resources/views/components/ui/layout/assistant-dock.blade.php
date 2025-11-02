@@ -50,22 +50,67 @@
     @stack('assistant-dock-items')
 </div>
 
+{{-- Container that will render all chatboxes pushed to the `chatboxes` stack. 
+     It is placed at the same bottom-right corner and laid out horizontally.
+     pointer-events handling ensures the dock buttons remain clickable while allowing
+     interaction with the chatboxes themselves. --}}
+<div class="fixed bottom-6 right-6 z-40 flex items-end">
+    <div class="pointer-events-none">
+        <div class="pointer-events-auto flex flex-row items-end space-x-3 flex-wrap justify-end">
+            @stack('chatboxes')
+        </div>
+    </div>
+</div>
 @once
     @push('assistant-dock')
         <script>
             (() => {
+                console.log('[assistant-dock] init');
                 const triggerSelector = '[data-assistant-launch]';
 
                 const dispatchLaunchEvent = (slug) => {
+                    console.log('[assistant-dock] dispatchLaunchEvent', slug);
                     if (!slug) {
                         return;
                     }
 
-                    if (window.Livewire?.dispatch) {
-                        window.Livewire.dispatch('launchAssistant', { slug });
-                    } else if (window.Livewire?.emit) {
-                        window.Livewire.emit('launchAssistant', slug);
-                    }
+                        // Prefer emit (server event) but also dispatch a client event if available.
+                        if (window.Livewire?.emit) {
+                            console.log('[assistant-dock] using Livewire.emit');
+                            window.Livewire.emit('launchAssistant', slug);
+                            // Also dispatch for components/listeners expecting a browser event
+                            if (window.Livewire?.dispatch) {
+                                console.log('[assistant-dock] also using Livewire.dispatch');
+                                window.Livewire.dispatch('launchAssistant', { slug });
+                            }
+
+                            // Fallback: try to find the chatbox DOM node and click its internal toggle button
+                            // This will trigger the Livewire wire:click toggle handler if present.
+                            setTimeout(() => {
+                                try {
+                                    const selector = `[data-trainer="${slug}"]`;
+                                    const comp = document.querySelector(selector);
+                                    if (comp) {
+                                        const toggleBtn = comp.querySelector('button[wire\\:click="toggle"]');
+                                        if (toggleBtn) {
+                                            console.log('[assistant-dock] fallback: clicking internal toggle button for', slug);
+                                            toggleBtn.click();
+                                        } else {
+                                            console.log('[assistant-dock] fallback: toggle button not found for', slug);
+                                        }
+                                    } else {
+                                        console.log('[assistant-dock] fallback: chatbox DOM not found for', slug);
+                                    }
+                                } catch (e) {
+                                    console.warn('[assistant-dock] fallback error', e);
+                                }
+                            }, 80);
+                        } else if (window.Livewire?.dispatch) {
+                            console.log('[assistant-dock] using Livewire.dispatch');
+                            window.Livewire.dispatch('launchAssistant', { slug });
+                        } else {
+                            console.warn('[assistant-dock] Livewire not available at click time');
+                        }
                 };
 
                 document.addEventListener('click', (event) => {
@@ -75,6 +120,7 @@
                     }
 
                     const slug = trigger.getAttribute('data-assistant-launch');
+                    console.log('[assistant-dock] click on trigger', slug, trigger);
                     dispatchLaunchEvent(slug);
                 });
             })();

@@ -23,7 +23,9 @@
         @endphp
 
         @if (! empty($chatTrainerSlug))
-            <livewire:chat-box :trainer="$chatTrainerSlug" :title="$chatTrainerTitle" />
+            @push('chatboxes')
+                <livewire:chat-box :trainer="$chatTrainerSlug" :title="$chatTrainerTitle" />
+            @endpush
         @endif
     @endauth
 </x-eleve-layout>

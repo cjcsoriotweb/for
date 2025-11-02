@@ -10,8 +10,10 @@
 @endphp
 
 @if (! empty($slug))
+    @push('chatboxes')
 
 
-    <livewire:chat-box :key="'assistant-chat-'.$slug" :trainer="$slug" :title="$name" />
+        <livewire:chat-box :key="'assistant-chat-'.$slug" :trainer="$slug" :title="$name" />
+    @endpush
 @endif
 

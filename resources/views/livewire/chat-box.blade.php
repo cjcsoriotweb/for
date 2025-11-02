@@ -1,11 +1,12 @@
-<div class="flex flex-col items-end space-y-3">
+<div class="flex flex-row items-end space-x-3 flex-wrap justify-end" data-trainer="{{ $trainer }}">
     @if (!$isOpen)
-        <button type="button" " wire:click="toggle"
-            class="inline-flex items-center gap-3 rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-lg ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:bg-gray-50"
-            data-assistant-launch="map"> <span
-                class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-xs font-bold">
-                SU </span> <span>{{ $title }}</span> 
-            </button>
+        <button type="button" wire:click="toggle"
+            class="inline-flex items-center gap-3 rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-lg ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:bg-gray-50">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-xs font-bold">
+                SU
+            </span>
+            <span>{{ $title }}</span>
+        </button>
     @else
         <div
             class="bg-white rounded-2xl shadow-2xl flex flex-col w-72 sm:w-96 h-[32rem] overflow-hidden border border-slate-200">
