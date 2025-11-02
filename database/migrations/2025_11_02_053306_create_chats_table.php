@@ -28,9 +28,6 @@ return new class extends Migration
             $table->index(['receiver_ia_id', 'created_at']);
             $table->index(['receiver_user_id', 'created_at']);
             $table->index('is_read');
-
-            // Contrainte : soit receiver_ia_id soit receiver_user_id doit être rempli
-            $table->check('receiver_ia_id IS NOT NULL OR receiver_user_id IS NOT NULL');
         });
     }
 

@@ -26,7 +26,7 @@
                     <!-- Assistants IA -->
                     @if($this->trainers->count() > 0)
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">🤖 Assistants IA</h3>
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">🤖 IA</h3>
                             <div class="space-y-2">
                                 @foreach ($this->trainers as $trainer)
                                     <button wire:click="selectContact('ai_{{ $trainer->id }}')"
@@ -49,7 +49,7 @@
                     <!-- Utilisateurs de la formation -->
                     @if($this->formationUsers->count() > 0)
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">👥 Participants</h3>
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">🏫 Dans ma formation</h3>
                             <div class="space-y-2">
                                 @foreach ($this->formationUsers as $user)
                                     <button wire:click="selectContact('user_{{ $user->id }}')"
@@ -71,11 +71,10 @@
                             </div>
                         </div>
                     @endif
-
                     <!-- Super administrateurs -->
                     @if($this->superAdmins->count() > 0)
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">👑 Administrateurs</h3>
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">👑 Superadmin</h3>
                             <div class="space-y-2">
                                 @foreach ($this->superAdmins as $admin)
                                     <button wire:click="selectContact('admin_{{ $admin->id }}')"
@@ -116,9 +115,10 @@
                             </div>
 
                             @livewire('chat-box', [
-                                'trainer' => $trainer->slug,
+                                'contactId' => 'ai_' . $trainer->id,
+                                'contactType' => 'ai',
                                 'title' => $trainer->name
-                            ], key('chatbox-' . $trainer->slug))
+                            ], key('chatbox-' . $trainer->id))
                         </div>
                     @endif
                 @endforeach
@@ -144,14 +144,11 @@
                                 <span class="font-semibold text-green-900 text-lg">{{ $user->name }}</span>
                             </div>
 
-                            <div class="flex-1 flex flex-col p-4">
-                                <div class="flex-1 flex items-center justify-center text-center text-gray-500">
-                                    <div>
-                                        <p class="text-lg font-medium mb-2">💬 Chat avec {{ $user->name }}</p>
-                                        <p class="text-sm">Fonctionnalité de chat utilisateur à utilisateur à implémenter</p>
-                                    </div>
-                                </div>
-                            </div>
+                            @livewire('chat-box', [
+                                'contactId' => 'user_' . $user->id,
+                                'contactType' => 'user',
+                                'title' => $user->name
+                            ], key('chatbox-user-' . $user->id))
                         </div>
                     @endif
                 @endforeach
@@ -177,14 +174,11 @@
                                 <span class="font-semibold text-red-900 text-lg">{{ $admin->name }}</span>
                             </div>
 
-                            <div class="flex-1 flex flex-col p-4">
-                                <div class="flex-1 flex items-center justify-center text-center text-gray-500">
-                                    <div>
-                                        <p class="text-lg font-medium mb-2">👑 Chat avec {{ $admin->name }}</p>
-                                        <p class="text-sm">Administrateur - Contact direct disponible</p>
-                                    </div>
-                                </div>
-                            </div>
+                            @livewire('chat-box', [
+                                'contactId' => 'admin_' . $admin->id,
+                                'contactType' => 'admin',
+                                'title' => $admin->name
+                            ], key('chatbox-admin-' . $admin->id))
                         </div>
                     @endif
                 @endforeach

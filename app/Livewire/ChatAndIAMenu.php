@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-class AssistantsIaMenu extends Component
+class ChatAndIAMenu extends Component
 {
     public bool $drawer = false;
 
@@ -137,10 +137,8 @@ class AssistantsIaMenu extends Component
 
         $user = Auth::user();
 
-        // Récupérer les superadmin (membres d'équipes avec role superadmin)
-        return User::whereHas('teams', function ($teamQuery) {
-            $teamQuery->where('role', 'superadmin');
-        })
+        // Récupérer les superadmin
+        return User::where('superadmin', 1)
             ->where('id', '!=', $user->id) // Exclure l'utilisateur actuel
             ->orderBy('name')
             ->get();
@@ -191,6 +189,6 @@ class AssistantsIaMenu extends Component
 
     public function render()
     {
-        return view('livewire.assistants-ia-menu');
+        return view('livewire.chat-and-ia-menu');
     }
 }
