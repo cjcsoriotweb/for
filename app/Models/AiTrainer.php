@@ -24,12 +24,14 @@ class AiTrainer extends Model
         'prompt_rules',
         'prompt_custom',
         'is_active',
+        'show_everywhere',
         'sort_order',
     ];
 
     protected $casts = [
         'use_tools' => 'bool',
         'is_active' => 'bool',
+        'show_everywhere' => 'bool',
         'temperature' => 'float',
     ];
 

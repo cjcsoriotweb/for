@@ -13,6 +13,7 @@
 
     $trainers = AiTrainer::query()
         ->active()
+        ->where('show_everywhere', true)
         ->orderBy('sort_order')
         ->orderBy('name')
         ->get();

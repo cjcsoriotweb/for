@@ -27,6 +27,7 @@ class AiTrainerManager extends Component
         'prompt_custom' => '',
         'is_active' => true,
         'sort_order' => 0,
+        'show_everywhere' => true,
     ];
 
     public ?int $trainerId = null;
@@ -73,6 +74,7 @@ class AiTrainerManager extends Component
             'prompt_custom' => $trainer->prompt_custom,
             'is_active' => $trainer->is_active,
             'sort_order' => $trainer->sort_order,
+            'show_everywhere' => $trainer->show_everywhere,
         ];
 
         $this->showForm = true;
@@ -96,6 +98,7 @@ class AiTrainerManager extends Component
         $data['use_tools'] = (bool) ($data['use_tools'] ?? false);
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
+        $data['show_everywhere'] = (bool) ($data['show_everywhere'] ?? false);
 
         if ($this->trainerId) {
             $trainer = AiTrainer::query()->findOrFail($this->trainerId);
@@ -116,6 +119,13 @@ class AiTrainerManager extends Component
         $trainer->delete();
     }
 
+
+    public function toggleShowEverywhere(int $trainerId): void
+    {
+        $trainer = AiTrainer::query()->findOrFail($trainerId);
+        $trainer->show_everywhere = ! $trainer->show_everywhere;
+        $trainer->save();
+    }
     public function toggleActive(int $trainerId): void
     {
         $trainer = AiTrainer::query()->findOrFail($trainerId);
@@ -151,6 +161,7 @@ class AiTrainerManager extends Component
             'form.prompt_custom' => ['nullable', 'string'],
             'form.is_active' => ['boolean'],
             'form.sort_order' => ['integer', 'min:0'],
+            'form.show_everywhere' => ['boolean'],
         ];
     }
 
@@ -172,6 +183,7 @@ class AiTrainerManager extends Component
             'prompt_custom' => '',
             'is_active' => true,
             'sort_order' => 0,
+            'show_everywhere' => true,
         ];
     }
 }

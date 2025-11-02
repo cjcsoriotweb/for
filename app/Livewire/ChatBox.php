@@ -311,11 +311,15 @@ class ChatBox extends Component
     {
         $desiredSlug = $slug !== null ? trim($slug) : null;
 
-        $query = AiTrainer::query()->active();
-        $trainer = $desiredSlug ? (clone $query)->where('slug', $desiredSlug)->first() : null;
+        $baseQuery = AiTrainer::query()->active();
+        $trainer = $desiredSlug ? (clone $baseQuery)->where('slug', $desiredSlug)->first() : null;
 
         if (! $trainer) {
-            $trainer = $query->orderBy('sort_order')->orderBy('name')->first();
+            $trainer = (clone $baseQuery)->where('show_everywhere', true)->orderBy('sort_order')->orderBy('name')->first();
+        }
+
+        if (! $trainer) {
+            $trainer = $baseQuery->orderBy('sort_order')->orderBy('name')->first();
         }
 
         if (! $trainer) {

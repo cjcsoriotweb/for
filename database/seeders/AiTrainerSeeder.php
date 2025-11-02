@@ -34,6 +34,7 @@ class AiTrainerSeeder extends Seeder
                 'guard' => Arr::get($config, 'guard'),
                 'prompt_custom' => Arr::get($config, 'system_prompt'),
                 'is_active' => true,
+                'show_everywhere' => true,
                 'sort_order' => Arr::get($config, 'sort_order', 0),
             ]);
         }

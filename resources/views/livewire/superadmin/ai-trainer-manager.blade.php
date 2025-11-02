@@ -22,6 +22,7 @@
                         <th class="px-4 py-3">{{ __('Slug') }}</th>
                         <th class="px-4 py-3">{{ __('Modele') }}</th>
                         <th class="px-4 py-3 text-center">{{ __('Actif') }}</th>
+                        <th class="px-4 py-3 text-center">{{ __('Afficher partout') }}</th>
                         <th class="px-4 py-3 text-right">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
@@ -38,6 +39,15 @@
                                     class="inline-flex items-center justify-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $trainer->is_active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300' }}"
                                 >
                                     {{ $trainer->is_active ? __('Actif') : __('Inactif') }}
+                                </button>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <button
+                                    type="button"
+                                    wire:click="toggleShowEverywhere({{ $trainer->id }})"
+                                    class="inline-flex items-center justify-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $trainer->show_everywhere ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-200' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300' }}"
+                                >
+                                    {{ $trainer->show_everywhere ? __('Oui') : __('Non') }}
                                 </button>
                             </td>
                             <td class="px-4 py-3">
@@ -64,7 +74,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                            <td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
                                 {{ __('Aucun assistant configure pour le moment.') }}
                             </td>
                         </tr>
@@ -147,7 +157,7 @@
                         <textarea wire:model.defer="form.prompt_custom" rows="4" class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-600 dark:bg-slate-800"></textarea>
                     </div>
 
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
                         <label class="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                             <input type="checkbox" wire:model.defer="form.use_tools" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800" />
                             {{ __('Autoriser les outils Evolubat') }}
@@ -155,6 +165,10 @@
                         <label class="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                             <input type="checkbox" wire:model.defer="form.is_active" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800" />
                             {{ __('Assistant actif') }}
+                        </label>
+                        <label class="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                            <input type="checkbox" wire:model.defer="form.show_everywhere" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800" />
+                            {{ __('Afficher partout') }}
                         </label>
                     </div>
 
