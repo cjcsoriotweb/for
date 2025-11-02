@@ -316,7 +316,7 @@
                 @if($drawerTab === 'ia')
                     @foreach ($this->trainers as $trainer)
                         @if($active === 'ai_' . $trainer->id)
-                            <div class="flex-1 flex flex-col overflow-hidden">
+                            <div class="flex-1 flex flex-col overflow-hidden" wire:ignore>
                                 <div class="flex items-center gap-2 px-5 py-3 border-b bg-indigo-50">
                                     <button wire:click="closeChat" class="text-indigo-600 hover:text-indigo-900 text-xl mr-2" aria-label="Retour">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
@@ -340,7 +340,7 @@
                 @elseif($drawerTab === 'contacts')
                     @foreach ($this->allChatUsers as $chatUser)
                         @if($active === 'user_' . $chatUser->id || $active === 'admin_' . $chatUser->id)
-                            <div class="flex-1 flex flex-col overflow-hidden">
+                            <div class="flex-1 flex flex-col overflow-hidden"  wire:ignore>
                                 <div class="flex items-center gap-2 px-5 py-3 border-b {{ $chatUser->superadmin ? 'bg-red-50' : 'bg-green-50' }}">
                                     <button wire:click="closeChat" class="{{ $chatUser->superadmin ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900' }} text-xl mr-2" aria-label="Retour">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
