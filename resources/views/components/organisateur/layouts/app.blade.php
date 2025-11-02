@@ -6,21 +6,15 @@
     $canSwitchSpaces = count($availableDestinations) > 1;
 @endphp
 
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@push('head')
+    <title>{{ config("app.name", "Laravel") }} - Espace Organisateur</title>
 
-<head>
-  <title>{{ config("app.name", "Laravel") }} - Espace Organisateur</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+@endpush
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.bunny.net" />
-  <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-  <!-- Scripts -->
-  <x-meta-header />
-</head>
-
-<body class="font-sans antialiased">
+<x-app-layout :team="$team">
   {{-- Messages de notification --}}
   @if(session('success'))
   <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
@@ -105,6 +99,4 @@
 
   @livewireScripts
   @stack('scripts')
-</body>
-
-</html>
+</x-app-layout>

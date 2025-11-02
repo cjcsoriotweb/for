@@ -6,21 +6,15 @@
     $canSwitchSpaces = count($availableDestinations) > 1;
 @endphp
 
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@push('head')
+    <title>{{ config('app.name', 'Laravel') }} - Espace &Eacute;l&egrave;ve</title>
 
-<head>
-  <title>{{ config('app.name', 'Laravel') }} - Espace &Eacute;l&egrave;ve</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+@endpush
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.bunny.net" />
-  <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-  <!-- Scripts -->
-  <x-meta-header />
-</head>
-
-<body class="font-sans antialiased bg-slate-950 text-slate-50">
+<x-application-layout :team="$team">
   <div class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900">
     <!-- Navigation -->
     <nav
@@ -83,6 +77,4 @@
   </div>
   <x-ui.layout.assistant-dock />
   @livewireScripts
-</body>
-
-</html>
+</x-application-layout>

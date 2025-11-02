@@ -1,4 +1,4 @@
-<x-admin.layout
+<x-app-layout
     :team="$team"
     icon="shield_person"
     :title="__('Tableau de bord administrateur')"
@@ -11,5 +11,7 @@
     </div>
 
 
-</x-admin.layout>
+</x-app-layout>
+
+<x-ui.layout.assistant-dock />
 
