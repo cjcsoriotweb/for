@@ -1,8 +1,14 @@
 <div data-trainer="{{ $trainer }}" class="w-full h-full flex flex-col">
     <script>
+        // Définir le trainer actuel pour le JavaScript
+        window.currentTrainer = '{{ $trainer }}';
+
         document.addEventListener('livewire:loaded', () => {
-            // Scroll handler
-            Livewire.on('chatbox-scroll', () => {
+            console.log('ChatBox JavaScript loaded for trainer:', window.currentTrainer);
+
+            // Scroll handler - listen for browser events dispatched by PHP
+            window.addEventListener('chatbox-scroll', () => {
+                console.log('chatbox-scroll event received');
                 setTimeout(() => {
                     // Find the visible chatbox messages container and scroll it
                     const containers = document.querySelectorAll('[data-trainer]');
@@ -15,24 +21,38 @@
                 }, 50);
             });
 
-            // Simulated IA reply: the Livewire PHP component dispatches this browser event with trainer and text
-            Livewire.on('chatbox-ia-reply', (data) => {
-                const trainer = data.trainer;
-                const text = data.text || '';
-                if (!trainer) return;
+            // Simulated IA reply: listen for browser events dispatched by PHP
+            window.addEventListener('simulate-reply', (e) => {
+                console.log('simulate-reply event received:', e.detail);
+                const detail = e.detail || {};
+                const text = detail.text || '';
 
-                // Find the chatbox DOM node for this trainer, then the Livewire component id
-                const trainerNode = document.querySelector(`[data-trainer="${trainer}"]`);
-                if (!trainerNode) return;
+                // Simuler un délai de réponse IA
+                setTimeout(() => {
+                    // Find the chatbox DOM node for this trainer, then the Livewire component id
+                    const trainerNode = document.querySelector(`[data-trainer="${window.currentTrainer || ''}"]`);
+                    console.log('Trainer node found:', trainerNode);
 
-                const livewireRoot = trainerNode.closest('[wire\\:id]');
-                const wireId = livewireRoot ? livewireRoot.getAttribute('wire:id') : null;
-                // Compose a simulated reply (replace with real AI response integration)
-                const reply = "Réponse IA simulée à : " + text;
+                    if (!trainerNode) {
+                        console.log('No trainer node found');
+                        return;
+                    }
 
-                if (wireId && window.Livewire && Livewire.find(wireId)) {
-                    Livewire.find(wireId).call('receiveIaReply', reply);
-                }
+                    const livewireRoot = trainerNode.closest('[wire\\:id]');
+                    const wireId = livewireRoot ? livewireRoot.getAttribute('wire:id') : null;
+                    console.log('Livewire ID:', wireId);
+
+                    // Compose a simulated reply (replace with real AI response integration)
+                    const reply = "Réponse IA simulée à : " + text;
+                    console.log('Reply to send:', reply);
+
+                    if (wireId && window.Livewire && Livewire.find(wireId)) {
+                        console.log('Calling simulateAiReply on component:', wireId);
+                        Livewire.find(wireId).call('simulateAiReply', text);
+                    } else {
+                        console.log('Cannot find Livewire component or Livewire not available');
+                    }
+                }, 1500); // Délai de 1.5 secondes pour simuler la réponse IA
             });
         });
     </script>
