@@ -78,6 +78,7 @@ class ChatBox extends Component
 
             $this->loadMessages();
             $this->message = '';
+            $this->dispatch('chat-message-sent', componentId: $this->getId());
 
             // Scroll vers le bas
             $this->dispatch('scroll-to-bottom');

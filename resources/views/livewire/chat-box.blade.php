@@ -157,6 +157,39 @@
                     rememberSelection(input);
                 });
             });
+
+            Livewire.on('chat-message-sent', (event = {}) => {
+                const componentId =
+                    event.componentId ??
+                    event.id ??
+                    (typeof event === 'string' || typeof event === 'number' ? event : null);
+                if (!componentId) {
+                    return;
+                }
+
+                const input = findInput(componentId);
+                if (!input) {
+                    return;
+                }
+
+                input.value = '';
+
+                try {
+                    input.focus({ preventScroll: true });
+                } catch (error) {
+                    // focus can fail when element is detached; ignore silently
+                }
+
+                try {
+                    input.setSelectionRange(0, 0);
+                } catch (error) {
+                    // selection may fail on certain input types; ignore
+                }
+
+                window.__chatFocusedInputs[componentId] = { start: 0, end: 0 };
+
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
         });
     </script>
 
