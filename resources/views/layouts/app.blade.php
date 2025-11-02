@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full antialiased">
 
 <head>
@@ -20,6 +20,8 @@
 
 
   <x-ui.layout.assistant-dock :notifications="9" :enable="true" :locked="false" />
+
+  @stack('assistant-dock')
 
   <!-- Bottom widget from layouts/app.blade -->
   @stack('modals') @livewireScripts @stack('scripts')
