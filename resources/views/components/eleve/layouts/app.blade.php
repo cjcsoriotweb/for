@@ -20,7 +20,6 @@
       {{ $slot }}
     </main>
   </div>
-  <x-ui.layout.assistant-dock />
   
   @livewireScripts
 </x-app-layout>
