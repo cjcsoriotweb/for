@@ -107,7 +107,7 @@
                         <form
                             action="{{
                                 route(
-                                    'formateur.formation.chapter.update.put',
+                                    'formateur.formation.chapter.update',
                                     [$formation, $chapter]
                                 )
                             }}"

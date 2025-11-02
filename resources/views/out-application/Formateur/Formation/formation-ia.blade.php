@@ -13,13 +13,13 @@
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            {{ __('Retour à la formation') }}
+            {{ __('Retour a la formation') }}
           </a>
           <h1 class="mt-4 text-3xl font-bold text-gray-900">
             {{ __('Formateur IA pour : :title', ['title' => $formation->title]) }}
           </h1>
           <p class="mt-2 text-sm text-gray-600">
-            {{ __('Sélectionnez un formateur IA actif pour cette formation ou choisissez de ne pas en utiliser.') }}
+            {{ __('Selectionnez un formateur IA actif pour cette formation ou choisissez de ne pas en utiliser.') }}
           </p>
         </div>
         <div class="hidden sm:block">
@@ -48,10 +48,10 @@
       <div class="bg-white shadow-sm ring-1 ring-gray-100/70 sm:rounded-2xl">
         <div class="border-b border-gray-100 px-6 py-4">
           <h2 class="text-lg font-semibold text-gray-900">
-            {{ __('Paramétrage du formateur IA') }}
+            {{ __('Parametrage du formateur IA') }}
           </h2>
           <p class="mt-1 text-sm text-gray-500">
-            {{ __('Un formateur IA permet aux élèves de dialoguer avec un assistant dédié à cette formation.') }}
+            {{ __('Un formateur IA permet aux eleves de dialoguer avec un assistant dedie a cette formation.') }}
           </p>
         </div>
 
@@ -59,7 +59,7 @@
           @if ($trainers->isEmpty())
             <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center">
               <p class="text-sm text-gray-600">
-                {{ __('Aucun formateur IA actif n’est disponible pour le moment. Contactez un administrateur pour en créer.') }}
+                {{ __('Aucun formateur IA actif nest disponible pour le moment. Contactez un administrateur pour en creer.') }}
               </p>
             </div>
           @else
@@ -69,7 +69,7 @@
 
               <fieldset class="space-y-4">
                 <legend class="text-sm font-medium text-gray-700">
-                  {{ __('Choisissez le formateur IA à associer à cette formation') }}
+                  {{ __('Choisissez le formateur IA a associer a cette formation') }}
                 </legend>
 
                 <div class="flex flex-col gap-3">
@@ -87,7 +87,7 @@
                           {{ __('Aucun formateur IA') }}
                         </p>
                         <p class="text-xs text-gray-500">
-                          {{ __('Les élèves ne verront pas le module de discussion IA pour cette formation.') }}
+                          {{ __('Les eleves ne verront pas le module de discussion IA pour cette formation.') }}
                         </p>
                       </div>
                     </div>
@@ -113,13 +113,13 @@
                             </p>
                           @endif
                           <p class="mt-1 text-xs text-gray-400">
-                            {{ __('Modèle : :model', ['model' => $trainer->model ?: __('défaut')]) }}
+                            {{ __('Modele : :model', ['model' => $trainer->model ?: __('defaut')]) }}
                           </p>
                         </div>
                       </div>
-                      @if ($trainer->is_default)
+                      @if ($trainer->slug === $defaultTrainerSlug)
                         <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
-                          {{ __('Défaut') }}
+                          {{ __('Defaut') }}
                         </span>
                       @endif
                     </label>
@@ -148,5 +148,3 @@
     </div>
   </div>
 </x-app-layout>
-
-

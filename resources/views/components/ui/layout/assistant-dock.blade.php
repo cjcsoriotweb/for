@@ -5,12 +5,13 @@
 ])
 
 @php
+    use App\Models\AiTrainer;
 
     if (! $enable || ! auth()->check()) {
         return;
     }
 
-    $trainers = \App\Models\AiTrainer::query()
+    $trainers = AiTrainer::query()
         ->active()
         ->where('show_everywhere', true)
         ->orderBy('sort_order')
