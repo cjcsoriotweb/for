@@ -6,6 +6,7 @@ use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class ChatAndIAMenu extends Component
@@ -13,6 +14,8 @@ class ChatAndIAMenu extends Component
     public bool $drawer = false;
 
     public ?string $active = null;
+
+    public ?string $drawerTab = null;
 
     public $notifications = 0;
 
@@ -34,7 +37,8 @@ class ChatAndIAMenu extends Component
     public function onLaunchAssistant($slug)
     {
         $this->drawer = true;
-        $this->active = $slug;
+        $this->drawerTab = 'ia';
+        $this->active = Str::start($slug, 'ai_');
     }
 
     public function closeChat()
@@ -42,10 +46,33 @@ class ChatAndIAMenu extends Component
         $this->active = null;
     }
 
-    public function toggleDrawer()
+    public function toggleDrawer(?string $tab = null)
     {
-        $this->drawer = ! $this->drawer;
-        if (! $this->drawer) {
+        if ($tab === null) {
+            if ($this->drawer) {
+                $this->resetDrawerState();
+            } else {
+                $this->drawer = true;
+            }
+
+            return;
+        }
+
+        if ($this->drawer && $this->drawerTab === $tab) {
+            $this->resetDrawerState();
+
+            return;
+        }
+
+        $this->drawer = true;
+        $this->drawerTab = $tab;
+
+        if ($tab === 'notifications') {
+            $this->active = null;
+            $this->markNotificationsAsRead();
+        } elseif ($tab === 'ia' && ! str_starts_with((string) $this->active, 'ai_')) {
+            $this->active = null;
+        } elseif ($tab === 'contacts' && str_starts_with((string) $this->active, 'ai_')) {
             $this->active = null;
         }
     }
@@ -53,8 +80,33 @@ class ChatAndIAMenu extends Component
     public function selectContact($contactId)
     {
         $this->active = $contactId;
+        $this->drawer = true;
+        $this->drawerTab = str_starts_with($contactId, 'ai_') ? 'ia' : 'contacts';
+
         // Activer le polling pour le chat actif
         $this->dispatch('activate-chat-polling', contactId: $contactId);
+    }
+
+    public function closeDrawer()
+    {
+        $this->resetDrawerState();
+    }
+
+    protected function resetDrawerState(): void
+    {
+        $this->drawer = false;
+        $this->drawerTab = null;
+        $this->active = null;
+    }
+
+    protected function markNotificationsAsRead(): void
+    {
+        if (! Auth::check()) {
+            return;
+        }
+
+        Auth::user()->unreadNotifications()->update(['read_at' => now()]);
+        $this->notifications = 0;
     }
 
     public function loadPendingContacts()
@@ -166,6 +218,10 @@ class ChatAndIAMenu extends Component
                 ->where('is_read', false);
         })
             ->where('id', '!=', $user->id)
+            ->withCount(['sentChats as unread_count' => function ($query) use ($user) {
+                $query->where('receiver_user_id', $user->id)
+                    ->where('is_read', false);
+            }])
             ->with(['sentChats' => function ($query) use ($user) {
                 $query->where('receiver_user_id', $user->id)
                     ->where('is_read', false)
@@ -176,11 +232,15 @@ class ChatAndIAMenu extends Component
             ->map(function ($contact) {
                 $latestMessage = $contact->sentChats->first();
                 $contact->latest_message = $latestMessage;
-                $contact->unread_count = $contact->sentChats->where('is_read', false)->count();
+                $contact->chat_contact_type = $contact->superadmin ? 'admin' : 'user';
+                $contact->chat_contact_id = $contact->chat_contact_type.'_'.$contact->id;
 
                 return $contact;
             })
-            ->sortByDesc('latest_message.created_at');
+            ->sortByDesc(function ($contact) {
+                return optional($contact->latest_message)->created_at;
+            })
+            ->values();
     }
 
     public function getAllChatUsersProperty()
@@ -259,8 +319,62 @@ class ChatAndIAMenu extends Component
         return $contacts;
     }
 
+    public function getUserNotificationsProperty()
+    {
+        if (! Auth::check()) {
+            return collect();
+        }
+
+        return Auth::user()->notifications()
+            ->latest()
+            ->limit(20)
+            ->get();
+    }
+
+    public function getFormattedNotificationsProperty()
+    {
+        return $this->userNotifications->map(function ($notification) {
+            $data = $notification->data ?? [];
+            $title = $data['title'] ?? ($data['subject'] ?? null);
+
+            if (! $title) {
+                $title = Str::headline(class_basename($notification->type ?? 'Notification'));
+            }
+
+            $message = $data['message'] ?? ($data['body'] ?? null);
+
+            return (object) [
+                'id' => $notification->id,
+                'title' => $title,
+                'message' => $message,
+                'created_at' => $notification->created_at,
+                'is_read' => (bool) $notification->read_at,
+            ];
+        });
+    }
+
+    public function getUnreadNotificationsCountProperty()
+    {
+        if (! Auth::check()) {
+            return 0;
+        }
+
+        return Auth::user()->unreadNotifications()->count();
+    }
+
+    public function getPendingTotalUnreadProperty()
+    {
+        return $this->pendingContacts->sum('unread_count');
+    }
+
     public function render()
     {
+        if (Auth::check()) {
+            $this->notifications = $this->unreadNotificationsCount;
+        } else {
+            $this->notifications = 0;
+        }
+
         return view('livewire.chat-and-ia-menu');
     }
 }
