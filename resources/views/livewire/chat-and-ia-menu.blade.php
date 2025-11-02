@@ -1,4 +1,4 @@
-<div class="fixed bottom-6 right-6 z-50" wire:poll.5s="loadPendingContacts" wire:loading.class="animate-pulse bg-blue-50 rounded-lg">
+<div class="fixed bottom-6 right-6 z-50" wire:loading.class="animate-pulse bg-blue-50 rounded-lg">
     <div class="flex flex-col items-end gap-3">
         <!-- Bouton Assistants IA -->
         <button wire:click="toggleDrawer('ia')" aria-label="Ouvrir le menu des assistants IA"
@@ -14,7 +14,7 @@
         </button>
 
         <!-- Bouton Contacts -->
-        <button wire:click="toggleDrawer('contacts')" aria-label="Ouvrir le menu des contacts"
+        <button  wire:poll.5s="loadPendingContacts" wire:click="toggleDrawer('contacts')" aria-label="Ouvrir le menu des contacts"
             @class([
                 'w-14 h-14 rounded-full text-white shadow-2xl flex items-center justify-center transition relative focus:outline-none focus:ring-2 focus:ring-offset-2',
                 'bg-green-700 ring-4 ring-green-200 focus:ring-green-500' => $drawer && $drawerTab === 'contacts',

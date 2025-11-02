@@ -7,7 +7,7 @@
                 wire:model="message"
                 placeholder="Tapez votre message et appuyez sur Entrée..."
                 class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                wire:loading.attr="disabled"
+                wire:loading.attr="disabled" wire:target="sendMessage"
                 maxlength="1000"
                 data-chat-input="{{ $this->getId() }}"
             >
@@ -46,23 +46,116 @@
             window.__chatInputFocusHooked = true;
             window.__chatFocusedInputs = {};
 
-            Livewire.hook('message.sent', (component) => {
-                const input = document.querySelector(`input[data-chat-input="${component.id}"]`);
-                if (input && document.activeElement === input) {
-                    window.__chatFocusedInputs[component.id] = true;
+            const selector = '[data-chat-input]';
+
+            const findInput = (componentId) =>
+                document.querySelector(`[data-chat-input="${componentId}"]`);
+
+            const rememberSelection = (input) => {
+                if (!input || document.activeElement !== input) {
+                    return;
                 }
+
+                const componentId = input.dataset.chatInput;
+                if (!componentId) {
+                    return;
+                }
+
+                window.__chatFocusedInputs[componentId] = {
+                    start: input.selectionStart ?? input.value.length,
+                    end: input.selectionEnd ?? input.value.length,
+                };
+            };
+
+            const forgetSelection = (input) => {
+                if (!input) {
+                    return;
+                }
+
+                const componentId = input.dataset.chatInput;
+                if (componentId) {
+                    delete window.__chatFocusedInputs[componentId];
+                }
+            };
+
+            const registerInput = (input) => {
+                if (!input || input.__chatFocusRegistered) {
+                    return;
+                }
+
+                input.__chatFocusRegistered = true;
+
+                ['focus', 'keyup', 'click', 'input'].forEach((eventName) => {
+                    input.addEventListener(eventName, () => rememberSelection(input));
+                });
+
+                input.addEventListener('blur', () => forgetSelection(input));
+            };
+
+            const registerAllInputs = () => {
+                document.querySelectorAll(selector).forEach(registerInput);
+            };
+
+            const resolveComponent = (hookArgs) => {
+                const args = Array.isArray(hookArgs) ? hookArgs : Array.from(hookArgs);
+
+                for (const arg of args) {
+                    if (arg && typeof arg === 'object' && 'id' in arg && 'el' in arg) {
+                        return arg;
+                    }
+                }
+
+                return null;
+            };
+
+            registerAllInputs();
+
+            Livewire.hook('message.sent', function (...hookArgs) {
+                const component = resolveComponent(hookArgs);
+                if (!component) {
+                    return;
+                }
+
+                rememberSelection(findInput(component.id));
             });
 
-            Livewire.hook('message.processed', (component) => {
-                if (window.__chatFocusedInputs[component.id]) {
-                    const input = document.querySelector(`input[data-chat-input="${component.id}"]`);
-                    if (input) {
-                        const length = input.value.length;
-                        input.focus({ preventScroll: true });
-                        input.setSelectionRange(length, length);
-                    }
-                    delete window.__chatFocusedInputs[component.id];
+            Livewire.hook('message.received', function (...hookArgs) {
+                const component = resolveComponent(hookArgs);
+                if (!component) {
+                    return;
                 }
+
+                rememberSelection(findInput(component.id));
+            });
+
+            Livewire.hook('message.processed', function (...hookArgs) {
+                const component = resolveComponent(hookArgs);
+                if (!component) {
+                    return;
+                }
+
+                registerAllInputs();
+
+                const selection = window.__chatFocusedInputs[component.id];
+                if (!selection) {
+                    return;
+                }
+
+                const input = findInput(component.id);
+                if (!input) {
+                    delete window.__chatFocusedInputs[component.id];
+                    return;
+                }
+
+                requestAnimationFrame(() => {
+                    const start =
+                        typeof selection.start === 'number' ? selection.start : input.value.length;
+                    const end = typeof selection.end === 'number' ? selection.end : start;
+
+                    input.focus({ preventScroll: true });
+                    input.setSelectionRange(start, end);
+                    rememberSelection(input);
+                });
             });
         });
     </script>
