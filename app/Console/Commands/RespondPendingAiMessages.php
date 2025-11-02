@@ -382,7 +382,7 @@ class RespondPendingAiMessages extends Command
     private function createAssistantMessage(Chat $sourceMessage, User $assistantUser, int $trainerId, string $content, array $metadata): Chat
     {
         return Chat::query()->create([
-            'sender_user_id' => $assistantUser->id,
+            'sender_user_id' => null,
             'sender_ia_id' => $trainerId,
             'receiver_user_id' => $sourceMessage->sender_user_id,
             'content' => $content,
@@ -512,7 +512,9 @@ class RespondPendingAiMessages extends Command
     private function notifyUserOfReply(Chat $assistantMessage, Chat $sourceMessage): void
     {
         $recipient = $sourceMessage->sender;
-        if (! $recipient || (int) $recipient->id === (int) $assistantMessage->sender_user_id) {
+        $assistantSenderUserId = $assistantMessage->sender_user_id;
+
+        if (! $recipient || ($assistantSenderUserId !== null && (int) $recipient->id === (int) $assistantSenderUserId)) {
             return;
         }
 
