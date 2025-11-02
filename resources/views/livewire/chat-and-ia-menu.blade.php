@@ -329,7 +329,7 @@
                                                     <div class="flex flex-col items-end gap-2">
                                                         <span class="text-xs text-gray-400">{{ $aiNotification->created_at->diffForHumans() }}</span>
                                                         <button type="button"
-                                                            wire:click.stop="dismissAiNotification({{ $aiNotification->id }})"
+                                                            wire:click="removeNotification({{ $aiNotification->id }})"
                                                             class="text-xs text-indigo-700 hover:text-indigo-900 underline">
                                                             Retirer notification
                                                         </button>

@@ -15,6 +15,8 @@ class QuizService
      */
     public function submitQuiz(User $user, Quiz $quiz, Lesson $lesson, array $answers, ?int $startTime = null): array
     {
+        $quiz->loadMissing('quizQuestions.quizChoices');
+
         // Calculer le score
         $result = $this->calculateScore($quiz, $answers);
 
@@ -25,13 +27,43 @@ class QuizService
         }
 
         // Créer une tentative de quiz avec la durée
-        $attempt = $this->createQuizAttempt($user, $quiz, $result, $duration);
+        $attempt = $this->createQuizAttempt($user, $quiz, $result, QuizAttempt::TYPE_REGULAR, $duration);
 
         // Enregistrer les réponses individuelles
         $this->saveQuizAnswers($attempt, $quiz, $answers);
 
         // Mettre à jour la progression de la leçon
         $this->updateLessonProgress($user, $lesson, $result);
+
+        return [
+            'success' => true,
+            'score' => $result['score'],
+            'passed' => $result['passed'],
+            'correct_answers' => $result['correct_answers'],
+            'total_questions' => $result['total_questions'],
+            'max_score' => $result['max_score'],
+            'attempt_id' => $attempt->id,
+            'duration_seconds' => $duration,
+        ];
+    }
+
+    /**
+     * Soumettre un quiz li� � la formation (pr� ou post)
+     */
+    public function submitFormationQuiz(User $user, Quiz $quiz, array $answers, string $attemptType = QuizAttempt::TYPE_PRE, ?int $startTime = null): array
+    {
+        $quiz->loadMissing('quizQuestions.quizChoices');
+
+        $result = $this->calculateScore($quiz, $answers);
+
+        $duration = null;
+        if ($startTime) {
+            $duration = time() - $startTime;
+        }
+
+        $attempt = $this->createQuizAttempt($user, $quiz, $result, $attemptType, $duration);
+
+        $this->saveQuizAnswers($attempt, $quiz, $answers);
 
         return [
             'success' => true,
@@ -83,11 +115,12 @@ class QuizService
     /**
      * Créer une tentative de quiz
      */
-    private function createQuizAttempt(User $user, Quiz $quiz, array $result, ?int $duration = null): QuizAttempt
+    private function createQuizAttempt(User $user, Quiz $quiz, array $result, string $attemptType, ?int $duration = null): QuizAttempt
     {
         return QuizAttempt::create([
             'user_id' => $user->id,
             'quiz_id' => $quiz->id,
+            'attempt_type' => $attemptType,
             'score' => $result['score'],
             'max_score' => $result['max_score'],
             'duration_seconds' => $duration ?? 0,

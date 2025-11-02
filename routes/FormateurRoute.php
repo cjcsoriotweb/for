@@ -3,6 +3,7 @@
 use App\Http\Controllers\Clean\Formateur\FormateurPageController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationAiController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationController;
+use App\Http\Controllers\Clean\Formateur\Formation\FormationEntryQuizController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationCompletionDocumentController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
@@ -35,6 +36,14 @@ Route::prefix('formateur')
             Route::get('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'index'])->name('formation.completion-documents.index');
             Route::post('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'store'])->name('formation.completion-documents.store');
             Route::delete('/formation/{formation}/completion-documents/{document}', [FormationCompletionDocumentController::class, 'destroy'])->name('formation.completion-documents.destroy');
+
+            // Entry quiz management
+            Route::get('/formation/{formation}/entry-quiz', [FormationEntryQuizController::class, 'edit'])->name('formation.entry-quiz.edit');
+            Route::post('/formation/{formation}/entry-quiz', [FormationEntryQuizController::class, 'store'])->name('formation.entry-quiz.store');
+            Route::get('/formation/{formation}/entry-quiz/questions', [FormationEntryQuizController::class, 'manageQuestions'])->name('formation.entry-quiz.questions');
+            Route::post('/formation/{formation}/entry-quiz/questions', [FormationEntryQuizController::class, 'storeQuestion'])->name('formation.entry-quiz.questions.store');
+            Route::put('/formation/{formation}/entry-quiz/questions/{question}', [FormationEntryQuizController::class, 'updateQuestion'])->name('formation.entry-quiz.questions.update');
+            Route::delete('/formation/{formation}/entry-quiz/questions/{question}', [FormationEntryQuizController::class, 'deleteQuestion'])->name('formation.entry-quiz.questions.delete');
 
             // Chapter routes
             Route::get('/formation/{formation}/chapitre/{chapter}/show', [FormationChapterController::class, 'editChapter'])->name('formation.chapter.edit');

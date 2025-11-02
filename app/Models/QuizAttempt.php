@@ -13,6 +13,7 @@ class QuizAttempt extends Model
     public $fillable = [
         'user_id',
         'quiz_id',
+        'attempt_type',
         'score',
         'max_score',
         'duration_seconds',
@@ -25,12 +26,29 @@ class QuizAttempt extends Model
         return [
             'user_id' => 'integer',
             'quiz_id' => 'integer',
+            'attempt_type' => 'string',
             'score' => 'integer',
             'max_score' => 'integer',
             'duration_seconds' => 'integer',
             'started_at' => 'datetime',
             'submitted_at' => 'datetime',
         ];
+    }
+
+    public const TYPE_REGULAR = 'regular';
+
+    public const TYPE_PRE = 'pre';
+
+    public const TYPE_POST = 'post';
+
+    public function isPreAssessment(): bool
+    {
+        return $this->attempt_type === self::TYPE_PRE;
+    }
+
+    public function isPostAssessment(): bool
+    {
+        return $this->attempt_type === self::TYPE_POST;
     }
 
     public function user()

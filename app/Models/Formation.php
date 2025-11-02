@@ -6,6 +6,7 @@ use Database\Factories\FormationFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -81,6 +82,13 @@ class Formation extends Model
                 'completed_at',
                 'score_total',
                 'max_score_total',
+                'entry_quiz_attempt_id',
+                'entry_quiz_score',
+                'entry_quiz_completed_at',
+                'post_quiz_attempt_id',
+                'post_quiz_score',
+                'post_quiz_completed_at',
+                'quiz_progress_delta',
                 'enrollment_cost',
             ])
             ->withTimestamps();
@@ -97,6 +105,12 @@ class Formation extends Model
     public function completionDocuments(): HasMany
     {
         return $this->hasMany(FormationCompletionDocument::class);
+    }
+
+    public function entryQuiz(): HasOne
+    {
+        return $this->hasOne(Quiz::class)
+            ->where('type', Quiz::TYPE_ENTRY);
     }
 
     public function category(): BelongsTo
