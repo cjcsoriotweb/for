@@ -37,17 +37,15 @@
   </button>
   @else
   <button type="button" wire:click="autoplayOn"
-    class="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-bold text-lg rounded-xl hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+    class="inline-flex items-center px-8 py-4 -bold text-lg rounded-xl transition-all duration-300  transform hover:-translate-y-1">
     {{-- Icône "éclair" / activer auto --}}
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
       class="w-6 h-6 mr-3">
       <path stroke-linecap="round" stroke-linejoin="round"
         d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
     </svg>
-    Automatique
-    <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
+    
+
   </button>
   @endif
 </div>
