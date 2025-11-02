@@ -1,7 +1,7 @@
     <footer class="bg-gradient-to-r from-white via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-800 py-12">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col items-center gap-6">
-          <x-application-logo class="h-12 w-auto" size="4xl"/>
+          <x-application-logo class="h-12 w-auto" size="5xl"/>
 
           <p class="text-center text-sm text-gray-600 dark:text-gray-300 max-w-prose">
             {{ __("Construisons des choses élégantes et utiles — restez informé·e de nos nouveautés.") }}

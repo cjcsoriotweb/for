@@ -54,6 +54,31 @@
                     }
                 }, 1500); // Délai de 1.5 secondes pour simuler la réponse IA
             });
+
+            // AI response request handler
+            window.addEventListener('process-ai-response', (e) => {
+                console.log('process-ai-response event received:', e.detail);
+                const detail = e.detail || {};
+                const text = detail.text || '';
+
+                // Trouver le composant Livewire pour ce trainer
+                const trainerNode = document.querySelector(`[data-trainer="${window.currentTrainer || ''}"]`);
+                if (!trainerNode) {
+                    console.log('No trainer node found for AI response');
+                    return;
+                }
+
+                const livewireRoot = trainerNode.closest('[wire\\:id]');
+                const wireId = livewireRoot ? livewireRoot.getAttribute('wire:id') : null;
+
+                if (wireId && window.Livewire && Livewire.find(wireId)) {
+                    console.log('Calling processAiResponse on component:', wireId);
+                    // Appeler la méthode immédiatement pour traiter la réponse IA
+                    Livewire.find(wireId).call('processAiResponse', text);
+                } else {
+                    console.log('Cannot find Livewire component for AI response');
+                }
+            });
         });
     </script>
 
@@ -76,9 +101,15 @@
             </div>
         @endforelse
 
-        @if ($isLoading)
+        @if ($isLoading || $isSending)
             <div class="flex justify-center py-2">
-                <span class="text-xs text-gray-500">{{ __('Chargement...') }}</span>
+                <span class="text-xs text-gray-500">
+                    @if ($isSending && !$isLoading)
+                        {{ __('Envoi en cours...') }}
+                    @else
+                        {{ __('L\'assistant réfléchit...') }}
+                    @endif
+                </span>
             </div>
         @endif
 

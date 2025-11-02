@@ -16,14 +16,23 @@ use Throwable;
 class ChatBox extends Component
 {
     public $trainer;
+
     public $title;
+
     public $isOpen = false;
+
     public $assistantMeta = [];
+
     public $messages = [];
+
     public $isLoading = false;
+
     public $isSending = false;
+
     public $message = '';
+
     public $error = null;
+
     public ?int $conversationId = null;
 
     protected $listeners = [
@@ -32,7 +41,9 @@ class ChatBox extends Component
     ];
 
     protected OllamaClient $ollamaClient;
+
     protected ToolExecutor $toolExecutor;
+
     protected ?AiTrainer $trainerModel = null;
 
     public function boot(OllamaClient $ollamaClient, ToolExecutor $toolExecutor): void
@@ -78,7 +89,7 @@ class ChatBox extends Component
             return;
         }
 
-        // Ajouter le message utilisateur
+        // Ajouter le message utilisateur immédiatement
         $this->messages[] = [
             'role' => 'user',
             'content' => $text,
@@ -87,11 +98,18 @@ class ChatBox extends Component
 
         $this->message = '';
         $this->isSending = true;
-        $this->isLoading = true;
         $this->error = null;
 
         // Demander au navigateur de scroller
         $this->dispatch('chatbox-scroll');
+
+        // Dispatch un événement pour traiter la réponse IA de manière asynchrone
+        $this->dispatch('process-ai-response', ['text' => $text]);
+    }
+
+    public function processAiResponse($text)
+    {
+        $this->isLoading = true;
 
         try {
             // Essayer d'appeler Ollama pour une vraie réponse
@@ -99,7 +117,7 @@ class ChatBox extends Component
                 [
                     'role' => 'user',
                     'content' => $text,
-                ]
+                ],
             ];
 
             $result = $this->ollamaClient->chat($messages);
@@ -108,7 +126,7 @@ class ChatBox extends Component
         } catch (Throwable $exception) {
             // En cas d'erreur, utiliser une réponse simulée
             report($exception);
-            $reply = "Réponse IA simulée à : " . $text . " (Erreur Ollama: " . $exception->getMessage() . ")";
+            $reply = 'Réponse IA simulée à : '.$text.' (Erreur Ollama: '.$exception->getMessage().')';
         }
 
         // Ajouter la réponse
@@ -131,7 +149,7 @@ class ChatBox extends Component
 
     public function simulateAiReply($text)
     {
-        $reply = "Réponse IA simulée à : " . $text;
+        $reply = 'Réponse IA simulée à : '.$text;
 
         $this->messages[] = [
             'role' => 'assistant',
@@ -199,6 +217,7 @@ class ChatBox extends Component
     {
         if ($this->conversationId) {
             $this->loadConversation($this->conversationId);
+
             return;
         }
 
@@ -210,6 +229,7 @@ class ChatBox extends Component
         $user = $this->user();
         if (! $user) {
             $this->error = __('Authentification requise.');
+
             return;
         }
 
@@ -247,6 +267,7 @@ class ChatBox extends Component
         $user = $this->user();
         if (! $user) {
             $this->error = __('Authentification requise.');
+
             return;
         }
 
