@@ -56,7 +56,7 @@
                     class="inline-flex items-center gap-2 rounded-full border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-50"
                 >
                     <span class="material-symbols-outlined text-base">category</span>
-                    {{ __('Gérer les catégories IA') }}
+                    {{ __('Gérer les catégories de formation') }}
                 </a>
             </div>
         </div>

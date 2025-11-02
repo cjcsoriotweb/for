@@ -24,7 +24,7 @@
             'icon' => 'library_books',
             'label' => __('Formations'),
             'stat' => number_format($stats->get('formations', 0)),
-            'description' => __('Pilotez le catalogue global et ses catégories IA.'),
+            'description' => __('Pilotez le catalogue global et les catégories de formation.'),
             'cta' => __('Gérer les formations'),
         ],
         [
