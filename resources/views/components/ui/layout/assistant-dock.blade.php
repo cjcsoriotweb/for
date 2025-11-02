@@ -22,22 +22,46 @@
     // Ajouter le trainer spécifique à la formation si on est sur une page de formation (mais pas de leçon)
     $currentRoute = request()->route();
     if ($currentRoute && str_contains($currentRoute->getName(), 'eleve.formation') && !str_contains($currentRoute->getName(), 'eleve.formation.lesson')) {
-        $formationId = $currentRoute->parameter('formation');
-        if ($formationId && is_numeric($formationId)) {
-            $formation = Formation::find($formationId);
-            if ($formation && $formation->primaryTrainer) {
-                // Vérifier que ce trainer n'est pas déjà dans la liste
-                $trainerExists = $trainers->contains('id', $formation->primaryTrainer->id);
-                if (! $trainerExists) {
-                    // Placer le trainer de formation en haut de la liste
-                    $trainers->prepend($formation->primaryTrainer);
+        // The route 'formation' parameter may be an id, a bound Formation model, or an array/object.
+        $formationParam = $currentRoute->parameter('formation');
+        $formation = null;
+
+        if ($formationParam) {
+            // Numeric id
+            if (is_numeric($formationParam)) {
+                $formation = Formation::find($formationParam);
+            }
+
+            // Already a Formation model (route model binding)
+            if (! $formation && $formationParam instanceof Formation) {
+                $formation = $formationParam;
+            }
+
+            // If it's an object/array with id attribute
+            if (! $formation) {
+                if (is_object($formationParam) && property_exists($formationParam, 'id')) {
+                    $formation = Formation::find($formationParam->id);
+                } elseif (is_array($formationParam) && isset($formationParam['id'])) {
+                    $formation = Formation::find($formationParam['id']);
                 }
             }
         }
+
+        if ($formation && $formation->primaryTrainer) {
+            // Vérifier que ce trainer n'est pas déjà dans la liste
+            $trainerExists = $trainers->contains('id', $formation->primaryTrainer->id);
+            if (! $trainerExists) {
+                // Placer le trainer de formation en haut de la liste
+                $trainers->prepend($formation->primaryTrainer);
+            }
+        }
     }
+
+    
 @endphp
 
 <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-4">
+    
     @foreach ($trainers as $trainer)
         <x-ui.layout.assistant-entry
             :slug="$trainer->slug"
