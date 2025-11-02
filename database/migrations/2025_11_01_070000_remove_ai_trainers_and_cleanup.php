@@ -11,20 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Supprimer les tables ai_trainers et ai_trainer_formation
-        Schema::dropIfExists('ai_trainer_formation');
-        Schema::dropIfExists('ai_trainers');
-
-        // Supprimer la colonne ai_trainer_id de ai_conversations
-        if (Schema::hasTable('ai_conversations')) {
-            Schema::table('ai_conversations', function (Blueprint $table) {
-                if (Schema::hasColumn('ai_conversations', 'ai_trainer_id')) {
-                    // Supprimer la contrainte foreign key par son nom
-                    $table->dropForeign('ai_conversations_ai_trainer_id_foreign');
-                    $table->dropColumn('ai_trainer_id');
-                }
-            });
-        }
+        // Migration devenue obsolète : les formateurs IA sont gérés via la base de données.
+        // On ne supprime plus aucune table pour préserver les données existantes.
     }
 
     /**

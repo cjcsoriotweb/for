@@ -1,5 +1,6 @@
 @php
   use Illuminate\Support\Str;
+  $defaultTrainerSlug = config('ai.default_trainer_slug', 'default');
 @endphp
 
 <x-app-layout>
@@ -147,3 +148,5 @@
     </div>
   </div>
 </x-app-layout>
+
+

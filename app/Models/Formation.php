@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\FormationFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,6 +31,7 @@ class Formation extends Model
         'active',
         'cover_image_path',
         'user_id',
+        'primary_ai_trainer_id',
     ];
 
     protected function casts(): array
@@ -97,7 +99,10 @@ class Formation extends Model
         return $this->hasMany(FormationCompletionDocument::class);
     }
 
-    // aiTrainers relation removed - trainers are now managed in config/ai.php
+    public function primaryTrainer(): BelongsTo
+    {
+        return $this->belongsTo(AiTrainer::class, 'primary_ai_trainer_id');
+    }
 
     /**
      * Alias for completionDocuments to support scoped route bindings (documents/{document}).

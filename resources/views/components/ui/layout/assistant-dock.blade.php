@@ -5,13 +5,12 @@
 ])
 
 @php
-    use App\Models\AiTrainer;
 
     if (! $enable || ! auth()->check()) {
         return;
     }
 
-    $trainers = AiTrainer::query()
+    $trainers = \App\Models\AiTrainer::query()
         ->active()
         ->where('show_everywhere', true)
         ->orderBy('sort_order')
@@ -30,3 +29,7 @@
         @endforeach
     </div>
 @endif
+
+
+
+
