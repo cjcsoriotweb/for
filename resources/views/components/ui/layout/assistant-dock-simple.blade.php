@@ -88,8 +88,11 @@
                             <span class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">{{ strtoupper(mb_substr($trainer->name,0,2)) }}</span>
                             <span class="font-semibold text-indigo-900 text-lg">{{ $trainer->name }}</span>
                         </div>
-                        <div class="flex-1 p-0 overflow-y-auto">
-                            <livewire:chat-box :trainer="$trainer->slug" :title="$trainer->name" />
+                        <div class="flex-1 p-4 text-gray-700 overflow-y-auto">
+                            <p class="italic">Ceci est une fausse chatbox pour test visuel.<br>Slug : <b>{{ $trainer->slug }}</b></p>
+                        </div>
+                        <div class="p-3 border-t">
+                            <input type="text" class="w-full rounded-lg border px-3 py-2" placeholder="Tapez un message... (test)" />
                         </div>
                     </div>
                 </template>

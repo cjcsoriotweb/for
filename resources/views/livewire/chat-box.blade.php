@@ -14,6 +14,44 @@
                 <div>
                     <h3 class="font-semibold">{{ $assistantMeta['name'] ?? 'Assistant' }}</h3>
                     @if (!empty($assistantMeta['description']))
+                <script>
+                    document.addEventListener('livewire:load', () => {
+                        // Scroll handler
+                        window.addEventListener('chatbox-scroll', () => {
+                            setTimeout(() => {
+                                // Find the visible chatbox messages container and scroll it
+                                const containers = document.querySelectorAll('[data-trainer]');
+                                containers.forEach(c => {
+                                    const messages = c.querySelector('#chatbox-messages');
+                                    if (messages) {
+                                        messages.scrollTop = messages.scrollHeight;
+                                    }
+                                });
+                            }, 50);
+                        });
+
+                        // Simulated IA reply: the Livewire PHP component dispatches this browser event with trainer and text
+                        window.addEventListener('chatbox-ia-reply', (e) => {
+                            const detail = e.detail || {};
+                            const trainer = detail.trainer;
+                            const text = detail.text || '';
+                            if (!trainer) return;
+
+                            // Find the chatbox DOM node for this trainer, then the Livewire component id
+                            const trainerNode = document.querySelector(`[data-trainer="${trainer}"]`);
+                            if (!trainerNode) return;
+
+                            const livewireRoot = trainerNode.closest('[wire\\:id]');
+                            const wireId = livewireRoot ? livewireRoot.getAttribute('wire:id') : null;
+                            // Compose a simulated reply (replace with real AI response integration)
+                            const reply = "Réponse IA simulée à : " + text;
+
+                            if (wireId && window.Livewire && Livewire.find(wireId)) {
+                                Livewire.find(wireId).call('receiveIaReply', reply);
+                            }
+                        });
+                    });
+                </script>
                         <p class="text-xs text-blue-100">{{ $assistantMeta['description'] }}</p>
                     @endif
                 </div>
@@ -26,7 +64,7 @@
                 </button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+            <div id="chatbox-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
                 @forelse ($messages as $message)
                     <div class="flex flex-col gap-2 {{ $message['role'] === 'user' ? 'items-end' : 'items-start' }}">
                         <div
