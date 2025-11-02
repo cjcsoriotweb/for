@@ -136,7 +136,7 @@ class ElevePageController extends Controller
             ])
             ->values();
 
-        $assistantTrainer = $formationWithProgress->primaryTrainer;
+        $assistantTrainer = $formationWithProgress->category?->aiTrainer;
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
 
@@ -438,8 +438,8 @@ class ElevePageController extends Controller
         $formationDocuments = $formation->completionDocuments()->get();
         $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
 
-        $formation->loadMissing('primaryTrainer');
-        $assistantTrainer = $formation->primaryTrainer;
+        $formation->loadMissing('category.aiTrainer');
+        $assistantTrainer = $formation->category?->aiTrainer;
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
 

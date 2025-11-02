@@ -31,7 +31,7 @@ class Formation extends Model
         'active',
         'cover_image_path',
         'user_id',
-        'primary_ai_trainer_id',
+        'formation_category_id',
     ];
 
     protected function casts(): array
@@ -99,9 +99,14 @@ class Formation extends Model
         return $this->hasMany(FormationCompletionDocument::class);
     }
 
-    public function primaryTrainer(): BelongsTo
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(AiTrainer::class, 'primary_ai_trainer_id');
+        return $this->belongsTo(FormationCategory::class, 'formation_category_id');
+    }
+
+    public function aiTrainer(): ?AiTrainer
+    {
+        return $this->category?->aiTrainer;
     }
 
     /**

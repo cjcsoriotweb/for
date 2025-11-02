@@ -109,6 +109,11 @@ class User extends Authenticatable
         return $this->hasMany(ClaimUpdate::class, 'user_id');
     }
 
+    public function formationCategories()
+    {
+        return $this->hasMany(FormationCategory::class, 'created_by');
+    }
+
     public function aiConversations()
     {
         return $this->hasMany(AiConversation::class, 'user_id');

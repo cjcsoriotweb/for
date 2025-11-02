@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Controllers\Controller;
-use App\Models\AiTrainer;
 use App\Models\Formation;
+use App\Models\FormationCategory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -12,37 +12,34 @@ class FormateurFormationAiController extends Controller
 {
     public function edit(Formation $formation)
     {
-        $trainers = AiTrainer::query()
-            ->active()
-            ->orderBy('sort_order')
+        $categories = FormationCategory::query()
+            ->with('aiTrainer')
             ->orderBy('name')
             ->get();
 
         return view('out-application.formateur.formation.formation-ia', [
             'formation' => $formation,
-            'trainers' => $trainers,
-            'primaryTrainerId' => $formation->primary_ai_trainer_id,
+            'categories' => $categories,
+            'selectedCategoryId' => $formation->formation_category_id,
         ]);
     }
 
     public function update(Request $request, Formation $formation)
     {
         $data = $request->validate([
-            'primary_trainer_id' => [
+            'category_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('ai_trainers', 'id')->where(function ($query) {
-                    $query->where('is_active', true);
-                }),
+                Rule::exists('formation_categories', 'id'),
             ],
         ]);
 
         $formation->update([
-            'primary_ai_trainer_id' => $data['primary_trainer_id'] ?? null,
+            'formation_category_id' => $data['category_id'] ?? null,
         ]);
 
         return redirect()
             ->route('formateur.formation.ai.edit', $formation)
-            ->with('success', __('Le formateur IA a ete mis a jour.'));
+            ->with('success', __('La categorie de formation a ete mise a jour.'));
     }
 }

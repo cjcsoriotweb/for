@@ -56,10 +56,10 @@
         </div>
 
         <div class="px-6 py-6">
-          @if ($trainers->isEmpty())
+          @if ($categories->isEmpty())
             <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center">
               <p class="text-sm text-gray-600">
-                {{ __('Aucun formateur IA actif nest disponible pour le moment. Contactez un administrateur pour en creer.') }}
+                {{ __('Aucune categorie nest disponible pour le moment. Contactez un administrateur pour en creer.') }}
               </p>
             </div>
           @else
@@ -69,7 +69,7 @@
 
               <fieldset class="space-y-4">
                 <legend class="text-sm font-medium text-gray-700">
-                  {{ __('Choisissez le formateur IA a associer a cette formation') }}
+                  {{ __('Choisissez la categorie associee a cette formation') }}
                 </legend>
 
                 <div class="flex flex-col gap-3">
@@ -77,47 +77,56 @@
                     <div class="flex items-center gap-3">
                       <input
                         type="radio"
-                        name="primary_trainer_id"
+                        name="category_id"
                         value=""
-                        @checked(!$primaryTrainerId)
+                        @checked(!$selectedCategoryId)
                         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
                       />
                       <div>
                         <p class="text-sm font-semibold text-gray-900">
-                          {{ __('Aucun formateur IA') }}
+                          {{ __('Aucune categorie') }}
                         </p>
                         <p class="text-xs text-gray-500">
-                          {{ __('Les eleves ne verront pas le module de discussion IA pour cette formation.') }}
+                          {{ __('Les eleves ne verront que les assistants generiques ou ceux ajoutes manuellement.') }}
                         </p>
                       </div>
                     </div>
                   </label>
 
-                  @foreach ($trainers as $trainer)
+                  @foreach ($categories as $category)
                     <label class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-indigo-200">
                       <div class="flex items-center gap-3">
                         <input
                           type="radio"
-                          name="primary_trainer_id"
-                          value="{{ $trainer->id }}"
-                          @checked($primaryTrainerId === $trainer->id)
+                          name="category_id"
+                          value="{{ $category->id }}"
+                          @checked($selectedCategoryId === $category->id)
                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
                         />
                         <div>
                           <p class="text-sm font-semibold text-gray-900">
-                            {{ $trainer->name }}
+                            {{ $category->name }}
                           </p>
-                          @if ($trainer->description)
+                          @if ($category->description)
                             <p class="text-xs text-gray-500">
-                              {{ Str::limit($trainer->description, 120) }}
+                              {{ Str::limit($category->description, 120) }}
                             </p>
                           @endif
-                          <p class="mt-1 text-xs text-gray-400">
-                            {{ __('Modele : :model', ['model' => $trainer->model ?: __('defaut')]) }}
-                          </p>
+                          @if ($category->aiTrainer)
+                            <p class="text-xs text-gray-500">
+                              {{ __('Assistant IA : :name', ['name' => $category->aiTrainer->name]) }}
+                            </p>
+                            <p class="mt-1 text-xs text-gray-400">
+                              {{ __('Modele : :model', ['model' => $category->aiTrainer->model ?: __('defaut')]) }}
+                            </p>
+                          @else
+                            <p class="mt-1 text-xs text-gray-400">
+                              {{ __('Aucun assistant IA associe a cette categorie') }}
+                            </p>
+                          @endif
                         </div>
                       </div>
-                      @if ($trainer->slug === $defaultTrainerSlug)
+                      @if ($category->aiTrainer && $category->aiTrainer->slug === $defaultTrainerSlug)
                         <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
                           {{ __('Defaut') }}
                         </span>
@@ -138,7 +147,7 @@
                   type="submit"
                   class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
-                  {{ __('Enregistrer le formateur IA') }}
+                  {{ __('Enregistrer la categorie') }}
                 </button>
               </div>
             </form>

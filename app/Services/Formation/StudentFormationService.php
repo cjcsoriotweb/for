@@ -119,7 +119,7 @@ class StudentFormationService extends BaseFormationService
                 'completionDocuments' => function ($query): void {
                     $query->orderBy('created_at');
                 },
-                'primaryTrainer',
+                'category.aiTrainer',
             ])
             ->first();
 

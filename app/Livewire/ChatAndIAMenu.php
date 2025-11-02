@@ -143,8 +143,8 @@ class ChatAndIAMenu extends Component
                     $formation = Formation::find($formationParam['id']);
                 }
             }
-            if ($formation && $formation->primaryTrainer) {
-                $trainers->prepend($formation->primaryTrainer);
+            if ($formation && $formation->category?->aiTrainer) {
+                $trainers->prepend($formation->category->aiTrainer);
             }
         }
 
