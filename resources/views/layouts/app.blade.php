@@ -19,7 +19,7 @@
   </div>
 
 
-  <x-ui.layout.assistants-ia-menu />
+  @livewire('assistants-ia-menu')
 
   @stack('assistant-dock')
 
