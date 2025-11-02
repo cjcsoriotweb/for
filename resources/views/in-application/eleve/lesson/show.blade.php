@@ -16,16 +16,4 @@
         @include('in-application.eleve.lesson.partials.navigation')
     </div>
 
-    @auth
-        @php
-            $chatTrainerSlug = $assistantTrainerSlug ?? config('ai.default_trainer_slug', 'default');
-            $chatTrainerTitle = $assistantTrainerName ?? __('Assistant Formation');
-        @endphp
-
-        @if (! empty($chatTrainerSlug))
-            @push('chatboxes')
-                <livewire:chat-box :trainer="$chatTrainerSlug" :title="$chatTrainerTitle" />
-            @endpush
-        @endif
-    @endauth
 </x-eleve-layout>

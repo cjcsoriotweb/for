@@ -19,7 +19,7 @@
   </div>
 
 
-  <x-ui.layout.assistant-dock :notifications="9" :enable="true" :locked="false" />
+  <x-ui.layout.assistant-dock-simple />
 
   @stack('assistant-dock')
 
