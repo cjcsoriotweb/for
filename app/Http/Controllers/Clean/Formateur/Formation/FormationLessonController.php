@@ -220,7 +220,7 @@ class FormationLessonController
                 ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
         }
 
-        return view('in-application.formateur.Formation.Chapter.Lesson.EditQuiz', compact('formation', 'chapter', 'lesson', 'quiz'));
+        return view('out-application.formateur.formation.chapter.lesson.edit-quiz', compact('formation', 'chapter', 'lesson', 'quiz'));
     }
 
     public function updateQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)

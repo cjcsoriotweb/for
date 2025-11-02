@@ -17,6 +17,13 @@ Route::prefix('eleve')
             Route::get('/{team}/{formation}/congratulation', [ElevePageController::class, 'formationCongratulation'])->name('congratulation');
             Route::get('/{team}/{formation}/documents/{document}', [ElevePageController::class, 'downloadCompletionDocument'])->name('documents.download');
             Route::post('/{team}/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('enroll');
+
+            // Entry quiz routes
+            Route::prefix('entry-quiz')->name('entry-quiz.')->group(function () {
+                Route::get('/{team}/{formation}/attempt', [ElevePageController::class, 'attemptEntryQuiz'])->name('attempt');
+                Route::post('/{team}/{formation}/submit', [ElevePageController::class, 'submitEntryQuiz'])->name('submit');
+                Route::get('/{team}/{formation}/results/{attempt}', [ElevePageController::class, 'entryQuizResults'])->name('results');
+            });
         });
 
         // Lesson routes - most specific first

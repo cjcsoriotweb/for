@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use RuntimeException;
 
 return new class extends Migration
 {
@@ -59,7 +58,7 @@ return new class extends Migration
             DB::statement('ALTER TABLE quizzes ALTER COLUMN lesson_id DROP NOT NULL');
             DB::statement('ALTER TABLE quizzes ADD CONSTRAINT quizzes_lesson_id_foreign FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE SET NULL');
         } else {
-            throw new RuntimeException('Unsupported database driver for entry quiz migration: '.$driver);
+            throw new \RuntimeException('Unsupported database driver for entry quiz migration: '.$driver);
         }
 
         Schema::table('quizzes', function (Blueprint $table) {
@@ -129,7 +128,7 @@ return new class extends Migration
             DB::statement('ALTER TABLE quizzes ALTER COLUMN lesson_id SET NOT NULL');
             DB::statement('ALTER TABLE quizzes ADD CONSTRAINT quizzes_lesson_id_foreign FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE');
         } else {
-            throw new RuntimeException('Unsupported database driver for entry quiz migration: '.$driver);
+            throw new \RuntimeException('Unsupported database driver for entry quiz migration: '.$driver);
         }
     }
 };

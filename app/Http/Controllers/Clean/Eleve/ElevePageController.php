@@ -74,6 +74,28 @@ class ElevePageController extends Controller
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
             abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
         }
+
+        // Vérifier le quiz d'entrée si la formation en a un
+        $entryQuiz = $formation->entryQuiz;
+        $entryQuizStatus = null;
+
+        if ($entryQuiz) {
+            $formationProgress = $formation->learners()->where('user_id', $user->id)->first();
+
+            if ($formationProgress && $formationProgress->pivot->entry_quiz_attempt_id) {
+                $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
+                $passingScore = $entryQuiz->passing_score ?? 80;
+
+                if ($entryScore >= $passingScore) {
+                    $entryQuizStatus = 'passed';
+                } else {
+                    $entryQuizStatus = 'failed';
+                }
+            } else {
+                $entryQuizStatus = 'required';
+            }
+        }
+
         $studentFormationService = $this->studentFormationService;
 
         // Récupérer la formation avec le progrès de l'étudiant
@@ -150,6 +172,7 @@ class ElevePageController extends Controller
             'isFormationCompleted' => $isFormationCompleted,
             'assistantTrainerSlug' => $assistantTrainerSlug,
             'assistantTrainerName' => $assistantTrainerName,
+            'entryQuizStatus' => $entryQuizStatus,
         ]);
     }
 
@@ -279,6 +302,13 @@ class ElevePageController extends Controller
                 return back()->with('error', 'Une erreur est survenue lors de l\'inscription.');
             }
 
+            // Rediriger vers le quiz d'entrée si la formation en a un
+            $entryQuiz = $formation->entryQuiz;
+            if ($entryQuiz) {
+                return redirect()->route('eleve.formation.entry-quiz.attempt', [$team, $formation])
+                    ->with('info', 'Bienvenue dans cette formation ! Veuillez d\'abord passer le quiz d\'entrée.');
+            }
+
             return back()->with('success', 'Vous avez été inscrit à la formation avec succès !');
         } catch (\Throwable $e) {
             report($e);
@@ -375,6 +405,25 @@ class ElevePageController extends Controller
         // Vérifier que la leçon appartient bien au chapitre et à la formation
         if ($lesson->chapter_id !== $chapter->id || $chapter->formation_id !== $formation->id) {
             abort(404, 'Leçon non trouvée.');
+        }
+
+        // Vérifier le quiz d'entrée si la formation en a un
+        $entryQuiz = $formation->entryQuiz;
+        if ($entryQuiz) {
+            $formationProgress = $formation->learners()->where('user_id', $user->id)->first();
+
+            if ($formationProgress && $formationProgress->pivot->entry_quiz_attempt_id) {
+                $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
+                $passingScore = $entryQuiz->passing_score ?? 80;
+
+                if ($entryScore < $passingScore) {
+                    return redirect()->route('eleve.formation.show', [$team, $formation])
+                        ->with('error', 'Vous devez réussir le quiz d\'entrée avant d\'accéder aux leçons de cette formation.');
+                }
+            } else {
+                return redirect()->route('eleve.formation.entry-quiz.attempt', [$team, $formation])
+                    ->with('warning', 'Vous devez d\'abord passer le quiz d\'entrée pour accéder à cette formation.');
+            }
         }
 
         // Vérifier si la leçon est déjà terminée (sauf si c'est la première visite)
@@ -828,5 +877,140 @@ class ElevePageController extends Controller
                 'last_seen_at' => now(),
             ],
         ]);
+    }
+
+    /**
+     * Afficher le quiz d'entrée pour un étudiant
+     */
+    public function attemptEntryQuiz(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit à la formation
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation a un quiz d'entrée
+        $entryQuiz = $formation->entryQuiz;
+        if (! $entryQuiz) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('info', 'Cette formation n\'a pas de quiz d\'entrée.');
+        }
+
+        // Vérifier si l'étudiant a déjà passé le quiz d'entrée avec succès
+        $formationProgress = $formation->learners()->where('user_id', $user->id)->first();
+        if ($formationProgress && $formationProgress->pivot->entry_quiz_attempt_id) {
+            $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
+            $passingScore = $entryQuiz->passing_score ?? 80;
+
+            if ($entryScore >= $passingScore) {
+                return redirect()->route('eleve.formation.show', [$team, $formation])
+                    ->with('success', 'Vous avez déjà réussi le quiz d\'entrée. Vous pouvez commencer la formation.');
+            } else {
+                return redirect()->route('eleve.formation.show', [$team, $formation])
+                    ->with('error', 'Désolé, mais votre niveau est supérieur à cette formation. Contactez un superadmin pour plus d\'informations.');
+            }
+        }
+
+        // Récupérer les questions du quiz
+        $questions = $entryQuiz->quizQuestions()->with('quizChoices')->get();
+
+        return view('in-application.eleve.formation.entry-quiz', compact(
+            'team',
+            'formation',
+            'entryQuiz',
+            'questions'
+        ));
+    }
+
+    /**
+     * Soumettre les réponses du quiz d'entrée
+     */
+    public function submitEntryQuiz(Team $team, Formation $formation, Request $request)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit à la formation
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            return response()->json(['error' => 'Non autorisé'], 403);
+        }
+
+        // Vérifier si la formation a un quiz d'entrée
+        $entryQuiz = $formation->entryQuiz;
+        if (! $entryQuiz) {
+            return response()->json(['error' => 'Quiz d\'entrée non trouvé'], 404);
+        }
+
+        $answers = $request->input('answers', []);
+
+        // Utiliser le QuizService pour soumettre le quiz
+        $quizService = app(\App\Services\Quiz\QuizService::class);
+        $result = $quizService->submitFormationQuiz($user, $entryQuiz, $answers, \App\Models\QuizAttempt::TYPE_PRE);
+
+        // Mettre à jour la progression de l'étudiant dans la formation
+        $formation->learners()->syncWithoutDetaching([
+            $user->id => [
+                'entry_quiz_attempt_id' => $result['attempt_id'],
+                'entry_quiz_score' => $result['score'],
+                'entry_quiz_completed_at' => now(),
+                'last_seen_at' => now(),
+            ],
+        ]);
+
+        // Vérifier si l'étudiant a réussi le quiz
+        $passingScore = $entryQuiz->passing_score ?? 80;
+        if ($result['score'] >= $passingScore) {
+            // L'étudiant peut continuer la formation
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz d\'entrée avec un score de '.round($result['score'], 1).'%. Vous pouvez maintenant commencer la formation.');
+        } else {
+            // L'étudiant ne peut pas continuer - niveau trop élevé
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('error', 'Désolé, mais votre niveau est supérieur à cette formation (score: '.round($result['score'], 1).'%). Contactez un superadmin pour plus d\'informations.');
+        }
+    }
+
+    /**
+     * Afficher les résultats du quiz d'entrée
+     */
+    public function entryQuizResults(Team $team, Formation $formation, QuizAttempt $attempt)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit à la formation
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier que la tentative appartient à l'utilisateur connecté
+        if ($attempt->user_id !== $user->id) {
+            abort(403, 'Tentative non autorisée.');
+        }
+
+        // Vérifier que c'est bien une tentative de quiz d'entrée
+        if ($attempt->attempt_type !== \App\Models\QuizAttempt::TYPE_PRE) {
+            abort(404, 'Résultats non trouvés.');
+        }
+
+        $entryQuiz = $formation->entryQuiz;
+        if (! $entryQuiz || $attempt->quiz_id !== $entryQuiz->id) {
+            abort(404, 'Quiz non trouvé.');
+        }
+
+        // Récupérer les réponses de cette tentative
+        $answers = $attempt->answers()->with(['question', 'choice'])->get();
+
+        // Récupérer les informations du quiz
+        $questions = $entryQuiz->quizQuestions()->with('quizChoices')->get();
+
+        return view('in-application.eleve.formation.entry-quiz-results', compact(
+            'team',
+            'formation',
+            'entryQuiz',
+            'attempt',
+            'answers',
+            'questions'
+        ));
     }
 }
