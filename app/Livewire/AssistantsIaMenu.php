@@ -4,15 +4,20 @@ namespace App\Livewire;
 
 use App\Models\AiTrainer;
 use App\Models\Formation;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class AssistantsIaMenu extends Component
 {
     public bool $drawer = false;
+
     public ?string $active = null;
+
     public $notifications = 0;
+
     public $enable = true;
+
     public $locked = false;
 
     protected $listeners = [
@@ -39,20 +44,20 @@ class AssistantsIaMenu extends Component
 
     public function toggleDrawer()
     {
-        $this->drawer = !$this->drawer;
-        if (!$this->drawer) {
+        $this->drawer = ! $this->drawer;
+        if (! $this->drawer) {
             $this->active = null;
         }
     }
 
-    public function selectTrainer($slug)
+    public function selectContact($contactId)
     {
-        $this->active = $slug;
+        $this->active = $contactId;
     }
 
     public function getTrainersProperty()
     {
-        if (!$this->enable || !Auth::check()) {
+        if (! $this->enable || ! Auth::check()) {
             return collect();
         }
 
@@ -84,6 +89,104 @@ class AssistantsIaMenu extends Component
         }
 
         return $trainers->unique('id')->values();
+    }
+
+    public function getFormationUsersProperty()
+    {
+        if (! Auth::check()) {
+            return collect();
+        }
+
+        $user = Auth::user();
+        $currentRoute = request()->route();
+
+        // Chercher la formation actuelle
+        if ($currentRoute && str_contains($currentRoute->getName(), 'formation')) {
+            $formationParam = $currentRoute->parameter('formation');
+            $formation = null;
+
+            if ($formationParam) {
+                if (is_numeric($formationParam)) {
+                    $formation = Formation::find($formationParam);
+                } elseif ($formationParam instanceof Formation) {
+                    $formation = $formationParam;
+                } elseif (is_object($formationParam) && property_exists($formationParam, 'id')) {
+                    $formation = Formation::find($formationParam->id);
+                } elseif (is_array($formationParam) && isset($formationParam['id'])) {
+                    $formation = Formation::find($formationParam['id']);
+                }
+            }
+
+            if ($formation) {
+                // Récupérer les utilisateurs de cette formation
+                return $formation->users()
+                    ->where('users.id', '!=', $user->id) // Exclure l'utilisateur actuel
+                    ->orderBy('name')
+                    ->get();
+            }
+        }
+
+        return collect();
+    }
+
+    public function getSuperAdminsProperty()
+    {
+        if (! Auth::check()) {
+            return collect();
+        }
+
+        $user = Auth::user();
+
+        // Récupérer les superadmin (membres d'équipes avec role superadmin)
+        return User::whereHas('teams', function ($teamQuery) {
+            $teamQuery->where('role', 'superadmin');
+        })
+            ->where('id', '!=', $user->id) // Exclure l'utilisateur actuel
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function getAllContactsProperty()
+    {
+        $contacts = collect();
+
+        // Ajouter les IA
+        $this->trainers->each(function ($trainer) use (&$contacts) {
+            $contacts->push([
+                'id' => 'ai_'.$trainer->id,
+                'type' => 'ai',
+                'name' => $trainer->name,
+                'description' => $trainer->description ?? '',
+                'slug' => $trainer->slug,
+                'avatar' => null,
+            ]);
+        });
+
+        // Ajouter les utilisateurs de la formation
+        $this->formationUsers->each(function ($user) use (&$contacts) {
+            $contacts->push([
+                'id' => 'user_'.$user->id,
+                'type' => 'user',
+                'name' => $user->name,
+                'description' => 'Participant à la formation',
+                'slug' => null,
+                'avatar' => $user->profile_photo_path,
+            ]);
+        });
+
+        // Ajouter les superadmin
+        $this->superAdmins->each(function ($admin) use (&$contacts) {
+            $contacts->push([
+                'id' => 'admin_'.$admin->id,
+                'type' => 'admin',
+                'name' => $admin->name,
+                'description' => 'Administrateur',
+                'slug' => null,
+                'avatar' => $admin->profile_photo_path,
+            ]);
+        });
+
+        return $contacts;
     }
 
     public function render()

@@ -21,50 +21,14 @@
                 }, 50);
             });
 
-            // Simulated IA reply: listen for browser events dispatched by PHP
-            window.addEventListener('simulate-reply', (e) => {
-                console.log('simulate-reply event received:', e.detail);
-                const detail = e.detail || {};
-                const text = detail.text || '';
-
-                // Simuler un délai de réponse IA
-                setTimeout(() => {
-                    // Find the chatbox DOM node for this trainer, then the Livewire component id
-                    const trainerNode = document.querySelector(`[data-trainer="${window.currentTrainer || ''}"]`);
-                    console.log('Trainer node found:', trainerNode);
-
-                    if (!trainerNode) {
-                        console.log('No trainer node found');
-                        return;
-                    }
-
-                    const livewireRoot = trainerNode.closest('[wire\\:id]');
-                    const wireId = livewireRoot ? livewireRoot.getAttribute('wire:id') : null;
-                    console.log('Livewire ID:', wireId);
-
-                    // Compose a simulated reply (replace with real AI response integration)
-                    const reply = "Réponse IA simulée à : " + text;
-                    console.log('Reply to send:', reply);
-
-                    if (wireId && window.Livewire && Livewire.find(wireId)) {
-                        console.log('Calling simulateAiReply on component:', wireId);
-                        Livewire.find(wireId).call('simulateAiReply', text);
-                    } else {
-                        console.log('Cannot find Livewire component or Livewire not available');
-                    }
-                }, 1500); // Délai de 1.5 secondes pour simuler la réponse IA
-            });
-
             // AI response handler - appelle la méthode avec un petit délai pour la fluidité
             window.addEventListener('trigger-ai-response', (e) => {
-                console.log('Triggering AI response:', e.detail);
                 const detail = e.detail || {};
                 const text = detail.text || '';
 
                 // Trouver le composant Livewire pour ce trainer
                 const trainerNode = document.querySelector(`[data-trainer="${window.currentTrainer || ''}"]`);
                 if (!trainerNode) {
-                    console.log('No trainer node found for AI response');
                     return;
                 }
 
@@ -72,13 +36,29 @@
                 const wireId = livewireRoot ? livewireRoot.getAttribute('wire:id') : null;
 
                 if (wireId && window.Livewire && Livewire.find(wireId)) {
-                    console.log('Calling processAiResponse on component:', wireId);
-                    // Petit délai pour permettre à l'interface de se mettre à jour avant de traiter la réponse IA
+                    // Petit délai pour permettre à l'interface de se mettre à jour
                     setTimeout(() => {
                         Livewire.find(wireId).call('processAiResponse', text);
-                    }, 300); // 300ms pour que le message utilisateur soit bien affiché
-                } else {
-                    console.log('Cannot find Livewire component for AI response');
+                    }, 300);
+                }
+            });
+
+            // Load more messages handler
+            window.addEventListener('load-more-messages', (e) => {
+                const detail = e.detail || {};
+                const scrollToTop = detail.scrollToTop || false;
+
+                if (scrollToTop) {
+                    // Scroll vers le haut pour montrer les nouveaux messages
+                    setTimeout(() => {
+                        const containers = document.querySelectorAll('[data-trainer]');
+                        containers.forEach(c => {
+                            const messages = c.querySelector('#chatbox-messages');
+                            if (messages) {
+                                messages.scrollTop = 0;
+                            }
+                        });
+                    }, 100);
                 }
             });
         });
@@ -86,6 +66,19 @@
 
     <!-- Messages Area -->
     <div id="chatbox-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+        <!-- Bouton Charger plus -->
+        @if ($canLoadMore)
+            <div class="flex justify-center pb-4">
+                <button wire:click="loadMoreMessages"
+                    wire:loading.attr="disabled" wire:target="loadMoreMessages"
+                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50">
+                    <span wire:loading wire:target="loadMoreMessages" class="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+                    <span wire:loading.remove wire:target="loadMoreMessages">Charger +15 messages</span>
+                    <span wire:loading wire:target="loadMoreMessages">Chargement...</span>
+                </button>
+            </div>
+        @endif
+
         @forelse ($messages as $message)
             <div class="flex flex-col gap-2 {{ $message['role'] === 'user' ? 'items-end' : 'items-start' }}">
                 <div

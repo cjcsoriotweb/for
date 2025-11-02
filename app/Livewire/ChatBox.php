@@ -2,15 +2,11 @@
 
 namespace App\Livewire;
 
-use App\Models\AiConversation;
-use App\Models\AiConversationMessage;
 use App\Models\AiTrainer;
 use App\Services\Ai\OllamaClient;
 use App\Services\Ai\ToolExecutor;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Throwable;
 
@@ -34,7 +30,11 @@ class ChatBox extends Component
 
     public $error = null;
 
-    public ?int $conversationId = null;
+    public $messagesLimit = 15;
+
+    public $canLoadMore = false;
+
+    public $isLoadingMore = false;
 
     protected $listeners = [
         'sendMessageFromOutside' => 'sendMessage',
@@ -58,24 +58,9 @@ class ChatBox extends Component
         $this->trainer = $trainer;
         $this->title = $title;
         $this->messages = [];
-        $this->assistantMeta = [];
 
-        // Charger les meta du trainer si disponible
-        try {
-            $t = AiTrainer::where('slug', $trainer)->first();
-            if ($t) {
-                $this->assistantMeta = [
-                    'name' => $t->name,
-                    'description' => $t->description ?? null,
-                    'slug' => $t->slug,
-                ];
-                if (! $this->title) {
-                    $this->title = $t->name;
-                }
-            }
-        } catch (\Throwable $e) {
-            // ignore
-        }
+        // Charger les meta du trainer
+        $this->loadTrainerModel($this->trainer);
     }
 
     public function toggle()
@@ -97,37 +82,11 @@ class ChatBox extends Component
             return;
         }
 
-        // S'assurer qu'une conversation existe
-        $this->ensureConversation();
-        if (! $this->conversationId) {
-            $this->error = __('Impossible de créer la conversation.');
-
-            return;
-        }
-
         $this->isSending = true;
         $this->error = null;
 
         try {
-            // Sauvegarder le message utilisateur dans la base de données
-            $conversation = AiConversation::find($this->conversationId);
-            if (! $conversation) {
-                throw new \Exception('Conversation not found');
-            }
-
-            DB::transaction(function () use ($conversation, $text) {
-                AiConversationMessage::create([
-                    'conversation_id' => $conversation->id,
-                    'role' => AiConversationMessage::ROLE_USER,
-                    'content' => $text,
-                ]);
-
-                $conversation->update([
-                    'last_message_at' => now(),
-                ]);
-            });
-
-            // Ajouter le message utilisateur à l'interface immédiatement
+            // Ajouter le message utilisateur immédiatement
             $this->messages[] = [
                 'role' => 'user',
                 'content' => $text,
@@ -139,7 +98,7 @@ class ChatBox extends Component
             // Demander au navigateur de scroller
             $this->dispatch('chatbox-scroll');
 
-            // Dispatch un événement JavaScript pour traiter la réponse IA de manière asynchrone
+            // Traiter la réponse IA de manière asynchrone
             $this->dispatch('trigger-ai-response', ['text' => $text]);
 
         } catch (Throwable $exception) {
@@ -151,28 +110,18 @@ class ChatBox extends Component
 
     public function processAiResponse($text)
     {
-        // Log pour debug
-        Log::info('processAiResponse called', ['text' => $text]);
-
         $this->isLoading = true;
 
         try {
-            // Essayer d'appeler Ollama pour une vraie réponse
-            $messages = [
-                [
-                    'role' => 'user',
-                    'content' => $text,
-                ],
-            ];
+            // Préparer le message pour l'IA avec l'historique récent
+            $messages = $this->prepareMessages($text);
 
             $result = $this->ollamaClient->chat($messages);
             $reply = $this->sanitizeUtf8String((string) ($result['text'] ?? 'Erreur: pas de réponse'));
 
         } catch (Throwable $exception) {
-            // En cas d'erreur, utiliser une réponse simulée
-            Log::error('AI call failed, using fallback', ['error' => $exception->getMessage()]);
             report($exception);
-            $reply = 'Réponse IA simulée à : '.$text.' (Erreur Ollama: '.$exception->getMessage().')';
+            $reply = 'Réponse IA simulée à : '.$text.' (Erreur: '.$exception->getMessage().')';
         }
 
         // Ajouter la réponse
@@ -185,41 +134,22 @@ class ChatBox extends Component
         $this->isSending = false;
         $this->isLoading = false;
         $this->dispatch('chatbox-scroll');
-
-        Log::info('processAiResponse completed', ['reply_length' => strlen($reply)]);
     }
 
-    protected function callDelayedReply($text)
+    public function loadMoreMessages()
     {
-        // Dispatch un événement pour que le JavaScript gère le délai
-        $this->dispatch('simulate-reply', ['text' => $text]);
-    }
+        $this->isLoadingMore = true;
 
-    public function simulateAiReply($text)
-    {
-        $reply = 'Réponse IA simulée à : '.$text;
+        // Augmenter la limite de messages affichés
+        $this->messagesLimit += 15;
 
-        $this->messages[] = [
-            'role' => 'assistant',
-            'content' => $reply,
-            'at' => now()->toDateTimeString(),
-        ];
+        // Simuler un délai pour l'effet visuel
+        $this->dispatch('load-more-messages', [
+            'limit' => $this->messagesLimit,
+            'scrollToTop' => true,
+        ]);
 
-        $this->isSending = false;
-        $this->isLoading = false;
-        $this->dispatch('chatbox-scroll');
-    }
-
-    public function receiveIaReply($reply)
-    {
-        $this->messages[] = [
-            'role' => 'assistant',
-            'content' => $reply,
-            'at' => now()->toDateTimeString(),
-        ];
-        $this->isSending = false;
-        $this->isLoading = false;
-        $this->dispatch('chatbox-scroll');
+        $this->isLoadingMore = false;
     }
 
     public function onLaunchAssistant($payload = null)
@@ -261,152 +191,38 @@ class ChatBox extends Component
         return $escaped;
     }
 
-    protected function ensureConversation(): void
-    {
-        if ($this->conversationId) {
-            $this->loadConversation($this->conversationId);
-
-            return;
-        }
-
-        $this->loadTrainerModel($this->trainer);
-        if (! $this->trainerModel) {
-            return;
-        }
-
-        $user = $this->user();
-        if (! $user) {
-            $this->error = __('Authentification requise.');
-
-            return;
-        }
-
-        $trainerConfig = $this->trainerConfig();
-
-        $this->isLoading = true;
-        $this->error = null;
-
-        try {
-            DB::transaction(function () use ($user, $trainerConfig): void {
-                $conversation = AiConversation::create([
-                    'user_id' => $user->getAuthIdentifier(),
-                    'team_id' => $user->currentTeam?->id,
-                    'status' => AiConversation::STATUS_ACTIVE,
-                    'metadata' => [
-                        'trainer' => $this->trainer,
-                        'model' => $trainerConfig['model'] ?? null,
-                    ],
-                    'last_message_at' => now(),
-                ]);
-
-                $this->conversationId = $conversation->id;
-                $this->loadConversationData($conversation->fresh('messages'));
-            });
-        } catch (Throwable $exception) {
-            report($exception);
-            $this->error = __('Impossible de creer la conversation.');
-        } finally {
-            $this->isLoading = false;
-        }
-    }
-
-    protected function loadConversation(int $conversationId): void
-    {
-        $user = $this->user();
-        if (! $user) {
-            $this->error = __('Authentification requise.');
-
-            return;
-        }
-
-        $this->isLoading = true;
-        $this->error = null;
-
-        try {
-            $conversation = AiConversation::query()
-                ->whereKey($conversationId)
-                ->where('user_id', $user->getAuthIdentifier())
-                ->with('messages')
-                ->first();
-
-            if (! $conversation) {
-                $this->error = __('Conversation introuvable.');
-                $this->conversationId = null;
-                $this->messages = [];
-
-                return;
-            }
-
-            $this->loadConversationData($conversation);
-        } catch (Throwable $exception) {
-            report($exception);
-            $this->error = __('Erreur lors du chargement.');
-        } finally {
-            $this->isLoading = false;
-        }
-    }
-
-    protected function loadConversationData(AiConversation $conversation): void
-    {
-        $metadataTrainer = (string) ($conversation->metadata['trainer'] ?? $this->trainer);
-
-        $this->loadTrainerModel($metadataTrainer ?: $this->trainer);
-
-        $this->conversationId = $conversation->id;
-
-        $this->messages = $conversation->messages
-            ->sortBy('id')
-            ->map(fn (AiConversationMessage $message) => $this->presentMessage($message))
-            ->values()
-            ->all();
-    }
-
-    protected function presentMessage(AiConversationMessage $message): array
-    {
-        return [
-            'id' => $message->id,
-            'role' => $message->role,
-            'content' => $this->sanitizeUtf8String((string) $message->content),
-        ];
-    }
-
-    protected function prepareMessages(AiConversation $conversation, array $trainer): array
+    protected function prepareMessages(string $userMessage): array
     {
         $messages = [];
 
-        $systemPrompt = $this->sanitizeUtf8String((string) ($trainer['system_prompt'] ?? ''));
-        if ($systemPrompt !== '') {
-            $messages[] = [
-                'role' => 'system',
-                'content' => $systemPrompt,
-            ];
-        }
-
-        if ($trainer['use_tools'] ?? false) {
-            $messages[] = [
-                'role' => 'system',
-                'content' => $this->sanitizeUtf8String(ToolExecutor::getToolsPrompt()),
-            ];
-        }
-
-        $historyLimit = (int) config('ai.history_limit', 30);
-        $history = $conversation->messages()
-            ->latest('id')
-            ->limit($historyLimit)
-            ->get()
-            ->sortBy('id')
-            ->values();
-
-        foreach ($history as $msg) {
-            if ($msg->role === AiConversationMessage::ROLE_SYSTEM) {
-                continue;
+        // Ajouter le prompt système si disponible
+        if ($this->trainerModel) {
+            $systemPrompt = $this->trainerModel->systemPrompt();
+            if ($systemPrompt) {
+                $messages[] = [
+                    'role' => 'system',
+                    'content' => $systemPrompt,
+                ];
             }
+        }
 
+        // Déterminer si on peut charger plus de messages
+        $this->canLoadMore = count($this->messages) > $this->messagesLimit;
+
+        // Ajouter les derniers messages de l'historique selon la limite actuelle
+        $historyMessages = array_slice($this->messages, -$this->messagesLimit);
+        foreach ($historyMessages as $msg) {
             $messages[] = [
-                'role' => $msg->role,
-                'content' => $this->sanitizeUtf8String((string) $msg->content),
+                'role' => $msg['role'],
+                'content' => $msg['content'],
             ];
         }
+
+        // Ajouter le nouveau message utilisateur
+        $messages[] = [
+            'role' => 'user',
+            'content' => $userMessage,
+        ];
 
         return $messages;
     }
@@ -429,12 +245,9 @@ class ChatBox extends Component
         if (! $trainer) {
             $this->trainerModel = null;
             $this->assistantMeta = [
-                'name' => $this->sanitizeUtf8String('Assistant'),
+                'name' => 'Assistant',
                 'description' => '',
             ];
-            if ($this->error === null) {
-                $this->error = __('Aucun assistant disponible.');
-            }
 
             return;
         }
@@ -442,32 +255,9 @@ class ChatBox extends Component
         $this->trainerModel = $trainer;
         $this->trainer = $trainer->slug;
         $this->assistantMeta = [
-            'name' => $this->sanitizeUtf8String($trainer->name),
-            'description' => $this->sanitizeUtf8String($trainer->description ?? ''),
+            'name' => $trainer->name,
+            'description' => $trainer->description ?? '',
         ];
-    }
-
-    protected function trainerConfig(): array
-    {
-        if (! $this->trainerModel) {
-            return [];
-        }
-
-        return [
-            'model' => $this->trainerModel->model,
-            'temperature' => $this->trainerModel->temperature,
-            'use_tools' => $this->trainerModel->use_tools,
-            'system_prompt' => $this->trainerModel->systemPrompt(),
-        ];
-    }
-
-    protected function conversation(): ?AiConversation
-    {
-        if (! $this->conversationId) {
-            return null;
-        }
-
-        return AiConversation::query()->find($this->conversationId);
     }
 
     protected function user(): ?Authenticatable

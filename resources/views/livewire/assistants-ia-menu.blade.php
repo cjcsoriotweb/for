@@ -22,26 +22,86 @@
             </div>
 
             @if(!$active)
-                <div class="flex-1 overflow-y-auto p-4 space-y-3">
-                    @foreach ($this->trainers as $trainer)
-                        <button wire:click="selectTrainer('{{ $trainer->slug }}')"
-                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-indigo-100 hover:bg-indigo-50 focus:bg-indigo-100 transition group">
-                            <span class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xl">
-                                {{ strtoupper(mb_substr($trainer->name,0,2)) }}
-                            </span>
-                            <span class="flex flex-col items-start">
-                                <span class="text-gray-900 font-semibold text-base group-hover:text-indigo-700">{{ $trainer->name }}</span>
-                                @if(!empty($trainer->description))
-                                    <span class="text-xs text-gray-500 mt-1">{{ $trainer->description }}</span>
-                                @endif
-                            </span>
-                        </button>
-                    @endforeach
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Assistants IA -->
+                    @if($this->trainers->count() > 0)
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">🤖 Assistants IA</h3>
+                            <div class="space-y-2">
+                                @foreach ($this->trainers as $trainer)
+                                    <button wire:click="selectContact('ai_{{ $trainer->id }}')"
+                                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-indigo-100 hover:bg-indigo-50 focus:bg-indigo-100 transition group">
+                                        <span class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">
+                                            {{ strtoupper(mb_substr($trainer->name,0,2)) }}
+                                        </span>
+                                        <span class="flex flex-col items-start flex-1">
+                                            <span class="text-gray-900 font-semibold text-base group-hover:text-indigo-700">{{ $trainer->name }}</span>
+                                            @if(!empty($trainer->description))
+                                                <span class="text-xs text-gray-500 mt-1">{{ $trainer->description }}</span>
+                                            @endif
+                                        </span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Utilisateurs de la formation -->
+                    @if($this->formationUsers->count() > 0)
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">👥 Participants</h3>
+                            <div class="space-y-2">
+                                @foreach ($this->formationUsers as $user)
+                                    <button wire:click="selectContact('user_{{ $user->id }}')"
+                                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-green-100 hover:bg-green-50 focus:bg-green-100 transition group">
+                                        @if($user->profile_photo_path)
+                                            <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}"
+                                                 class="w-10 h-10 rounded-full object-cover">
+                                        @else
+                                            <span class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-lg">
+                                                {{ strtoupper(mb_substr($user->name,0,2)) }}
+                                            </span>
+                                        @endif
+                                        <span class="flex flex-col items-start flex-1">
+                                            <span class="text-gray-900 font-semibold text-base group-hover:text-green-700">{{ $user->name }}</span>
+                                            <span class="text-xs text-gray-500 mt-1">Participant à la formation</span>
+                                        </span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Super administrateurs -->
+                    @if($this->superAdmins->count() > 0)
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">👑 Administrateurs</h3>
+                            <div class="space-y-2">
+                                @foreach ($this->superAdmins as $admin)
+                                    <button wire:click="selectContact('admin_{{ $admin->id }}')"
+                                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-red-100 hover:bg-red-50 focus:bg-red-100 transition group">
+                                        @if($admin->profile_photo_path)
+                                            <img src="{{ $admin->profile_photo_url }}" alt="{{ $admin->name }}"
+                                                 class="w-10 h-10 rounded-full object-cover">
+                                        @else
+                                            <span class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-lg">
+                                                {{ strtoupper(mb_substr($admin->name,0,2)) }}
+                                            </span>
+                                        @endif
+                                        <span class="flex flex-col items-start flex-1">
+                                            <span class="text-gray-900 font-semibold text-base group-hover:text-red-700">{{ $admin->name }}</span>
+                                            <span class="text-xs text-gray-500 mt-1">Administrateur</span>
+                                        </span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @else
-                <!-- Chat containers -->
+                <!-- Chat containers pour IA -->
                 @foreach ($this->trainers as $trainer)
-                    @if($active === $trainer->slug)
+                    @if($active === 'ai_' . $trainer->id)
                         <div class="flex-1 flex flex-col overflow-hidden">
                             <div class="flex items-center gap-2 px-5 py-3 border-b bg-indigo-50">
                                 <button wire:click="closeChat" class="text-indigo-600 hover:text-indigo-900 text-xl mr-2" aria-label="Retour">
@@ -59,6 +119,72 @@
                                 'trainer' => $trainer->slug,
                                 'title' => $trainer->name
                             ], key('chatbox-' . $trainer->slug))
+                        </div>
+                    @endif
+                @endforeach
+
+                <!-- Chat containers pour utilisateurs -->
+                @foreach ($this->formationUsers as $user)
+                    @if($active === 'user_' . $user->id)
+                        <div class="flex-1 flex flex-col overflow-hidden">
+                            <div class="flex items-center gap-2 px-5 py-3 border-b bg-green-50">
+                                <button wire:click="closeChat" class="text-green-600 hover:text-green-900 text-xl mr-2" aria-label="Retour">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                    </svg>
+                                </button>
+                                @if($user->profile_photo_path)
+                                    <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}"
+                                         class="w-9 h-9 rounded-full object-cover">
+                                @else
+                                    <span class="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-lg">
+                                        {{ strtoupper(mb_substr($user->name,0,2)) }}
+                                    </span>
+                                @endif
+                                <span class="font-semibold text-green-900 text-lg">{{ $user->name }}</span>
+                            </div>
+
+                            <div class="flex-1 flex flex-col p-4">
+                                <div class="flex-1 flex items-center justify-center text-center text-gray-500">
+                                    <div>
+                                        <p class="text-lg font-medium mb-2">💬 Chat avec {{ $user->name }}</p>
+                                        <p class="text-sm">Fonctionnalité de chat utilisateur à utilisateur à implémenter</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+
+                <!-- Chat containers pour administrateurs -->
+                @foreach ($this->superAdmins as $admin)
+                    @if($active === 'admin_' . $admin->id)
+                        <div class="flex-1 flex flex-col overflow-hidden">
+                            <div class="flex items-center gap-2 px-5 py-3 border-b bg-red-50">
+                                <button wire:click="closeChat" class="text-red-600 hover:text-red-900 text-xl mr-2" aria-label="Retour">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                    </svg>
+                                </button>
+                                @if($admin->profile_photo_path)
+                                    <img src="{{ $admin->profile_photo_url }}" alt="{{ $admin->name }}"
+                                         class="w-9 h-9 rounded-full object-cover">
+                                @else
+                                    <span class="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-lg">
+                                        {{ strtoupper(mb_substr($admin->name,0,2)) }}
+                                    </span>
+                                @endif
+                                <span class="font-semibold text-red-900 text-lg">{{ $admin->name }}</span>
+                            </div>
+
+                            <div class="flex-1 flex flex-col p-4">
+                                <div class="flex-1 flex items-center justify-center text-center text-gray-500">
+                                    <div>
+                                        <p class="text-lg font-medium mb-2">👑 Chat avec {{ $admin->name }}</p>
+                                        <p class="text-sm">Administrateur - Contact direct disponible</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @endif
                 @endforeach
