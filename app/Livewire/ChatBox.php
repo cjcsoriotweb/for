@@ -7,10 +7,8 @@ use App\Models\AiConversationMessage;
 use App\Services\Ai\OllamaClient;
 use App\Services\Ai\ToolExecutor;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Throwable;
 
@@ -20,19 +18,13 @@ class ChatBox extends Component
     public ?int $conversationId = null;
     public bool $isOpen = false;
     public string $title = 'Assistant IA';
-    public array $shortcodeTemplates = [];
-
-    public array $trainerOptions = [];
-    public array $trainerMeta = [];
     public array $messages = [];
     public string $message = '';
     public bool $isLoading = false;
     public bool $isSending = false;
     public ?string $error = null;
-    public string $selectedTrainer = '';
-    public string $ticketsUrl = '/mes-tickets';
-    public string $ticketButtonLabel;
-    public array $suggestionPresets = [];
+    public array $assistantMeta = [];
+    public array $shortcodeTemplates = [];
 
     protected OllamaClient $ollamaClient;
     protected ToolExecutor $toolExecutor;
@@ -46,27 +38,13 @@ class ChatBox extends Component
     public function mount(?string $trainer = null, ?int $conversationId = null, string $title = 'Assistant IA'): void
     {
         $defaultTrainer = config('ai.default_trainer_slug', 'default');
+        $resolvedTrainer = is_string($trainer) && $trainer !== '' ? $trainer : $defaultTrainer;
 
-        $initialTrainer = trim((string) ($trainer ?? $defaultTrainer));
-        $this->trainer = $initialTrainer !== '' ? $initialTrainer : $defaultTrainer;
-        $this->selectedTrainer = $this->trainer;
+        $this->trainer = $resolvedTrainer;
         $this->conversationId = $conversationId;
-        $this->title = $title;
+        $this->title = $this->sanitizeUtf8String($title);
+        $this->assistantMeta = $this->resolveAssistantMeta($this->trainer);
         $this->shortcodeTemplates = $this->resolveShortcodeTemplates();
-        $this->trainerOptions = $this->prepareTrainerOptions();
-        $this->ticketButtonLabel = $this->sanitizeUtf8String((string) __('Consulter le ticket'));
-        $this->ticketsUrl = $this->sanitizeUtf8String(route('user.tickets'));
-        $this->suggestionPresets = $this->prepareSuggestionPresets();
-
-        if (! array_key_exists($this->trainer, $this->trainerOptions)) {
-            $this->trainer = $defaultTrainer;
-            $this->selectedTrainer = $defaultTrainer;
-        }
-
-        $this->trainerMeta = $this->trainerOptions[$this->trainer] ?? [
-            'name' => $this->sanitizeUtf8String('Assistant'),
-            'description' => '',
-        ];
 
         if ($this->conversationId) {
             $this->loadConversation($this->conversationId);
@@ -85,58 +63,6 @@ class ChatBox extends Component
         if ($this->isOpen) {
             $this->ensureConversation();
         }
-    }
-
-    public function updatedSelectedTrainer(string $value): void
-    {
-        $this->changeTrainer($value);
-    }
-
-    public function changeTrainer(string $slug): void
-    {
-        $slug = trim($slug);
-
-        if ($slug === '' || $slug === $this->trainer || ! array_key_exists($slug, $this->trainerOptions)) {
-            $this->selectedTrainer = $this->trainer;
-            return;
-        }
-
-        $this->trainer = $slug;
-        $this->selectedTrainer = $slug;
-        $this->trainerMeta = $this->trainerOptions[$slug];
-        $this->conversationId = null;
-        $this->messages = [];
-        $this->error = null;
-
-        if ($this->isOpen) {
-            $this->ensureConversation();
-        }
-    }
-
-    public function sendSuggestedMessageEncoded(string $encoded): void
-    {
-        $text = base64_decode($encoded, true);
-        if ($text === false) {
-            return;
-        }
-
-        $this->sendSuggestedMessage($text);
-    }
-
-    public function sendSuggestedMessage(string $text): void
-    {
-        if ($this->isSending) {
-            return;
-        }
-
-        $sanitized = trim($this->sanitizeUtf8String($text));
-
-        if ($sanitized === '') {
-            return;
-        }
-
-        $this->message = $sanitized;
-        $this->sendMessage();
     }
 
     public function sendMessage(): void
@@ -202,25 +128,14 @@ class ChatBox extends Component
                 $result = $this->ollamaClient->chat($messages, $options);
                 $assistantText = $this->sanitizeUtf8String((string) ($result['text'] ?? ''));
 
-                $toolResult = [
-                    'content' => $assistantText,
-                    'tool_results' => [],
-                ];
-
                 if ($trainerConfig['use_tools'] ?? false) {
                     $toolResult = $this->toolExecutor->parseAndExecuteTools($assistantText, $user);
-                    $toolResult['content'] = $this->sanitizeUtf8String((string) $toolResult['content']);
+                    $assistantText = $this->sanitizeUtf8String((string) ($toolResult['content'] ?? ''));
                 }
-
-                $assistantPayload = $this->buildAssistantPayload($toolResult['content'], $toolResult['tool_results'] ?? []);
 
                 $conversation->messages()->create([
                     'role' => AiConversationMessage::ROLE_ASSISTANT,
-                    'content' => $assistantPayload['content'],
-                    'metadata' => [
-                        'buttons' => $assistantPayload['buttons'],
-                        'ticket_url' => $assistantPayload['ticket_url'],
-                    ],
+                    'content' => $assistantText,
                 ]);
 
                 $conversation->forceFill([
@@ -238,11 +153,6 @@ class ChatBox extends Component
         } finally {
             $this->isSending = false;
         }
-    }
-
-    public function getHasTrainerChoiceProperty(): bool
-    {
-        return count($this->trainerOptions) > 1;
     }
 
     protected function ensureConversation(): void
@@ -324,12 +234,11 @@ class ChatBox extends Component
 
     protected function loadConversationData(AiConversation $conversation): void
     {
-        $metadataTrainer = trim((string) ($conversation->metadata['trainer'] ?? $this->trainer));
+        $metadataTrainer = (string) ($conversation->metadata['trainer'] ?? $this->trainer);
 
-        if ($metadataTrainer !== '' && array_key_exists($metadataTrainer, $this->trainerOptions)) {
+        if ($metadataTrainer !== '' && $metadataTrainer !== $this->trainer) {
             $this->trainer = $metadataTrainer;
-            $this->selectedTrainer = $metadataTrainer;
-            $this->trainerMeta = $this->trainerOptions[$metadataTrainer];
+            $this->assistantMeta = $this->resolveAssistantMeta($metadataTrainer);
         }
 
         $this->conversationId = $conversation->id;
@@ -343,73 +252,11 @@ class ChatBox extends Component
 
     protected function presentMessage(AiConversationMessage $message): array
     {
-        $content = $this->sanitizeUtf8String((string) $message->content);
-        $metadata = is_array($message->metadata) ? $message->metadata : [];
-        $buttons = array_map(
-            fn ($label) => $this->sanitizeUtf8String((string) $label),
-            Arr::wrap($metadata['buttons'] ?? [])
-        );
-        $buttons = array_values(array_filter($buttons, fn ($label) => $label !== ''));
-
-        $ticketUrl = null;
-        if (! empty($metadata['ticket_url'])) {
-            $ticketUrl = $this->buildTicketsUrl((string) $metadata['ticket_url']);
-        }
-
         return [
             'id' => $message->id,
             'role' => $message->role,
-            'content' => $content,
-            'buttons' => $buttons,
-            'ticket_url' => $ticketUrl,
+            'content' => $this->sanitizeUtf8String((string) $message->content),
         ];
-    }
-
-    protected function prepareTrainerOptions(): array
-    {
-        $trainersConfig = config('ai.trainers', []);
-        $options = [];
-
-        foreach ($trainersConfig as $slug => $config) {
-            $options[$slug] = [
-                'name' => $this->sanitizeUtf8String((string) ($config['name'] ?? ucfirst($slug))),
-                'description' => $this->sanitizeUtf8String((string) ($config['description'] ?? '')),
-            ];
-        }
-
-        return $options;
-    }
-
-    protected function prepareSuggestionPresets(): array
-    {
-        $presets = [
-            __('Voir mes prochains cours'),
-            __('Comment rejoindre une application ?'),
-            __('Quelles sont les nouveautes de la plateforme ?'),
-        ];
-
-        return array_map(fn ($value) => $this->sanitizeUtf8String((string) $value), $presets);
-    }
-
-    protected function trainerConfig(): array
-    {
-        $config = config("ai.trainers.{$this->trainer}", []);
-
-        return is_array($config) ? $config : [];
-    }
-
-    protected function conversation(): ?AiConversation
-    {
-        if (! $this->conversationId) {
-            return null;
-        }
-
-        return AiConversation::query()->find($this->conversationId);
-    }
-
-    protected function user(): ?Authenticatable
-    {
-        return Auth::user();
     }
 
     protected function prepareMessages(AiConversation $conversation, array $trainer): array
@@ -429,17 +276,6 @@ class ChatBox extends Component
                 'role' => 'system',
                 'content' => $this->sanitizeUtf8String(ToolExecutor::getToolsPrompt()),
             ];
-        }
-
-        $user = $conversation->user;
-        if ($user && method_exists($user, 'getIaContext')) {
-            $userContext = trim((string) $user->getIaContext());
-            if ($userContext !== '') {
-                $messages[] = [
-                    'role' => 'system',
-                    'content' => $this->sanitizeUtf8String("Contexte utilisateur :\n" . $userContext),
-                ];
-            }
         }
 
         $historyLimit = (int) config('ai.history_limit', 30);
@@ -464,84 +300,35 @@ class ChatBox extends Component
         return $messages;
     }
 
-    protected function buildAssistantPayload(string $content, array $toolResults): array
+    protected function trainerConfig(): array
     {
-        $cleanContent = $content;
+        $config = config("ai.trainers.{$this->trainer}", []);
 
-        $buttons = [];
-        $buttonPattern = '/\[BUTTONS\](.*?)\[\/BUTTONS\]/is';
-        if (preg_match($buttonPattern, $cleanContent, $match)) {
-            $buttonsBlock = $match[1] ?? '';
-            $lines = preg_split('/\r\n|\r|\n/', $buttonsBlock);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (Str::startsWith($line, '-')) {
-                    $label = trim(ltrim($line, '-'));
-                    if ($label !== '') {
-                        $buttons[] = $this->sanitizeUtf8String(Str::limit($label, 100, ''));
-                    }
-                }
-            }
+        return is_array($config) ? $config : [];
+    }
 
-            $cleanContent = trim(preg_replace($buttonPattern, '', $cleanContent));
-        }
-
-        $ticketUrl = $this->extractTicketUrlFromToolResults($toolResults);
-
-        if ($ticketUrl && ! in_array($this->ticketButtonLabel, $buttons, true)) {
-            $buttons[] = $this->ticketButtonLabel;
-        }
+    protected function resolveAssistantMeta(string $slug): array
+    {
+        $config = config("ai.trainers.{$slug}", []);
 
         return [
-            'content' => $this->sanitizeUtf8String($cleanContent),
-            'buttons' => $buttons,
-            'ticket_url' => $ticketUrl ? $this->buildTicketsUrl($ticketUrl) : null,
+            'name' => $this->sanitizeUtf8String((string) ($config['name'] ?? ucfirst($slug))),
+            'description' => $this->sanitizeUtf8String((string) ($config['description'] ?? '')),
         ];
     }
 
-    protected function extractTicketUrlFromToolResults(array $toolResults): ?string
+    protected function conversation(): ?AiConversation
     {
-        foreach ($toolResults as $entry) {
-            $result = $entry['result'] ?? null;
-            if (! is_array($result)) {
-                continue;
-            }
-
-            if (! empty($result['ticket_url'])) {
-                return (string) $result['ticket_url'];
-            }
-
-            if (! empty($result['ticket']['ticket_url'])) {
-                return (string) $result['ticket']['ticket_url'];
-            }
-        }
-
-        return null;
-    }
-
-    public function buildTicketsUrl(?string $rawUrl): ?string
-    {
-        $rawUrl = $this->sanitizeUtf8String((string) $rawUrl);
-
-        if ($rawUrl === '') {
+        if (! $this->conversationId) {
             return null;
         }
 
-        $baseUrl = $this->ticketsUrl ?: url('/mes-tickets');
-        if (! str_starts_with($baseUrl, 'http')) {
-            $baseUrl = url('/mes-tickets');
-        }
+        return AiConversation::query()->find($this->conversationId);
+    }
 
-        $ticketId = null;
-        if (preg_match('/(\d+)(?!.*\d)/', $rawUrl, $matches)) {
-            $ticketId = $matches[1] ?? null;
-        }
-
-        if ($ticketId) {
-            return $baseUrl . '?ticket=' . $ticketId;
-        }
-
-        return $baseUrl;
+    protected function user(): ?Authenticatable
+    {
+        return Auth::user();
     }
 
     public function renderMessageHtml(string $content): string
