@@ -10,6 +10,7 @@ use App\Services\Ai\ToolExecutor;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Throwable;
 
@@ -89,26 +90,70 @@ class ChatBox extends Component
             return;
         }
 
-        // Ajouter le message utilisateur immédiatement
-        $this->messages[] = [
-            'role' => 'user',
-            'content' => $text,
-            'at' => now()->toDateTimeString(),
-        ];
+        $user = $this->user();
+        if (! $user) {
+            $this->error = __('Authentification requise.');
 
-        $this->message = '';
+            return;
+        }
+
+        // S'assurer qu'une conversation existe
+        $this->ensureConversation();
+        if (! $this->conversationId) {
+            $this->error = __('Impossible de créer la conversation.');
+
+            return;
+        }
+
         $this->isSending = true;
         $this->error = null;
 
-        // Demander au navigateur de scroller
-        $this->dispatch('chatbox-scroll');
+        try {
+            // Sauvegarder le message utilisateur dans la base de données
+            $conversation = AiConversation::find($this->conversationId);
+            if (! $conversation) {
+                throw new \Exception('Conversation not found');
+            }
 
-        // Dispatch un événement pour traiter la réponse IA de manière asynchrone
-        $this->dispatch('process-ai-response', ['text' => $text]);
+            DB::transaction(function () use ($conversation, $text) {
+                AiConversationMessage::create([
+                    'conversation_id' => $conversation->id,
+                    'role' => AiConversationMessage::ROLE_USER,
+                    'content' => $text,
+                ]);
+
+                $conversation->update([
+                    'last_message_at' => now(),
+                ]);
+            });
+
+            // Ajouter le message utilisateur à l'interface immédiatement
+            $this->messages[] = [
+                'role' => 'user',
+                'content' => $text,
+                'at' => now()->toDateTimeString(),
+            ];
+
+            $this->message = '';
+
+            // Demander au navigateur de scroller
+            $this->dispatch('chatbox-scroll');
+
+            // Dispatch un événement JavaScript pour traiter la réponse IA de manière asynchrone
+            $this->dispatch('trigger-ai-response', ['text' => $text]);
+
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->error = __('Erreur lors de l\'envoi du message.');
+            $this->isSending = false;
+        }
     }
 
     public function processAiResponse($text)
     {
+        // Log pour debug
+        Log::info('processAiResponse called', ['text' => $text]);
+
         $this->isLoading = true;
 
         try {
@@ -125,6 +170,7 @@ class ChatBox extends Component
 
         } catch (Throwable $exception) {
             // En cas d'erreur, utiliser une réponse simulée
+            Log::error('AI call failed, using fallback', ['error' => $exception->getMessage()]);
             report($exception);
             $reply = 'Réponse IA simulée à : '.$text.' (Erreur Ollama: '.$exception->getMessage().')';
         }
@@ -139,6 +185,8 @@ class ChatBox extends Component
         $this->isSending = false;
         $this->isLoading = false;
         $this->dispatch('chatbox-scroll');
+
+        Log::info('processAiResponse completed', ['reply_length' => strlen($reply)]);
     }
 
     protected function callDelayedReply($text)

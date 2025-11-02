@@ -55,9 +55,9 @@
                 }, 1500); // Délai de 1.5 secondes pour simuler la réponse IA
             });
 
-            // AI response request handler
-            window.addEventListener('process-ai-response', (e) => {
-                console.log('process-ai-response event received:', e.detail);
+            // AI response handler - appelle la méthode avec un petit délai pour la fluidité
+            window.addEventListener('trigger-ai-response', (e) => {
+                console.log('Triggering AI response:', e.detail);
                 const detail = e.detail || {};
                 const text = detail.text || '';
 
@@ -73,8 +73,10 @@
 
                 if (wireId && window.Livewire && Livewire.find(wireId)) {
                     console.log('Calling processAiResponse on component:', wireId);
-                    // Appeler la méthode immédiatement pour traiter la réponse IA
-                    Livewire.find(wireId).call('processAiResponse', text);
+                    // Petit délai pour permettre à l'interface de se mettre à jour avant de traiter la réponse IA
+                    setTimeout(() => {
+                        Livewire.find(wireId).call('processAiResponse', text);
+                    }, 300); // 300ms pour que le message utilisateur soit bien affiché
                 } else {
                     console.log('Cannot find Livewire component for AI response');
                 }
