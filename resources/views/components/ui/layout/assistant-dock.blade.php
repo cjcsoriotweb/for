@@ -19,9 +19,9 @@
         ->orderBy('name')
         ->get();
 
-    // Ajouter le trainer spécifique à la formation si on est sur une page de formation
+    // Ajouter le trainer spécifique à la formation si on est sur une page de formation (mais pas de leçon)
     $currentRoute = request()->route();
-    if ($currentRoute && str_contains($currentRoute->getName(), 'eleve.formation')) {
+    if ($currentRoute && str_contains($currentRoute->getName(), 'eleve.formation') && !str_contains($currentRoute->getName(), 'eleve.formation.lesson')) {
         $formationId = $currentRoute->parameter('formation');
         if ($formationId && is_numeric($formationId)) {
             $formation = Formation::find($formationId);
