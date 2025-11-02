@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Clean\Admin\AdminPageController;
 use App\Http\Controllers\Clean\Admin\SuperadminTestController;
 use App\Http\Controllers\Clean\Superadmin\FormationCategoryController;
+use App\Http\Controllers\Clean\Superadmin\SuperadminPageController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -10,11 +10,11 @@ Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth', AdminMiddleware::class])
     ->group(function (): void {
-        Route::get('/', [AdminPageController::class, 'overview'])->name('overview');
-        Route::get('/teams', [AdminPageController::class, 'teamsIndex'])->name('teams.index');
-        Route::get('/users', [AdminPageController::class, 'usersIndex'])->name('users.index');
-        Route::get('/formations', [AdminPageController::class, 'formationsIndex'])->name('formations.index');
-        Route::get('/support', [AdminPageController::class, 'supportIndex'])->name('support.index');
+        Route::get('/', [SuperadminPageController::class, 'overview'])->name('overview');
+        Route::get('/teams', [SuperadminPageController::class, 'teamsIndex'])->name('teams.index');
+        Route::get('/users', [SuperadminPageController::class, 'usersIndex'])->name('users.index');
+        Route::get('/formations', [SuperadminPageController::class, 'formationsIndex'])->name('formations.index');
+        Route::get('/support', [SuperadminPageController::class, 'supportIndex'])->name('support.index');
         Route::get('/ai', function () {
             return view('out-application.superadmin.superadmin-ia-page');
         })->name('ai.index');

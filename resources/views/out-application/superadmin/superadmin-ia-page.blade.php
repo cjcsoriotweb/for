@@ -3,5 +3,8 @@
     :title="__('Gestion des assistants IA')"
     :subtitle="__('Creez, mettez a jour et pilotez les differents profils IA disponibles dans l\'application.')"
 >
-    <livewire:superadmin.ai-trainer-manager />
+    <div class="space-y-12">
+        <livewire:superadmin.ai-trainer-manager />
+        <livewire:superadmin.formation-category-manager />
+    </div>
 </x-admin.global-layout>

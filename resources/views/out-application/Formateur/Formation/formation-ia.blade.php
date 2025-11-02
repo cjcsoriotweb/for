@@ -13,18 +13,18 @@
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            {{ __('Retour a la formation') }}
+            {{ __('Retour à la formation') }}
           </a>
           <h1 class="mt-4 text-3xl font-bold text-gray-900">
-            {{ __('Formateur IA pour : :title', ['title' => $formation->title]) }}
+            {{ __('Catégorie pour la formation : :title', ['title' => $formation->title]) }}
           </h1>
           <p class="mt-2 text-sm text-gray-600">
-            {{ __('Selectionnez un formateur IA actif pour cette formation ou choisissez de ne pas en utiliser.') }}
+            {{ __('Choisissez la catégorie qui sera proposée aux apprenants ; elle détermine le contexte et l’assistant IA associé.') }}
           </p>
         </div>
         <div class="hidden sm:block">
           <span class="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
-            {{ __('IA') }}
+            {{ __('Catégorie') }}
           </span>
         </div>
       </div>
@@ -48,10 +48,10 @@
       <div class="bg-white shadow-sm ring-1 ring-gray-100/70 sm:rounded-2xl">
         <div class="border-b border-gray-100 px-6 py-4">
           <h2 class="text-lg font-semibold text-gray-900">
-            {{ __('Parametrage du formateur IA') }}
+            {{ __('Paramétrage de la catégorie') }}
           </h2>
           <p class="mt-1 text-sm text-gray-500">
-            {{ __('Un formateur IA permet aux eleves de dialoguer avec un assistant dedie a cette formation.') }}
+            {{ __('Les catégories permettent d’unifier les assistants IA et contenus proposés pour cette formation.') }}
           </p>
         </div>
 
@@ -59,7 +59,7 @@
           @if ($categories->isEmpty())
             <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center">
               <p class="text-sm text-gray-600">
-                {{ __('Aucune categorie nest disponible pour le moment. Contactez un administrateur pour en creer.') }}
+                {{ __('Aucune catégorie n’est disponible pour le moment. Contactez un superadmin pour en créer.') }}
               </p>
             </div>
           @else
@@ -69,7 +69,7 @@
 
               <fieldset class="space-y-4">
                 <legend class="text-sm font-medium text-gray-700">
-                  {{ __('Choisissez la categorie associee a cette formation') }}
+                  {{ __('Choisissez la catégorie associée à cette formation') }}
                 </legend>
 
                 <div class="flex flex-col gap-3">
@@ -84,10 +84,10 @@
                       />
                       <div>
                         <p class="text-sm font-semibold text-gray-900">
-                          {{ __('Aucune categorie') }}
+                          {{ __('Aucune catégorie') }}
                         </p>
                         <p class="text-xs text-gray-500">
-                          {{ __('Les eleves ne verront que les assistants generiques ou ceux ajoutes manuellement.') }}
+                          {{ __('Les apprenants ne verront que les assistants génériques ou ajoutés manuellement.') }}
                         </p>
                       </div>
                     </div>
@@ -114,14 +114,14 @@
                           @endif
                           @if ($category->aiTrainer)
                             <p class="text-xs text-gray-500">
-                              {{ __('Assistant IA : :name', ['name' => $category->aiTrainer->name]) }}
+                              {{ __('Assistant IA associé : :name', ['name' => $category->aiTrainer->name]) }}
                             </p>
                             <p class="mt-1 text-xs text-gray-400">
-                              {{ __('Modele : :model', ['model' => $category->aiTrainer->model ?: __('defaut')]) }}
+                              {{ __('Modèle : :model', ['model' => $category->aiTrainer->model ?: __('défaut')]) }}
                             </p>
                           @else
                             <p class="mt-1 text-xs text-gray-400">
-                              {{ __('Aucun assistant IA associe a cette categorie') }}
+                              {{ __('Aucun assistant IA n’est actuellement relié à cette catégorie.') }}
                             </p>
                           @endif
                         </div>
@@ -147,7 +147,7 @@
                   type="submit"
                   class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
-                  {{ __('Enregistrer la categorie') }}
+                  {{ __('Enregistrer la catégorie') }}
                 </button>
               </div>
             </form>

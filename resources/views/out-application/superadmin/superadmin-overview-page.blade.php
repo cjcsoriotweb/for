@@ -20,6 +20,14 @@
             'cta' => __('Gérer les utilisateurs'),
         ],
         [
+            'route' => route('superadmin.formations.index'),
+            'icon' => 'library_books',
+            'label' => __('Formations'),
+            'stat' => number_format($stats->get('formations', 0)),
+            'description' => __('Pilotez le catalogue global et ses catégories IA.'),
+            'cta' => __('Gérer les formations'),
+        ],
+        [
             'route' => route('superadmin.support.index'),
             'icon' => 'support_agent',
             'label' => __('Tickets support'),
