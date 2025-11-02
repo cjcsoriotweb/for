@@ -137,6 +137,7 @@
                                     <form method="POST" action="{{ route('superadmin.formation-categories.update', $category) }}" class="space-y-4">
                                         @csrf
                                         @method('PUT')
+                                        <input type="hidden" name="category_id" value="{{ $category->id }}">
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">
@@ -145,7 +146,7 @@
                                                 <input
                                                     type="text"
                                                     name="name"
-                                                    value="{{ old('name_'.$category->id, $category->name) }}"
+                                                    value="{{ old('category_id') == $category->id ? old('name') : $category->name }}"
                                                     class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                                     maxlength="120"
                                                 >
@@ -160,7 +161,7 @@
                                                 >
                                                     <option value="">{{ __('Aucun assistant specifique') }}</option>
                                                     @foreach ($trainers as $trainer)
-                                                        <option value="{{ $trainer->id }}" @selected(old('ai_trainer_id_'.$category->id, $category->ai_trainer_id) == $trainer->id)>
+                                                        <option value="{{ $trainer->id }}" @selected((old('category_id') == $category->id ? old('ai_trainer_id') : $category->ai_trainer_id) == $trainer->id)>
                                                             {{ $trainer->name }} @if($trainer->model) - {{ $trainer->model }} @endif
                                                         </option>
                                                     @endforeach
@@ -176,7 +177,7 @@
                                                 name="description"
                                                 rows="3"
                                                 class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            >{{ old('description_'.$category->id, $category->description) }}</textarea>
+                                            >{{ old('category_id') == $category->id ? old('description') : $category->description }}</textarea>
                                         </div>
 
                                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
