@@ -23,6 +23,6 @@ Artisan::command('ia:repond', function () {
 
 
 Schedule::command('ia:repond')
-    ->everyFiveMinutes() // ou ->hourly(), ->dailyAt('02:00'), etc.
+    ->everyMinutes() // ou ->hourly(), ->dailyAt('02:00'), etc.
     ->withoutOverlapping()
     ->sendOutputTo(storage_path('logs/ia-repond.log'));
