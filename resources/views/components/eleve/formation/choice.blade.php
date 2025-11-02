@@ -1,13 +1,5 @@
 <section class="space-y-6">
-  <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400/70">Catalogue</p>
-      <h2 class="text-2xl font-semibold text-white sm:text-3xl">Vos formations disponibles</h2>
-      <p class="mt-2 text-sm text-slate-300/80">
-        D&eacute;couvrez de nouveaux parcours et d&eacute;veloppez vos comp&eacute;tences &eacute;tape par &eacute;tape.
-      </p>
-    </div>
-  </div>
+
 
   @if($formations->isNotEmpty())
   <div class="-mx-4 overflow-hidden sm:-mx-2">
@@ -102,15 +94,15 @@
     </div>
   </div>
   @else
-  <div class="rounded-3xl border border-dashed border-white/15 bg-white/5 px-8 py-14 text-center text-slate-200/80">
-    <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white/10">
-      <svg class="h-10 w-10 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+  <div class="rounded-3xl border border-dashed border-white/20 bg-gradient-to-br from-slate-800/80 via-indigo-900/60 to-purple-900/50 px-10 py-16 text-center shadow-xl transition hover:shadow-2xl">
+    <div class="mx-auto mb-7 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-tr from-sky-500/30 via-indigo-500/20 to-purple-500/30 shadow-inner">
+      <svg class="h-12 w-12 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
           d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
       </svg>
     </div>
-    <h3 class="text-xl font-semibold text-white">Aucune formation disponible</h3>
-    <p class="mt-3 text-sm text-slate-300/80">
+    <h3 class="text-2xl font-bold text-white drop-shadow">Aucune autre formation disponible</h3>
+    <p class="mt-4 text-base text-slate-200/90">
       Revenez bientôt pour découvrir les nouvelles formations proposées à votre équipe.
     </p>
   </div>
