@@ -13,5 +13,4 @@
 
 </x-app-layout>
 
-<x-ui.layout.assistant-dock />
 
