@@ -31,9 +31,7 @@ class FormationsList extends Component
                 'lessons' => function ($query) {
                     $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
                 },
-                'lessons.lessonable.quizQuestions' => function ($query) {
-                    $query->select('id', 'quiz_id'); // Précharger le compte de questions pour optimiser
-                },
+                'lessons.lessonable',
             ]);
 
         // Appliquer le filtre utilisateur seulement si ce n'est pas un superadmin
