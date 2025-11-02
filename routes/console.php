@@ -22,7 +22,3 @@ Artisan::command('ia:repond', function () {
 })->purpose('Lancer la reponse automatique des assistants IA.');
 
 
-Schedule::command('ia:repond')
-    ->everyMinutes() // ou ->hourly(), ->dailyAt('02:00'), etc.
-    ->withoutOverlapping()
-    ->sendOutputTo(storage_path('logs/ia-repond.log'));
