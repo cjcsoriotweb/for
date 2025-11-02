@@ -22,12 +22,6 @@ class ChatBox extends Component
 
     public $isActive = false;
 
-    public $messagesOffset = 0;
-
-    public $canLoadMore = false;
-
-    public $canLoadNewer = false;
-
     protected $listeners = [
         'activate-chat-polling' => 'activatePolling',
     ];
@@ -73,10 +67,7 @@ class ChatBox extends Component
 
             Chat::create($chatData);
 
-            // Reset l'offset pour afficher les derniers messages
-            $this->messagesOffset = 0;
             $this->loadMessages();
-
             $this->message = '';
 
             // Scroll vers le bas
@@ -97,23 +88,11 @@ class ChatBox extends Component
         }
 
         try {
-            // Récupérer d'abord le nombre total de messages pour savoir s'il y en a plus
-            $totalQuery = Chat::query();
-            $this->applyContactFilter($totalQuery, $user);
-            $totalMessages = $totalQuery->count();
-
-            // Charger les messages avec pagination
             $query = Chat::query()
                 ->with(['sender'])
-                ->orderBy('created_at', 'asc');
+                ->orderBy('created_at', 'desc');
 
             $this->applyContactFilter($query, $user);
-
-            // Calculer l'offset et la limite
-            $limit = 5; // Maximum 5 messages affichés
-            $offset = max(0, $totalMessages - $this->messagesOffset - $limit);
-
-            $query->offset($offset)->limit($limit);
 
             $chats = $query->get();
 
@@ -126,10 +105,6 @@ class ChatBox extends Component
                 ];
             })->toArray();
 
-            // Vérifier s'il y a plus de messages à charger
-            $this->canLoadMore = ($offset > 0);
-            $this->canLoadNewer = ($this->messagesOffset > 0 && $totalMessages > $limit);
-
             // Marquer les messages comme lus (seulement pour les conversations user-to-user)
             if ($this->contactType !== 'ai') {
                 $this->markMessagesAsRead();
@@ -137,26 +112,7 @@ class ChatBox extends Component
 
         } catch (\Exception $e) {
             $this->messages = [];
-            $this->canLoadMore = false;
         }
-    }
-
-    public function loadMoreMessages()
-    {
-        $this->messagesOffset += 5;
-        $this->loadMessages();
-
-        // Scroll vers le haut pour montrer les nouveaux messages
-        $this->dispatch('scroll-to-top');
-    }
-
-    public function loadNewerMessages()
-    {
-        $this->messagesOffset = max(0, $this->messagesOffset - 5);
-        $this->loadMessages();
-
-        // Scroll vers le bas pour montrer les nouveaux messages
-        $this->dispatch('scroll-to-bottom');
     }
 
     private function applyContactFilter($query, $user)
@@ -203,8 +159,6 @@ class ChatBox extends Component
         // Activer le polling seulement si c'est le bon contact
         if ($contactId === $this->contactId) {
             $this->isActive = true;
-            // Reset l'offset pour afficher les derniers messages
-            $this->messagesOffset = 0;
             $this->loadMessages();
         }
     }
