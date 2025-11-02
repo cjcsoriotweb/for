@@ -5,6 +5,10 @@ use App\Http\Controllers\Clean\Account\AccountInvitationController;
 use App\Http\Controllers\Clean\Account\AccountPageController;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['auth'])
+    ->get('/mes-tickets', [AccountPageController::class, 'tickets'])
+    ->name('user.tickets');
+
 Route::prefix('mon-compte')
     ->name('user.')
     ->middleware(['auth'])

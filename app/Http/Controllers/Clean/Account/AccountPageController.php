@@ -7,6 +7,7 @@ use App\Http\Requests\account\team\SwitchTeamRequest;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AccountPageController extends Controller
 {
@@ -36,5 +37,10 @@ class AccountPageController extends Controller
         }
 
         return $this->accountService->teams()->switchTeam(Auth::user(), $team);
+    }
+
+    public function tickets(): View
+    {
+        return view('out-application.account.tickets');
     }
 }

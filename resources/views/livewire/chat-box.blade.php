@@ -215,6 +215,81 @@ function chatBox() {
         hasTrainerChoice: false,
         currentToolResults: [],
         shortcodeTemplates: @js($shortcodeTemplates),
+        ticketsButtonLabel: @js(__('Consulter le ticket')),
+        ticketsPageRoute: @js(route('user.tickets')),
+
+        getCsrfToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.content || '';
+        },
+
+        getHttpErrorMessage(status) {
+            if (status === 401) {
+                return 'Authentification requise.';
+            }
+            if (status === 403) {
+                return 'Acces refuse.';
+            }
+            if (status === 404) {
+                return 'Ressource introuvable.';
+            }
+            if (status === 419) {
+                return 'Session expiree.';
+            }
+            if (status >= 500) {
+                return 'Erreur serveur (' + status + ').';
+            }
+
+            return 'Erreur (' + status + ').';
+        },
+
+        async requestJson(url, options = {}) {
+            const originalHeaders = options.headers || {};
+            const headers = {
+                Accept: 'application/json',
+                ...originalHeaders,
+            };
+
+            if (options.body && !headers['Content-Type']) {
+                headers['Content-Type'] = 'application/json';
+            }
+
+            const response = await fetch(url, {
+                ...options,
+                headers,
+            });
+
+            const contentType = response.headers.get('content-type') || '';
+            const rawBody = await response.text();
+            let data = null;
+
+            if (contentType.includes('application/json')) {
+                try {
+                    data = rawBody ? JSON.parse(rawBody) : {};
+                } catch (error) {
+                    console.error('Invalid JSON from', url, error);
+                    throw new Error('Reponse JSON invalide.');
+                }
+            } else {
+                console.error('Unexpected response type', {
+                    url,
+                    contentType,
+                    bodyPreview: rawBody.slice(0, 200),
+                });
+                throw new Error('Reponse inattendue du serveur.');
+            }
+
+            if (!response.ok) {
+                const message = typeof data?.message === 'string' && data.message.trim().length > 0
+                    ? data.message
+                    : this.getHttpErrorMessage(response.status);
+                const error = new Error(message);
+                error.response = response;
+                error.payload = data;
+                throw error;
+            }
+
+            return data;
+        },
 
         init() {
             this.trainerMeta = this.trainerMeta || this.trainers?.[this.trainer] || { name: 'Assistant', description: '' };
@@ -248,18 +323,15 @@ function chatBox() {
             this.error = null;
 
             try {
-                const response = await fetch('/mon-compte/ai/conversations', {
+                const data = await this.requestJson('/mon-compte/ai/conversations', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'X-CSRF-TOKEN': this.getCsrfToken(),
                     },
                     body: JSON.stringify({
                         trainer: this.trainer,
                     }),
                 });
-
-                const data = await response.json();
 
                 if (data.success && data.conversation) {
                     this.conversationId = data.conversation.id;
@@ -268,7 +340,10 @@ function chatBox() {
                     this.error = data.message || 'Impossible de creer la conversation.';
                 }
             } catch (e) {
-                this.error = 'Erreur lors de la creation de la conversation : ' + e.message;
+                console.error('createConversation error', e);
+                this.error = e?.message
+                    ? 'Erreur lors de la creation de la conversation : ' + e.message
+                    : 'Erreur lors de la creation de la conversation.';
             } finally {
                 this.isLoadingConversation = false;
                 this.scrollToBottom();
@@ -284,13 +359,7 @@ function chatBox() {
             this.error = null;
 
             try {
-                const response = await fetch(`/mon-compte/ai/conversations/${conversationId}`);
-
-                if (!response.ok) {
-                    throw new Error('Chargement impossible.');
-                }
-
-                const data = await response.json();
+                const data = await this.requestJson(`/mon-compte/ai/conversations/${conversationId}`);
 
                 if (data.success) {
                     this.conversationId = data.conversation?.id || conversationId;
@@ -312,7 +381,10 @@ function chatBox() {
                     this.error = data.message || 'Conversation introuvable.';
                 }
             } catch (e) {
-                this.error = 'Erreur lors du chargement : ' + e.message;
+                console.error('loadConversation error', e);
+                this.error = e?.message
+                    ? 'Erreur lors du chargement : ' + e.message
+                    : 'Erreur lors du chargement.';
             } finally {
                 this.isLoadingConversation = false;
                 this.scrollToBottom();
@@ -398,7 +470,8 @@ function chatBox() {
                     throw new Error('Flux indisponible.');
                 }
 
-                const decoder = new TextDecoder('utf-8', { stream: true });
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -407,31 +480,87 @@ function chatBox() {
                         break;
                     }
 
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n');
+                    buffer += decoder.decode(value, { stream: true });
 
-                    for (const line of lines) {
-                        if (!line.startsWith('data: ')) {
-                            continue;
+                    // Process complete SSE events separated by double newline
+                    let sepIndex;
+                    while ((sepIndex = buffer.indexOf('\n\n')) !== -1) {
+                        const rawEvent = buffer.slice(0, sepIndex).trim();
+                        buffer = buffer.slice(sepIndex + 2);
+
+                        const lines = rawEvent.split(/\r\n|\r|\n/);
+                        for (const line of lines) {
+                            if (!line.startsWith('data: ')) {
+                                continue;
+                            }
+
+                            try {
+                                const data = JSON.parse(line.substring(6));
+
+                                if (data.type === 'conversation_id') {
+                                    this.conversationId = data.conversation_id;
+                                } else if (data.type === 'chunk') {
+                                    this.currentResponse += data.content;
+                                    this.scrollToBottom();
+                                } else if (data.type === 'tool_result') {
+                                    this.currentResponse = data.content;
+                                    this.currentToolResults = Array.isArray(data.tool_results) ? data.tool_results : [];
+                                    this.scrollToBottom();
+                                } else if (data.type === 'done') {
+                                    const { content, buttons } = this.extractButtons(this.currentResponse);
+                                    const rawTicketUrl = this.getTicketUrlFromToolResults();
+                                    const ticketUrl = this.buildTicketsUrl(rawTicketUrl);
+                                    const ticketLabel = this.ticketsButtonLabel || 'Consulter le ticket';
+                                    const finalButtons = ticketUrl && !buttons.includes(ticketLabel)
+                                        ? [...buttons, ticketLabel]
+                                        : buttons;
+
+                                    this.messages.push({
+                                        role: 'assistant',
+                                        content: content,
+                                        buttons: finalButtons,
+                                        ticketUrl: ticketUrl,
+                                    });
+
+                                    this.currentResponse = '';
+                                    this.currentToolResults = [];
+                                    this.scrollToBottom();
+                                } else if (data.type === 'error') {
+                                    this.error = data.message;
+                                }
+                            } catch (parseError) {
+                                console.error('JSON parse error (chunked):', parseError, 'Line:', line);
+                            }
                         }
+                    }
 
+                    // Safety: if buffer grows too large without separator, truncate to avoid memory bloat
+                    if (buffer.length > 20000) {
+                        buffer = buffer.slice(-10000);
+                    }
+                }
+
+                // Process any remaining buffer (if it ends without double newline)
+                if (buffer.trim().length > 0) {
+                    const leftoverLines = buffer.split(/\r\n|\r|\n/);
+                    for (const line of leftoverLines) {
+                        if (!line.startsWith('data: ')) continue;
                         try {
                             const data = JSON.parse(line.substring(6));
-
                             if (data.type === 'conversation_id') {
                                 this.conversationId = data.conversation_id;
                             } else if (data.type === 'chunk') {
                                 this.currentResponse += data.content;
-                                this.scrollToBottom();
                             } else if (data.type === 'tool_result') {
                                 this.currentResponse = data.content;
                                 this.currentToolResults = Array.isArray(data.tool_results) ? data.tool_results : [];
-                                this.scrollToBottom();
                             } else if (data.type === 'done') {
                                 const { content, buttons } = this.extractButtons(this.currentResponse);
-                                const ticketUrl = this.getTicketUrlFromToolResults();
-                                const finalButtons = ticketUrl && !buttons.includes('Consulter le ticket')
-                                    ? [...buttons, 'Consulter le ticket']
+                                const rawTicketUrl = this.getTicketUrlFromToolResults();
+                                const ticketUrl = this.buildTicketsUrl(rawTicketUrl);
+                                const ticketLabel = this.ticketsButtonLabel || 'Consulter le ticket';
+                                const finalButtons = ticketUrl && !buttons.includes(ticketLabel)
+                                    ? [...buttons, ticketLabel]
                                     : buttons;
 
                                 this.messages.push({
@@ -447,8 +576,8 @@ function chatBox() {
                             } else if (data.type === 'error') {
                                 this.error = data.message;
                             }
-                        } catch (parseError) {
-                            console.error('JSON parse error:', parseError, 'Line:', line);
+                        } catch (e) {
+                            console.error('JSON parse error (leftover):', e, 'line:', line);
                         }
                     }
                 }
@@ -484,9 +613,28 @@ function chatBox() {
             return null;
         },
 
+        buildTicketsUrl(rawUrl) {
+            if (typeof rawUrl !== 'string' || rawUrl.trim() === '') {
+                return null;
+            }
+
+            const baseUrl = this.ticketsPageRoute || '/mes-tickets';
+            const idMatch = rawUrl.match(/(\d+)(?!.*\d)/);
+
+            if (idMatch && idMatch[1]) {
+                return `${baseUrl}?ticket=${idMatch[1]}`;
+            }
+
+            return baseUrl;
+        },
+
         handleButtonClick(label, message) {
-            if (label === 'Consulter le ticket' && message?.ticketUrl) {
-                window.open(message.ticketUrl, '_blank');
+            const normalizedLabel = (label || '').trim();
+            const ticketLabel = (this.ticketsButtonLabel || 'Consulter le ticket').trim();
+            const fallbackUrl = this.ticketsPageRoute || '/mes-tickets';
+
+            if ((normalizedLabel === ticketLabel || normalizedLabel === 'Voir mes tickets') && (message?.ticketUrl || fallbackUrl)) {
+                window.open(message?.ticketUrl || fallbackUrl, '_blank');
                 return;
             }
 
