@@ -19,7 +19,7 @@
   </div>
 
 
-  @livewire('chat-and-ia-menu')
+  @livewire('chat-and-i-a-menu')
 
   @stack('assistant-dock')
 
