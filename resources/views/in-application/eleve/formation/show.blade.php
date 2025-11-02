@@ -21,16 +21,5 @@
     @endif
   </div>
 
-  @auth
-    @php
-      $chatTrainerSlug = $assistantTrainerSlug ?? config('ai.default_trainer_slug', 'default');
-      $chatTrainerTitle = $assistantTrainerName ?? __('Assistant Formation');
-    @endphp
 
-    @if (! empty($chatTrainerSlug))
-      <div style="position:fixed;left:10px">
-        <livewire:chat-box :trainer="$chatTrainerSlug" :title="$chatTrainerTitle" />
-      </div>
-    @endif
-  @endauth
 </x-eleve-layout>
