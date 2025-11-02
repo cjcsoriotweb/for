@@ -30,7 +30,7 @@
             'route' => route('superadmin.ai.index'),
             'icon' => 'smart_toy',
             'label' => __('Formateurs IA'),
-            'stat' => count(config('ai.trainers', [])),
+            'stat' => number_format(\\App\\Models\\AiTrainer::query()->count()),
             'description' => __('Consultez les profils IA configurés.'),
             'cta' => __('Voir l\'IA'),
         ],
@@ -80,3 +80,4 @@
         @endforeach
     </div>
 </x-admin.global-layout>
+

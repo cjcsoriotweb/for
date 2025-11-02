@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
+use App\Models\AiTrainer;
 use App\Services\Ai\OllamaClient;
 use App\Services\Ai\ToolExecutor;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -28,6 +29,7 @@ class ChatBox extends Component
 
     protected OllamaClient $ollamaClient;
     protected ToolExecutor $toolExecutor;
+    protected ?AiTrainer $trainerModel = null;
 
     public function boot(OllamaClient $ollamaClient, ToolExecutor $toolExecutor): void
     {
@@ -43,7 +45,7 @@ class ChatBox extends Component
         $this->trainer = $resolvedTrainer;
         $this->conversationId = $conversationId;
         $this->title = $this->sanitizeUtf8String($title);
-        $this->assistantMeta = $this->resolveAssistantMeta($this->trainer);
+        $this->loadTrainerModel($resolvedTrainer);
         $this->shortcodeTemplates = $this->resolveShortcodeTemplates();
 
         if ($this->conversationId) {
@@ -119,6 +121,9 @@ class ChatBox extends Component
                     throw new \RuntimeException('Conversation introuvable.');
                 }
 
+                $this->loadTrainerModel($conversationFresh->metadata['trainer'] ?? $this->trainer);
+                $trainerConfig = $this->trainerConfig();
+
                 $messages = $this->prepareMessages($conversationFresh, $trainerConfig);
                 $options = [
                     'model' => $trainerConfig['model'] ?? null,
@@ -159,6 +164,11 @@ class ChatBox extends Component
     {
         if ($this->conversationId) {
             $this->loadConversation($this->conversationId);
+            return;
+        }
+
+        $this->loadTrainerModel($this->trainer);
+        if (! $this->trainerModel) {
             return;
         }
 
@@ -236,10 +246,7 @@ class ChatBox extends Component
     {
         $metadataTrainer = (string) ($conversation->metadata['trainer'] ?? $this->trainer);
 
-        if ($metadataTrainer !== '' && $metadataTrainer !== $this->trainer) {
-            $this->trainer = $metadataTrainer;
-            $this->assistantMeta = $this->resolveAssistantMeta($metadataTrainer);
-        }
+        $this->loadTrainerModel($metadataTrainer ?: $this->trainer);
 
         $this->conversationId = $conversation->id;
 
@@ -300,20 +307,49 @@ class ChatBox extends Component
         return $messages;
     }
 
-    protected function trainerConfig(): array
+    protected function loadTrainerModel(?string $slug = null): void
     {
-        $config = config("ai.trainers.{$this->trainer}", []);
+        $desiredSlug = $slug !== null ? trim($slug) : null;
 
-        return is_array($config) ? $config : [];
+        $query = AiTrainer::query()->active();
+        $trainer = $desiredSlug ? (clone $query)->where('slug', $desiredSlug)->first() : null;
+
+        if (! $trainer) {
+            $trainer = $query->orderBy('sort_order')->orderBy('name')->first();
+        }
+
+        if (! $trainer) {
+            $this->trainerModel = null;
+            $this->assistantMeta = [
+                'name' => $this->sanitizeUtf8String('Assistant'),
+                'description' => '',
+            ];
+            if ($this->error === null) {
+                $this->error = __('Aucun assistant disponible.');
+            }
+
+            return;
+        }
+
+        $this->trainerModel = $trainer;
+        $this->trainer = $trainer->slug;
+        $this->assistantMeta = [
+            'name' => $this->sanitizeUtf8String($trainer->name),
+            'description' => $this->sanitizeUtf8String($trainer->description ?? ''),
+        ];
     }
 
-    protected function resolveAssistantMeta(string $slug): array
+    protected function trainerConfig(): array
     {
-        $config = config("ai.trainers.{$slug}", []);
+        if (! $this->trainerModel) {
+            return [];
+        }
 
         return [
-            'name' => $this->sanitizeUtf8String((string) ($config['name'] ?? ucfirst($slug))),
-            'description' => $this->sanitizeUtf8String((string) ($config['description'] ?? '')),
+            'model' => $this->trainerModel->model,
+            'temperature' => $this->trainerModel->temperature,
+            'use_tools' => $this->trainerModel->use_tools,
+            'system_prompt' => $this->trainerModel->systemPrompt(),
         ];
     }
 
@@ -415,3 +451,6 @@ class ChatBox extends Component
         return $s;
     }
 }
+
+
+

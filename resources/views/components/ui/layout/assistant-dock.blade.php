@@ -5,20 +5,26 @@
 ])
 
 @php
+    use App\Models\AiTrainer;
+
     if (! $enable || ! auth()->check()) {
         return;
     }
 
-    $trainers = config('ai.trainers', []);
+    $trainers = AiTrainer::query()
+        ->active()
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get();
 @endphp
 
-@if (! empty($trainers))
+@if ($trainers->isNotEmpty())
     <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-4">
-        @foreach ($trainers as $slug => $trainer)
+        @foreach ($trainers as $trainer)
             <livewire:chat-box
-                :key="'assistant-chat-'.$slug"
-                :trainer="$slug"
-                :title="$trainer['name'] ?? ucfirst($slug)"
+                :key="'assistant-chat-'.$trainer->slug"
+                :trainer="$trainer->slug"
+                :title="$trainer->name"
             />
         @endforeach
     </div>

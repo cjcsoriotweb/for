@@ -32,12 +32,9 @@ class AiController extends Controller
      */
     public function stream(Request $request): Response|StreamedResponse
     {
-        // Validation - les trainers disponibles sont mis en cache
-        $availableTrainers = implode(',', $this->getAvailableTrainers());
-        
         $validator = Validator::make($request->all(), [
             'message' => ['required', 'string', 'max:' . config('ai.max_message_length', 2000)],
-            'trainer' => ['nullable', 'string', 'in:' . $availableTrainers],
+            'trainer' => ['nullable', 'string'],
             'conversation_id' => ['required', 'integer', 'exists:ai_conversations,id'],
         ]);
 
@@ -49,7 +46,7 @@ class AiController extends Controller
         }
 
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'error' => true,
                 'message' => 'Authentification requise',
@@ -57,19 +54,8 @@ class AiController extends Controller
         }
 
         $message = trim($request->input('message'));
-        $trainerSlug = $request->input('trainer', config('ai.default_trainer_slug'));
         $conversationId = $request->input('conversation_id');
 
-        // Récupérer le trainer depuis la config
-        $trainer = config("ai.trainers.$trainerSlug");
-        if (!$trainer) {
-            return response()->json([
-                'error' => true,
-                'message' => "Trainer '$trainerSlug' non trouvé",
-            ], 404);
-        }
-
-        // Récupérer la conversation (doit exister)
         $conversationQuery = AiConversation::query()
             ->where('id', $conversationId);
 
@@ -79,12 +65,35 @@ class AiController extends Controller
 
         $conversation = $conversationQuery->first();
 
-        if (!$conversation) {
+        if (! $conversation) {
             return response()->json([
                 'error' => true,
-                'message' => 'Conversation non trouvée. Veuillez créer une conversation d\'abord.',
+                'message' => "Conversation non trouvee. Veuillez creer une conversation d'abord.",
             ], 404);
         }
+
+        $trainerSlug = $request->input('trainer', $conversation->metadata['trainer'] ?? config('ai.default_trainer_slug'));
+        $trainerModel = AiTrainer::query()->active()->where('slug', $trainerSlug)->first();
+
+        if (! $trainerModel) {
+            $trainerModel = AiTrainer::query()->active()->orderBy('sort_order')->orderBy('name')->first();
+        }
+
+        if (! $trainerModel) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Aucun assistant disponible.',
+            ], 404);
+        }
+
+        $trainer = $this->formatTrainer($trainerModel);
+
+        $conversation->forceFill([
+            'metadata' => array_merge($conversation->metadata ?? [], [
+                'trainer' => $trainer['slug'],
+                'model' => $trainer['model'],
+            ]),
+        ])->save();
 
         $messageAuthorId = $user->id;
 
@@ -97,34 +106,31 @@ class AiController extends Controller
             }
         }
 
-        // Sauvegarder le message utilisateur
         $conversation->messages()->create([
             'role' => AiConversationMessage::ROLE_USER,
             'content' => $message,
             'user_id' => $messageAuthorId,
         ]);
 
-        // Préparer les messages pour l'IA
         $messages = $this->prepareMessages($conversation, $trainer);
 
-        // Streamer la réponse
         return response()->stream(function () use ($conversation, $messages, $trainer, $user) {
             $fullResponse = '';
 
-            // Envoyer l'ID de conversation au début
             $conversationData = json_encode([
                 'type' => 'conversation_id',
                 'conversation_id' => $conversation->id,
             ]);
-            echo "data: {$conversationData}\n\n";
-            
+            echo "data: {$conversationData}
+
+";
+
             if (ob_get_level() > 0) {
                 ob_flush();
             }
             flush();
 
             try {
-                // Stream les chunks de réponse
                 foreach ($this->ollamaClient->chatStream($messages, $trainer) as $chunk) {
                     $fullResponse .= $chunk;
 
@@ -132,7 +138,9 @@ class AiController extends Controller
                         'type' => 'chunk',
                         'content' => $chunk,
                     ]);
-                    echo "data: {$chunkData}\n\n";
+                    echo "data: {$chunkData}
+
+";
 
                     if (ob_get_level() > 0) {
                         ob_flush();
@@ -140,55 +148,55 @@ class AiController extends Controller
                     flush();
                 }
 
-                // Exécuter les outils si présents dans la réponse
                 $toolResult = $this->toolExecutor->parseAndExecuteTools($fullResponse, $user);
                 $processedResponse = $toolResult['content'];
-                
-                // Si des outils ont été utilisés, envoyer le contenu traité
-                if (!empty($toolResult['tool_results'])) {
-                    // Envoyer le contenu mis à jour (avec résultats des outils)
+
+                if (! empty($toolResult['tool_results'])) {
                     $updateData = json_encode([
                         'type' => 'tool_result',
                         'content' => $processedResponse,
                         'tool_results' => $toolResult['tool_results'],
                     ]);
-                    echo "data: {$updateData}\n\n";
-                    
+                    echo "data: {$updateData}
+
+";
+
                     if (ob_get_level() > 0) {
                         ob_flush();
                     }
                     flush();
                 }
-                
-                // Sauvegarder la réponse complète (avec résultats d'outils)
+
                 $conversation->messages()->create([
                     'role' => AiConversationMessage::ROLE_ASSISTANT,
                     'content' => $processedResponse,
                     'metadata' => [
-                        'trainer' => $trainer['slug'],
-                        'model' => $trainer['model'],
-                        'tools_used' => !empty($toolResult['tool_results']),
-                        'tool_results' => $toolResult['tool_results'],
+                        'tool_results' => $toolResult['tool_results'] ?? [],
                     ],
                 ]);
 
-                $conversation->update(['last_message_at' => now()]);
+                $doneData = json_encode([
+                    'type' => 'done',
+                    'content' => $processedResponse,
+                ]);
+                echo "data: {$doneData}
 
-                // Envoyer le signal de fin
-                $doneData = json_encode(['type' => 'done']);
-                echo "data: {$doneData}\n\n";
+";
 
                 if (ob_get_level() > 0) {
                     ob_flush();
                 }
                 flush();
-            } catch (\Throwable $e) {
-                // Envoyer l'erreur
+            } catch (Throwable $exception) {
+                report($exception);
+
                 $errorData = json_encode([
                     'type' => 'error',
-                    'message' => $e->getMessage(),
+                    'message' => 'Erreur lors du traitement : ' . $exception->getMessage(),
                 ]);
-                echo "data: {$errorData}\n\n";
+                echo "data: {$errorData}
+
+";
 
                 if (ob_get_level() > 0) {
                     ob_flush();
@@ -202,14 +210,18 @@ class AiController extends Controller
             'Connection' => 'keep-alive',
         ]);
     }
+    private function formatTrainer(AiTrainer $trainer): array
+    {
+        return [
+            'slug' => $trainer->slug,
+            'name' => $trainer->name,
+            'model' => $trainer->model ?: config('ai.default_model'),
+            'temperature' => $trainer->temperature ?? (float) config('ai.temperature', 0.7),
+            'use_tools' => (bool) $trainer->use_tools,
+            'system_prompt' => $trainer->systemPrompt(),
+        ];
+    }
 
-    /**
-     * Prépare les messages pour l'IA en incluant le prompt système et l'historique.
-     *
-     * @param  AiConversation  $conversation
-     * @param  array<string, mixed>  $trainer
-     * @return array<int, array{role: string, content: string}>
-     */
     private function prepareMessages(AiConversation $conversation, array $trainer): array
     {
         $messages = [];
@@ -267,24 +279,13 @@ class AiController extends Controller
      *
      * @return array<string>
      */
-    private function getAvailableTrainers(): array
-    {
-        static $trainers = null;
-
-        if ($trainers === null) {
-            $trainers = array_keys(config('ai.trainers', []));
-        }
-
-        return $trainers;
-    }
-
     /**
      * Créer une nouvelle conversation.
      */
     public function createConversation(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'trainer' => ['nullable', 'string', 'in:' . implode(',', $this->getAvailableTrainers())],
+            'trainer' => ['nullable', 'string'],
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
@@ -296,15 +297,14 @@ class AiController extends Controller
         }
 
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'error' => true,
                 'message' => 'Authentification requise',
             ], 401);
         }
 
-        $trainerSlug = $request->input('trainer', config('ai.default_trainer_slug'));
-        $trainer = config("ai.trainers.$trainerSlug");
+        $trainerSlug = $request->input('trainer');
         $targetUser = $user;
 
         if ($user->superadmin() && $request->filled('user_id')) {
@@ -318,19 +318,32 @@ class AiController extends Controller
             }
         }
 
-        if (!$trainer) {
+        $trainerQuery = AiTrainer::query()->active();
+        $trainerModel = $trainerSlug ? (clone $trainerQuery)->where('slug', $trainerSlug)->first() : null;
+
+        if (! $trainerModel) {
+            $trainerModel = $trainerQuery->where('slug', config('ai.default_trainer_slug', 'default'))->first();
+        }
+
+        if (! $trainerModel) {
+            $trainerModel = AiTrainer::query()->active()->orderBy('sort_order')->orderBy('name')->first();
+        }
+
+        if (! $trainerModel) {
             return response()->json([
                 'error' => true,
-                'message' => "Trainer '$trainerSlug' non trouvé",
+                'message' => 'Aucun assistant disponible.',
             ], 404);
         }
+
+        $trainer = $this->formatTrainer($trainerModel);
 
         $conversation = AiConversation::create([
             'user_id' => $targetUser->id,
             'team_id' => $targetUser->currentTeam?->id,
             'status' => AiConversation::STATUS_ACTIVE,
             'metadata' => [
-                'trainer' => $trainerSlug,
+                'trainer' => $trainer['slug'],
                 'model' => $trainer['model'],
             ],
             'last_message_at' => now(),
@@ -340,7 +353,7 @@ class AiController extends Controller
             'success' => true,
             'conversation' => [
                 'id' => $conversation->id,
-                'trainer' => $trainerSlug,
+                'trainer' => $trainer['slug'],
                 'created_at' => $conversation->created_at->toIso8601String(),
                 'user' => [
                     'id' => $targetUser->id,
@@ -351,6 +364,7 @@ class AiController extends Controller
             ],
         ]);
     }
+
 
     /**
      * Lister les conversations de l'utilisateur.
@@ -525,3 +539,6 @@ class AiController extends Controller
         ]);
     }
 }
+
+
+
