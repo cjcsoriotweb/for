@@ -55,6 +55,8 @@ class ChatBox extends Component
 
     public function render()
     {
+        $this->ensureValidUtf8State();
+
         return view('livewire.chat-box');
     }
 
@@ -389,6 +391,61 @@ class ChatBox extends Component
         }
 
         return $escaped;
+    }
+
+    /**
+     * Ensure every public property that will be dehydrated is valid UTF-8.
+     */
+    protected function ensureValidUtf8State(): void
+    {
+        $this->title = $this->sanitizeUtf8String($this->title);
+        $this->message = $this->sanitizeUtf8String($this->message);
+        $this->error = $this->error !== null ? $this->sanitizeUtf8String($this->error) : null;
+
+        $this->assistantMeta = $this->sanitizeUtf8Array($this->assistantMeta);
+
+        $this->messages = collect($this->messages)
+            ->map(function ($message) {
+                if (! is_array($message)) {
+                    return [
+                        'id' => null,
+                        'role' => '',
+                        'content' => '',
+                    ];
+                }
+
+                return [
+                    'id' => $message['id'] ?? null,
+                    'role' => $this->sanitizeUtf8String((string) ($message['role'] ?? '')),
+                    'content' => $this->sanitizeUtf8String((string) ($message['content'] ?? '')),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $this->shortcodeTemplates = $this->sanitizeUtf8Array($this->shortcodeTemplates);
+    }
+
+    /**
+     * Recursively sanitize array string values to valid UTF-8.
+     */
+    protected function sanitizeUtf8Array(array $data): array
+    {
+        $sanitized = [];
+
+        foreach ($data as $key => $value) {
+            $sanitizedKey = is_string($key) ? $this->sanitizeUtf8String($key) : $key;
+
+            if (is_string($value)) {
+                $sanitized[$sanitizedKey] = $this->sanitizeUtf8String($value);
+            } elseif (is_array($value)) {
+                $sanitized[$sanitizedKey] = $this->sanitizeUtf8Array($value);
+            } else {
+                $sanitized[$sanitizedKey] = $value;
+            }
+        }
+
+        return $sanitized;
     }
 
     protected function replaceShortcodesWithPlaceholders(string $content): array

@@ -136,15 +136,21 @@ class ElevePageController extends Controller
             ])
             ->values();
 
-        return view('in-application.eleve.formation.show', compact(
-            'team',
-            'studentFormationService',
-            'formationWithProgress',
-            'progress',
-            'formationDocuments',
-            'lessonResources',
-            'isFormationCompleted'
-        ));
+        $assistantTrainer = $formationWithProgress->primaryTrainer;
+        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
+        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
+
+        return view('in-application.eleve.formation.show', [
+            'team' => $team,
+            'studentFormationService' => $studentFormationService,
+            'formationWithProgress' => $formationWithProgress,
+            'progress' => $progress,
+            'formationDocuments' => $formationDocuments,
+            'lessonResources' => $lessonResources,
+            'isFormationCompleted' => $isFormationCompleted,
+            'assistantTrainerSlug' => $assistantTrainerSlug,
+            'assistantTrainerName' => $assistantTrainerName,
+        ]);
     }
 
     /**
@@ -432,20 +438,27 @@ class ElevePageController extends Controller
         $formationDocuments = $formation->completionDocuments()->get();
         $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
 
-        return view('in-application.eleve.lesson.show', compact(
-            'team',
-            'formation',
-            'chapter',
-            'lesson',
-            'lessonContent',
-            'lessonType',
-            'lessonProgress',
-            'previousLesson',
-            'nextLesson',
-            'otherChapters',
-            'formationDocuments',
-            'isFormationCompleted'
-        ));
+        $formation->loadMissing('primaryTrainer');
+        $assistantTrainer = $formation->primaryTrainer;
+        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
+        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
+
+        return view('in-application.eleve.lesson.show', [
+            'team' => $team,
+            'formation' => $formation,
+            'chapter' => $chapter,
+            'lesson' => $lesson,
+            'lessonContent' => $lessonContent,
+            'lessonType' => $lessonType,
+            'lessonProgress' => $lessonProgress,
+            'previousLesson' => $previousLesson,
+            'nextLesson' => $nextLesson,
+            'otherChapters' => $otherChapters,
+            'formationDocuments' => $formationDocuments,
+            'isFormationCompleted' => $isFormationCompleted,
+            'assistantTrainerSlug' => $assistantTrainerSlug,
+            'assistantTrainerName' => $assistantTrainerName,
+        ]);
     }
 
     /**

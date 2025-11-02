@@ -43,6 +43,6 @@ class FormateurFormationAiController extends Controller
 
         return redirect()
             ->route('formateur.formation.ai.edit', $formation)
-            ->with('success', __('Le formateur IA a été mis à jour.'));
+            ->with('success', __('Le formateur IA a ete mis a jour.'));
     }
 }
