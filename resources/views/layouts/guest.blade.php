@@ -13,7 +13,6 @@
     {{ $slot }}
   </div>
 
-  <x-ui.layout.assistant-dock />
 
   @livewireScripts
   @stack('scripts')
