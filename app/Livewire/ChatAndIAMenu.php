@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\AiTrainer;
+use App\Models\Chat;
 use App\Models\Formation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,14 @@ class ChatAndIAMenu extends Component
     public $enable = true;
 
     public $locked = false;
+
+    public string $addContactEmail = '';
+
+    public ?string $addContactError = null;
+
+    public ?string $addContactSuccess = null;
+
+    public array $manualContactIds = [];
 
     protected $listeners = [
         'launchAssistant' => 'onLaunchAssistant',
@@ -138,6 +147,58 @@ class ChatAndIAMenu extends Component
     {
         // Forcer le rechargement des pending contacts
         unset($this->pendingContacts);
+    }
+
+    public function addContactByEmail(): void
+    {
+        if (! Auth::check()) {
+            return;
+        }
+
+        $this->addContactError = null;
+        $this->addContactSuccess = null;
+
+        $email = trim($this->addContactEmail);
+
+        if ($email === '') {
+            $this->addContactError = 'Veuillez saisir une adresse e-mail.';
+
+            return;
+        }
+
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->addContactError = 'Adresse e-mail invalide.';
+
+            return;
+        }
+
+        $currentUser = Auth::user();
+
+        $contact = User::query()->where('email', $email)->first();
+
+        if (! $contact) {
+            $this->addContactError = 'Aucun utilisateur trouvé avec cette adresse e-mail.';
+
+            return;
+        }
+
+        if ((int) $contact->id === (int) $currentUser->id) {
+            $this->addContactError = 'Vous ne pouvez pas vous ajouter vous-même.';
+
+            return;
+        }
+
+        if (! in_array($contact->id, $this->manualContactIds, true)) {
+            $this->manualContactIds[] = $contact->id;
+        }
+
+        $contactType = $contact->superadmin ? 'admin' : 'user';
+        $contactId = $contactType.'_'.$contact->id;
+
+        $this->addContactSuccess = sprintf('%s a été ajouté à vos contacts.', $contact->name ?? $email);
+        $this->addContactEmail = '';
+
+        $this->selectContact($contactId);
     }
 
     public function getTrainersProperty()
@@ -268,6 +329,122 @@ class ChatAndIAMenu extends Component
             ->values();
     }
 
+    public function getConversationContactsProperty()
+    {
+        if (! Auth::check()) {
+            return collect();
+        }
+
+        $user = Auth::user();
+
+        $conversationIds = Chat::query()
+            ->selectRaw('CASE WHEN sender_user_id = ? THEN receiver_user_id ELSE sender_user_id END AS contact_id', [$user->id])
+            ->where(function ($query) use ($user) {
+                $query->where(function ($subQuery) use ($user) {
+                    $subQuery->where('sender_user_id', $user->id)
+                        ->whereNotNull('receiver_user_id');
+                })->orWhere(function ($subQuery) use ($user) {
+                    $subQuery->where('receiver_user_id', $user->id)
+                        ->whereNotNull('sender_user_id');
+                });
+            })
+            ->whereNull('sender_ia_id')
+            ->pluck('contact_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($conversationIds->isEmpty()) {
+            return collect();
+        }
+
+        $recentMessages = Chat::query()
+            ->where(function ($query) use ($user, $conversationIds) {
+                $query->where(function ($subQuery) use ($user, $conversationIds) {
+                    $subQuery->where('sender_user_id', $user->id)
+                        ->whereIn('receiver_user_id', $conversationIds);
+                })->orWhere(function ($subQuery) use ($user, $conversationIds) {
+                    $subQuery->whereIn('sender_user_id', $conversationIds)
+                        ->where('receiver_user_id', $user->id);
+                });
+            })
+            ->orderByDesc('created_at')
+            ->get()
+            ->groupBy(function (Chat $chat) use ($user) {
+                return $chat->sender_user_id === $user->id
+                    ? $chat->receiver_user_id
+                    : $chat->sender_user_id;
+            })
+            ->map(function ($group) {
+                return $group->first();
+            });
+
+        $excludedIds = collect()
+            ->merge($this->pendingContacts->pluck('id'))
+            ->merge($this->formationUsers->pluck('id'))
+            ->merge($this->superAdmins->pluck('id'))
+            ->unique();
+
+        return User::query()
+            ->whereIn('id', $conversationIds)
+            ->get()
+            ->reject(function ($contact) use ($excludedIds) {
+                return $excludedIds->contains($contact->id);
+            })
+            ->map(function (User $contact) use ($recentMessages) {
+                $latest = $recentMessages->get($contact->id);
+                $contact->latest_message = $latest;
+                $contact->latest_message_at = optional($latest)->created_at;
+                $contact->chat_contact_type = $contact->superadmin ? 'admin' : 'user';
+                $contact->chat_contact_id = $contact->chat_contact_type.'_'.$contact->id;
+
+                return $contact;
+            })
+            ->sortByDesc(function (User $contact) {
+                return optional($contact->latest_message_at)->getTimestamp() ?? 0;
+            })
+            ->values();
+    }
+
+    public function getManualContactsProperty()
+    {
+        if (! Auth::check()) {
+            return collect();
+        }
+
+        $ids = collect($this->manualContactIds ?? [])
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return collect();
+        }
+
+        $excludedIds = collect()
+            ->merge($this->pendingContacts->pluck('id'))
+            ->merge($this->formationUsers->pluck('id'))
+            ->merge($this->superAdmins->pluck('id'))
+            ->merge($this->conversationContacts->pluck('id'));
+
+        return User::query()
+            ->whereIn('id', $ids)
+            ->get()
+            ->reject(function (User $contact) use ($excludedIds) {
+                return $excludedIds->contains($contact->id);
+            })
+            ->map(function (User $contact) {
+                $contact->latest_message = null;
+                $contact->latest_message_at = null;
+                $contact->chat_contact_type = $contact->superadmin ? 'admin' : 'user';
+                $contact->chat_contact_id = $contact->chat_contact_type.'_'.$contact->id;
+
+                return $contact;
+            })
+            ->values();
+    }
+
     public function getAllChatUsersProperty()
     {
         if (! Auth::check()) {
@@ -295,6 +472,17 @@ class ChatAndIAMenu extends Component
             // Éviter les doublons
             if (! $allUsers->contains('id', $pendingUser->id)) {
                 $allUsers->push($pendingUser);
+            }
+        });
+        $this->manualContacts->each(function ($manualContact) use (&$allUsers) {
+            if (! $allUsers->contains('id', $manualContact->id)) {
+                $allUsers->push($manualContact);
+            }
+        });
+
+        $this->conversationContacts->each(function ($contact) use (&$allUsers) {
+            if (! $allUsers->contains('id', $contact->id)) {
+                $allUsers->push($contact);
             }
         });
 

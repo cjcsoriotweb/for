@@ -105,13 +105,62 @@
                         @endif
                     @elseif($drawerTab === 'contacts')
                         <div class="space-y-5">
+                            <div class="bg-white/90 border border-slate-200 rounded-2xl shadow-sm p-5">
+                                <h3 class="text-base font-semibold text-slate-800">Ajouter un contact</h3>
+                                <p class="text-xs text-slate-500 mt-1">Saisissez l'adresse e-mail de votre interlocuteur pour lancer une nouvelle conversation.</p>
+                                <form wire:submit.prevent="addContactByEmail" class="mt-4 flex flex-col gap-3">
+                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                        <div class="flex-1">
+                                            <input type="email" wire:model.defer="addContactEmail"
+                                                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                                                placeholder="prenom.nom@exemple.com">
+                                        </div>
+                                        <button type="submit"
+                                            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60"
+                                            wire:loading.attr="disabled" wire:target="addContactByEmail">
+                                            Ajouter
+                                        </button>
+                                    </div>
+                                    @if($addContactError)
+                                        <p class="text-sm text-red-600">{{ $addContactError }}</p>
+                                    @endif
+                                    @if($addContactSuccess)
+                                        <p class="text-sm text-green-600">{{ $addContactSuccess }}</p>
+                                    @endif
+                                </form>
+                            </div>
+
+                            @if($this->manualContacts->count() > 0)
+                                <div class="bg-white/90 border border-slate-200 rounded-2xl shadow-sm p-5">
+                                    <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Contacts rapides</h3>
+                                    <div class="space-y-2">
+                                        @foreach ($this->manualContacts as $contact)
+                                            <button wire:click="selectContact('{{ $contact->chat_contact_id }}')"
+                                                class="w-full flex items-center gap-3 rounded-xl border border-slate-200/70 bg-slate-50/60 px-4 py-3 text-left transition hover:bg-slate-100 focus:bg-slate-100">
+                                                @if($contact->profile_photo_path)
+                                                    <img src="{{ $contact->profile_photo_url }}" alt="{{ $contact->name }}"
+                                                        class="w-10 h-10 rounded-full object-cover">
+                                                @else
+                                                    <span class="w-10 h-10 rounded-full {{ $contact->superadmin ? 'bg-red-500' : 'bg-indigo-500' }} text-white flex items-center justify-center font-bold text-lg">
+                                                        {{ strtoupper(mb_substr($contact->name,0,2)) }}
+                                                    </span>
+                                                @endif
+                                                <span class="flex flex-col items-start flex-1">
+                                                    <span class="text-slate-800 font-semibold text-base">{{ $contact->name }}</span>
+                                                    <span class="text-xs text-slate-500 mt-1">Conversation à venir</span>
+                                                </span>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                             @if($this->pendingContacts->count() > 0)
-                                <div>
-                                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">⏳ Ils attendent une réponse</h3>
+                                <div class="bg-white/90 border border-orange-200 rounded-2xl shadow-sm p-5">
+                                    <h3 class="text-sm font-semibold text-orange-600 uppercase tracking-wide mb-3">Ils attendent une reponse</h3>
                                     <div class="space-y-2">
                                         @foreach ($this->pendingContacts as $contact)
                                             <button wire:click="selectContact('{{ $contact->chat_contact_id }}')"
-                                                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-orange-100 hover:bg-orange-50 focus:bg-orange-100 transition group relative">
+                                                class="w-full flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50/70 px-4 py-3 text-left transition hover:bg-orange-100 focus:bg-orange-100 relative">
                                                 @if($contact->profile_photo_path)
                                                     <img src="{{ $contact->profile_photo_url }}" alt="{{ $contact->name }}"
                                                         class="w-10 h-10 rounded-full object-cover">
@@ -123,7 +172,7 @@
                                                 <span class="flex flex-col items-start flex-1">
                                                     <span class="text-gray-900 font-semibold text-base group-hover:text-orange-700">{{ $contact->name }}</span>
                                                     @if($contact->latest_message)
-                                                        <span class="text-xs text-gray-500 mt-1 truncate max-w-[200px]">{{ $contact->latest_message->content }}</span>
+                                                        <span class="text-xs text-slate-500 mt-1 truncate max-w-[220px]">{{ $contact->latest_message->content }}</span>
                                                     @endif
                                                 </span>
                                                 @if($contact->unread_count > 0)
@@ -137,13 +186,47 @@
                                 </div>
                             @endif
 
+                            @if($this->conversationContacts->count() > 0)
+                                <div class="bg-white/90 border border-slate-200 rounded-2xl shadow-sm p-5">
+                                    <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Conversations recentes</h3>
+                                    <div class="space-y-2">
+                                        @foreach ($this->conversationContacts as $contact)
+                                            <button wire:click="selectContact('{{ $contact->chat_contact_id }}')"
+                                                class="w-full flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-left transition hover:bg-slate-50 focus:bg-slate-100">
+                                                @if($contact->profile_photo_path)
+                                                    <img src="{{ $contact->profile_photo_url }}" alt="{{ $contact->name }}"
+                                                        class="w-10 h-10 rounded-full object-cover">
+                                                @else
+                                                    <span class="w-10 h-10 rounded-full {{ $contact->superadmin ? 'bg-red-500' : 'bg-teal-500' }} text-white flex items-center justify-center font-bold text-lg">
+                                                        {{ strtoupper(mb_substr($contact->name,0,2)) }}
+                                                    </span>
+                                                @endif
+                                                <span class="flex flex-col items-start flex-1">
+                                                    <span class="text-gray-900 font-semibold text-base group-hover:text-slate-800">{{ $contact->name }}</span>
+                                                    @if($contact->latest_message)
+                                                        <span class="text-xs text-slate-500 mt-1 truncate max-w-[220px]">
+                                                            {{ \Illuminate\Support\Str::limit($contact->latest_message->content ?? '', 90) }}
+                                                        </span>
+                                                    @endif
+                                                </span>
+                                                @if($contact->latest_message_at)
+                                                    <span class="text-xs text-slate-400">
+                                                        {{ $contact->latest_message_at->diffForHumans() }}
+                                                    </span>
+                                                @endif
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
                             @if($this->formationUsers->count() > 0)
-                                <div>
-                                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">👥 Dans ma formation</h3>
+                                <div class="bg-white/90 border border-emerald-200 rounded-2xl shadow-sm p-5">
+                                    <h3 class="text-sm font-semibold text-emerald-600 uppercase tracking-wide mb-3">Dans ma formation</h3>
                                     <div class="space-y-2">
                                         @foreach ($this->formationUsers as $user)
                                             <button wire:click="selectContact('user_{{ $user->id }}')"
-                                                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-green-100 hover:bg-green-50 focus:bg-green-100 transition group">
+                                                class="w-full flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-left transition hover:bg-emerald-100 focus:bg-emerald-100">
                                                 @if($user->profile_photo_path)
                                                     <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}"
                                                         class="w-10 h-10 rounded-full object-cover">
@@ -164,7 +247,7 @@
 
                             @if($this->superAdmins->count() > 0)
                                 <div>
-                                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">🛡️ Superadmin</h3>
+                                    <h3 class="text-sm font-semibold text-rose-600 uppercase tracking-wide mb-3">Superadmins</h3>
                                     <div class="space-y-2">
                                         @foreach ($this->superAdmins as $admin)
                                             <button wire:click="selectContact('admin_{{ $admin->id }}')"
@@ -189,6 +272,7 @@
 
                             @if(
                                 $this->pendingContacts->count() === 0 &&
+                                $this->conversationContacts->count() === 0 &&
                                 $this->formationUsers->count() === 0 &&
                                 $this->superAdmins->count() === 0
                             )
