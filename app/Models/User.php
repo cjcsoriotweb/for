@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\SupportTicket;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -115,6 +114,16 @@ class User extends Authenticatable
         return $this->hasMany(AiConversation::class, 'user_id');
     }
 
+    public function sentChats()
+    {
+        return $this->hasMany(Chat::class, 'sender_user_id');
+    }
+
+    public function receivedChats()
+    {
+        return $this->hasMany(Chat::class, 'receiver_user_id');
+    }
+
     /**
      * Provide a textual context summary for AI prompts.
      */
@@ -130,7 +139,7 @@ class User extends Authenticatable
         $segments = [];
 
         $segments[] = sprintf(
-            "Utilisateur connecte : %s (%s).",
+            'Utilisateur connecte : %s (%s).',
             $this->name ?? 'Inconnu',
             $this->email ?? 'Email inconnu'
         );

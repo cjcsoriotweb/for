@@ -53,6 +53,14 @@ class ChatAndIAMenu extends Component
     public function selectContact($contactId)
     {
         $this->active = $contactId;
+        // Activer le polling pour le chat actif
+        $this->dispatch('activate-chat-polling', contactId: $contactId);
+    }
+
+    public function loadPendingContacts()
+    {
+        // Forcer le rechargement des pending contacts
+        unset($this->pendingContacts);
     }
 
     public function getTrainersProperty()
@@ -142,6 +150,70 @@ class ChatAndIAMenu extends Component
             ->where('id', '!=', $user->id) // Exclure l'utilisateur actuel
             ->orderBy('name')
             ->get();
+    }
+
+    public function getPendingContactsProperty()
+    {
+        if (! Auth::check()) {
+            return collect();
+        }
+
+        $user = Auth::user();
+
+        // Récupérer les utilisateurs qui ont envoyé des messages non lus
+        return User::whereHas('sentChats', function ($query) use ($user) {
+            $query->where('receiver_user_id', $user->id)
+                ->where('is_read', false);
+        })
+            ->where('id', '!=', $user->id)
+            ->with(['sentChats' => function ($query) use ($user) {
+                $query->where('receiver_user_id', $user->id)
+                    ->where('is_read', false)
+                    ->latest()
+                    ->limit(1);
+            }])
+            ->get()
+            ->map(function ($contact) {
+                $latestMessage = $contact->sentChats->first();
+                $contact->latest_message = $latestMessage;
+                $contact->unread_count = $contact->sentChats->where('is_read', false)->count();
+
+                return $contact;
+            })
+            ->sortByDesc('latest_message.created_at');
+    }
+
+    public function getAllChatUsersProperty()
+    {
+        if (! Auth::check()) {
+            return collect();
+        }
+
+        $user = Auth::user();
+
+        // Récupérer tous les utilisateurs qui peuvent être contactés
+        // Combinaison de formationUsers, superAdmins et pendingContacts
+        $allUsers = collect();
+
+        // Ajouter les utilisateurs de formation
+        $this->formationUsers->each(function ($formationUser) use (&$allUsers) {
+            $allUsers->push($formationUser);
+        });
+
+        // Ajouter les superadmin
+        $this->superAdmins->each(function ($admin) use (&$allUsers) {
+            $allUsers->push($admin);
+        });
+
+        // Ajouter les pending contacts (utilisateurs qui ont envoyé des messages non lus)
+        $this->pendingContacts->each(function ($pendingUser) use (&$allUsers) {
+            // Éviter les doublons
+            if (! $allUsers->contains('id', $pendingUser->id)) {
+                $allUsers->push($pendingUser);
+            }
+        });
+
+        return $allUsers->unique('id')->values();
     }
 
     public function getAllContactsProperty()
