@@ -1,17 +1,11 @@
 <x-app-layout>
-    <div class="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-sky-50 text-slate-800">
-        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div class="absolute -left-28 -top-20 h-80 w-80 rounded-full bg-sky-200/60 blur-3xl"></div>
-            <div class="absolute right-10 top-24 h-64 w-64 rounded-full bg-indigo-200/50 blur-3xl"></div>
-            <div class="absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-emerald-200/40 blur-3xl"></div>
-            <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white"></div>
-        </div>
+    <div class="relative min-h-screen overflow-hidden bg-gradient-to-br  text-slate-800">
+  
 
         <main class="relative z-10 px-4 py-16 sm:px-8 lg:px-14">
             <div class="mx-auto flex max-w-5xl flex-col gap-12">
                 <div class="relative overflow-hidden rounded-3xl border border-white/70 bg-white/75 p-10 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-12">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.25),_transparent_55%)]"></div>
-                    <div class="relative mx-auto max-w-3xl text-center">
+                        <div class="relative mx-auto max-w-3xl text-center">
                         <span class="inline-flex items-center gap-2 rounded-full bg-sky-100/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">
                             <span class="material-symbols-outlined text-sm">swap_horiz</span>
                             {{ __('Changement d espace') }}

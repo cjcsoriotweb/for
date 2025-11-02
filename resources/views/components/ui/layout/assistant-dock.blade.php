@@ -48,16 +48,12 @@
         }
 
         if ($formation && $formation->primaryTrainer) {
-            // Vérifier que ce trainer n'est pas déjà dans la liste
-            $trainerExists = $trainers->contains('id', $formation->primaryTrainer->id);
-            if (! $trainerExists) {
-                // Placer le trainer de formation en haut de la liste
-                $trainers->prepend($formation->primaryTrainer);
-            }
+            $trainers->prepend($formation->primaryTrainer);
         }
     }
 
-    
+    // Dédupliquer les trainers par id pour éviter les doublons
+    $trainers = $trainers->unique('id')->values();
 @endphp
 
 <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-4">
