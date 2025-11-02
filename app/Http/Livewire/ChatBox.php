@@ -19,6 +19,7 @@ class ChatBox extends Component
 
     protected $listeners = [
         'sendMessageFromOutside' => 'sendMessage',
+        'launchAssistant' => 'onLaunchAssistant',
     ];
 
     public function mount($trainer, $title = null)
@@ -89,6 +90,29 @@ class ChatBox extends Component
         $this->isSending = false;
         $this->isLoading = false;
         $this->dispatchBrowserEvent('chatbox-scroll');
+    }
+
+    public function onLaunchAssistant($payload = null)
+    {
+        $slug = null;
+
+        if (is_array($payload) && array_key_exists('slug', $payload)) {
+            $slug = $payload['slug'];
+        } elseif (is_object($payload) && property_exists($payload, 'slug')) {
+            $slug = $payload->slug;
+        } elseif (is_string($payload)) {
+            $slug = $payload;
+        }
+
+        if (! is_string($slug) || trim($slug) === '') {
+            return;
+        }
+
+        // Only open if this component instance corresponds to the requested trainer
+        if ($slug === $this->trainer) {
+            $this->isOpen = true;
+            $this->ensureConversation();
+        }
     }
 
     public function render()

@@ -42,7 +42,15 @@
 @endphp
 
 
-<div x-data="{ drawer: false, active: null }" class="fixed bottom-6 right-6 z-50">
+<div
+    x-data="{ drawer: false, active: null }"
+    class="fixed bottom-6 right-6 z-50"
+    x-init="
+        $el.addEventListener('close-chat', () => {
+            active = null;
+        });
+    "
+>
     <!-- Bouton flottant -->
     <button @click="drawer = true" aria-label="Ouvrir l'assistant IA" class="w-16 h-16 rounded-full bg-indigo-600 text-white shadow-2xl flex items-center justify-center text-3xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-9 h-9">
@@ -78,25 +86,28 @@
             </template>
             @foreach ($trainers as $trainer)
                 <template x-if="active === '{{ $trainer->slug }}'">
-                    <div class="flex-1 flex flex-col">
-                        <div class="flex items-center gap-2 px-5 py-3 border-b bg-indigo-50">
-                            <button @click="active = null" class="text-indigo-600 hover:text-indigo-900 text-xl mr-2" aria-label="Retour">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                                </svg>
-                            </button>
-                            <span class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">{{ strtoupper(mb_substr($trainer->name,0,2)) }}</span>
-                            <span class="font-semibold text-indigo-900 text-lg">{{ $trainer->name }}</span>
-                        </div>
-                        <div class="flex-1 p-4 text-gray-700 overflow-y-auto">
-                            <p class="italic">Ceci est une fausse chatbox pour test visuel.<br>Slug : <b>{{ $trainer->slug }}</b></p>
-                        </div>
-                        <div class="p-3 border-t">
-                            <input type="text" class="w-full rounded-lg border px-3 py-2" placeholder="Tapez un message... (test)" />
-                        </div>
+                    <div class="flex-1 flex flex-col overflow-hidden">
+                        <!-- Force open the chatbox when this trainer is active -->
+                        @livewire('chat-box', [
+                            'trainer' => $trainer->slug,
+                            'title' => $trainer->name
+                        ], key('chatbox-' . $trainer->slug))
                     </div>
                 </template>
             @endforeach
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('livewire:loaded', function () {
+    Livewire.on('launchAssistant', (slug) => {
+        // Find the assistant dock and open the drawer with the specific trainer
+        const dock = document.querySelector('[x-data*="drawer: false"]');
+        if (dock && dock._x_dataStack) {
+            dock._x_dataStack[0].drawer = true;
+            dock._x_dataStack[0].active = slug;
+        }
+    });
+});
+</script>

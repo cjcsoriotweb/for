@@ -19,7 +19,7 @@
   </div>
 
 
-  <x-ui.layout.assistant-dock-simple />
+  <x-ui.layout.assistants-ia-menu />
 
   @stack('assistant-dock')
 
