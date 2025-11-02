@@ -381,6 +381,13 @@ class RespondPendingAiMessages extends Command
      */
     private function createAssistantMessage(Chat $sourceMessage, User $assistantUser, int $trainerId, string $content, array $metadata): Chat
     {
+        $metadata['ai'] = array_merge([
+            'notification_cleared' => false,
+            'notification_cleared_at' => null,
+        ], $metadata['ai'] ?? []);
+
+        $metadata['ai']['original_message_id'] = $metadata['ai']['original_message_id'] ?? $sourceMessage->id;
+
         return Chat::query()->create([
             'sender_user_id' => null,
             'sender_ia_id' => $trainerId,
@@ -398,7 +405,12 @@ class RespondPendingAiMessages extends Command
         $metadata = $message->metadata ?? [];
 
         $metadata['ai_id'] = $trainerId;
-        $metadata['ai'] = array_merge($metadata['ai'] ?? [], [
+        $metadata['ai'] = array_merge([
+            'notification_cleared' => false,
+            'notification_cleared_at' => null,
+        ], $metadata['ai'] ?? []);
+
+        $metadata['ai'] = array_merge($metadata['ai'], [
             'reply_message_id' => $replyMessage->id,
             'sent_at' => now()->toIso8601String(),
             'trainer_id' => $trainerId,

@@ -32,7 +32,7 @@
         </button>
 
         <!-- Bouton Notifications -->
-        <button wire:click="toggleDrawer('notifications')" aria-label="Ouvrir le menu des notifications"
+        <button wire:poll.10s="refreshAiNotifications" wire:click="toggleDrawer('notifications')" aria-label="Ouvrir le menu des notifications"
             @class([
                 'w-14 h-14 rounded-full text-white shadow-2xl flex items-center justify-center transition relative focus:outline-none focus:ring-2 focus:ring-offset-2',
                 'bg-amber-700 ring-4 ring-amber-200 focus:ring-amber-500' => $drawer && $drawerTab === 'notifications',
@@ -283,28 +283,88 @@
                         </div>
                     @elseif($drawerTab === 'notifications')
                         <div class="space-y-3">
-                            @forelse ($this->formattedNotifications as $notification)
-                                <div class="rounded-xl border {{ $notification->is_read ? 'border-gray-200 bg-gray-50' : 'border-amber-200 bg-amber-50' }} p-4">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <span class="font-semibold text-gray-900">{{ $notification->title }}</span>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</span>
-                                            <button type="button"
-                                                wire:click="markNotificationAsRead('{{ $notification->id }}')"
-                                                class="text-xs text-amber-700 hover:text-amber-900 underline">
-                                                Marquer comme lu
-                                            </button>
-                                        </div>
+                            @if($this->pendingAiNotifications->count() > 0)
+                                <div class="bg-white/90 border border-indigo-200 rounded-2xl shadow-sm p-5">
+                                    <h3 class="text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-3">Réponses des assistants IA</h3>
+                                    <div class="space-y-2">
+                                        @foreach ($this->pendingAiNotifications as $aiNotification)
+                                            <div class="rounded-xl border border-indigo-200 bg-indigo-50/70 px-4 py-3">
+                                                <div class="flex items-start gap-3">
+                                                    @if($aiNotification->contact_id)
+                                                        <div
+                                                            class="flex-1 flex items-start gap-3 cursor-pointer rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+                                                            role="button"
+                                                            tabindex="0"
+                                                            wire:click="selectContact('{{ $aiNotification->contact_id }}')"
+                                                        >
+                                                            <span class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">
+                                                                {{ strtoupper(mb_substr($aiNotification->assistant_name,0,2)) }}
+                                                            </span>
+                                                            <span class="flex flex-col">
+                                                                <span class="text-gray-900 font-semibold text-base">{{ $aiNotification->assistant_name }}</span>
+                                                                @if($aiNotification->preview)
+                                                                    <span class="text-xs text-gray-600 mt-1">{{ $aiNotification->preview }}</span>
+                                                                @endif
+                                                                @if($aiNotification->source_preview)
+                                                                    <span class="text-[11px] text-gray-400 mt-1 italic">Vous : {{ $aiNotification->source_preview }}</span>
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    @else
+                                                        <div class="flex-1 flex items-start gap-3">
+                                                            <span class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">
+                                                                {{ strtoupper(mb_substr($aiNotification->assistant_name,0,2)) }}
+                                                            </span>
+                                                            <span class="flex flex-col">
+                                                                <span class="text-gray-900 font-semibold text-base">{{ $aiNotification->assistant_name }}</span>
+                                                                @if($aiNotification->preview)
+                                                                    <span class="text-xs text-gray-600 mt-1">{{ $aiNotification->preview }}</span>
+                                                                @endif
+                                                                @if($aiNotification->source_preview)
+                                                                    <span class="text-[11px] text-gray-400 mt-1 italic">Vous : {{ $aiNotification->source_preview }}</span>
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                    <div class="flex flex-col items-end gap-2">
+                                                        <span class="text-xs text-gray-400">{{ $aiNotification->created_at->diffForHumans() }}</span>
+                                                        <button type="button"
+                                                            wire:click.stop="dismissAiNotification({{ $aiNotification->id }})"
+                                                            class="text-xs text-indigo-700 hover:text-indigo-900 underline">
+                                                            Retirer notification
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                    @if($notification->message)
-                                        <div class="text-sm text-gray-600 mt-2 whitespace-pre-line">{{ $notification->message }}</div>
-                                    @endif
                                 </div>
-                            @empty
+                            @endif
+
+                            @if($this->formattedNotifications->count() > 0)
+                                @foreach ($this->formattedNotifications as $notification)
+                                    <div class="rounded-xl border {{ $notification->is_read ? 'border-gray-200 bg-gray-50' : 'border-amber-200 bg-amber-50' }} p-4">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <span class="font-semibold text-gray-900">{{ $notification->title }}</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                                <button type="button"
+                                                    wire:click="markNotificationAsRead('{{ $notification->id }}')"
+                                                    class="text-xs text-amber-700 hover:text-amber-900 underline">
+                                                    Marquer comme lu
+                                                </button>
+                                            </div>
+                                        </div>
+                                        @if($notification->message)
+                                            <div class="text-sm text-gray-600 mt-2 whitespace-pre-line">{{ $notification->message }}</div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            @elseif($this->pendingAiNotifications->count() === 0)
                                 <div class="text-center text-sm text-gray-500 py-6">
                                     Aucune notification récente.
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
                     @else
                         <div class="text-center text-sm text-gray-500 py-6">
@@ -371,3 +431,4 @@
         </div>
     </div>
 </div>
+

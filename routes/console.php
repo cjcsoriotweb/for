@@ -3,6 +3,12 @@
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Artisan;
 
+Artisan::command('ia:delete_message', function () {
+    
+
+})->purpose('Retirer les messages plus vieux entre ia et user.');
+
+
 Artisan::command('ia:repond', function () {
     $start = microtime(true);
     $maxDuration = 50; // secondes max avant d'arrêter

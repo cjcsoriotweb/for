@@ -49,7 +49,7 @@
                 </div>
                 <div class="hidden sm:flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                     <span class="material-symbols-outlined text-base">groups_3</span>
-                    <span>{{ __('Votre équipe') }}</span>
+                    <span>{{ __('Votre équipe') }} adz</span>
                 </div>
             </div>
 
