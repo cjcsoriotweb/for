@@ -1,4 +1,5 @@
 @php
+    $trainerCount = \App\Models\AiTrainer::query()->count();
     $stats = collect($stats);
 
     $cards = [
@@ -30,7 +31,7 @@
             'route' => route('superadmin.ai.index'),
             'icon' => 'smart_toy',
             'label' => __('Formateurs IA'),
-            'stat' => number_format(\\App\\Models\\AiTrainer::query()->count()),
+            'stat' => number_format($trainerCount),
             'description' => __('Consultez les profils IA configurés.'),
             'cta' => __('Voir l\'IA'),
         ],
@@ -80,4 +81,5 @@
         @endforeach
     </div>
 </x-admin.global-layout>
+
 
