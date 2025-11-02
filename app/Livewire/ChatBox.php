@@ -33,6 +33,7 @@ class ChatBox extends Component
         $this->title = $title ?: 'Chat';
 
         $this->loadMessages();
+        $this->isActive = true;
     }
 
     public function sendMessage()
@@ -114,6 +115,15 @@ class ChatBox extends Component
         } catch (\Exception $e) {
             $this->messages = [];
         }
+    }
+
+    public function refreshMessages(): void
+    {
+        if (! $this->isActive) {
+            return;
+        }
+
+        $this->loadMessages();
     }
 
     private function applyContactFilter($query, $user)

@@ -2,12 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Models\AiTrainer;
 use App\Models\Chat;
 use App\Models\User;
+use App\Services\Ai\OllamaClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Throwable;
 
 class RespondPendingAiMessages extends Command
 {
@@ -17,7 +22,7 @@ class RespondPendingAiMessages extends Command
      * @var string
      */
     protected $signature = 'assistants:respond-pending
-                            {--message= : Message a envoyer (placeholders: user_name, conversation_id, message_id, message_created_at)}
+                            {--message= : Message de secours a envoyer en cas d\'indisponibilite IA (placeholders: user_name, conversation_id, message_id, message_created_at)}
                             {--min-age= : Delai minimal (en minutes) avant de traiter un message}
                             {--limit=50 : Nombre maximum de conversations a traiter par execution}
                             {--dry-run : Afficher les actions sans enregistrer de reponse}';
@@ -39,7 +44,10 @@ class RespondPendingAiMessages extends Command
      */
     public function handle(): int
     {
-        $messageTemplate = (string) ($this->option('message') ?: config('ai.fallback_message', $this->defaultMessage()));
+        /** @var OllamaClient $ollama */
+        $ollama = app(OllamaClient::class);
+
+        $fallbackTemplate = (string) ($this->option('message') ?: config('ai.fallback_message', $this->defaultFallbackMessage()));
         $minAgeOption = $this->option('min-age');
         $minAgeMinutes = $minAgeOption === null || $minAgeOption === ''
             ? (int) config('ai.fallback_min_age', 0)
@@ -48,9 +56,9 @@ class RespondPendingAiMessages extends Command
         $limit = (int) max(1, $this->option('limit') ?? 50);
         $dryRun = (bool) $this->option('dry-run');
 
-        $fallbackSender = $this->resolveFallbackSender();
-        if (! $fallbackSender) {
-            $this->error("Impossible de determiner l'utilisateur expediant les messages fallback. Configurez AI_FALLBACK_SENDER_USER_ID ou creez un superadmin.");
+        $assistantUser = $this->resolveAssistantSender();
+        if (! $assistantUser) {
+            $this->error("Impossible de determiner l'utilisateur associe aux reponses IA. Configurez AI_FALLBACK_SENDER_USER_ID ou creez un superadmin.");
 
             return self::FAILURE;
         }
@@ -68,7 +76,7 @@ class RespondPendingAiMessages extends Command
         $processed = 0;
 
         foreach ($pendingMessages as $userMessage) {
-            DB::transaction(function () use ($userMessage, $messageTemplate, $fallbackSender, $dryRun, &$processed): void {
+            DB::transaction(function () use ($userMessage, $assistantUser, $ollama, $fallbackTemplate, $dryRun, &$processed): void {
                 /** @var Chat|null $message */
                 $message = Chat::query()->with(['sender', 'receiverIa'])->find($userMessage->id);
                 if (! $message) {
@@ -82,55 +90,88 @@ class RespondPendingAiMessages extends Command
                     return;
                 }
 
-                $metadata = $message->metadata ?? [];
-                if (Arr::get($metadata, 'fallback.sent')) {
+                $meta = $message->metadata ?? [];
+                if (Arr::get($meta, 'ai.reply_message_id')) {
                     return;
                 }
 
-                $content = $this->renderMessage($message, $messageTemplate);
+                $trainer = AiTrainer::query()->active()->find($aiId);
+                if (! $trainer) {
+                    $this->sendFallbackResponse($message, $assistantUser, $aiId, $fallbackTemplate, 'trainer_unavailable', $dryRun);
+                    $processed++;
+
+                    return;
+                }
 
                 if ($dryRun) {
+                    $preview = Str::limit($message->content ?? '', 120);
                     $this->line(sprintf(
-                        '[DRY RUN] Conversation user:%d-ai:%d (message %d) -> "%s"',
+                        '[DRY RUN] user:%d -> ai:%d (%s) // Dernier message #%d: "%s"',
                         $user->id,
-                        $aiId,
+                        $trainer->id,
+                        $trainer->name,
                         $message->id,
-                        $content
+                        $preview
                     ));
-                } else {
-                    $assistantMessage = Chat::query()->create([
-                        'sender_user_id' => $fallbackSender->id,
-                        'sender_ia_id' => $aiId,
-                        'receiver_user_id' => $user->id,
-                        'content' => $content,
-                        'metadata' => [
-                            'ai_id' => $aiId,
-                            'role' => 'assistant',
-                            'fallback' => [
-                                'source' => 'assistants:respond-pending',
-                                'original_message_id' => $message->id,
-                            ],
-                        ],
-                    ]);
+                    $processed++;
 
-                    $metadata['ai_id'] = $aiId;
-                    $metadata['fallback'] = [
-                        'sent' => true,
-                        'message_id' => $assistantMessage->id,
-                        'sent_at' => now()->toIso8601String(),
-                        'command' => self::class,
-                    ];
-
-                    $message->forceFill(['metadata' => $metadata])->save();
-
-                    $this->info(sprintf(
-                        'Conversation user:%d-ai:%d : reponse fallback envoyee (message %d -> %d)',
-                        $user->id,
-                        $aiId,
-                        $message->id,
-                        $assistantMessage->id
-                    ));
+                    return;
                 }
+
+                [$assistantContent, $responseMeta] = $this->generateAiResponse($ollama, $message, $trainer, $user);
+
+                if ($assistantContent === null || trim($assistantContent) === '') {
+                    $reason = $responseMeta['error'] ?? 'unknown_error';
+                    $this->warn(sprintf(
+                        'Generation IA impossible pour message #%d (user:%d -> ai:%d). Raison: %s',
+                        $message->id,
+                        $user->id,
+                        $trainer->id,
+                        $reason
+                    ));
+
+                    $this->sendFallbackResponse($message, $assistantUser, $trainer->id, $fallbackTemplate, $reason, false);
+                    $processed++;
+
+                    return;
+                }
+
+                $assistantMessage = $this->createAssistantMessage(
+                    sourceMessage: $message,
+                    assistantUser: $assistantUser,
+                    trainerId: $trainer->id,
+                    content: $assistantContent,
+                    metadata: [
+                        'role' => 'assistant',
+                        'ai_id' => $trainer->id,
+                        'ai' => [
+                            'trainer_id' => $trainer->id,
+                            'model' => $responseMeta['model'] ?? null,
+                            'temperature' => $responseMeta['temperature'] ?? null,
+                            'usage' => $responseMeta['usage'] ?? null,
+                            'fallback_used' => false,
+                            'fallback_reason' => null,
+                            'source' => 'ollama',
+                            'original_message_id' => $message->id,
+                        ],
+                    ],
+                );
+
+                $this->markMessageReplied(
+                    message: $message,
+                    trainerId: $trainer->id,
+                    replyMessage: $assistantMessage,
+                    responseMeta: $responseMeta,
+                    isFallback: false
+                );
+
+                $this->info(sprintf(
+                    'Conversation user:%d-ai:%d : reponse IA envoyee (message %d -> %d)',
+                    $user->id,
+                    $trainer->id,
+                    $message->id,
+                    $assistantMessage->id
+                ));
 
                 $processed++;
             });
@@ -146,9 +187,9 @@ class RespondPendingAiMessages extends Command
     }
 
     /**
-     * Determine l'utilisateur a utiliser comme expéditeur fallback.
+     * Determine l'utilisateur a utiliser comme expéditeur des messages IA.
      */
-    private function resolveFallbackSender(): ?User
+    private function resolveAssistantSender(): ?User
     {
         $configuredId = config('ai.fallback_sender_user_id');
         if ($configuredId) {
@@ -172,7 +213,7 @@ class RespondPendingAiMessages extends Command
             ->with(['sender'])
             ->whereNotNull('receiver_ia_id')
             ->whereNull('sender_ia_id')
-            ->whereNull('metadata->fallback->sent')
+            ->whereNull('metadata->ai->reply_message_id')
             ->where('created_at', '<=', $threshold)
             ->orderBy('created_at')
             ->limit($limit * 5)
@@ -214,9 +255,229 @@ class RespondPendingAiMessages extends Command
     }
 
     /**
-     * Genere le message envoye a l'utilisateur.
+     * Genere une reponse IA a partir de l'historique de conversation.
+     *
+     * @return array{0: ?string, 1: array<string, mixed>}
      */
-    private function renderMessage(Chat $message, string $template): string
+    private function generateAiResponse(OllamaClient $ollama, Chat $message, AiTrainer $trainer, User $user): array
+    {
+        $options = [
+            'model' => $trainer->model ?: config('ai.default_model'),
+            'temperature' => $trainer->temperature ?? (float) config('ai.temperature', 0.7),
+        ];
+
+        $history = $this->buildConversationMessages($message, $trainer, $user);
+
+        if (empty($history)) {
+            return [null, [
+                'error' => 'conversation_history_empty',
+                'model' => $options['model'],
+                'temperature' => $options['temperature'],
+            ]];
+        }
+
+        try {
+            $response = $ollama->chat($history, $options);
+            $text = trim($response['text'] ?? '');
+
+            if ($text === '') {
+                return [null, [
+                    'error' => 'empty_response',
+                    'model' => $options['model'],
+                    'temperature' => $options['temperature'],
+                    'usage' => $response['usage'] ?? null,
+                ]];
+            }
+
+            return [$text, [
+                'model' => $options['model'],
+                'temperature' => $options['temperature'],
+                'usage' => $response['usage'] ?? null,
+            ]];
+        } catch (Throwable $e) {
+            Log::error('assistants:respond-pending - generation IA echouee', [
+                'message_id' => $message->id,
+                'trainer_id' => $trainer->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [null, [
+                'error' => $e->getMessage(),
+                'model' => $options['model'],
+                'temperature' => $options['temperature'],
+            ]];
+        }
+    }
+
+    /**
+     * Construit le contexte de conversation pour Ollama.
+     *
+     * @return array<int, array{role:string, content:string}>
+     */
+    private function buildConversationMessages(Chat $message, AiTrainer $trainer, User $user): array
+    {
+        $historyLimit = max(1, (int) config('ai.history_limit', 30));
+        $userId = (int) $message->sender_user_id;
+        $aiId = (int) $message->receiver_ia_id;
+
+        $conversation = Chat::query()
+            ->where(function ($query) use ($userId, $aiId) {
+                $query->where('sender_user_id', $userId)
+                    ->where('receiver_ia_id', $aiId);
+            })
+            ->orWhere(function ($query) use ($userId, $aiId) {
+                $query->where('receiver_user_id', $userId)
+                    ->where('sender_ia_id', $aiId);
+            })
+            ->orderByDesc('id')
+            ->limit($historyLimit)
+            ->get()
+            ->sortBy('id')
+            ->values();
+
+        $messages = [];
+
+        $systemPrompt = trim((string) $trainer->systemPrompt());
+        if ($systemPrompt !== '') {
+            $messages[] = [
+                'role' => 'system',
+                'content' => $systemPrompt,
+            ];
+        }
+
+        if (method_exists($user, 'getIaContext')) {
+            $context = trim((string) $user->getIaContext());
+            if ($context !== '') {
+                $messages[] = [
+                    'role' => 'system',
+                    'content' => "Contexte utilisateur :\n" . $context,
+                ];
+            }
+        }
+
+        foreach ($conversation as $chatMessage) {
+            if ($chatMessage->sender_ia_id) {
+                $messages[] = [
+                    'role' => 'assistant',
+                    'content' => (string) $chatMessage->content,
+                ];
+            } else {
+                $messages[] = [
+                    'role' => 'user',
+                    'content' => (string) $chatMessage->content,
+                ];
+            }
+        }
+
+        return $messages;
+    }
+
+    /**
+     * Cree et enregistre un message assistant.
+     */
+    private function createAssistantMessage(Chat $sourceMessage, User $assistantUser, int $trainerId, string $content, array $metadata): Chat
+    {
+        return Chat::query()->create([
+            'sender_user_id' => $assistantUser->id,
+            'sender_ia_id' => $trainerId,
+            'receiver_user_id' => $sourceMessage->sender_user_id,
+            'content' => $content,
+            'metadata' => $metadata,
+        ]);
+    }
+
+    /**
+     * Met a jour le metadata du message utilisateur source.
+     */
+    private function markMessageReplied(Chat $message, int $trainerId, Chat $replyMessage, array $responseMeta, bool $isFallback): void
+    {
+        $metadata = $message->metadata ?? [];
+
+        $metadata['ai_id'] = $trainerId;
+        $metadata['ai'] = array_merge($metadata['ai'] ?? [], [
+            'reply_message_id' => $replyMessage->id,
+            'sent_at' => now()->toIso8601String(),
+            'trainer_id' => $trainerId,
+            'model' => $responseMeta['model'] ?? null,
+            'temperature' => $responseMeta['temperature'] ?? null,
+            'usage' => $responseMeta['usage'] ?? null,
+            'fallback_used' => $isFallback,
+            'fallback_reason' => $isFallback ? ($responseMeta['error'] ?? 'fallback') : null,
+            'source' => $isFallback ? 'fallback' : 'ollama',
+        ]);
+
+        $message->forceFill(['metadata' => $metadata])->save();
+    }
+
+    /**
+     * Envoie une reponse de secours.
+     */
+    private function sendFallbackResponse(Chat $message, User $assistantUser, int $trainerId, string $template, string $reason, bool $dryRun): void
+    {
+        $content = $this->renderFallbackMessage($message, $template);
+
+        if ($dryRun) {
+            $this->line(sprintf(
+                '[DRY RUN | FALLBACK] user:%d -> ai:%d (message %d) // raison: %s',
+                $message->sender_user_id,
+                $trainerId,
+                $message->id,
+                $reason
+            ));
+
+            return;
+        }
+
+        $trainer = AiTrainer::query()->find($trainerId);
+
+        $assistantMessage = $this->createAssistantMessage(
+            sourceMessage: $message,
+            assistantUser: $assistantUser,
+            trainerId: $trainerId,
+            content: $content,
+            metadata: [
+                'role' => 'assistant',
+                'ai_id' => $trainerId,
+                'ai' => [
+                    'trainer_id' => $trainerId,
+                    'model' => $trainer?->model,
+                    'temperature' => $trainer?->temperature,
+                    'usage' => null,
+                    'fallback_used' => true,
+                    'fallback_reason' => $reason,
+                    'source' => 'fallback',
+                    'original_message_id' => $message->id,
+                ],
+            ],
+        );
+
+        $this->markMessageReplied(
+            message: $message,
+            trainerId: $trainerId,
+            replyMessage: $assistantMessage,
+            responseMeta: [
+                'model' => $trainer?->model,
+                'temperature' => $trainer?->temperature,
+                'error' => $reason,
+            ],
+            isFallback: true
+        );
+
+        $this->info(sprintf(
+            'Conversation user:%d-ai:%d : reponse fallback envoyee (message %d -> %d) [raison: %s]',
+            $message->sender_user_id,
+            $trainerId,
+            $message->id,
+            $assistantMessage->id,
+            $reason
+        ));
+    }
+
+    /**
+     * Genere le message de secours pour l'utilisateur.
+     */
+    private function renderFallbackMessage(Chat $message, string $template): string
     {
         $user = $message->sender;
         $userName = $user?->name ?? 'utilisateur';
@@ -233,9 +494,9 @@ class RespondPendingAiMessages extends Command
     }
 
     /**
-     * Message par defaut utilise quand aucune option n'est fournie.
+     * Message fallback par defaut utilise quand aucune option n'est fournie.
      */
-    private function defaultMessage(): string
+    private function defaultFallbackMessage(): string
     {
         return "Bonjour {user_name}, notre assistant IA est indisponible pour le moment. Nous avons bien recu votre message #{message_id} et un membre de l'equipe vous repondra prochainement.";
     }

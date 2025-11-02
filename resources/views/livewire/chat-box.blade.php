@@ -1,4 +1,4 @@
-<div class="w-full h-full flex flex-col bg-gray-50 relative" @if($isActive) wire:poll.5s="loadMessages" @endif>
+<div class="w-full h-full flex flex-col bg-gray-50 relative" @if($isActive) wire:poll.5s="refreshMessages" @endif>
     <!-- Formulaire d'envoi - Position absolue en haut pour être toujours visible -->
     <div class="bg-white border-b p-3 shadow-lg z-[100] flex-shrink-0">
         <form wire:submit.prevent="sendMessage">
