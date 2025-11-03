@@ -15,9 +15,21 @@ Route::prefix('superadmin')
         Route::get('/users', [SuperadminPageController::class, 'usersIndex'])->name('users.index');
         Route::get('/formations', [SuperadminPageController::class, 'formationsIndex'])->name('formations.index');
         Route::get('/support', [SuperadminPageController::class, 'supportIndex'])->name('support.index');
-        Route::get('/ai', function () {
-            return view('out-application.superadmin.superadmin-ia-page');
-        })->name('ai.index');
+        Route::prefix('ai')
+            ->name('ai.')
+            ->group(function (): void {
+                Route::get('/', function () {
+                    return view('out-application.superadmin.ai.index');
+                })->name('index');
+
+                Route::get('/trainers', function () {
+                    return view('out-application.superadmin.ai.trainers');
+                })->name('trainers');
+
+                Route::get('/categories', function () {
+                    return view('out-application.superadmin.ai.categories');
+                })->name('categories');
+            });
         Route::get('/formation-categories', [FormationCategoryController::class, 'index'])->name('formation-categories.index');
         Route::post('/formation-categories', [FormationCategoryController::class, 'store'])->name('formation-categories.store');
         Route::put('/formation-categories/{formationCategory}', [FormationCategoryController::class, 'update'])->name('formation-categories.update');
