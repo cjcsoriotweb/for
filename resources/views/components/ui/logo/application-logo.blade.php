@@ -2,6 +2,7 @@
 @props([
     // Fichier dans public/ (ex: logo.png, images/brand.png)
     'src'   => 'logo.png',
+    'darkSrc' => 'logo-dark.png',
 
     // Taille prédéfinie OU valeur numérique en px (ex: '3xl' ou 256)
     'size'  => 'md',  // xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|full | int
@@ -62,20 +63,34 @@
         $style = "width: {$dim['w']}px; height: {$dim['h']}px;";
     }
 
-    // URL publique
-    $url = asset($src);
+    // URL publique diffǸrente selon le thǸme
+    $lightSource = $darkSrc ?: $src;
+    $lightUrl = asset($lightSource);
+    $darkUrl = asset($src);
 @endphp
 
 <a href="{{url('')}}">
     <img
-    src="{{ $url }}"
-    alt="{{ $label }}"
-    loading="lazy"
-    decoding="async"
-    fetchpriority="auto"
-    {{ $attributes->merge([
-        'class' => trim("inline-block {$objectFit} {$roundClass}"),
-        'style' => $style,
-    ]) }}
-/>
+        src="{{ $lightUrl }}"
+        alt="{{ $label }}"
+        loading="lazy"
+        decoding="async"
+        fetchpriority="auto"
+        {{ $attributes->merge([
+            'class' => trim("inline-block {$objectFit} {$roundClass} dark:hidden"),
+            'style' => $style,
+        ]) }}
+    />
+
+    <img
+        src="{{ $darkUrl }}"
+        alt="{{ $label }}"
+        loading="lazy"
+        decoding="async"
+        fetchpriority="auto"
+        {{ $attributes->merge([
+            'class' => trim("hidden dark:inline-block {$objectFit} {$roundClass}"),
+            'style' => $style,
+        ]) }}
+    />
 </a>
