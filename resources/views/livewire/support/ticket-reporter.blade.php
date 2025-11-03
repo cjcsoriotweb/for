@@ -19,7 +19,7 @@
     ];
 @endphp
 
-<div class="flex h-full flex-col text-white">
+<div class="flex h-full w-full flex-col overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
     <header class="relative overflow-hidden border-b border-white/10 px-6 py-6">
         <div class="absolute inset-0 bg-gradient-to-r from-sky-500/5 via-transparent to-purple-500/5"></div>
 
@@ -44,7 +44,7 @@
         <div class="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-sky-400/30 to-transparent"></div>
     </header>
 
-    <div class="flex-1 overflow-y-auto px-6 pb-6">
+    <div class="flex-1 overflow-x-hidden overflow-y-auto px-6 pb-6">
         <div class="space-y-6">
             @if ($mode !== 'create')
                 <div class="grid gap-6 lg:grid-cols-[minmax(0,320px),1fr]">
@@ -71,7 +71,7 @@
                             </div>
 
                             <div class="relative space-y-4 px-6 py-5">
-                                <div class="flex gap-3 overflow-x-auto pb-2">
+                                <div class="grid gap-10 overflow-x-auto pb-2" style="overflow-x:hidden">
                                     @forelse ($recentTickets as $ticket)
                                         <button
                                             type="button"
@@ -196,7 +196,7 @@
             @endif
 
             @if ($mode !== 'detail')
-                <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
+                <div class="mt-5 relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
                     <div class="absolute inset-0 opacity-5">
                         <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
                     </div>
