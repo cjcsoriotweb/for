@@ -13,6 +13,7 @@
 
                         <h1 class="mt-6 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
                             {{ __('Choisissez votre destination au sein de') }}
+                            <br>
                             <span class="bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-transparent">
                                 {{ $team->name }}
                             </span>
@@ -53,11 +54,11 @@
                         <a
                             href="{{ $destination['route'] }}"
                             data-team-switch-choice
-                            class="group relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white/80 p-7 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.3)] transition duration-500 hover:-translate-y-1.5 hover:border-sky-200/80 hover:shadow-[0_35px_75px_-40px_rgba(30,64,175,0.45)] focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/50"
+                            class="group relative overflow-hidden rounded-3xl border border-sky-200/60 bg-white/90 p-7 shadow-[0_20px_45px_-25px_rgba(30,64,175,0.3)] transition duration-500 hover:-translate-y-2 hover:border-sky-300/80 hover:shadow-[0_35px_75px_-40px_rgba(30,64,175,0.6)] hover:scale-[1.02] focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/60"
                         >
-                            <div class="absolute inset-0 bg-gradient-to-br {{ $destination['gradient'] }} opacity-0 transition-opacity duration-400 group-hover:opacity-80"></div>
-                            <div class="absolute inset-0 opacity-0 transition-opacity duration-400 group-hover:opacity-100">
-                                <div class="absolute -top-16 right-0 h-56 w-56 rounded-full bg-white/25 blur-3xl"></div>
+                            <div class="absolute inset-0 bg-gradient-to-br {{ $destination['gradient'] }} opacity-60 transition-opacity duration-400 group-hover:opacity-90"></div>
+                            <div class="absolute inset-0 opacity-70 transition-opacity duration-400 group-hover:opacity-100">
+                                <div class="absolute -top-16 right-0 h-56 w-56 rounded-full bg-white/30 blur-3xl"></div>
                             </div>
 
                             <div class="relative z-10 flex flex-col gap-6">
