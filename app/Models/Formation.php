@@ -113,6 +113,11 @@ class Formation extends Model
             ->where('type', Quiz::TYPE_ENTRY);
     }
 
+    public function questions()
+    {
+        return $this->entryQuiz()->first()?->quizQuestions() ?? collect();
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(FormationCategory::class, 'formation_category_id');
