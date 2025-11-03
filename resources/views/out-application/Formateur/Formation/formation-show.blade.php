@@ -55,13 +55,13 @@
 
 
           <!-- Modifier la formation (include) !-->
-          @include('out-application.formateur.Formation.Formation.Card.modify-formation-informations')
-          @include('out-application.formateur.Formation.Formation.Card.modify-formation-ia')
-          @include('out-application.formateur.Formation.Formation.Card.modify-formation-pricing')
-          @include('out-application.formateur.Formation.Formation.Card.manage-formation-chapter')
-          @include('out-application.formateur.Formation.Formation.Card.manage-entry-quiz')
-          @include('out-application.formateur.Formation.Formation.Card.manage-files-end-formation')
-          @include('out-application.formateur.Formation.Formation.Card.owner-formation-modify')
+          @include('out-application.formateur.formation.formation.card.modify-formation-informations')
+          @include('out-application.formateur.formation.formation.card.modify-formation-ia')
+          @include('out-application.formateur.formation.formation.card.modify-formation-pricing')
+          @include('out-application.formateur.formation.formation.card.manage-formation-chapter')
+          @include('out-application.formateur.formation.formation.card.manage-entry-quiz')
+          @include('out-application.formateur.formation.formation.card.manage-files-end-formation')
+          @include('out-application.formateur.formation.formation.card.owner-formation-modify')
 
         </div>
       </div>
