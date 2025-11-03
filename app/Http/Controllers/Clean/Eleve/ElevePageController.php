@@ -86,7 +86,7 @@ class ElevePageController extends Controller
                 $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
                 $passingScore = $entryQuiz->passing_score ?? 80;
 
-                if ($entryScore >= $passingScore) {
+                if ($entryScore <= $passingScore) {
                     $entryQuizStatus = 'passed';
                 } else {
                     $entryQuizStatus = 'failed';
@@ -416,9 +416,9 @@ class ElevePageController extends Controller
                 $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
                 $passingScore = $entryQuiz->passing_score ?? 80;
 
-                if ($entryScore < $passingScore) {
+                if ($entryScore > $passingScore) {
                     return redirect()->route('eleve.formation.show', [$team, $formation])
-                        ->with('error', 'Vous devez réussir le quiz d\'entrée avant d\'accéder aux leçons de cette formation.');
+                        ->with('error', 'Votre niveau est trop élevé pour cette formation. Un superadmin vous contactera pour vous proposer une formation plus adaptée.');
                 }
             } else {
                 return redirect()->route('eleve.formation.entry-quiz.attempt', [$team, $formation])
@@ -898,18 +898,18 @@ class ElevePageController extends Controller
                 ->with('info', 'Cette formation n\'a pas de quiz d\'entrée.');
         }
 
-        // Vérifier si l'étudiant a déjà passé le quiz d'entrée avec succès
+        // Vérifier si l'étudiant a déjà passé le quiz d'entrée
         $formationProgress = $formation->learners()->where('user_id', $user->id)->first();
         if ($formationProgress && $formationProgress->pivot->entry_quiz_attempt_id) {
             $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
             $passingScore = $entryQuiz->passing_score ?? 80;
 
-            if ($entryScore >= $passingScore) {
+            if ($entryScore <= $passingScore) {
                 return redirect()->route('eleve.formation.show', [$team, $formation])
-                    ->with('success', 'Vous avez déjà réussi le quiz d\'entrée. Vous pouvez commencer la formation.');
+                    ->with('success', 'Vous avez déjà passé le quiz d\'entrée avec succès. Vous pouvez commencer la formation.');
             } else {
                 return redirect()->route('eleve.formation.show', [$team, $formation])
-                    ->with('error', 'Désolé, mais votre niveau est supérieur à cette formation. Contactez un superadmin pour plus d\'informations.');
+                    ->with('error', 'Votre niveau est trop élevé pour cette formation. Un superadmin vous contactera pour vous proposer une formation plus adaptée.');
             }
         }
 
@@ -960,14 +960,14 @@ class ElevePageController extends Controller
 
         // Vérifier si l'étudiant a réussi le quiz
         $passingScore = $entryQuiz->passing_score ?? 80;
-        if ($result['score'] >= $passingScore) {
-            // L'étudiant peut continuer la formation
+        if ($result['score'] <= $passingScore) {
+            // L'étudiant peut continuer la formation - niveau adapté
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'Félicitations ! Vous avez réussi le quiz d\'entrée avec un score de '.round($result['score'], 1).'%. Vous pouvez maintenant commencer la formation.');
+                ->with('success', 'Félicitations ! Votre niveau correspond parfaitement à cette formation (score: '.round($result['score'], 1).'%). Vous pouvez maintenant commencer.');
         } else {
             // L'étudiant ne peut pas continuer - niveau trop élevé
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('error', 'Désolé, mais votre niveau est supérieur à cette formation (score: '.round($result['score'], 1).'%). Contactez un superadmin pour plus d\'informations.');
+                ->with('error', 'Votre niveau est trop élevé pour cette formation (score: '.round($result['score'], 1).'%). Un superadmin vous contactera pour vous proposer une formation plus adaptée.');
         }
     }
 

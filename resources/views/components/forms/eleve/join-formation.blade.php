@@ -1,7 +1,8 @@
 @props(['formation', 'label' => null])
 
 @php
-    $buttonLabel = $label ?? ($formation['enroll_button_label'] ?? __('Rejoindre cette formation'));
+    $hasEntryQuiz = data_get($formation, 'has_entry_quiz', false);
+    $buttonLabel = $label ?? ($formation['enroll_button_label'] ?? ($hasEntryQuiz ? __('Cette formation me correspond ?') : __('Rejoindre cette formation')));
 @endphp
 
 <form method="POST" action="{{ $formation['enroll_route'] }}" {{ $attributes->merge(['class' => 'w-full']) }}>
