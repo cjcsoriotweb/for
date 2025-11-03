@@ -30,29 +30,35 @@ class TicketReporter extends Component
 
     public string $reply = '';
 
-    public function mount(?string $originPath = null, ?string $originLabel = null): void
+    public string $mode = 'overview';
+
+    public ?int $defaultTicketId = null;
+
+    public function mount(?string $originPath = null, ?string $originLabel = null, ?int $defaultTicketId = null, string $mode = 'overview'): void
     {
         $this->ensureAuthorized();
+
+        $this->mode = in_array($mode, ['overview', 'create', 'detail'], true) ? $mode : 'overview';
+        $this->defaultTicketId = $defaultTicketId;
 
         $this->originPath = $originPath ?: $this->guessOriginPath();
         $this->originLabel = $originLabel ?: 'Dock Signaler un bug';
 
-        $this->loadRecentTickets();
+        $requestedTicketId = $defaultTicketId ?: $this->requestedTicketFromQuery();
+
+        $this->loadRecentTickets($requestedTicketId);
 
         // Check if a specific ticket is requested via query parameter
-        $requestedTicketId = request()->query('ticket');
-        if ($requestedTicketId && is_numeric($requestedTicketId)) {
-            $ticketId = (int) $requestedTicketId;
-            // Verify the ticket belongs to the user
-            $ticketExists = collect($this->recentTickets)->contains('id', $ticketId);
+        if ($requestedTicketId) {
+            $ticketExists = collect($this->recentTickets)->contains('id', $requestedTicketId);
             if ($ticketExists) {
-                $this->selectTicket($ticketId);
+                $this->selectTicket($requestedTicketId);
                 return;
             }
         }
 
         // Otherwise, select the first ticket if available
-        if ($this->activeTicketId === null && count($this->recentTickets) > 0) {
+        if ($this->mode !== 'create' && $this->activeTicketId === null && count($this->recentTickets) > 0) {
             $firstTicket = $this->recentTickets[0]['id'] ?? null;
             if ($firstTicket) {
                 $this->selectTicket((int) $firstTicket);
@@ -110,7 +116,7 @@ class TicketReporter extends Component
         $this->description = '';
         $this->sent = true;
 
-        $this->loadRecentTickets();
+        $this->loadRecentTickets($ticketId ? (int) $ticketId : null);
 
         if ($ticketId) {
             $this->selectTicket((int) $ticketId);
@@ -179,7 +185,7 @@ class TicketReporter extends Component
 
         $this->reply = '';
 
-        $this->loadRecentTickets();
+        $this->loadRecentTickets($ticket->id);
         $this->selectTicket($ticket->id);
     }
 
@@ -202,23 +208,42 @@ class TicketReporter extends Component
         }
     }
 
-    private function loadRecentTickets(): void
+    private function loadRecentTickets(?int $ensureTicketId = null): void
     {
         $user = Auth::user();
 
         if (! $user) {
             $this->recentTickets = [];
+            $this->activeTicket = null;
+            $this->activeTicketId = null;
 
             return;
         }
 
-        $this->recentTickets = SupportTicket::query()
+        $limit = $this->mode === 'detail' ? 10 : 5;
+
+        $tickets = SupportTicket::query()
             ->select(['id', 'subject', 'status', 'created_at', 'last_message_at'])
             ->where('user_id', $user->id)
             ->orderByDesc('last_message_at')
             ->orderByDesc('created_at')
-            ->limit(5)
-            ->get()
+            ->limit($limit)
+            ->get();
+
+        if ($ensureTicketId && ! $tickets->contains('id', $ensureTicketId)) {
+            $extraTicket = SupportTicket::query()
+                ->select(['id', 'subject', 'status', 'created_at', 'last_message_at'])
+                ->where('user_id', $user->id)
+                ->where('id', $ensureTicketId)
+                ->first();
+
+            if ($extraTicket) {
+                $tickets->push($extraTicket);
+            }
+        }
+
+        $this->recentTickets = $tickets
+            ->unique('id')
             ->map(function (SupportTicket $ticket): array {
                 $lastTimestamp = $ticket->last_message_at ?? $ticket->created_at;
 
@@ -231,6 +256,7 @@ class TicketReporter extends Component
                     'last_message_human' => optional($lastTimestamp)->diffForHumans(),
                 ];
             })
+            ->values()
             ->all();
 
         if ($this->activeTicketId) {
@@ -290,5 +316,16 @@ class TicketReporter extends Component
         $previous = url()->previous();
 
         return $previous !== url()->current() ? $previous : null;
+    }
+
+    private function requestedTicketFromQuery(): ?int
+    {
+        $requested = request()->query('ticket');
+
+        if ($requested !== null && $requested !== '' && is_numeric($requested)) {
+            return (int) $requested;
+        }
+
+        return null;
     }
 }

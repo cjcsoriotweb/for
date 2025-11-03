@@ -1,108 +1,116 @@
+@php
+    $statusColors = [
+        'open' => 'border-amber-300/50 bg-amber-400/15 text-amber-100',
+        'pending' => 'border-amber-300/50 bg-amber-400/15 text-amber-100',
+        'resolved' => 'border-emerald-300/60 bg-emerald-400/20 text-emerald-100',
+        'closed' => 'border-slate-300/30 bg-slate-400/10 text-slate-200',
+    ];
+
+    $modeTitles = [
+        'overview' => 'Centre support',
+        'detail' => 'Suivre mon ticket',
+        'create' => 'Creer un ticket',
+    ];
+
+    $modeDescriptions = [
+        'overview' => 'Signalez un probleme, consultez vos tickets recents et suivez les reponses du support.',
+        'detail' => 'Consultez la conversation de votre ticket et apportez des precisions si besoin.',
+        'create' => 'Decrivez votre situation pour nous aider a comprendre et a traiter votre demande.',
+    ];
+@endphp
+
 <div class="flex h-full flex-col text-white">
-    <!-- Header Section -->
     <header class="relative overflow-hidden border-b border-white/10 px-6 py-6">
-        <!-- Background gradient overlay -->
         <div class="absolute inset-0 bg-gradient-to-r from-sky-500/5 via-transparent to-purple-500/5"></div>
 
-        <div class="relative flex items-start justify-between gap-4">
-            <div class="flex-1">
-                <div class="inline-flex items-center gap-2 rounded-full bg-sky-500/10 border border-sky-400/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-sky-300">
+        <div class="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex-1 space-y-3">
+                <div class="inline-flex items-center gap-2 rounded-full border border-sky-400/20 bg-sky-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-sky-300">
                     <span class="material-symbols-outlined text-sm">support</span>
-                    Centre support
+                    {{ __('Support') }}
                 </div>
-                <h1 class="mt-3 text-2xl font-bold text-white">Signaler un bug</h1>
-                <p class="mt-2 text-sm text-slate-300 leading-relaxed">
-                    Faites-nous part d'un dysfonctionnement et suivez vos échanges avec l'équipe support directement depuis ce dock.
+                <h1 class="text-2xl font-bold text-white">
+                    {{ __($modeTitles[$mode] ?? $modeTitles['overview']) }}
+                </h1>
+                <p class="text-sm leading-relaxed text-slate-300">
+                    {{ __($modeDescriptions[$mode] ?? $modeDescriptions['overview']) }}
                 </p>
             </div>
             <div class="hidden shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-gradient-to-br from-sky-500/10 to-purple-500/10 p-4 shadow-xl backdrop-blur-xl sm:flex">
-                <span class="material-symbols-outlined text-4xl text-sky-300">bug_report</span>
+                <span class="material-symbols-outlined text-4xl text-sky-300">confirmation_number</span>
             </div>
         </div>
 
-        <!-- Decorative bottom accent -->
         <div class="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-sky-400/30 to-transparent"></div>
     </header>
 
     <div class="flex-1 overflow-y-auto px-6 pb-6">
         <div class="space-y-6">
-          
-            <!-- Existing Tickets Section -->
-            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
-                <!-- Subtle background pattern -->
-                <div class="absolute inset-0 opacity-5">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
-                </div>
-
-                <div class="relative flex items-center justify-between gap-3 border-b border-white/10 px-6 py-5">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-lg text-sky-300">forum</span>
-                            <h2 class="text-lg font-semibold text-white">Mes tickets</h2>
-                        </div>
-                        <p class="mt-1 text-xs text-slate-400">Suivez les réponses du support et fournissez des informations supplémentaires.</p>
-                    </div>
-                    <span class="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/20 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-sky-200">
-                        <span class="material-symbols-outlined text-sm">confirmation_number</span>
-                        @choice(':count ticket|:count tickets', count($recentTickets), ['count' => count($recentTickets)])
-                    </span>
-                </div>
-
-                @php
-                    $statusColors = [
-                        'open' => 'border-amber-300/50 bg-amber-400/15 text-amber-100',
-                        'pending' => 'border-amber-300/50 bg-amber-400/15 text-amber-100',
-                        'resolved' => 'border-emerald-300/60 bg-emerald-400/20 text-emerald-100',
-                        'closed' => 'border-slate-300/30 bg-slate-400/10 text-slate-200',
-                    ];
-                @endphp
-
-                <div class="space-y-4 px-6 py-5">
-                    <div class="flex gap-3 overflow-x-auto pb-2">
-                        @forelse ($recentTickets as $ticket)
-                            <button
-                                type="button"
-                                wire:key="ticket-{{ $ticket['id'] }}"
-                                wire:click="selectTicket({{ $ticket['id'] }})"
-                                class="group relative flex min-w-[240px] flex-1 cursor-pointer flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left transition-all duration-300 hover:border-sky-400/50 hover:bg-sky-500/10 hover:shadow-lg hover:shadow-sky-500/10 focus:outline-none focus:ring-2 focus:ring-sky-400/50 {{ $activeTicketId === $ticket['id'] ? 'border-sky-400/70 bg-sky-500/20 shadow-lg shadow-sky-500/20' : '' }}"
-                            >
-                                <!-- Active indicator -->
-                                @if ($activeTicketId === $ticket['id'])
-                                    <div class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-sky-400 shadow-lg"></div>
-                                @endif
-
-                                <div class="flex items-start justify-between gap-3">
-                                    <p class="line-clamp-2 text-sm font-semibold text-white group-hover:text-sky-50 transition-colors duration-200">{{ $ticket['subject'] }}</p>
-                                    <span class="shrink-0 rounded-full border {{ $statusColors[$ticket['status']] ?? 'border-slate-300/30 bg-slate-400/15 text-slate-200' }} px-2.5 py-1 text-xs font-semibold uppercase tracking-wide">
-                                        {{ $ticket['status_label'] }}
-                                    </span>
-                                </div>
-
-                                <div class="flex items-center justify-between text-xs text-slate-300">
-                                    <span class="inline-flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-sm">schedule</span>
-                                        {{ $ticket['created_at_human'] ?? '' }}
-                                    </span>
-                                    <span class="inline-flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-sm">update</span>
-                                        {{ $ticket['last_message_human'] ?? '' }}
-                                    </span>
-                                </div>
-
-                                <!-- Hover indicator -->
-                                <div class="absolute bottom-2 right-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                                    <span class="material-symbols-outlined text-lg text-sky-300">arrow_forward</span>
-                                </div>
-                            </button>
-                        @empty
-                            <div class="flex min-h-[140px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-gradient-to-br from-slate-700/30 to-slate-600/20 px-6 py-8 text-center">
-                                <div class="mb-3 rounded-full bg-sky-500/20 p-3">
-                                    <span class="material-symbols-outlined text-2xl text-sky-300">forum</span>
-                                </div>
-                                <p class="text-sm font-medium text-slate-300">Aucun ticket pour le moment</p>
-                                <p class="text-xs text-slate-400 mt-1">Vos conversations apparaîtront ici.</p>
+            @if ($mode !== 'create')
+                <div class="grid gap-6 lg:grid-cols-[minmax(0,320px),1fr]">
+                    <div class="space-y-4">
+                        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
+                            <div class="absolute inset-0 opacity-5">
+                                <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
                             </div>
-                        @endforelse
+
+                            <div class="relative flex items-center justify-between gap-3 border-b border-white/10 px-6 py-5">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-lg text-sky-300">forum</span>
+                                        <h2 class="text-lg font-semibold text-white">{{ __('Mes tickets') }}</h2>
+                                    </div>
+                                    <p class="mt-1 text-xs text-slate-400">
+                                        {{ __('Suivez vos echanges recents avec l equipe support.') }}
+                                    </p>
+                                </div>
+                                <span class="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/20 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-sky-200">
+                                    <span class="material-symbols-outlined text-sm">confirmation_number</span>
+                                    @choice(':count ticket|:count tickets', count($recentTickets), ['count' => count($recentTickets)])
+                                </span>
+                            </div>
+
+                            <div class="relative space-y-4 px-6 py-5">
+                                <div class="flex gap-3 overflow-x-auto pb-2">
+                                    @forelse ($recentTickets as $ticket)
+                                        <button
+                                            type="button"
+                                            wire:key="ticket-{{ $ticket['id'] }}"
+                                            wire:click="selectTicket({{ $ticket['id'] }})"
+                                            class="group relative flex min-w-[220px] flex-1 flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left transition-all duration-300 hover:border-sky-400/50 hover:bg-sky-500/10 hover:shadow-lg hover:shadow-sky-500/10 focus:outline-none focus:ring-2 focus:ring-sky-400/50 {{ $activeTicketId === $ticket['id'] ? 'border-sky-400/70 bg-sky-500/20 shadow-lg shadow-sky-500/20' : '' }}"
+                                        >
+                                            @if ($activeTicketId === $ticket['id'])
+                                                <div class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-sky-400/80 shadow-lg shadow-sky-900/30">
+                                                    <span class="material-symbols-outlined text-[15px] text-slate-900">check</span>
+                                                </div>
+                                            @endif
+
+                                            <div class="flex items-start justify-between gap-2">
+                                                <h3 class="text-sm font-semibold text-white leading-5 line-clamp-2">{{ $ticket['subject'] }}</h3>
+                                                <span class="rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide {{ $statusColors[$ticket['status']] ?? 'border-slate-300/30 bg-slate-400/15 text-slate-200' }}">
+                                                    {{ $ticket['status_label'] }}
+                                                </span>
+                                            </div>
+                                            <p class="text-xs text-slate-300">
+                                                {{ __('Dernier message : :date', ['date' => $ticket['last_message_human'] ?? '']) }}
+                                            </p>
+
+                                            <div class="absolute bottom-2 right-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                                                <span class="material-symbols-outlined text-lg text-sky-300">arrow_forward</span>
+                                            </div>
+                                        </button>
+                                    @empty
+                                        <div class="flex min-h-[140px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-gradient-to-br from-slate-700/30 to-slate-600/20 px-6 py-8 text-center">
+                                            <div class="mb-3 rounded-full bg-sky-500/20 p-3">
+                                                <span class="material-symbols-outlined text-2xl text-sky-300">forum</span>
+                                            </div>
+                                            <p class="text-sm font-medium text-slate-300">{{ __('Aucun ticket pour le moment') }}</p>
+                                            <p class="mt-1 text-xs text-slate-400">{{ __('Vos conversations apparaitront ici.') }}</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="relative">
@@ -113,21 +121,23 @@
                         >
                             <div class="flex items-center gap-3 text-sm text-slate-200">
                                 <svg class="h-4 w-4 animate-spin text-sky-300" viewBox="0 0 24 24">
-                                    <circle class="opacity-30" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none"/>
-                                    <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z"/>
+                                    <circle class="opacity-30" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none"></circle>
+                                    <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z"></path>
                                 </svg>
-                                Mise a jour...
+                                {{ __('Mise a jour...') }}
                             </div>
                         </div>
 
-                        <div class="flex min-h-[240px] flex-col gap-4 rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-5 shadow-inner shadow-black/40">
+                        <div class="flex min-h-[260px] flex-col gap-4 rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-5 shadow-inner shadow-black/40">
                             @if ($activeTicket)
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <h3 class="text-base font-semibold text-white">{{ $activeTicket['subject'] }}</h3>
-                                        <p class="text-[11px] uppercase tracking-wide text-slate-400">Cree {{ $activeTicket['created_at_human'] ?? '' }}</p>
+                                        <p class="text-[11px] uppercase tracking-wide text-slate-400">
+                                            {{ __('Cree :date', ['date' => $activeTicket['created_at_human'] ?? '']) }}
+                                        </p>
                                     </div>
-                                    <span class="rounded-full border {{ $statusColors[$activeTicket['status']] ?? 'border-slate-300/30 bg-slate-400/15 text-slate-200' }} px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                                    <span class="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide {{ $statusColors[$activeTicket['status']] ?? 'border-slate-300/30 bg-slate-400/15 text-slate-200' }}">
                                         {{ $activeTicket['status_label'] }}
                                     </span>
                                 </div>
@@ -138,7 +148,7 @@
                                             <div class="max-w-[85%] rounded-2xl px-4 py-3 shadow-lg {{ $message['is_support'] ? 'bg-white/10 text-slate-50 shadow-sky-950/30' : 'bg-sky-500/90 text-white shadow-sky-900/40' }}">
                                                 <p class="whitespace-pre-line leading-relaxed">{!! nl2br(e($message['content'])) !!}</p>
                                                 <p class="mt-2 text-[11px] font-semibold uppercase tracking-wide {{ $message['is_support'] ? 'text-slate-300' : 'text-white/80' }}">
-                                                    {{ $message['author'] }}<span class="mx-1 text-slate-500">•</span>{{ $message['created_at_human'] ?? '' }}
+                                                    {{ $message['author'] }}<span class="mx-1 text-slate-500">&bull;</span>{{ $message['created_at_human'] ?? '' }}
                                                 </p>
                                             </div>
                                         </div>
@@ -146,20 +156,22 @@
                                 </div>
 
                                 <form wire:submit.prevent="sendReply" class="space-y-3">
-                                    <label for="reply" class="text-xs font-medium uppercase tracking-wide text-slate-300">Votre reponse</label>
+                                    <label for="reply" class="text-xs font-medium uppercase tracking-wide text-slate-300">{{ __('Votre reponse') }}</label>
                                     <textarea
                                         id="reply"
                                         rows="3"
                                         wire:model.defer="reply"
                                         class="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200/60"
-                                        placeholder="Ajoutez des informations, repondez a l equipe support..."
+                                        placeholder="{{ __('Ajoutez des informations pour aider le support...') }}"
                                     ></textarea>
                                     @error('reply')
                                         <p class="text-sm text-rose-300">{{ $message }}</p>
                                     @enderror
 
                                     <div class="flex items-center justify-between gap-3">
-                                        <p class="text-[11px] text-slate-400">Votre message sera ajoute au ticket et notifie au support.</p>
+                                        <p class="text-[11px] text-slate-400">
+                                            {{ __('Votre message sera ajoute au ticket et notifie au support.') }}
+                                        </p>
                                         <button
                                             type="submit"
                                             wire:loading.attr="disabled"
@@ -167,101 +179,104 @@
                                             class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/30 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:bg-slate-500/30 disabled:text-slate-300"
                                         >
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12H3m0 0 6 6m-6-6 6-6" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12H3m0 0 6 6m-6-6 6-6"></path>
                                             </svg>
-                                            Envoyer une reponse
+                                            {{ __('Envoyer une reponse') }}
                                         </button>
                                     </div>
                                 </form>
                             @else
                                 <div class="flex h-full items-center justify-center text-sm text-slate-300">
-                                    Selectionnez un ticket pour afficher la conversation.
+                                    {{ __('Selectionnez un ticket pour afficher la conversation.') }}
                                 </div>
                             @endif
                         </div>
                     </div>
-            <!-- New Ticket Section -->
-            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
-                <!-- Subtle background pattern -->
-                <div class="absolute inset-0 opacity-5">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
                 </div>
+            @endif
 
-                <div class="relative flex items-center gap-3 border-b border-white/10 px-6 py-5">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-red-500/20 border border-amber-400/30">
-                        <span class="material-symbols-outlined text-xl text-amber-300">bug_report</span>
+            @if ($mode !== 'detail')
+                <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
+                    <div class="absolute inset-0 opacity-5">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
                     </div>
-                    <div>
-                        <h2 class="text-lg font-semibold text-white">Nouveau signalement</h2>
-                        <p class="text-xs text-slate-300">Expliquez ce qui s'est passé, nous analysons généralement sous 24h.</p>
-                    </div>
-                </div>
 
-                <form wire:submit.prevent="submit" class="space-y-5 px-6 py-6">
-                    @if ($sent)
-                        <div class="rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200 shadow-inner shadow-emerald-500/20">
-                            Merci ! Votre ticket est bien enregistre. Nous revenons vers vous des que possible.
+                    <div class="relative flex items-center gap-3 border-b border-white/10 px-6 py-5">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-500/20 to-red-500/20">
+                            <span class="material-symbols-outlined text-xl text-amber-300">bug_report</span>
                         </div>
-                    @endif
-
-                    <div class="space-y-2">
-                        <label for="subject" class="text-sm font-medium text-slate-200">Sujet</label>
-                        <input
-                            id="subject"
-                            type="text"
-                            wire:model.defer="subject"
-                            autocomplete="off"
-                            class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                            placeholder="Exemple : Erreur lors de la validation d un quiz"
-                        />
-                        @error('subject')
-                            <p class="text-sm text-rose-300">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="description" class="text-sm font-medium text-slate-200">Description detaillee</label>
-                        <textarea
-                            id="description"
-                            rows="5"
-                            wire:model.defer="description"
-                            class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                            placeholder="Decrivez les etapes pour reproduire le bug, les messages d erreur, ou ajoutez des details utiles."
-                        ></textarea>
-                        @error('description')
-                            <p class="text-sm text-rose-300">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-300">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-sky-200">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-3A2.25 2.25 0 0 0 8.25 5.25V9m-3 3h13.5m-11.25 3v3A2.25 2.25 0 0 0 9.75 20.25h4.5A2.25 2.25 0 0 0 16.5 18v-3" />
-                                </svg>
-                            </span>
-                            <span>Le lien de la page actuelle est joint pour aider l equipe.</span>
+                        <div>
+                            <h2 class="text-lg font-semibold text-white">{{ __('Nouveau ticket') }}</h2>
+                            <p class="text-xs text-slate-300">
+                                {{ __('Expliquez la situation avec le plus de details possible.') }}
+                            </p>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span wire:loading.delay.inline wire:target="submit" class="text-slate-400">Envoi...</span>
+                    </div>
+
+                    <form wire:submit.prevent="submit" class="relative space-y-5 px-6 py-6">
+                        @if ($sent)
+                            <div class="rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200 shadow-inner shadow-emerald-500/20">
+                                {{ __('Merci ! Votre ticket est bien enregistre. Nous revenons vers vous des que possible.') }}
+                            </div>
+                        @endif
+
+                        <div class="space-y-2">
+                            <label for="subject" class="text-sm font-medium text-slate-200">{{ __('Sujet') }}</label>
+                            <input
+                                id="subject"
+                                type="text"
+                                wire:model.defer="subject"
+                                autocomplete="off"
+                                class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
+                                placeholder="{{ __('Exemple : Erreur lors de la validation d un quiz') }}"
+                            />
+                            @error('subject')
+                                <p class="text-sm text-rose-300">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="description" class="text-sm font-medium text-slate-200">{{ __('Description detaillee') }}</label>
+                            <textarea
+                                id="description"
+                                rows="5"
+                                wire:model.defer="description"
+                                class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white shadow-sm shadow-black/20 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
+                                placeholder="{{ __('Decrivez les etapes, les messages d erreur ou ajoutez des details utiles.') }}"
+                            ></textarea>
+                            @error('description')
+                                <p class="text-sm text-rose-300">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-300">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-sky-200">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-3A2.25 2.25 0 0 0 8.25 5.25V9m-3 3h13.5m-11.25 3v3A2.25 2.25 0 0 0 9.75 20.25h4.5A2.25 2.25 0 0 0 16.5 18v-3"></path>
+                                    </svg>
+                                </span>
+                                {{ __('Les informations sont partagees uniquement avec le support.') }}
+                            </div>
+                            <span wire:loading.delay.inline wire:target="submit" class="text-slate-400">{{ __('Envoi...') }}</span>
+                        </div>
+
+                        <div class="flex justify-end">
                             <button
                                 type="submit"
                                 wire:loading.attr="disabled"
                                 wire:target="submit"
-                                class="inline-flex items-center gap-2 rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:bg-sky-700/60"
+                                class="inline-flex items-center gap-2 rounded-lg bg-sky-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:bg-sky-500/40"
                             >
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 12 5-9m0 0 5 9m-5-9v13.5m0 0L9 21m2-3.5 2 3.5" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0 5.25-5.25M12 19.5 6.75 14.25"></path>
                                 </svg>
-                                Envoyer
+                                {{ __('Soumettre le ticket') }}
                             </button>
                         </div>
-                    </div>
-                </form>
-            </div>
-
+                    </form>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>

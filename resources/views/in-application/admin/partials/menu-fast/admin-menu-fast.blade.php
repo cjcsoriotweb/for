@@ -15,92 +15,13 @@
 
                         <div class="space-y-3">
                             <h1 class="text-3xl font-semibold leading-tight text-white lg:text-[2.65rem]">
-                                {{ __('Bonjour :name', ['name' => $adminName]) }}
+                                {{ $team->name }}
                             </h1>
-                            <p class="text-sm text-white/70 lg:text-base">
-                                {{ __('Pilotez votre plateforme avec une vision claire de vos actions clés et des résultats de votre équipe.') }}
-                            </p>
                         </div>
                     </div>
 
-                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        <div class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.35em] text-white/60">
-                                <span>{{ __('Utilisateurs') }}</span>
-                                <span class="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[11px] tracking-[0.25em] text-white/70">
-                                    <span class="material-symbols-outlined text-[13px]">groups</span>
-                                    {{ $totalUsers }}
-                                </span>
-                            </div>
-                            <p class="mt-3 text-lg font-semibold text-white">
-                                {{ $totalUsers }} {{ $usersLabel }}
-                            </p>
-                            <p class="mt-1 text-xs text-white/60">
-                                {{ __('Collaborateurs connectés à votre organisation') }}
-                            </p>
-                        </div>
+          
 
-                        <div class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.35em] text-white/60">
-                                <span>{{ __('Formations actives') }}</span>
-                                <span class="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[11px] tracking-[0.25em] text-white/70">
-                                    <span class="material-symbols-outlined text-[13px]">workspace_premium</span>
-                                    {{ $activeCount }}
-                                </span>
-                            </div>
-                            <p class="mt-3 text-lg font-semibold text-white">
-                                {{ __(':active formations disponibles', ['active' => $activeCount]) }}
-                            </p>
-                            <p class="mt-1 text-xs text-white/60">
-                                {{ __('Sur un catalogue total de :total contenus', ['total' => $totalCount]) }}
-                            </p>
-                        </div>
-
-                        <div class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.35em] text-white/60">
-                                <span>{{ __('Catalogue') }}</span>
-                                <span class="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[11px] tracking-[0.25em] text-white/70">
-                                    <span class="material-symbols-outlined text-[13px]">inventory_2</span>
-                                    {{ $totalCount }}
-                                </span>
-                            </div>
-                            <p class="mt-3 text-lg font-semibold text-white">
-                                {{ __('Catalogue complet :total', ['total' => $totalCount]) }}
-                            </p>
-                            <p class="mt-1 text-xs text-white/60">
-                                {{ __('Contenus prêts à être déployés aux équipes') }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60">
-                            {{ __('Navigation rapide') }}
-                        </p>
-                        <div class="flex flex-wrap gap-2">
-                            <a
-                                href="#bascule"
-                                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:bg-white/20 hover:text-white"
-                            >
-                                <span class="material-symbols-outlined text-base">tune</span>
-                                {{ __('Actions') }}
-                            </a>
-                            <a
-                                href="#fonctionnement"
-                                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:bg-white/20 hover:text-white"
-                            >
-                                <span class="material-symbols-outlined text-base">monitoring</span>
-                                {{ __('Statistiques') }}
-                            </a>
-                            <a
-                                href="#configuration"
-                                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:bg-white/20 hover:text-white"
-                            >
-                                <span class="material-symbols-outlined text-base">settings</span>
-                                {{ __('Configuration') }}
-                            </a>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="w-full max-w-md rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur lg:max-w-sm">
@@ -161,25 +82,6 @@
                             </div>
                         </div>
 
-                        <div class="rounded-2xl border border-white/15 bg-white/10 p-4 text-sm text-white/80">
-                            <p class="font-semibold uppercase tracking-[0.3em] text-white/60">
-                                {{ __('Suivi rapide') }}
-                            </p>
-                            <ul class="mt-3 space-y-2 text-[13px] text-white/75">
-                                <li class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-base text-emerald-300">bolt</span>
-                                    {{ __('Retrouvez vos leviers prioritaires dans la section Actions.') }}
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-base text-indigo-300">hub</span>
-                                    {{ __('Visualisez l\'impact des formations depuis Statistiques.') }}
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-base text-sky-300">tune</span>
-                                    {{ __('Pilotez les paramètres essentiels via Configuration.') }}
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </div>

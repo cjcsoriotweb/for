@@ -28,8 +28,5 @@
         ></div>
     </div>
 
-    <span class="mt-3 inline-flex items-center text-xs font-medium text-blue-600 transition group-hover:text-blue-500 dark:text-blue-300 dark:group-hover:text-blue-200">
-        {{ __('Voir les profils') }}
-        <span class="material-symbols-outlined ml-2 text-base">arrow_outward</span>
-    </span>
+  
 </a>

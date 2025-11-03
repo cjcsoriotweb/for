@@ -31,9 +31,5 @@
                 style="width: {{ $formationsProgressWidth }}%;"
             ></div>
         </div>
-        <p class="flex items-center text-xs font-medium text-emerald-600 transition group-hover:text-emerald-500 dark:text-emerald-300 dark:group-hover:text-emerald-200">
-            <span class="material-symbols-outlined mr-2 text-base">schedule_send</span>
-            {{ __('Ajuster la visibilité ou publier de nouvelles sessions') }}
-        </p>
     </div>
 </a>

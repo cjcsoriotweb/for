@@ -5,9 +5,17 @@ use App\Http\Controllers\Clean\Account\AccountInvitationController;
 use App\Http\Controllers\Clean\Account\AccountPageController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])
-    ->get('/mes-tickets', [AccountPageController::class, 'tickets'])
-    ->name('user.tickets');
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/mes-tickets', [AccountPageController::class, 'tickets'])
+        ->name('user.tickets');
+
+    Route::get('/mes-tickets/nouveau', [AccountPageController::class, 'ticketsCreate'])
+        ->name('user.tickets.create');
+
+    Route::get('/mes-tickets/{ticket}', [AccountPageController::class, 'ticketsShow'])
+        ->whereNumber('ticket')
+        ->name('user.tickets.show');
+});
 
 Route::prefix('mon-compte')
     ->name('user.')
