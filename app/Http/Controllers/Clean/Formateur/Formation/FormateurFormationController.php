@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Formateur\Formation\UpdateFormationCoverImageRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationDescriptionRequest;
-use App\Http\Requests\Formateur\Formation\UpdateFormationPricingRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationTitleRequest;
 use App\Models\Formation;
@@ -102,19 +101,6 @@ class FormateurFormationController extends Controller
         $formation->update($updatePayload);
 
         return back()->with('success', 'Formation mise à jour avec succès.');
-    }
-
-    public function updatePricing(UpdateFormationPricingRequest $request, Formation $formation)
-    {
-        $formation->update([
-            'money_amount' => $request->money_amount ?? 0,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tarification mise à jour avec succès.',
-            'new_price' => $formation->fresh()->money_amount,
-        ]);
     }
 
     public function toggleStatus(Formation $formation)

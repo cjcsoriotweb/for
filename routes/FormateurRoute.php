@@ -37,7 +37,6 @@ Route::prefix('formateur')
             Route::put('/formation/{formation}/ai', [FormateurFormationAiController::class, 'update'])->name('formation.ai.update');
             // Routes IA supprimées - trainers sont maintenant dans config/ai.php
             Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
-            Route::put('/formation/{formation}/pricing', [FormateurFormationController::class, 'updatePricing'])->name('formation.pricing.update');
             Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');
             Route::get('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'index'])->name('formation.completion-documents.index');
             Route::post('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'store'])->name('formation.completion-documents.store');
