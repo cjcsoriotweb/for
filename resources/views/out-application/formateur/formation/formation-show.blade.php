@@ -122,7 +122,7 @@
                 <div>
                   <h3 class="text-base font-semibold text-slate-900">Modifier les informations</h3>
                   <p class="mt-1 text-sm text-slate-600">
-                    Actualisez le titre, la description et le visuel.
+                    Accédez aux pages dédiées pour ajuster le titre, la description ou le visuel.
                   </p>
                 </div>
               </div>

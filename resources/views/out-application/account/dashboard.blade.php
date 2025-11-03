@@ -33,7 +33,7 @@
         <div class="mb-16">
 
 
-          <div class="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
+          <div class="grid gap-8">
             @foreach ($organisations as $application)
             <x-forms.account.switch-application :application="$application" />
             @endforeach

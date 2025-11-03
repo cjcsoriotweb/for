@@ -18,7 +18,7 @@
                     Modifier la formation
                   </h3>
                   <p class="text-sm text-gray-600">
-                    Titre, description et paramètres
+                    Choisissez la section à mettre à jour : titre, description ou visuel.
                   </p>
                 </div>
               </div>
