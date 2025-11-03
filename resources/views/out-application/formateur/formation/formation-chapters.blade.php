@@ -27,7 +27,7 @@
               </p>
             </div>
             <div class="flex-shrink-0">
-              <form method="post" action="{{ route('formateur.formation.chapter.store', [$formation]) }}" class="inline">
+              <form method="post" action="{{ route('formateur.formation.chapter.store', ['formation' => $formation]) }}" class="inline">
                 @csrf
                 <button class="inline-flex items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +56,7 @@
         <p class="text-gray-500 mb-8 max-w-sm mx-auto">
           Commencez par créer votre premier chapitre pour structurer votre formation.
         </p>
-        <form action="{{ route('formateur.formation.chapter.store', $formation) }}" method="POST" class="inline">
+        <form action="{{ route('formateur.formation.chapter.store', ['formation' => $formation]) }}" method="POST" class="inline">
           @csrf
           <button
             class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
@@ -93,7 +93,7 @@
                 </div>
               </div>
               <div class="flex items-center space-x-3">
-                <a href="{{ route('formateur.formation.chapter.edit', [$formation, $chapter]) }}"
+                <a href="{{ route('formateur.formation.chapter.edit', ['formation' => $formation, 'chapter' => $chapter]) }}"
                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors duration-200">
                   <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -102,7 +102,7 @@
                   </svg>
                   Modifier
                 </a>
-                <form method="post" action="{{ route('formateur.formation.chapter.lesson.add', [$formation, $chapter]) }}" class="inline">
+                <form method="post" action="{{ route('formateur.formation.chapter.lesson.add', ['formation' => $formation, 'chapter' => $chapter]) }}" class="inline">
                   @csrf
                   <button class="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +126,7 @@
               <p class="text-gray-500 text-sm mb-6">
                 Ajoutez votre première leçon pour commencer à construire ce chapitre.
               </p>
-              <form method="post" action="{{ route('formateur.formation.chapter.lesson.add', [$formation, $chapter]) }}" class="inline">
+              <form method="post" action="{{ route('formateur.formation.chapter.lesson.add', ['formation' => $formation, 'chapter' => $chapter]) }}" class="inline">
                 @csrf
                 <button class="inline-flex items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,7 +210,7 @@
                 <div class="flex items-center space-x-1 ml-4 flex-shrink-0">
                   @if($lesson->lessonable)
                   @if($lesson->lessonable_type === 'App\Models\Quiz')
-                  <a href="{{ route('formateur.formation.chapter.lesson.quiz.edit', [$formation, $chapter, $lesson]) }}"
+                  <a href="{{ route('formateur.formation.chapter.lesson.quiz.edit', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 rounded-md transition-colors duration-200">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -218,7 +218,7 @@
                     Modifier
                   </a>
                   @elseif($lesson->lessonable_type === 'App\Models\VideoContent')
-                  <a href="{{ route('formateur.formation.chapter.lesson.video.edit', [$formation, $chapter, $lesson]) }}"
+                  <a href="{{ route('formateur.formation.chapter.lesson.video.edit', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 rounded-md transition-colors duration-200">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
@@ -226,7 +226,7 @@
                     Modifier
                   </a>
                   @elseif($lesson->lessonable_type === 'App\Models\TextContent')
-                  <a href="{{ route('formateur.formation.chapter.lesson.text.edit', [$formation, $chapter, $lesson]) }}"
+                  <a href="{{ route('formateur.formation.chapter.lesson.text.edit', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:text-blue-900 hover:bg-blue-50 rounded-md transition-colors duration-200">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -235,7 +235,7 @@
                   </a>
                   @endif
                   @else
-                  <a href="{{ route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson]) }}"
+                  <a href="{{ route('formateur.formation.chapter.lesson.define', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 rounded-md transition-colors duration-200"
                     title="Choisir le type de leçon (Quiz, Vidéo ou Texte)">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +246,7 @@
                   @endif
 
                   <!-- Delete Lesson Button -->
-                  <form method="POST" action="{{ route('formateur.formation.chapter.lesson.delete', [$formation, $chapter, $lesson]) }}" class="inline"
+                  <form method="POST" action="{{ route('formateur.formation.chapter.lesson.delete', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}" class="inline"
                     onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette leçon? Cette action est irréversible.')">
                     @csrf
                     <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-red-700 hover:text-red-900 hover:bg-red-50 rounded-md transition-colors duration-200">

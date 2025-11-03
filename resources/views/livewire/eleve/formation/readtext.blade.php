@@ -1,5 +1,5 @@
 <div
-    class="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg" style="position:fixed;bottom:0;left:0;width:100%"
+    class="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg" 
     wire:poll.1s="checkTimer"
 >
     <div class="flex items-center justify-between mb-4">
