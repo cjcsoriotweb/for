@@ -22,6 +22,13 @@ class FormateurFormationController extends Controller
         return view('out-application.formateur.formation.formation-show', compact('formation'));
     }
 
+    public function showFormationTeams(Formation $formation)
+    {
+        $formation->loadMissing(['teams:id,name']);
+
+        return view('out-application.formateur.formation.formation-teams', compact('formation'));
+    }
+
     public function editFormation(Formation $formation)
     {
         return view('out-application.formateur.formation.formation-edit', compact('formation'));

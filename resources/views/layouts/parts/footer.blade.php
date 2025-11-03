@@ -15,8 +15,8 @@
               <a href="#" class="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
                 {{ __("Confidentialité") }}
               </a>
-              <a href="#" class="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-                {{ __("Contact") }}
+              <a href="{{ route('user.tickets') }}" class="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                {{ __("Contact & Aide") }}
               </a>
             </nav>
 

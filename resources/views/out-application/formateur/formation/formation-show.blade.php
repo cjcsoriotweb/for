@@ -57,15 +57,8 @@
                   class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                   Modifier la formation
                 </a>
-                <a href="{{ route('formateur.formation.chapters.index', $formation) }}"
-                  class="inline-flex items-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                  Gerer les chapitres
-                </a>
-                <button type="button"
-                  class="inline-flex items-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  onclick="toggleTeamsModal(true)">
-                  Voir les equipes ({{ $teams->count() }})
-                </button>
+        
+       
               </div>
             </div>
 
@@ -110,29 +103,7 @@
           </div>
 
           <div class="mt-6 grid gap-4 sm:grid-cols-2">
-            <a href="{{ route('formateur.formation.edit', $formation) }}"
-              class="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 transition hover:border-indigo-200 hover:shadow-sm">
-              <div class="flex items-start gap-4">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </span>
-                <div>
-                  <h3 class="text-base font-semibold text-slate-900">Modifier les informations</h3>
-                  <p class="mt-1 text-sm text-slate-600">
-                    Accédez aux pages dédiées pour ajuster le titre, la description ou le visuel.
-                  </p>
-                </div>
-              </div>
-              <span class="mt-4 inline-flex items-center text-sm font-semibold text-indigo-600">
-                Ouvrir
-                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </span>
-            </a>
+         
 
             <a href="{{ route('formateur.formation.pricing.edit', $formation) }}"
               class="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 transition hover:border-indigo-200 hover:shadow-sm">
@@ -159,54 +130,7 @@
               </span>
             </a>
 
-            <a href="{{ route('formateur.formation.chapters.index', $formation) }}"
-              class="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 transition hover:border-indigo-200 hover:shadow-sm">
-              <div class="flex items-start gap-4">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </span>
-                <div>
-                  <h3 class="text-base font-semibold text-slate-900">Gerer les chapitres</h3>
-                  <p class="mt-1 text-sm text-slate-600">
-                    {{ $chapters->count() }} chapitre{{ $chapters->count() === 1 ? '' : 's' }} organises dans la
-                    formation.
-                  </p>
-                </div>
-              </div>
-              <span class="mt-4 inline-flex items-center text-sm font-semibold text-indigo-600">
-                Ouvrir
-                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </span>
-            </a>
 
-            <a href="{{ route('formateur.formation.entry-quiz.edit', $formation) }}"
-              class="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 transition hover:border-indigo-200 hover:shadow-sm">
-              <div class="flex items-start gap-4">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-purple-600">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </span>
-                <div>
-                  <h3 class="text-base font-semibold text-slate-900">Quiz d'entree</h3>
-                  <p class="mt-1 text-sm text-slate-600">
-                    {{ $entryQuiz ? 'Quiz configure avec ' . $entryQuiz->quizQuestions->count() . ' question(s).' : 'Aucun quiz configure pour l instant.' }}
-                  </p>
-                </div>
-              </div>
-              <span class="mt-4 inline-flex items-center text-sm font-semibold text-indigo-600">
-                {{ $entryQuiz ? 'Gerer le quiz' : 'Creer un quiz' }}
-                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </span>
-            </a>
           </div>
         </section>
 
@@ -244,14 +168,13 @@
             @endif
 
             <div class="mt-5">
-              <button type="button"
-                class="inline-flex items-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:text-indigo-700"
-                onclick="toggleTeamsModal(true)">
+              <a href="{{ route('formateur.formation.teams.index', $formation) }}"
+                class="inline-flex items-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:text-indigo-700">
                 Voir toutes les equipes
                 <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
-              </button>
+              </a>
             </div>
           </div>
 
@@ -301,89 +224,4 @@
     </div>
   </div>
 
-  <div id="teamsModal"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 px-4 py-6 backdrop-blur-sm">
-    <div class="w-full max-w-lg rounded-2xl bg-white shadow-xl">
-      <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-        <div>
-          <h3 class="text-lg font-semibold text-slate-900">Equipes rattachees</h3>
-          <p class="text-sm text-slate-500">
-            Liste complete des equipes qui utilisent cette formation.
-          </p>
-        </div>
-        <button type="button" class="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-          data-close>
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div class="max-h-96 overflow-y-auto px-6 py-5">
-        <ul class="space-y-3">
-          @forelse($teams as $team)
-            <li class="flex items-center justify-between rounded-lg border border-slate-100 px-4 py-3">
-              <div>
-                <p class="text-sm font-semibold text-slate-900">{{ $team->name }}</p>
-                <span class="text-xs text-slate-500">Equipe rattachee</span>
-              </div>
-              <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                ID #{{ $team->id }}
-              </span>
-            </li>
-          @empty
-            <li class="rounded-lg border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
-              Aucune equipe rattachee pour le moment.
-            </li>
-          @endforelse
-        </ul>
-      </div>
-
-      <div class="border-t border-slate-200 px-6 py-4 text-right">
-        <button type="button"
-          class="inline-flex items-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-indigo-200 hover:text-indigo-700"
-          data-close>
-          Fermer
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const modal = document.getElementById('teamsModal');
-
-      window.toggleTeamsModal = (show) => {
-        if (!modal) {
-          return;
-        }
-
-        if (show) {
-          modal.classList.remove('hidden');
-        } else {
-          modal.classList.add('hidden');
-        }
-
-        document.body.classList.toggle('overflow-hidden', show);
-      };
-
-      if (modal) {
-        modal.addEventListener('click', (event) => {
-          if (event.target === modal) {
-            toggleTeamsModal(false);
-          }
-        });
-
-        modal.querySelectorAll('[data-close]').forEach((button) => {
-          button.addEventListener('click', () => toggleTeamsModal(false));
-        });
-
-        document.addEventListener('keydown', (event) => {
-          if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
-            toggleTeamsModal(false);
-          }
-        });
-      }
-    });
-  </script>
 </x-app-layout>

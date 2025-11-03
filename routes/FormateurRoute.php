@@ -24,6 +24,7 @@ Route::prefix('formateur')
         // ici middleware admin
         Route::middleware(FormateurOwner::class)->group(function () {
             Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show');
+            Route::get('/formation/{formation}/teams', [FormateurFormationController::class, 'showFormationTeams'])->name('formation.teams.index');
             Route::get('/formation/{formation}/edit', [FormateurFormationController::class, 'editFormation'])->name('formation.edit');
             Route::get('/formation/{formation}/edit/title', [FormateurFormationController::class, 'editFormationTitle'])->name('formation.edit.title');
             Route::put('/formation/{formation}/edit/title', [FormateurFormationController::class, 'updateFormationTitle'])->name('formation.update.title');
@@ -46,6 +47,8 @@ Route::prefix('formateur')
             Route::get('/formation/{formation}/entry-quiz', [FormationEntryQuizController::class, 'edit'])->name('formation.entry-quiz.edit');
             Route::post('/formation/{formation}/entry-quiz', [FormationEntryQuizController::class, 'store'])->name('formation.entry-quiz.store');
             Route::get('/formation/{formation}/entry-quiz/questions', [FormationEntryQuizController::class, 'manageQuestions'])->name('formation.entry-quiz.questions');
+            Route::get('/formation/{formation}/entry-quiz/questions/create', [FormationEntryQuizController::class, 'createQuestion'])->name('formation.entry-quiz.questions.create');
+            Route::get('/formation/{formation}/entry-quiz/questions/{question}/edit', [FormationEntryQuizController::class, 'editQuestion'])->name('formation.entry-quiz.questions.edit');
             Route::post('/formation/{formation}/entry-quiz/questions', [FormationEntryQuizController::class, 'storeQuestion'])->name('formation.entry-quiz.questions.store');
             Route::put('/formation/{formation}/entry-quiz/questions/{question}', [FormationEntryQuizController::class, 'updateQuestion'])->name('formation.entry-quiz.questions.update');
             Route::delete('/formation/{formation}/entry-quiz/questions/{question}', [FormationEntryQuizController::class, 'deleteQuestion'])->name('formation.entry-quiz.questions.delete');

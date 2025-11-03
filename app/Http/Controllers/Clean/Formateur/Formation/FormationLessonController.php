@@ -297,7 +297,7 @@ class FormationLessonController
 
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
-        return view('in-application.formateur.formation.chapter.lesson.manage-questions', compact('formation', 'chapter', 'lesson', 'quiz', 'questions'));
+        return view('out-application.formateur.formation.chapter.lesson.manage-questions', compact('formation', 'chapter', 'lesson', 'quiz', 'questions'));
     }
 
     public function storeQuestion(Formation $formation, Chapter $chapter, Lesson $lesson, \App\Models\Quiz $quiz)
@@ -414,7 +414,7 @@ class FormationLessonController
                 ->withErrors(['error' => 'Vidéo non trouvée pour cette leçon.']);
         }
 
-        return view('in-application.formateur.formation.chapter.lesson.edit-video', compact('formation', 'chapter', 'lesson', 'videoContent'));
+        return view('out-application.formateur.formation.chapter.lesson.edit-video', compact('formation', 'chapter', 'lesson', 'videoContent'));
     }
 
     public function updateVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
@@ -468,7 +468,7 @@ class FormationLessonController
 
         $textContent->load('attachments');
 
-        return view('in-application.formateur.formation.chapter.lesson.edit-text', compact('formation', 'chapter', 'lesson', 'textContent'));
+        return view('out-application.formateur.formation.chapter.lesson.edit-text', compact('formation', 'chapter', 'lesson', 'textContent'));
     }
 
     public function updateText(Formation $formation, Chapter $chapter, Lesson $lesson)

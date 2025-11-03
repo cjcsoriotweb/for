@@ -1,31 +1,49 @@
-<div class="flex h-full flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-    <header class="border-b border-white/10 px-6 py-5">
-        <div class="flex items-start justify-between gap-4">
-            <div>
-                <p class="text-xs uppercase tracking-[0.35em] text-slate-400">Centre support</p>
-                <h1 class="mt-2 text-xl font-semibold text-white">Signaler un bug</h1>
-                <p class="mt-1 text-sm text-slate-300">
-                    Faites-nous part d un dysfonctionnement et suivez vos echanges avec l equipe support directement depuis ce dock.
+<div class="flex h-full flex-col text-white">
+    <!-- Header Section -->
+    <header class="relative overflow-hidden border-b border-white/10 px-6 py-6">
+        <!-- Background gradient overlay -->
+        <div class="absolute inset-0 bg-gradient-to-r from-sky-500/5 via-transparent to-purple-500/5"></div>
+
+        <div class="relative flex items-start justify-between gap-4">
+            <div class="flex-1">
+                <div class="inline-flex items-center gap-2 rounded-full bg-sky-500/10 border border-sky-400/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-sky-300">
+                    <span class="material-symbols-outlined text-sm">support</span>
+                    Centre support
+                </div>
+                <h1 class="mt-3 text-2xl font-bold text-white">Signaler un bug</h1>
+                <p class="mt-2 text-sm text-slate-300 leading-relaxed">
+                    Faites-nous part d'un dysfonctionnement et suivez vos échanges avec l'équipe support directement depuis ce dock.
                 </p>
             </div>
-            <div class="hidden shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 shadow-lg backdrop-blur sm:flex">
-                <svg class="h-9 w-9 text-sky-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 6.75 2.25 2.25-2.25 2.25m3-4.5 2.25 2.25-2.25 2.25M6 18h6m-6-3h6m2.24-.94 1.42 1.42a1.5 1.5 0 0 0 2.12 0l1.06-1.06a1.5 1.5 0 0 0 0-2.12l-7.07-7.07a3 3 0 0 0-4.24 0L6.56 7.94a3 3 0 0 0 0 4.24l1.42 1.42" />
-                </svg>
+            <div class="hidden shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-gradient-to-br from-sky-500/10 to-purple-500/10 p-4 shadow-xl backdrop-blur-xl sm:flex">
+                <span class="material-symbols-outlined text-4xl text-sky-300">bug_report</span>
             </div>
         </div>
+
+        <!-- Decorative bottom accent -->
+        <div class="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-sky-400/30 to-transparent"></div>
     </header>
 
     <div class="flex-1 overflow-y-auto px-6 pb-6">
         <div class="space-y-6">
           
-            <div class="rounded-2xl border border-white/10 bg-white/5 shadow-xl shadow-slate-950/40 backdrop-blur">
-                <div class="flex items-center justify-between gap-3 border-b border-white/10 px-6 py-4">
+            <!-- Existing Tickets Section -->
+            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
+                <!-- Subtle background pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
+                </div>
+
+                <div class="relative flex items-center justify-between gap-3 border-b border-white/10 px-6 py-5">
                     <div>
-                        <h2 class="text-base font-semibold text-white">Mes tickets</h2>
-                        <p class="text-xs text-slate-300">Suivez les reponses du support et fournissez des informations supplementaires.</p>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg text-sky-300">forum</span>
+                            <h2 class="text-lg font-semibold text-white">Mes tickets</h2>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-400">Suivez les réponses du support et fournissez des informations supplémentaires.</p>
                     </div>
-                    <span class="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-200">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/20 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-sky-200">
+                        <span class="material-symbols-outlined text-sm">confirmation_number</span>
                         @choice(':count ticket|:count tickets', count($recentTickets), ['count' => count($recentTickets)])
                     </span>
                 </div>
@@ -46,21 +64,43 @@
                                 type="button"
                                 wire:key="ticket-{{ $ticket['id'] }}"
                                 wire:click="selectTicket({{ $ticket['id'] }})"
-                                class="group flex min-w-[220px] flex-1 cursor-pointer flex-col gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:border-sky-300/60 hover:bg-sky-400/10 {{ $activeTicketId === $ticket['id'] ? 'border-sky-400/70 bg-sky-500/15 shadow-lg shadow-sky-900/40' : '' }}"
+                                class="group relative flex min-w-[240px] flex-1 cursor-pointer flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left transition-all duration-300 hover:border-sky-400/50 hover:bg-sky-500/10 hover:shadow-lg hover:shadow-sky-500/10 focus:outline-none focus:ring-2 focus:ring-sky-400/50 {{ $activeTicketId === $ticket['id'] ? 'border-sky-400/70 bg-sky-500/20 shadow-lg shadow-sky-500/20' : '' }}"
                             >
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="line-clamp-1 text-sm font-semibold text-white">{{ $ticket['subject'] }}</p>
-                                    <span class="shrink-0 rounded-full border {{ $statusColors[$ticket['status']] ?? 'border-slate-300/30 bg-slate-400/15 text-slate-200' }} px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
+                                <!-- Active indicator -->
+                                @if ($activeTicketId === $ticket['id'])
+                                    <div class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-sky-400 shadow-lg"></div>
+                                @endif
+
+                                <div class="flex items-start justify-between gap-3">
+                                    <p class="line-clamp-2 text-sm font-semibold text-white group-hover:text-sky-50 transition-colors duration-200">{{ $ticket['subject'] }}</p>
+                                    <span class="shrink-0 rounded-full border {{ $statusColors[$ticket['status']] ?? 'border-slate-300/30 bg-slate-400/15 text-slate-200' }} px-2.5 py-1 text-xs font-semibold uppercase tracking-wide">
                                         {{ $ticket['status_label'] }}
                                     </span>
                                 </div>
-                                <p class="text-[11px] text-slate-300">
-                                    Cree {{ $ticket['created_at_human'] ?? '' }}<span class="mx-1 text-slate-500">•</span>Derniere activite {{ $ticket['last_message_human'] ?? '' }}
-                                </p>
+
+                                <div class="flex items-center justify-between text-xs text-slate-300">
+                                    <span class="inline-flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">schedule</span>
+                                        {{ $ticket['created_at_human'] ?? '' }}
+                                    </span>
+                                    <span class="inline-flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">update</span>
+                                        {{ $ticket['last_message_human'] ?? '' }}
+                                    </span>
+                                </div>
+
+                                <!-- Hover indicator -->
+                                <div class="absolute bottom-2 right-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                                    <span class="material-symbols-outlined text-lg text-sky-300">arrow_forward</span>
+                                </div>
                             </button>
                         @empty
-                            <div class="flex min-h-[120px] w-full items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-6 text-sm text-slate-300">
-                                Aucun ticket pour le moment. Vos conversations apparaitront ici.
+                            <div class="flex min-h-[140px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-gradient-to-br from-slate-700/30 to-slate-600/20 px-6 py-8 text-center">
+                                <div class="mb-3 rounded-full bg-sky-500/20 p-3">
+                                    <span class="material-symbols-outlined text-2xl text-sky-300">forum</span>
+                                </div>
+                                <p class="text-sm font-medium text-slate-300">Aucun ticket pour le moment</p>
+                                <p class="text-xs text-slate-400 mt-1">Vos conversations apparaîtront ici.</p>
                             </div>
                         @endforelse
                     </div>
@@ -140,17 +180,20 @@
                             @endif
                         </div>
                     </div>
-                      <div class="rounded-2xl border border-white/10 bg-white/5 shadow-xl shadow-slate-950/40 backdrop-blur">
-                <div class="flex items-center gap-3 border-b border-white/10 px-6 py-4">
-                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-sky-400/20 text-sky-200">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376 7.907-13.68c.564-.976 1.986-.97 2.543.01l7.763 13.68c.55.968-.147 2.19-1.27 2.19H3.02c-1.11 0-1.807-1.194-1.32-2.2Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75h.007v.007H12v-.007Z" />
-                        </svg>
-                    </span>
+            <!-- New Ticket Section -->
+            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/60 to-slate-700/40 shadow-xl backdrop-blur-sm">
+                <!-- Subtle background pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:20px_20px]"></div>
+                </div>
+
+                <div class="relative flex items-center gap-3 border-b border-white/10 px-6 py-5">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-red-500/20 border border-amber-400/30">
+                        <span class="material-symbols-outlined text-xl text-amber-300">bug_report</span>
+                    </div>
                     <div>
-                        <h2 class="text-base font-semibold text-white">Nouveau signalement</h2>
-                        <p class="text-xs text-slate-300">Expliquez ce qui s est passe, nous analysons generalement sous 24h.</p>
+                        <h2 class="text-lg font-semibold text-white">Nouveau signalement</h2>
+                        <p class="text-xs text-slate-300">Expliquez ce qui s'est passé, nous analysons généralement sous 24h.</p>
                     </div>
                 </div>
 

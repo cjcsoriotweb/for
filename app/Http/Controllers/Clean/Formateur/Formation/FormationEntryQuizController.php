@@ -53,7 +53,7 @@ class FormationEntryQuizController
 
         return redirect()
             ->route('formateur.formation.entry-quiz.questions', $formation)
-            ->with('success', 'Quiz d’entrée enregistré. Vous pouvez maintenant ajouter des questions.');
+            ->with('success', 'Quiz d entree enregistre. Vous pouvez maintenant ajouter des questions.');
     }
 
     public function manageQuestions(Formation $formation)
@@ -65,12 +65,49 @@ class FormationEntryQuizController
         if (! $quiz) {
             return redirect()
                 ->route('formateur.formation.entry-quiz.edit', $formation)
-                ->withErrors(['error' => 'Veuillez d’abord créer le quiz d’entrée.']);
+                ->withErrors(['error' => 'Veuillez d abord creer le quiz d entree.']);
         }
 
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
         return view('out-application.formateur.formation.entry-quiz.manage-questions', compact('formation', 'quiz', 'questions'));
+    }
+
+    public function createQuestion(Formation $formation)
+    {
+        $quiz = $formation->entryQuiz;
+
+        if (! $quiz) {
+            return redirect()
+                ->route('formateur.formation.entry-quiz.edit', $formation)
+                ->withErrors(['error' => 'Veuillez d abord creer le quiz d entree.']);
+        }
+
+        return view('out-application.formateur.formation.entry-quiz.create-question', compact('formation', 'quiz'));
+    }
+
+    public function editQuestion(Formation $formation, QuizQuestion $question)
+    {
+        $quiz = $formation->entryQuiz;
+
+        if (! $quiz || $question->quiz_id !== $quiz->id) {
+            return redirect()
+                ->route('formateur.formation.entry-quiz.questions', $formation)
+                ->withErrors(['error' => 'Question introuvable pour ce quiz.']);
+        }
+
+        $question->load('quizChoices');
+
+        return view('out-application.formateur.formation.entry-quiz.edit-question', [
+            'formation' => $formation,
+            'quiz' => $quiz,
+            'question' => $question,
+            'choices' => $question->quizChoices->map(fn (QuizChoice $choice) => [
+                'id' => $choice->id,
+                'text' => $choice->choice_text,
+                'is_correct' => (bool) $choice->is_correct,
+            ]),
+        ]);
     }
 
     public function storeQuestion(Formation $formation, Request $request)
@@ -80,7 +117,7 @@ class FormationEntryQuizController
         if (! $quiz) {
             return redirect()
                 ->route('formateur.formation.entry-quiz.edit', $formation)
-                ->withErrors(['error' => 'Veuillez d’abord créer le quiz d’entrée.']);
+                ->withErrors(['error' => 'Veuillez d abord creer le quiz d entree.']);
         }
 
         $validated = $request->validate([
@@ -92,7 +129,7 @@ class FormationEntryQuizController
         $choices = json_decode($validated['choices'], true);
 
         if (! $choices || ! is_array($choices)) {
-            return back()->withInput()->withErrors(['error' => 'Format des réponses invalide.']);
+            return back()->withInput()->withErrors(['error' => 'Format des reponses invalide.']);
         }
 
         DB::beginTransaction();
@@ -114,12 +151,14 @@ class FormationEntryQuizController
 
             DB::commit();
 
-            return back()->with('success', 'Question ajoutée avec succès.');
+            return redirect()
+                ->route('formateur.formation.entry-quiz.questions', $formation)
+                ->with('success', 'Question ajoutee avec succes.');
         } catch (\Exception $e) {
             DB::rollBack();
 
             return back()->withInput()->withErrors([
-                'error' => 'Erreur lors de l’ajout de la question : '.$e->getMessage(),
+                'error' => 'Erreur lors de l ajout de la question : '.$e->getMessage(),
             ]);
         }
     }
@@ -141,7 +180,7 @@ class FormationEntryQuizController
         $choices = json_decode($validated['choices'], true);
 
         if (! $choices || ! is_array($choices)) {
-            return back()->withInput()->withErrors(['error' => 'Format des réponses invalide.']);
+            return back()->withInput()->withErrors(['error' => 'Format des reponses invalide.']);
         }
 
         DB::beginTransaction();
@@ -164,12 +203,14 @@ class FormationEntryQuizController
 
             DB::commit();
 
-            return back()->with('success', 'Question mise à jour avec succès.');
+            return redirect()
+                ->route('formateur.formation.entry-quiz.questions', $formation)
+                ->with('success', 'Question mise a jour avec succes.');
         } catch (\Exception $e) {
             DB::rollBack();
 
             return back()->withInput()->withErrors([
-                'error' => 'Erreur lors de la mise à jour de la question : '.$e->getMessage(),
+                'error' => 'Erreur lors de la mise a jour de la question : '.$e->getMessage(),
             ]);
         }
     }
@@ -184,6 +225,8 @@ class FormationEntryQuizController
 
         $question->delete();
 
-        return back()->with('success', 'Question supprimée avec succès.');
+        return redirect()
+            ->route('formateur.formation.entry-quiz.questions', $formation)
+            ->with('success', 'Question supprimee avec succes.');
     }
 }
