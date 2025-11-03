@@ -8,6 +8,9 @@ use App\Http\Requests\Formateur\Formation\UpdateFormationDescriptionRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationTitleRequest;
 use App\Models\Formation;
+use App\Models\Quiz;
+use App\Models\TextContent;
+use App\Models\VideoContent;
 use App\Services\FormationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -72,7 +75,30 @@ class FormateurFormationController extends Controller
 
     public function editPricing(Formation $formation)
     {
-        return view('out-application.formateur.formation.formation-pricing', compact('formation'));
+        $formation->load([
+            'chapters' => fn ($query) => $query->orderBy('position'),
+            'chapters.lessons' => fn ($query) => $query->orderBy('position'),
+            'chapters.lessons.lessonable',
+            'entryQuiz',
+        ]);
+
+        $lessons = $formation->chapters
+            ->flatMap(fn ($chapter) => $chapter->lessons)
+            ->filter(fn ($lesson) => $lesson->lessonable_type !== null)
+            ->values();
+
+        $groupedLessons = $lessons->groupBy('lessonable_type');
+
+        $lessonGroups = [
+            'quizzes' => $groupedLessons->get(Quiz::class, collect()),
+            'videos' => $groupedLessons->get(VideoContent::class, collect()),
+            'texts' => $groupedLessons->get(TextContent::class, collect()),
+        ];
+
+        return view('out-application.formateur.formation.formation-pricing', [
+            'formation' => $formation,
+            'lessonGroups' => $lessonGroups,
+        ]);
     }
 
     public function manageChapters(Formation $formation)
