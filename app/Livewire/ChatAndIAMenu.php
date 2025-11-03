@@ -6,7 +6,6 @@ use App\Models\AiTrainer;
 use App\Models\Chat;
 use App\Models\Formation;
 use App\Models\User;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -109,14 +108,10 @@ class ChatAndIAMenu extends Component
         $this->active = null;
     }
 
-    protected function updateNotificationCounter(bool $refreshUnread = false, bool $refreshAi = false): void
+    protected function updateNotificationCounter(bool $refreshUnread = false): void
     {
         if ($refreshUnread) {
             unset($this->unreadNotificationsCount, $this->userNotifications, $this->formattedNotifications);
-        }
-
-        if ($refreshAi) {
-            unset($this->pendingAiNotifications);
         }
 
         if (! Auth::check()) {
@@ -125,7 +120,7 @@ class ChatAndIAMenu extends Component
             return;
         }
 
-        $this->notifications = $this->unreadNotificationsCount + $this->pendingAiNotifications->count();
+        $this->notifications = $this->unreadNotificationsCount;
     }
 
     protected function markNotificationsAsRead(): void
@@ -138,7 +133,7 @@ class ChatAndIAMenu extends Component
 
         unset($this->userNotifications, $this->formattedNotifications, $this->unreadNotificationsCount);
 
-        $this->updateNotificationCounter(true, false);
+        $this->updateNotificationCounter(true);
     }
 
     public function markNotificationAsRead(string $notificationId): void
@@ -165,7 +160,7 @@ class ChatAndIAMenu extends Component
 
         unset($this->userNotifications, $this->formattedNotifications, $this->unreadNotificationsCount);
 
-        $this->updateNotificationCounter(true, false);
+        $this->updateNotificationCounter(true);
     }
 
     public function loadPendingContacts()
@@ -174,79 +169,9 @@ class ChatAndIAMenu extends Component
         unset($this->pendingContacts);
     }
 
-    public function refreshAiNotifications(): void
+    public function refreshNotifications(): void
     {
-        $this->updateNotificationCounter(false, true);
-    }
-
-    public function dismissAiNotification(int $messageId): void
-    {
-        if (! Auth::check()) {
-            return;
-        }
-
-        $userId = (int) Auth::id();
-
-        $assistantMessage = Chat::query()
-            ->where('id', $messageId)
-            ->where('receiver_user_id', $userId)
-            ->whereNotNull('sender_ia_id')
-            ->first();
-
-        if (! $assistantMessage) {
-            return;
-        }
-
-        $this->clearAiNotification($assistantMessage);
-        $this->updateNotificationCounter(false, true);
-    }
-
-    public function dismissAllAiNotifications(): void
-    {
-        if (! Auth::check()) {
-            return;
-        }
-
-        $clearedAt = now()->toIso8601String();
-
-        $this->pendingAiNotifications->each(function (Chat $assistantMessage) use ($clearedAt) {
-            $this->clearAiNotification($assistantMessage, $clearedAt);
-        });
-
-        $this->updateNotificationCounter(false, true);
-    }
-
-    protected function clearAiNotification(Chat $assistantMessage, ?string $timestamp = null): void
-    {
-        $userId = (int) Auth::id();
-        if ($assistantMessage->receiver_user_id !== $userId) {
-            return;
-        }
-
-        $clearedAt = $timestamp ?? now()->toIso8601String();
-
-        $assistantMetadata = $assistantMessage->metadata ?? [];
-        Arr::set($assistantMetadata, 'ai.notification_cleared', true);
-        Arr::set($assistantMetadata, 'ai.notification_cleared_at', $clearedAt);
-
-        $assistantMessage->forceFill(['metadata' => $assistantMetadata])->save();
-
-        $originalMessageId = (int) Arr::get($assistantMetadata, 'ai.original_message_id');
-
-        if ($originalMessageId > 0) {
-            $sourceMessage = Chat::query()
-                ->where('id', $originalMessageId)
-                ->where('sender_user_id', $userId)
-                ->first();
-
-            if ($sourceMessage) {
-                $sourceMetadata = $sourceMessage->metadata ?? [];
-                Arr::set($sourceMetadata, 'ai.notification_cleared', true);
-                Arr::set($sourceMetadata, 'ai.notification_cleared_at', $clearedAt);
-
-                $sourceMessage->forceFill(['metadata' => $sourceMetadata])->save();
-            }
-        }
+        $this->updateNotificationCounter(true);
     }
 
     public function markAllNotificationsAsRead(): void
@@ -260,7 +185,7 @@ class ChatAndIAMenu extends Component
 
         unset($this->userNotifications, $this->formattedNotifications, $this->unreadNotificationsCount);
 
-        $this->updateNotificationCounter(true, false);
+        $this->updateNotificationCounter(true);
     }
 
     public function addContactByEmail(): void
@@ -441,62 +366,6 @@ class ChatAndIAMenu extends Component
                 return optional($contact->latest_message)->created_at;
             })
             ->values();
-    }
-
-    public function getPendingAiNotificationsProperty()
-    {
-        if (! Auth::check()) {
-            return collect();
-        }
-
-        $userId = (int) Auth::id();
-
-        $aiMessages = Chat::query()
-            ->with(['senderIa'])
-            ->where('receiver_user_id', $userId)
-            ->whereNull('sender_user_id')
-            ->whereNotNull('sender_ia_id')
-            ->where(function ($query) {
-                $query->whereNull('metadata->ai->notification_cleared')
-                    ->orWhere('metadata->ai->notification_cleared', false);
-            })
-            ->latest('created_at')
-            ->limit(20)
-            ->get();
-
-        if ($aiMessages->isEmpty()) {
-            return collect();
-        }
-
-        $originalIds = $aiMessages->map(function (Chat $message) {
-            return Arr::get($message->metadata, 'ai.original_message_id');
-        })->filter()->unique();
-
-        $originalMessages = $originalIds->isNotEmpty()
-            ? Chat::query()->whereIn('id', $originalIds)->get()->keyBy('id')
-            : collect();
-
-        return $aiMessages->map(function (Chat $message) use ($originalMessages) {
-            $metadata = $message->metadata ?? [];
-            $originalId = Arr::get($metadata, 'ai.original_message_id');
-            $source = $originalId ? $originalMessages->get($originalId) : null;
-
-            $preview = Str::of((string) $message->content)->trim()->limit(160, '...')->toString();
-            $sourcePreview = $source
-                ? Str::of((string) $source->content)->trim()->limit(150, '...')->toString()
-                : null;
-
-            return (object) [
-                'id' => $message->id,
-                'assistant_id' => $message->sender_ia_id,
-                'assistant_name' => $message->senderIa?->name ?? 'Assistant IA',
-                'assistant_description' => $message->senderIa?->description ?? null,
-                'preview' => $preview,
-                'source_preview' => $sourcePreview,
-                'contact_id' => $message->sender_ia_id ? 'ai_'.$message->sender_ia_id : null,
-                'created_at' => $message->created_at,
-            ];
-        });
     }
 
     public function getConversationContactsProperty()
