@@ -25,6 +25,12 @@ Route::prefix('formateur')
         Route::middleware(FormateurOwner::class)->group(function () {
             Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show');
             Route::get('/formation/{formation}/edit', [FormateurFormationController::class, 'editFormation'])->name('formation.edit');
+            Route::get('/formation/{formation}/edit/title', [FormateurFormationController::class, 'editFormationTitle'])->name('formation.edit.title');
+            Route::put('/formation/{formation}/edit/title', [FormateurFormationController::class, 'updateFormationTitle'])->name('formation.update.title');
+            Route::get('/formation/{formation}/edit/description', [FormateurFormationController::class, 'editFormationDescription'])->name('formation.edit.description');
+            Route::put('/formation/{formation}/edit/description', [FormateurFormationController::class, 'updateFormationDescription'])->name('formation.update.description');
+            Route::get('/formation/{formation}/edit/cover', [FormateurFormationController::class, 'editFormationCoverImage'])->name('formation.edit.cover');
+            Route::put('/formation/{formation}/edit/cover', [FormateurFormationController::class, 'updateFormationCoverImage'])->name('formation.update.cover');
             Route::get('/formation/{formation}/pricing', [FormateurFormationController::class, 'editPricing'])->name('formation.pricing.edit');
             Route::get('/formation/{formation}/chapters', [FormateurFormationController::class, 'manageChapters'])->name('formation.chapters.index');
             Route::get('/formation/{formation}/ai', [FormateurFormationAiController::class, 'edit'])->name('formation.ai.edit');

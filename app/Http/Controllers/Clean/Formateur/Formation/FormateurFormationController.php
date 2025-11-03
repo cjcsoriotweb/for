@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Formateur\Formation\UpdateFormationCoverImageRequest;
+use App\Http\Requests\Formateur\Formation\UpdateFormationDescriptionRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationPricingRequest;
 use App\Http\Requests\Formateur\Formation\UpdateFormationRequest;
+use App\Http\Requests\Formateur\Formation\UpdateFormationTitleRequest;
 use App\Models\Formation;
 use App\Services\FormationService;
 use Illuminate\Http\Request;
@@ -20,6 +23,52 @@ class FormateurFormationController extends Controller
     public function editFormation(Formation $formation)
     {
         return view('out-application.formateur.formation.formation-edit', compact('formation'));
+    }
+
+    public function editFormationTitle(Formation $formation)
+    {
+        return view('out-application.formateur.formation.edit.title', compact('formation'));
+    }
+
+    public function updateFormationTitle(UpdateFormationTitleRequest $request, Formation $formation)
+    {
+        $formation->update([
+            'title' => $request->title,
+        ]);
+
+        return back()->with('success', 'Titre mis à jour avec succès.');
+    }
+
+    public function editFormationDescription(Formation $formation)
+    {
+        return view('out-application.formateur.formation.edit.description', compact('formation'));
+    }
+
+    public function updateFormationDescription(UpdateFormationDescriptionRequest $request, Formation $formation)
+    {
+        $formation->update([
+            'description' => $request->description,
+        ]);
+
+        return back()->with('success', 'Description mise à jour avec succès.');
+    }
+
+    public function editFormationCoverImage(Formation $formation)
+    {
+        return view('out-application.formateur.formation.edit.cover-image', compact('formation'));
+    }
+
+    public function updateFormationCoverImage(UpdateFormationCoverImageRequest $request, Formation $formation)
+    {
+        if ($formation->cover_image_path && Storage::disk('public')->exists($formation->cover_image_path)) {
+            Storage::disk('public')->delete($formation->cover_image_path);
+        }
+
+        $formation->update([
+            'cover_image_path' => $request->file('cover_image')->store('formations/covers', 'public'),
+        ]);
+
+        return back()->with('success', 'Image de couverture mise à jour avec succès.');
     }
 
     public function editPricing(Formation $formation)

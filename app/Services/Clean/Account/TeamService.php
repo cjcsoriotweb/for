@@ -38,17 +38,6 @@ class TeamService
 
         }
 
-        if ($user->formateur) {
-            $destinations[] = [
-                'key' => 'formateur',
-                'badge' => __('Formateur'),
-                'title' => __('Studio de cours'),
-                'description' => __('Creer et mettre a jour les contenus pedagogiques de l equipe.'),
-                'icon' => 'draw',
-                'gradient' => 'from-amber-500 via-orange-500 to-rose-500',
-                'route' => route('formateur.home', ['team' => $team]),
-            ];
-        }
         if ($user->hasTeamRole($team, 'manager')) {
             $destinations[] = [
                 'key' => 'manager',

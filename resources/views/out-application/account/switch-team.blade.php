@@ -44,7 +44,7 @@
                     $hasMultipleDestinations = count($destinations) > 1;
                 @endphp
 
-                <div class="grid gap-6 sm:grid-cols-2">
+                <div class="grid gap-6 sm:grid-cols-1">
                     @foreach ($destinations as $destination)
                         @php
                             $isSelected = $selectedRole === $destination['key'];
