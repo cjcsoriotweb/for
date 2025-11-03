@@ -223,6 +223,39 @@ class FormationLessonController
         return view('out-application.formateur.formation.chapter.lesson.edit-quiz', compact('formation', 'chapter', 'lesson', 'quiz'));
     }
 
+    public function editQuizTitle(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $quiz = $lesson->lessonable;
+        if (! $quiz || ! ($quiz instanceof \App\Models\Quiz)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
+        }
+
+        return view('out-application.formateur.formation.chapter.lesson.edit-quiz-title', compact('formation', 'chapter', 'lesson', 'quiz'));
+    }
+
+    public function editQuizDescription(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $quiz = $lesson->lessonable;
+        if (! $quiz || ! ($quiz instanceof \App\Models\Quiz)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
+        }
+
+        return view('out-application.formateur.formation.chapter.lesson.edit-quiz-description', compact('formation', 'chapter', 'lesson', 'quiz'));
+    }
+
+    public function editQuizSettings(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $quiz = $lesson->lessonable;
+        if (! $quiz || ! ($quiz instanceof \App\Models\Quiz)) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
+        }
+
+        return view('out-application.formateur.formation.chapter.lesson.edit-quiz-settings', compact('formation', 'chapter', 'lesson', 'quiz'));
+    }
+
     public function updateQuiz(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $quiz = $lesson->lessonable;

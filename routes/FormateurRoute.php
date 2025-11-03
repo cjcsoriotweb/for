@@ -70,6 +70,9 @@ Route::prefix('formateur')
             Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/create', [FormationLessonController::class, 'createQuiz'])->name('formation.chapter.lesson.quiz.create');
             Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/create', [FormationLessonController::class, 'storeQuiz'])->name('formation.chapter.lesson.quiz.store');
             Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/edit', [FormationLessonController::class, 'editQuiz'])->name('formation.chapter.lesson.quiz.edit');
+            Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/edit/title', [FormationLessonController::class, 'editQuizTitle'])->name('formation.chapter.lesson.quiz.edit.title');
+            Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/edit/description', [FormationLessonController::class, 'editQuizDescription'])->name('formation.chapter.lesson.quiz.edit.description');
+            Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/edit/settings', [FormationLessonController::class, 'editQuizSettings'])->name('formation.chapter.lesson.quiz.edit.settings');
             Route::put('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/edit', [FormationLessonController::class, 'updateQuiz'])->name('formation.chapter.lesson.quiz.update');
 
             // Quiz Questions Management

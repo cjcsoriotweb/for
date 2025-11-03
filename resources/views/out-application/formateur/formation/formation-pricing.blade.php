@@ -171,14 +171,6 @@
               </a>
 
               <div class="flex space-x-4">
-                <button type="button" onclick="resetToFree()"
-                  class="inline-flex items-center px-6 py-3 text-lg font-medium text-emerald-700 hover:text-white hover:bg-emerald-600 bg-emerald-50 border-emerald-200 hover:border-emerald-600 rounded-xl transition-all duration-200 border">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Rendre gratuit
-                </button>
-
                 <button type="submit"
                   class="inline-flex items-center px-8 py-3 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
                   <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,13 +251,7 @@
         return s.join(dec);
       }
 
-      function resetToFree() {
-        if (confirm('Êtes-vous sûr de vouloir rendre cette formation gratuite ? Le prix sera remis à 0€.')) {
-          document.querySelector('input[name="pricing_type"][value="free"]').checked = true;
-          document.getElementById('money_amount').value = '0';
-          document.querySelector('.pricing-field').style.display = 'none';
-        }
-      }
+
 
       // Handle form submission
       document.getElementById("pricingForm").addEventListener("submit", function (e) {
