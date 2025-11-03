@@ -2,7 +2,7 @@
     use Carbon\Carbon;
 @endphp
 
-<x-application-layout :team="$team">
+<x-app-layout :team="$team">
     <x-slot name="header">
         <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
@@ -249,4 +249,4 @@
             </aside>
         </div>
     </div>
-</x-application-layout>
+</x-app-layout>

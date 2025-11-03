@@ -10,7 +10,7 @@
     $enrollmentStatus = $statusLabels[$enrollment->status] ?? $statusLabels['enrolled'];
 @endphp
 
-<x-application-layout :team="$team">
+<x-app-layout :team="$team">
     <x-slot name="header">
         <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
@@ -226,4 +226,4 @@
             </aside>
         </div>
     </div>
-</x-application-layout>
+</x-app-layout>

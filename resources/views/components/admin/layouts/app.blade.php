@@ -90,8 +90,8 @@
 
 @php($headerHasOwnActions = true)
 
-<x-application-layout :team="$team">
-    <x-slot name="header">
+<x-app-layout :team="$team">
+    <header>
         <div class="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm shadow-slate-200/70 dark:border-slate-700/60 dark:bg-slate-900/80 dark:shadow-none">
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex flex-wrap items-center gap-3">
@@ -213,9 +213,9 @@
                 </div>
             </div>
         </div>
-    </x-slot>
+    </header>
 
     <div class="py-8">
         {{ $slot }}
     </div>
-</x-application-layout>
+</x-app-layout>

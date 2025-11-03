@@ -17,7 +17,7 @@
 
         <div class="mt-5 md:mt-0 md:col-span-2">
             <section
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-6"
+                class="bg-white rounded-lg shadow-sm p-6 space-y-6"
             >
                 <div class="flex items-center gap-3">
                     <div class="flex-shrink-0">
