@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('formations') || Schema::hasColumn('formations', 'primary_ai_trainer_id')) {
+            return;
+        }
+
         Schema::table('formations', function (Blueprint $table) {
             $table->foreignId('primary_ai_trainer_id')
                 ->nullable()
@@ -19,6 +23,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('formations')) {
+            return;
+        }
+
         Schema::table('formations', function (Blueprint $table) {
             if (Schema::hasColumn('formations', 'primary_ai_trainer_id')) {
                 $table->dropForeign(['primary_ai_trainer_id']);
@@ -27,4 +35,3 @@ return new class extends Migration
         });
     }
 };
-
