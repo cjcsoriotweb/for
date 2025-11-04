@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
+use App\Models\AiTrainer;
 use App\Models\User;
 use App\Services\Ai\OllamaClient;
 use App\Services\Ai\ToolExecutor;
@@ -12,6 +13,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
+use RuntimeException;
 
 /**
  * Contrôleur unique pour les interactions IA.
@@ -131,13 +134,26 @@ class AiController extends Controller
             flush();
 
             try {
-                foreach ($this->ollamaClient->chatStream($messages, $trainer) as $chunk) {
+                $handle = $this->ollamaClient->chatStreamRaw($messages, $trainer);
+
+                if ($handle === false) {
+                    throw new RuntimeException('Impossible d\'initialiser le streaming Ollama.');
+                }
+
+                $buffer = '';
+                $streamCompleted = false;
+
+                $emitChunk = function (string $chunk) use (&$fullResponse): void {
+                    if ($chunk === '') {
+                        return;
+                    }
+
                     $fullResponse .= $chunk;
 
                     $chunkData = json_encode([
                         'type' => 'chunk',
                         'content' => $chunk,
-                    ]);
+                    ], JSON_UNESCAPED_UNICODE);
                     echo "data: {$chunkData}
 
 ";
@@ -146,6 +162,58 @@ class AiController extends Controller
                         ob_flush();
                     }
                     flush();
+                };
+
+                curl_setopt($handle, CURLOPT_WRITEFUNCTION, function ($ch, $chunk) use (&$buffer, &$streamCompleted, $emitChunk) {
+                    $buffer .= $chunk;
+
+                    while (($pos = strpos($buffer, "\n")) !== false) {
+                        $line = trim(substr($buffer, 0, $pos));
+                        $buffer = substr($buffer, $pos + 1);
+
+                        if ($line === '') {
+                            continue;
+                        }
+
+                        $parsed = $this->parseStreamChunk($line);
+
+                        if (isset($parsed['error'])) {
+                            throw new RuntimeException($parsed['error']);
+                        }
+
+                        if (! empty($parsed['chunk'])) {
+                            $emitChunk($parsed['chunk']);
+                        }
+
+                        if (! empty($parsed['done'])) {
+                            $streamCompleted = true;
+                        }
+                    }
+
+                    return strlen($chunk);
+                });
+
+                try {
+                    $success = curl_exec($handle);
+
+                    if ($success === false) {
+                        $errorMessage = curl_error($handle) ?: 'Echec du streaming Ollama.';
+                        throw new RuntimeException($errorMessage);
+                    }
+                } finally {
+                    curl_close($handle);
+                }
+
+                if (! $streamCompleted && trim($buffer) !== '') {
+                    $parsed = $this->parseStreamChunk(trim($buffer));
+
+                    if (isset($parsed['error'])) {
+                        throw new RuntimeException($parsed['error']);
+                    }
+
+                    if (! empty($parsed['chunk'])) {
+                        $emitChunk($parsed['chunk']);
+                    }
                 }
 
                 $toolResult = $this->toolExecutor->parseAndExecuteTools($fullResponse, $user);
@@ -210,6 +278,67 @@ class AiController extends Controller
             'Connection' => 'keep-alive',
         ]);
     }
+
+    /**
+     * Parse une ligne de flux Ollama/OpenAI et extrait le chunk texte/drapeaux.
+     *
+     * @return array{chunk?:string,done?:bool,error?:string}
+     */
+    private function parseStreamChunk(string $line): array
+    {
+        $line = trim($line);
+        if ($line === '') {
+            return [];
+        }
+
+        if (str_starts_with($line, 'data:')) {
+            $payload = trim(substr($line, 5));
+
+            if ($payload === '[DONE]') {
+                return ['done' => true];
+            }
+
+            $data = json_decode($payload, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return [];
+            }
+
+            if (! empty($data['error'])) {
+                return ['error' => (string) $data['error']];
+            }
+
+            $delta = $data['choices'][0]['delta']['content'] ?? '';
+            $done = ($data['choices'][0]['finish_reason'] ?? null) === 'stop';
+
+            $result = [];
+            if ($delta !== '') {
+                $result['chunk'] = $delta;
+            }
+            if ($done) {
+                $result['done'] = true;
+            }
+
+            return $result;
+        }
+
+        $data = json_decode($line, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [];
+        }
+
+        if (! empty($data['error'])) {
+            return ['error' => (string) $data['error']];
+        }
+
+        if (! empty($data['done'])) {
+            return ['done' => true];
+        }
+
+        $chunk = $data['message']['content'] ?? ($data['response'] ?? '');
+
+        return $chunk !== '' ? ['chunk' => $chunk] : [];
+    }
+
     private function formatTrainer(AiTrainer $trainer): array
     {
         return [
@@ -226,13 +355,14 @@ class AiController extends Controller
     {
         $messages = [];
 
-        // 1. Prompt système du trainer
-        $messages[] = [
-            'role' => 'system',
-            'content' => $trainer['system_prompt'],
-        ];
+        $systemPrompt = trim((string) $trainer['system_prompt']);
+        if ($systemPrompt !== '') {
+            $messages[] = [
+                'role' => 'system',
+                'content' => $systemPrompt,
+            ];
+        }
 
-        // 2. Ajouter les définitions d'outils si le trainer les utilise
         if ($trainer['use_tools'] ?? false) {
             $messages[] = [
                 'role' => 'system',
@@ -240,34 +370,16 @@ class AiController extends Controller
             ];
         }
 
-        // 3. Contexte utilisateur (si disponible)
-        $user = $conversation->user;
-        if ($user && method_exists($user, 'getIaContext')) {
-            $userContext = trim((string) $user->getIaContext());
-            if ($userContext !== '') {
-                $messages[] = [
-                    'role' => 'system',
-                    'content' => "Contexte utilisateur :\n" . $userContext,
-                ];
-            }
-        }
-
-        // 4. Historique des messages (limité)
-        $historyLimit = config('ai.history_limit', 30);
-        $history = $conversation->messages()
+        $latestUserMessage = $conversation->messages()
+            ->where('role', AiConversationMessage::ROLE_USER)
             ->latest('id')
-            ->limit($historyLimit)
-            ->get()
-            ->sortBy('id')
-            ->values();
+            ->first();
 
-        foreach ($history as $msg) {
-            if ($msg->role !== AiConversationMessage::ROLE_SYSTEM) {
-                $messages[] = [
-                    'role' => $msg->role,
-                    'content' => $msg->content,
-                ];
-            }
+        if ($latestUserMessage) {
+            $messages[] = [
+                'role' => AiConversationMessage::ROLE_USER,
+                'content' => $latestUserMessage->content,
+            ];
         }
 
         return $messages;
