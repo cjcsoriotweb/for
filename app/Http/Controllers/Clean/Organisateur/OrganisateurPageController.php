@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Clean\Organisateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
+use App\Models\Quiz;
 use App\Models\Team;
+use App\Models\TextContent;
 use App\Models\User;
+use App\Models\VideoContent;
 use App\Services\Clean\Organisateur\OrganisateurService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 
 class OrganisateurPageController extends Controller
@@ -35,7 +39,14 @@ class OrganisateurPageController extends Controller
         // Build query for all formations with search and filters
         $formationsQuery = Formation::withCount(['learners', 'lessons'])
             ->with(['lessons' => function ($query) {
-                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
+                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id')
+                    ->with(['lessonable' => function (MorphTo $morphTo) {
+                        $morphTo->morphWith([
+                            VideoContent::class => [],
+                            TextContent::class => [],
+                            Quiz::class => ['quizQuestions:id,quiz_id,is_correct'],
+                        ]);
+                    }]);
             }]);
 
         // Apply search filter
@@ -66,24 +77,24 @@ class OrganisateurPageController extends Controller
 
         // Count different content types and calculate duration for each formation
         $allFormations->each(function ($formation) {
-            $formation->video_count = $formation->lessons->where('lessonable_type', 'App\\Models\\VideoContent')->count();
-            $formation->quiz_count = $formation->lessons->where('lessonable_type', 'App\\Models\\Quiz')->count();
-            $formation->text_count = $formation->lessons->where('lessonable_type', 'App\\Models\\TextContent')->count();
+            $formation->video_count = $formation->lessons->where('lessonable_type', VideoContent::class)->count();
+            $formation->quiz_count = $formation->lessons->where('lessonable_type', Quiz::class)->count();
+            $formation->text_count = $formation->lessons->where('lessonable_type', TextContent::class)->count();
 
             // Calculate total duration in minutes
             $totalDuration = 0;
 
             foreach ($formation->lessons as $lesson) {
                 switch ($lesson->lessonable_type) {
-                    case 'App\\Models\\VideoContent':
+                    case VideoContent::class:
                         $totalDuration += $lesson->lessonable->duration_minutes ?? 0;
                         break;
-                    case 'App\\Models\\TextContent':
+                    case TextContent::class:
                         $totalDuration += $lesson->lessonable->estimated_read_time ?? 0;
                         break;
-                    case 'App\\Models\\Quiz':
+                    case Quiz::class:
                         // Estimate quiz duration: 2 minutes per question
-                        $questionCount = $lesson->lessonable->quizQuestions()->count();
+                        $questionCount = $lesson->lessonable->quizQuestions?->count() ?? 0;
                         $totalDuration += max($questionCount * 2, 5); // Minimum 5 minutes per quiz
                         break;
                 }

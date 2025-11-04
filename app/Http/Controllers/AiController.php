@@ -127,7 +127,7 @@ class AiController extends Controller
             'content' => '',
         ]);
 
-        $messages = $this->prepareIaMessages($chatMessage, $trainer);
+        $messages = $this->buildConversationMessages($chatMessage, $trainer);
 
         return response()->stream(function () use ($chatMessage, $assistantMessage, $messages, $trainer, $user) {
             $fullResponse = '';
@@ -253,6 +253,10 @@ class AiController extends Controller
                     ],
                 ])->save();
 
+                $chatMessage->forceFill([
+                    'status' => IaChatMessage::STATUS_COMPLETED,
+                ])->save();
+
                 $doneData = json_encode([
                     'type' => 'done',
                     'content' => $processedResponse,
@@ -363,7 +367,7 @@ class AiController extends Controller
         ];
     }
 
-    private function prepareIaMessages(IaChatMessage $message, array $trainer): array
+    private function buildConversationMessages(IaChatMessage $message, array $trainer): array
     {
         $messages = [];
 
@@ -382,10 +386,30 @@ class AiController extends Controller
             ];
         }
 
-        $messages[] = [
-            'role' => IaChatMessage::ROLE_USER,
-            'content' => (string) $message->content,
-        ];
+        $historyLimit = (int) config('ai.history_limit', 15);
+
+        $history = IaChatMessage::query()
+            ->where('user_id', $message->user_id)
+            ->where('trainer_id', $message->trainer_id)
+            ->where('id', '<=', $message->id)
+            ->orderByDesc('id')
+            ->limit(max(1, $historyLimit))
+            ->get()
+            ->sortBy('id');
+
+        foreach ($history as $historyMessage) {
+            if (
+                $historyMessage->role === IaChatMessage::ROLE_ASSISTANT
+                && $historyMessage->status !== IaChatMessage::STATUS_COMPLETED
+            ) {
+                continue;
+            }
+
+            $messages[] = [
+                'role' => $historyMessage->role,
+                'content' => (string) $historyMessage->content,
+            ];
+        }
 
         return $messages;
     }
@@ -656,6 +680,5 @@ class AiController extends Controller
         ]);
     }
 }
-
 
 

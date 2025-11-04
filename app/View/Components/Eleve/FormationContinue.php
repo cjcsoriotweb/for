@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Services\Formation\StudentFormationService;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
@@ -26,53 +27,35 @@ class FormationContinue extends Component
         $formations = null
     ) {
         $this->team = $team;
+        $user = Auth::user();
 
-        if ($formations) {
-            // Use formations passed from controller with progress data
-            $this->formationsWithProgress = $formations->map(function ($formation) {
-                // Ensure chapters and lessons are loaded for progress calculation
-                $formation->load(['chapters.lessons']);
+        $collection = $formations instanceof Collection
+            ? $formations
+            : ($formations ? collect($formations) : null);
 
-                // Recalculate progress to ensure it's accurate
-                $totalLessons = $formation->chapters->pluck('lessons')->flatten()->count();
-                $completedLessons = 0;
-
-                foreach ($formation->chapters as $chapter) {
-                    foreach ($chapter->lessons as $lesson) {
-                        $lessonProgress = $lesson->learners()->where('user_id', Auth::user()->id)->first();
-                        if ($lessonProgress && $lessonProgress->pivot->status === 'completed') {
-                            $completedLessons++;
-                        }
-                    }
-                }
-
-                $calculatedProgressPercent = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
-
-                // Update the progress data with calculated value
-                if ($formation->progress_data) {
-                    $progressData = $formation->progress_data;
-                    $progressData['progress_percent'] = $calculatedProgressPercent;
-                    $formation->progress_data = $progressData;
-                } else {
-                    // If no progress data exists, create it
-                    $formation->progress_data = [
-                        'status' => 'enrolled',
-                        'progress_percent' => $calculatedProgressPercent,
-                        'current_lesson_id' => null,
-                        'enrolled_at' => now(),
-                        'last_seen_at' => now(),
-                        'completed_at' => null,
-                        'score_total' => 0,
-                        'max_score_total' => 0,
-                    ];
-                }
-
-                return $formation;
-            });
-        } else {
-            // Fallback to service call if no formations provided
-            $this->formationsWithProgress = $studentFormationService->listFormationCurrentByStudent($team, Auth::user());
+        if (! $collection) {
+            $collection = $studentFormationService->listFormationCurrentByStudent(
+                $team,
+                $user
+            );
         }
+
+        $this->formationsWithProgress = $collection->map(function ($formation) use ($studentFormationService, $user) {
+            if (! $formation->progress_data && $user) {
+                $formation->progress_data = $studentFormationService->getStudentProgress($user, $formation)
+                    ?? $this->defaultProgressData();
+            } elseif (! $formation->progress_data) {
+                $formation->progress_data = $this->defaultProgressData();
+            }
+
+            if (! array_key_exists('progress_percent', $formation->progress_data ?? [])) {
+                $formation->progress_data['progress_percent'] = 0;
+            }
+
+            $formation->is_completed = (bool) ($formation->is_completed ?? false);
+
+            return $formation;
+        });
     }
 
     /**
@@ -84,5 +67,19 @@ class FormationContinue extends Component
             'team' => $this->team,
             'formationsWithProgress' => $this->formationsWithProgress,
         ]);
+    }
+
+    private function defaultProgressData(): array
+    {
+        return [
+            'status' => 'enrolled',
+            'progress_percent' => 0,
+            'current_lesson_id' => null,
+            'enrolled_at' => now(),
+            'last_seen_at' => now(),
+            'completed_at' => null,
+            'score_total' => 0,
+            'max_score_total' => 0,
+        ];
     }
 }
