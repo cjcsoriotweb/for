@@ -2,61 +2,63 @@
 
 namespace App\Console\Commands;
 
-use App\Models\AiConversation;
-use App\Services\Ai\AiConversationResponder;
+use App\Models\IaChatMessage;
+use App\Services\Ai\IaChatResponder;
 use Illuminate\Console\Command;
 use Throwable;
 
 class ProcessAiConversations extends Command
 {
-    protected $signature = 'ai:process-conversations {--limit=10 : Nombre max de conversations à traiter}';
+    protected $signature = 'ai:process-conversations {--limit=10 : Nombre max de messages IA a traiter}';
 
-    protected $description = 'Générer les réponses IA pour les conversations en attente.';
+    protected $description = 'Generer les reponses IA pour les messages en attente.';
 
-    public function handle(AiConversationResponder $responder): int
+    public function handle(IaChatResponder $responder): int
     {
         $limit = (int) max(1, $this->option('limit') ?? 10);
 
-        $conversations = AiConversation::query()
-            ->awaitingAi()
-            ->with(['messages' => fn ($query) => $query->orderBy('id')])
-            ->orderByDesc('last_message_at')
-            ->orderByDesc('id')
+        $pendingMessages = IaChatMessage::query()
+            ->where('role', IaChatMessage::ROLE_USER)
+            ->where('status', IaChatMessage::STATUS_PENDING)
+            ->whereDoesntHave('children', function ($query) {
+                $query->where('role', IaChatMessage::ROLE_ASSISTANT);
+            })
+            ->orderBy('id')
             ->limit($limit)
             ->get();
 
-        if ($conversations->isEmpty()) {
-            $this->info('Aucune conversation IA à traiter.');
+        if ($pendingMessages->isEmpty()) {
+            $this->info('Aucun message utilisateur a traiter.');
 
             return self::SUCCESS;
         }
 
-        $this->info(sprintf('Traitement de %d conversation(s)...', $conversations->count()));
+        $this->info(sprintf('Traitement de %d message(s)...', $pendingMessages->count()));
 
         $processed = 0;
 
-        foreach ($conversations as $conversation) {
+        foreach ($pendingMessages as $message) {
             $this->line(sprintf(
-                'Conversation #%d (user:%d, trainer:%s)',
-                $conversation->id,
-                $conversation->user_id,
-                $conversation->metadata['trainer'] ?? 'n/a'
+                'Message #%d (user:%d, trainer:%d)',
+                $message->id,
+                $message->user_id,
+                $message->trainer_id
             ));
+
             try {
-                if ($responder->respond($conversation)) {
+                if ($responder->respond($message)) {
                     $processed++;
-                    $this->components->info('→ Réponse envoyée');
+                    $this->components->info('-> Reponse envoyee');
                 } else {
-                    $this->components->warn('→ Aucune réponse générée');
+                    $this->components->warn('-> Aucune reponse generee');
                 }
             } catch (Throwable $e) {
                 report($e);
-                echo $e;
-                $this->components->error('→ Erreur: '.$e->getMessage());
+                $this->components->error('-> Erreur: ' . $e->getMessage());
             }
         }
 
-        $this->info(sprintf('%d conversation(s) traitée(s).', $processed));
+        $this->info(sprintf('%d message(s) traites.', $processed));
 
         return self::SUCCESS;
     }

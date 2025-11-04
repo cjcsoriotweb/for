@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AiConversation;
 use App\Models\AiConversationMessage;
 use App\Models\AiTrainer;
+use App\Models\IaChatMessage;
 use App\Models\User;
 use App\Services\Ai\OllamaClient;
 use App\Services\Ai\ToolExecutor;
@@ -36,9 +37,8 @@ class AiController extends Controller
     public function stream(Request $request): Response|StreamedResponse
     {
         $validator = Validator::make($request->all(), [
-            'message' => ['required', 'string', 'max:' . config('ai.max_message_length', 2000)],
+            'message_id' => ['required', 'integer', 'exists:ia_chat_messages,id'],
             'trainer' => ['nullable', 'string'],
-            'conversation_id' => ['required', 'integer', 'exists:ai_conversations,id'],
         ]);
 
         if ($validator->fails()) {
@@ -56,27 +56,46 @@ class AiController extends Controller
             ], 401);
         }
 
-        $message = trim($request->input('message'));
-        $conversationId = $request->input('conversation_id');
+        $messageId = (int) $request->input('message_id');
+        $chatMessage = IaChatMessage::query()
+            ->with('trainer')
+            ->find($messageId);
 
-        $conversationQuery = AiConversation::query()
-            ->where('id', $conversationId);
-
-        if (! $user->superadmin()) {
-            $conversationQuery->where('user_id', $user->id);
-        }
-
-        $conversation = $conversationQuery->first();
-
-        if (! $conversation) {
+        if (! $chatMessage) {
             return response()->json([
                 'error' => true,
-                'message' => "Conversation non trouvee. Veuillez creer une conversation d'abord.",
+                'message' => 'Message introuvable.',
             ], 404);
         }
 
-        $trainerSlug = $request->input('trainer', $conversation->metadata['trainer'] ?? config('ai.default_trainer_slug'));
-        $trainerModel = AiTrainer::query()->active()->where('slug', $trainerSlug)->first();
+        if (! $user->superadmin() && $chatMessage->user_id !== $user->id) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Acces refuse',
+            ], 403);
+        }
+
+        if ($chatMessage->role !== IaChatMessage::ROLE_USER) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Seuls les messages utilisateur peuvent etre traites.',
+            ], 422);
+        }
+
+        if (! in_array($chatMessage->status, [IaChatMessage::STATUS_PENDING, IaChatMessage::STATUS_SEEN], true)) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Ce message a deja ete traite.',
+            ], 409);
+        }
+
+        $trainerModel = $chatMessage->trainer;
+        if ($request->filled('trainer')) {
+            $override = AiTrainer::query()->active()->where('slug', $request->input('trainer'))->first();
+            if ($override) {
+                $trainerModel = $override;
+            }
+        }
 
         if (! $trainerModel) {
             $trainerModel = AiTrainer::query()->active()->orderBy('sort_order')->orderBy('name')->first();
@@ -89,44 +108,35 @@ class AiController extends Controller
             ], 404);
         }
 
-        $trainer = $this->formatTrainer($trainerModel);
-
-        $conversation->forceFill([
-            'metadata' => array_merge($conversation->metadata ?? [], [
-                'trainer' => $trainer['slug'],
-                'model' => $trainer['model'],
-            ]),
-        ])->save();
-
-        $messageAuthorId = $user->id;
-
-        if ($user->superadmin() && $request->filled('acting_user_id')) {
-            $actingUserId = (int) $request->input('acting_user_id');
-            $actingUser = User::query()->find($actingUserId);
-
-            if ($actingUser) {
-                $messageAuthorId = $actingUser->id;
-            }
+        if ($trainerModel->id !== $chatMessage->trainer_id) {
+            $chatMessage->forceFill([
+                'trainer_id' => $trainerModel->id,
+            ])->save();
         }
 
-        $conversation->messages()->create([
-            'role' => AiConversationMessage::ROLE_USER,
-            'content' => $message,
-            'user_id' => $messageAuthorId,
+        $trainer = $this->formatTrainer($trainerModel);
+
+        $chatMessage->forceFill(['status' => IaChatMessage::STATUS_SEEN])->save();
+
+        $assistantMessage = IaChatMessage::query()->create([
+            'user_id' => $chatMessage->user_id,
+            'trainer_id' => $chatMessage->trainer_id,
+            'parent_id' => $chatMessage->id,
+            'role' => IaChatMessage::ROLE_ASSISTANT,
+            'status' => IaChatMessage::STATUS_PENDING,
+            'content' => '',
         ]);
 
-        $messages = $this->prepareMessages($conversation, $trainer);
+        $messages = $this->prepareIaMessages($chatMessage, $trainer);
 
-        return response()->stream(function () use ($conversation, $messages, $trainer, $user) {
+        return response()->stream(function () use ($chatMessage, $assistantMessage, $messages, $trainer, $user) {
             $fullResponse = '';
 
-            $conversationData = json_encode([
-                'type' => 'conversation_id',
-                'conversation_id' => $conversation->id,
+            $messageData = json_encode([
+                'type' => 'message_id',
+                'message_id' => $chatMessage->id,
             ]);
-            echo "data: {$conversationData}
-
-";
+            echo "data: {$messageData}\\n\\n";
 
             if (ob_get_level() > 0) {
                 ob_flush();
@@ -143,7 +153,7 @@ class AiController extends Controller
                 $buffer = '';
                 $streamCompleted = false;
 
-                $emitChunk = function (string $chunk) use (&$fullResponse): void {
+                $emitChunk = function (string $chunk) use (&$fullResponse, $assistantMessage): void {
                     if ($chunk === '') {
                         return;
                     }
@@ -154,14 +164,16 @@ class AiController extends Controller
                         'type' => 'chunk',
                         'content' => $chunk,
                     ], JSON_UNESCAPED_UNICODE);
-                    echo "data: {$chunkData}
-
-";
+                    echo "data: {$chunkData}\\n\\n";
 
                     if (ob_get_level() > 0) {
                         ob_flush();
                     }
                     flush();
+
+                    $assistantMessage->forceFill([
+                        'content' => $fullResponse,
+                    ])->saveQuietly();
                 };
 
                 curl_setopt($handle, CURLOPT_WRITEFUNCTION, function ($ch, $chunk) use (&$buffer, &$streamCompleted, $emitChunk) {
@@ -225,9 +237,7 @@ class AiController extends Controller
                         'content' => $processedResponse,
                         'tool_results' => $toolResult['tool_results'],
                     ]);
-                    echo "data: {$updateData}
-
-";
+                    echo "data: {$updateData}\\n\\n";
 
                     if (ob_get_level() > 0) {
                         ob_flush();
@@ -235,21 +245,19 @@ class AiController extends Controller
                     flush();
                 }
 
-                $conversation->messages()->create([
-                    'role' => AiConversationMessage::ROLE_ASSISTANT,
+                $assistantMessage->forceFill([
                     'content' => $processedResponse,
+                    'status' => IaChatMessage::STATUS_COMPLETED,
                     'metadata' => [
                         'tool_results' => $toolResult['tool_results'] ?? [],
                     ],
-                ]);
+                ])->save();
 
                 $doneData = json_encode([
                     'type' => 'done',
                     'content' => $processedResponse,
                 ]);
-                echo "data: {$doneData}
-
-";
+                echo "data: {$doneData}\\n\\n";
 
                 if (ob_get_level() > 0) {
                     ob_flush();
@@ -258,13 +266,19 @@ class AiController extends Controller
             } catch (Throwable $exception) {
                 report($exception);
 
+                $chatMessage->forceFill(['status' => IaChatMessage::STATUS_FAILED])->save();
+                $assistantMessage->forceFill([
+                    'status' => IaChatMessage::STATUS_FAILED,
+                    'metadata' => [
+                        'error' => $exception->getMessage(),
+                    ],
+                ])->save();
+
                 $errorData = json_encode([
                     'type' => 'error',
                     'message' => 'Erreur lors du traitement : ' . $exception->getMessage(),
                 ]);
-                echo "data: {$errorData}
-
-";
+                echo "data: {$errorData}\\n\\n";
 
                 if (ob_get_level() > 0) {
                     ob_flush();
@@ -277,9 +291,7 @@ class AiController extends Controller
             'X-Accel-Buffering' => 'no',
             'Connection' => 'keep-alive',
         ]);
-    }
-
-    /**
+    }    /**
      * Parse une ligne de flux Ollama/OpenAI et extrait le chunk texte/drapeaux.
      *
      * @return array{chunk?:string,done?:bool,error?:string}
@@ -351,7 +363,7 @@ class AiController extends Controller
         ];
     }
 
-    private function prepareMessages(AiConversation $conversation, array $trainer): array
+    private function prepareIaMessages(IaChatMessage $message, array $trainer): array
     {
         $messages = [];
 
@@ -370,17 +382,10 @@ class AiController extends Controller
             ];
         }
 
-        $latestUserMessage = $conversation->messages()
-            ->where('role', AiConversationMessage::ROLE_USER)
-            ->latest('id')
-            ->first();
-
-        if ($latestUserMessage) {
-            $messages[] = [
-                'role' => AiConversationMessage::ROLE_USER,
-                'content' => $latestUserMessage->content,
-            ];
-        }
+        $messages[] = [
+            'role' => IaChatMessage::ROLE_USER,
+            'content' => (string) $message->content,
+        ];
 
         return $messages;
     }

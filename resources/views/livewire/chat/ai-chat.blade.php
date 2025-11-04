@@ -177,44 +177,6 @@
             </div>
         @endif
 
-        @if ($awaitingAiResponse)
-            <div class="flex justify-center">
-                <div class="text-xs text-gray-500">L'assistant vous répond...</div>
-            </div>
-        @endif
-    </div>
-
-    <div class="px-4 py-2 space-y-2">
-        <div
-            class="text-sm text-gray-500 flex items-center gap-2"
-            data-ai-status="{{ $componentId }}"
-            @if(! $awaitingAiResponse) hidden @endif
-        >
-            <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" data-ai-status-ping></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" data-ai-status-dot></span>
-            </span>
-            <span data-ai-status-text>Assistant en train d'écrire...</span>
-        </div>
-
-        <div class="flex justify-end">
-            <button
-                type="button"
-                wire:click="toggleAiDebug"
-                class="text-xs px-2 py-1 rounded border text-gray-600 hover:bg-gray-100 transition"
-            >
-                {{ $showAiDebug ? 'Masquer debug IA' : 'Afficher debug IA' }}
-            </button>
-        </div>
-
-        <div
-            class="bg-gray-900 text-gray-100 text-xs rounded-lg p-3 space-y-1 max-h-48 overflow-y-auto font-mono"
-            data-ai-debug-panel="{{ $componentId }}"
-            @if(! $showAiDebug) hidden @endif
-        >
-            <div class="text-gray-400">Console IA</div>
-            <div class="space-y-1" data-ai-debug-list></div>
-        </div>
     </div>
 </div>
 
@@ -293,65 +255,7 @@
             return bubble;
         };
 
-        const appendDebug = (componentId, label, detail = '') => {
-            const panel = document.querySelector(`[data-ai-debug-panel="${componentId}"]`);
-            if (!panel) {
-                return;
-            }
-
-            const list = panel.querySelector('[data-ai-debug-list]');
-            if (!list) {
-                return;
-            }
-
-            const entry = document.createElement('div');
-            entry.className = 'flex gap-2';
-
-            const time = document.createElement('span');
-            time.className = 'text-gray-500';
-            const now = new Date();
-            time.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-            const message = document.createElement('span');
-            message.className = 'flex-1';
-            message.textContent = `[${label}] ${detail}`;
-
-            entry.appendChild(time);
-            entry.appendChild(message);
-
-            list.appendChild(entry);
-            panel.scrollTop = panel.scrollHeight;
-        };
-
-        const updateStatus = (componentId, text = null, mode = 'typing') => {
-            const container = document.querySelector(`[data-ai-status="${componentId}"]`);
-            if (!container) {
-                return;
-            }
-
-            if (!text) {
-                container.hidden = true;
-                return;
-            }
-
-            container.hidden = false;
-            const textEl = container.querySelector('[data-ai-status-text]');
-            if (textEl) {
-                textEl.textContent = text;
-            }
-
-            const ping = container.querySelector('[data-ai-status-ping]');
-            if (ping) {
-                ping.style.display = mode === 'thinking' ? 'inline-flex' : 'none';
-            }
-
-            const dot = container.querySelector('[data-ai-status-dot]');
-            if (dot) {
-                dot.className =
-                    'relative inline-flex rounded-full h-2 w-2 ' +
-                    (mode === 'thinking' ? 'bg-indigo-500' : (mode === 'typing' ? 'bg-green-500' : 'bg-rose-500'));
-            }
-        };
+        const appendDebug = () => {};
 
         const updateAssistantBubble = (bubble, senderName, content) => {
             if (!bubble) {
@@ -406,10 +310,7 @@
                 return;
             }
 
-            updateAssistantBubble(assistantBubble, assistantName, 'Lancement de la tâche IA…');
-            updateStatus(componentId, 'Assistant analyse votre message…', 'thinking');
-            appendDebug(componentId, 'stream', `Message ${messageId}, trainer ${trainerSlug}`);
-            appendDebug(componentId, 'request', `Payload: ${message.slice(0, 120)}${message.length > 120 ? '…' : ''}`);
+            updateAssistantBubble(assistantBubble, assistantName, '');
 
             const controller = new AbortController();
             if (window.__aiActiveStreams[componentId]) {
