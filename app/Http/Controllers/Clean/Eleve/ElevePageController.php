@@ -662,9 +662,7 @@ class ElevePageController extends Controller
     /**
      * Soumettre les rÃ©ponses d'un quiz
      */
-    /**
-     * Soumettre les réponses d'un quiz
-     */
+
     public function submitQuiz(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, Request $request)
     {
         $user = Auth::user();
@@ -689,7 +687,8 @@ class ElevePageController extends Controller
 
         $totalQuestions = $questions->count();
         $correctAnswers = 0;
-        $maxScore = $questions->sum('points');
+        $earnedPoints = 0;
+        $maxScore = max(0, (int) $questions->sum('points'));
 
         foreach ($questions as $questionId => $question) {
             if (! isset($answers[$questionId])) {
@@ -702,10 +701,13 @@ class ElevePageController extends Controller
 
             if ($selectedChoice && $correctChoice && $selectedChoice->id === $correctChoice->id) {
                 $correctAnswers++;
+                $earnedPoints += (int) $question->points;
             }
         }
 
-        $score = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
+        $score = $maxScore > 0
+            ? ($earnedPoints / $maxScore) * 100
+            : ($totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0);
         $passingScore = $quiz->passing_score ?? 0;
         $passed = $passingScore > 0 ? $score >= $passingScore : true;
 
@@ -737,6 +739,9 @@ class ElevePageController extends Controller
             ],
         ]);
 
+        $now = now();
+        $rows = [];
+
         foreach ($answers as $questionId => $choiceId) {
             $question = $questions->get((int) $questionId);
             if (! $question) {
@@ -745,12 +750,18 @@ class ElevePageController extends Controller
 
             $selectedChoice = $question->quizChoices->firstWhere('id', (int) $choiceId);
 
-            \App\Models\QuizAnswer::create([
+            $rows[] = [
                 'quiz_attempt_id' => $attempt->id,
-                'question_id' => $questionId,
-                'choice_id' => $choiceId,
+                'question_id' => (int) $questionId,
+                'choice_id' => (int) $choiceId,
                 'is_correct' => (bool) ($selectedChoice?->is_correct),
-            ]);
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+
+        if (! empty($rows)) {
+            \App\Models\QuizAnswer::query()->insert($rows);
         }
 
         $this->updateFormationProgress($user, $formation);
@@ -766,7 +777,9 @@ class ElevePageController extends Controller
             'can_retry' => true,
             'message' => 'Quiz échoué. Vous pouvez réessayer.',
         ]);
-    }    /**
+    }
+
+    /**
      * Afficher les rÃ©sultats d'une tentative de quiz
      */
     public function quizResults(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, QuizAttempt $attempt)
