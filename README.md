@@ -72,7 +72,7 @@ L'architecture IA a été refactorisée pour être simple et maintenable :
 
 - **Un seul client HTTP** : `App\Services\Ai\OllamaClient` pour communiquer avec Ollama
 - **Un seul endpoint API** : `POST /api/ai/stream` pour le streaming NDJSON
-- **Un seul composant Livewire** : `ChatBox` pour toutes les interfaces de chat
+- **Deux composants Livewire dédiés** : `chat.ai-chat` pour l’assistant IA, `chat.user-chat` pour les conversations utilisateur↔utilisateur
 - **Configuration statique** : Les trainers sont définis dans `config/ai.php` (pas de DB)
 
 ### 🎓 Trainers disponibles
@@ -100,8 +100,8 @@ AI_DEFAULT_TRAINER_SLUG=default
 #### Dans une vue Blade :
 
 ```blade
-<livewire:chat-box 
-    trainer="michel" 
+<livewire:chat.ai-chat 
+    contact-id="ai_{{ $trainerId }}" 
     title="Assistance Maçonnerie" 
 />
 ```
@@ -124,7 +124,7 @@ const response = await fetch('/api/ai/stream', {
 
 // Lire le stream NDJSON
 const reader = response.body.getReader();
-// ... (voir resources/views/livewire/chat-box.blade.php pour exemple complet)
+// ... (voir resources/views/livewire/chat/ai-chat.blade.php pour exemple complet)
 ```
 
 ### 🛡️ Garde-fous

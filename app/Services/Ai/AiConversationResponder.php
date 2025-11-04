@@ -82,19 +82,14 @@ class AiConversationResponder
             ];
         }
 
-        $historyLimit = (int) config('ai.history_limit', 30);
-        $history = $history
-            ->sortBy('id')
-            ->slice(-1 * max(1, $historyLimit));
+        $latestUserMessage = $history
+            ->sortByDesc('id')
+            ->firstWhere('role', AiConversationMessage::ROLE_USER);
 
-        foreach ($history as $msg) {
-            if ($msg->role === AiConversationMessage::ROLE_SYSTEM) {
-                continue;
-            }
-
+        if ($latestUserMessage) {
             $messages[] = [
-                'role' => $msg->role,
-                'content' => (string) $msg->content,
+                'role' => AiConversationMessage::ROLE_USER,
+                'content' => (string) $latestUserMessage->content,
             ];
         }
 

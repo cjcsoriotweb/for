@@ -18,7 +18,7 @@ La refactorisation de l'architecture IA simplifie radicalement le système en é
 
 - **OllamaClient** : Client HTTP unique (`app/Services/Ai/OllamaClient.php`)
 - **AiController** : Endpoint API unique (`app/Http/Controllers/AiController.php`)
-- **ChatBox** : Composant Livewire universel (`app/Livewire/ChatBox.php`)
+- **Composants Livewire dédiés** : `chat.ai-chat` (assistant IA) et `chat.user-chat` (user↔user)
 - **Configuration** : Trainers définis dans `config/ai.php`
 - **Service Provider** : `AiServiceProvider` pour l'injection de dépendances
 
@@ -73,7 +73,7 @@ $formation->aiTrainers()->sync([...]);
 
 ```blade
 {{-- Nouveau composant --}}
-<livewire:chat-box trainer="michel" title="Assistance Maçonnerie" />
+<livewire:chat.ai-chat contact-id="ai_{{ $trainerId }}" title="Assistance Maçonnerie" />
 ```
 
 ```php
@@ -165,4 +165,4 @@ while (true) {
 Pour toute question sur la migration, consultez :
 - Le README principal
 - La configuration `config/ai.php`
-- Le code du composant `ChatBox` comme exemple d'implémentation
+- Le code des composants `chat.ai-chat` et `chat.user-chat` comme exemples d'implémentation

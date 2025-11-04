@@ -331,11 +331,10 @@
                                     <span class="font-semibold text-indigo-900 text-lg">{{ $trainer->name }}</span>
                                 </div>
 
-                                @livewire('chat-box', [
+                                @livewire('chat.ai-chat', [
                                     'contactId' => 'ai_' . $trainer->id,
-                                    'contactType' => 'ai',
                                     'title' => $trainer->name
-                                ], key('chatbox-' . $trainer->id))
+                                ], key('chatbox-ai-' . $trainer->id))
                             </div>
                         @endif
                     @endforeach
@@ -360,7 +359,7 @@
                                     <span class="font-semibold {{ $chatUser->superadmin ? 'text-red-900' : 'text-green-900' }} text-lg">{{ $chatUser->name }}</span>
                                 </div>
 
-                                @livewire('chat-box', [
+                                @livewire('chat.user-chat', [
                                     'contactId' => ($chatUser->superadmin ? 'admin_' : 'user_') . $chatUser->id,
                                     'contactType' => $chatUser->superadmin ? 'admin' : 'user',
                                     'title' => $chatUser->name
@@ -373,4 +372,3 @@
         </div>
     </div>
 </div>
-
