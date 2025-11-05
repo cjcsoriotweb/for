@@ -6,6 +6,7 @@ use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationEntryQuizController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationCompletionDocumentController;
+use App\Http\Controllers\Clean\Formateur\Formation\FormationExportController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
 use App\Http\Middleware\FormateurMiddleware;
 use App\Http\Middleware\FormateurOwner;
@@ -17,6 +18,10 @@ Route::prefix('formateur')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [FormateurPageController::class, 'home'])->name('home');
+        Route::get('/import', [FormateurPageController::class, 'import'])->name('import');
+        Route::post('/import/json', [FormateurPageController::class, 'importJson'])->name('import.json');
+        Route::post('/import/csv', [FormateurPageController::class, 'importCsv'])->name('import.csv');
+        Route::post('/import/scorm', [FormateurPageController::class, 'importScorm'])->name('import.scorm');
 
         // Formation routes
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
@@ -42,6 +47,9 @@ Route::prefix('formateur')
             Route::get('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'index'])->name('formation.completion-documents.index');
             Route::post('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'store'])->name('formation.completion-documents.store');
             Route::delete('/formation/{formation}/completion-documents/{document}', [FormationCompletionDocumentController::class, 'destroy'])->name('formation.completion-documents.destroy');
+
+            // Export formation
+            Route::get('/formation/{formation}/export', [FormationExportController::class, 'export'])->name('formation.export');
 
             // Entry quiz management
             Route::get('/formation/{formation}/entry-quiz', [FormationEntryQuizController::class, 'edit'])->name('formation.entry-quiz.edit');

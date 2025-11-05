@@ -1,0 +1,22 @@
+{
+  "title": "Ma Formation",
+  "description": "Description...",
+  "chapters": [
+    {
+      "title": "Chapitre 1",
+      "lessons": [
+        {
+          "title": "Leçon 1",
+          "type": "text",
+          "content": "Contenu de la leçon..."
+        },
+        {
+          "title": "Vidéo explicative",
+          "type": "video",
+          "content": "https://example.com/video.mp4",
+          "duration_minutes": 15
+        }
+      ]
+    }
+  ]
+}
