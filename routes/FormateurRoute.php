@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('formateur')
     ->name('formateur.')
-    ->middleware(['auth', FormateurMiddleware::class])
+    ->middleware(['auth', 'signature', FormateurMiddleware::class])
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [FormateurPageController::class, 'home'])->name('home');

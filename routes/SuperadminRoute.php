@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('superadmin')
     ->name('superadmin.')
-    ->middleware(['auth', AdminMiddleware::class])
+    ->middleware(['auth', 'signature', AdminMiddleware::class])
     ->group(function (): void {
         Route::get('/', [SuperadminPageController::class, 'overview'])->name('overview');
         Route::get('/teams', [SuperadminPageController::class, 'teamsIndex'])->name('teams.index');

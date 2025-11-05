@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('eleve')
     ->name('eleve.')
-    ->middleware(['auth', 'eleve'])
+    ->middleware(['auth', 'signature', 'eleve'])
     ->scopeBindings()
     ->group(function () {
         // Main routes - ordered by specificity (most specific first)

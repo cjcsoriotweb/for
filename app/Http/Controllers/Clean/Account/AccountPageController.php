@@ -137,7 +137,14 @@ class AccountPageController extends Controller
                 'signed_at' => now(),
             ]);
 
-            return back()->with('success', 'Votre signature a été enregistrée avec succès.');
+            // Redirect to intended URL if it exists, otherwise to dashboard
+            $intendedUrl = session('url.intended');
+            if ($intendedUrl) {
+                session()->forget('url.intended');
+                return redirect($intendedUrl)->with('success', 'Votre signature a été enregistrée avec succès.');
+            }
+
+            return redirect()->route('user.dashboard')->with('success', 'Votre signature a été enregistrée avec succès.');
         } catch (\Exception $e) {
             return back()->with('error', 'Une erreur est survenue lors de l\'enregistrement de votre signature.');
         }
