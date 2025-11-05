@@ -13,6 +13,7 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SuperadminPageController extends Controller
@@ -274,7 +275,7 @@ class SuperadminPageController extends Controller
         ]);
 
         // Récupérer la signature de l'étudiant
-        $studentSignature = $formationUser->user ? $formationUser->user->signatures()->latest()->first() : null;
+        $studentSignature = $formationUser->user && $formationUser->user->signatures()->exists() ? $formationUser->user->signatures()->latest()->first() : null;
 
         return view('out-application.superadmin.superadmin-completion-request-show-page', [
             'formationUser' => $formationUser,
@@ -289,6 +290,7 @@ class SuperadminPageController extends Controller
     {
         $request->validate([
             'trainer_signature' => 'required|string',
+            'completion_documents.*' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
         ]);
 
         $user = auth()->user();
@@ -302,15 +304,60 @@ class SuperadminPageController extends Controller
             'signed_at' => now(),
         ]);
 
+        // Gérer les fichiers joints
+        $completionDocuments = [];
+        if ($request->hasFile('completion_documents')) {
+            foreach ($request->file('completion_documents') as $file) {
+                $originalName = $file->getClientOriginalName();
+                $extension = $file->getClientOriginalExtension();
+                $size = $file->getSize();
+                $mimeType = $file->getMimeType();
+
+                // Générer un nom unique pour le fichier
+                $filename = time() . '_' . uniqid() . '.' . $extension;
+                $path = $file->storeAs('completion-documents', $filename, 'public');
+
+                $completionDocuments[] = [
+                    'original_name' => $originalName,
+                    'filename' => $filename,
+                    'path' => $path,
+                    'size' => $size,
+                    'mime_type' => $mimeType,
+                    'uploaded_at' => now()->toISOString(),
+                ];
+            }
+        }
+
         // Mettre à jour la demande
         $formationUser->update([
             'completion_request_status' => 'approved',
             'trainer_signature_id' => $trainerSignature->id,
             'completion_validated_at' => now(),
             'completion_validated_by' => $user->id,
+            'completion_documents' => !empty($completionDocuments) ? $completionDocuments : null,
         ]);
 
         return redirect()->back()->with('success', 'La demande de validation a été approuvée avec succès.');
+    }
+
+    /**
+     * Télécharger un document joint à une demande de validation
+     */
+    public function downloadCompletionDocument(FormationUser $formationUser, $index)
+    {
+        $documents = $formationUser->completion_documents;
+
+        if (!$documents || !isset($documents[$index])) {
+            abort(404, 'Document non trouvé.');
+        }
+
+        $document = $documents[$index];
+
+        if (!Storage::disk('public')->exists($document['path'])) {
+            abort(404, 'Fichier non trouvé sur le serveur.');
+        }
+
+        return Storage::disk('public')->download($document['path'], $document['original_name']);
     }
 
     /**

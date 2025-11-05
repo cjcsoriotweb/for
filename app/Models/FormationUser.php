@@ -29,6 +29,7 @@ class FormationUser extends Model
         'trainer_signature_id',
         'completion_validated_at',
         'completion_validated_by',
+        'completion_documents',
     ];
 
     protected function casts(): array
@@ -50,6 +51,7 @@ class FormationUser extends Model
             'max_score_total' => 'integer',
             'completion_request_at' => 'datetime',
             'completion_validated_at' => 'datetime',
+            'completion_documents' => 'array',
         ];
     }
 

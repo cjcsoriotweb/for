@@ -363,7 +363,7 @@ class ElevePageController extends Controller
         ));
     }
 
-    public function downloadCompletionDocument(Team $team, Formation $formation, FormationCompletionDocument $document)
+    public function downloadCompletionDocument(Team $team, Formation $formation, $documentIdentifier)
     {
         $user = Auth::user();
 
@@ -371,17 +371,45 @@ class ElevePageController extends Controller
             abort(403, 'Vous ne pouvez pas acceder a cette formation.');
         }
 
-        if ($document->formation_id !== $formation->id) {
-            abort(404);
-        }
-
         if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
             abort(403, 'La formation doit etre terminee pour acceder au document.');
         }
 
-        $downloadName = $document->title ?: $document->original_name;
+        // Vérifier si c'est un document de formation standard
+        if (is_numeric($documentIdentifier) || $documentIdentifier instanceof FormationCompletionDocument) {
+            $document = $documentIdentifier instanceof FormationCompletionDocument ? $documentIdentifier : FormationCompletionDocument::findOrFail($documentIdentifier);
 
-        return Storage::disk('public')->download($document->file_path, $downloadName);
+            if ($document->formation_id !== $formation->id) {
+                abort(404);
+            }
+
+            $downloadName = $document->title ?: $document->original_name;
+            return \Illuminate\Support\Facades\Storage::disk('public')->download($document->file_path, $downloadName);
+        }
+
+        // Vérifier si c'est un document joint de validation (format: completion-{index})
+        if (str_starts_with($documentIdentifier, 'completion-')) {
+            $index = (int) str_replace('completion-', '', $documentIdentifier);
+
+            $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
+                ->where('user_id', $user->id)
+                ->where('team_id', $team->id)
+                ->first();
+
+            if (!$formationUser || !$formationUser->completion_documents || !isset($formationUser->completion_documents[$index])) {
+                abort(404, 'Document non trouvé.');
+            }
+
+            $document = $formationUser->completion_documents[$index];
+
+            if (!Storage::disk('public')->exists($document['path'])) {
+                abort(404, 'Fichier non trouvé sur le serveur.');
+            }
+
+            return \Illuminate\Support\Facades\Storage::disk('public')->download($document['path'], $document['original_name']);
+        }
+
+        abort(404, 'Document non trouvé.');
     }
 
     /**
@@ -419,6 +447,124 @@ class ElevePageController extends Controller
         $formationUser->save();
 
         return back()->with('success', 'Votre demande de validation de fin de formation a été envoyée avec succès. Un superadmin la traitera dans les plus brefs délais.');
+    }
+
+    /**
+     * Télécharger la page de formation terminée en PDF
+     */
+    public function downloadCompletedFormationPdf(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation est terminée
+        if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('warning', 'Cette formation n\'est pas encore terminée.');
+        }
+
+        // Récupérer les données nécessaires pour le PDF
+        $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
+        $progress = $this->studentFormationService->getStudentProgress($user, $formation);
+        $formationDocuments = $formation->completionDocuments()->get();
+
+        // Récupérer toutes les leçons de la formation avec leur statut
+        $chapters = $formation->chapters()
+            ->with(['lessons' => function ($lessonQuery) use ($user) {
+                $lessonQuery->with(['learners' => function ($learnerQuery) use ($user) {
+                    $learnerQuery->where('user_id', $user->id);
+                }]);
+            }])
+            ->orderBy('position')
+            ->get();
+
+        $lessonResources = collect();
+        foreach ($chapters as $chapter) {
+            foreach ($chapter->lessons as $lesson) {
+                $lessonLearner = $lesson->learners->first();
+                $isCompleted = optional($lessonLearner?->pivot)->status === 'completed';
+
+                // Récupérer les pièces jointes si c'est du contenu texte
+                $attachments = collect();
+                if ($lesson->lessonable_type === TextContent::class && $lesson->lessonable) {
+                    $attachments = $lesson->lessonable->attachments ?? collect();
+                }
+
+                $lessonResources->push([
+                    'chapter_title' => $chapter->title,
+                    'chapter_position' => $chapter->position ?? 0,
+                    'lesson_id' => $lesson->id,
+                    'lesson_title' => $lesson->title,
+                    'lesson_position' => $lesson->position ?? 0,
+                    'lesson_type' => $lesson->lessonable_type,
+                    'attachments' => $attachments,
+                    'is_completed' => $isCompleted,
+                    'completed_at' => optional($lessonLearner?->pivot)->completed_at,
+                ]);
+            }
+        }
+
+        $lessonResources = $lessonResources->sortBy([
+            fn ($item) => $item['chapter_position'],
+            fn ($item) => $item['lesson_position'],
+        ])->values();
+
+        // Grouper par chapitre pour un meilleur affichage
+        $chaptersWithLessons = $lessonResources->groupBy('chapter_title')->map(function ($lessons, $chapterTitle) {
+            return [
+                'title' => $chapterTitle,
+                'lessons' => $lessons,
+                'completed_count' => $lessons->where('is_completed', true)->count(),
+                'total_count' => $lessons->count(),
+            ];
+        });
+
+        $assistantTrainer = $formationWithProgress->category?->aiTrainer;
+        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
+        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
+
+        // Récupérer la signature de l'étudiant
+        $studentSignature = $user->signatures()->latest()->first();
+
+        // Récupérer les données de completion de la formation
+        $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
+            ->where('user_id', $user->id)
+            ->where('team_id', $team->id)
+            ->with(['trainerSignature', 'completionValidatedBy'])
+            ->first();
+
+        // Générer le PDF
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.formation-completed', [
+            'team' => $team,
+            'formationWithProgress' => $formationWithProgress,
+            'progress' => $progress,
+            'formationDocuments' => $formationDocuments,
+            'chaptersWithLessons' => $chaptersWithLessons,
+            'lessonResources' => $lessonResources,
+            'assistantTrainer' => $assistantTrainer,
+            'assistantTrainerSlug' => $assistantTrainerSlug,
+            'assistantTrainerName' => $assistantTrainerName,
+            'studentSignature' => $studentSignature,
+            'formationUser' => $formationUser,
+            'user' => $user,
+        ]);
+
+        // Configuration du PDF
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOptions([
+            'defaultFont' => 'sans-serif',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+
+        // Nom du fichier
+        $filename = 'formation-' . $formation->id . '-certificat-' . $user->id . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     /**

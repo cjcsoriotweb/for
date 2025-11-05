@@ -1,6 +1,9 @@
-<x-superadmin-layout>
+<x-admin.global-layout
+    icon="check_circle"
+    :title="__('Demande de validation')"
+    :subtitle="__('Examiner et traiter une demande de validation de formation')"
+>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <x-superadmin.notification-messages />
 
     <!-- Header -->
     <div class="mb-8">
@@ -111,6 +114,56 @@
       </div>
     </div>
 
+    <!-- Documents joints -->
+    @if($formationUser->completion_documents && count($formationUser->completion_documents) > 0)
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Documents joints</h2>
+
+      <div class="space-y-3">
+        @foreach($formationUser->completion_documents as $index => $document)
+        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-600">
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0">
+              @if(str_contains($document['mime_type'], 'pdf'))
+                <svg class="h-8 w-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                </svg>
+              @elseif(str_contains($document['mime_type'], 'word') || str_contains($document['mime_type'], 'document'))
+                <svg class="h-8 w-8 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                </svg>
+              @elseif(str_contains($document['mime_type'], 'excel') || str_contains($document['mime_type'], 'spreadsheet'))
+                <svg class="h-8 w-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                </svg>
+              @else
+                <svg class="h-8 w-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                </svg>
+              @endif
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {{ $document['original_name'] }}
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ number_format($document['size'] / 1024, 1) }} KB • {{ strtoupper(pathinfo($document['original_name'], PATHINFO_EXTENSION)) }}
+              </p>
+            </div>
+          </div>
+          <a href="{{ route('superadmin.completion-requests.documents.download', [$formationUser, $index]) }}"
+             class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            Télécharger
+          </a>
+        </div>
+        @endforeach
+      </div>
+    </div>
+    @endif
+
     <!-- Signatures -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
       <!-- Student Signature -->
@@ -119,7 +172,7 @@
 
         @if($studentSignature)
         <div class="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50">
-          <img src="data:image/png;base64,{{ $studentSignature->signature_data }}"
+          <img src="{{ $studentSignature->signature_data }}"
                alt="Signature de l'étudiant"
                class="max-w-full h-auto border border-gray-200 dark:border-gray-600 rounded">
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -142,7 +195,7 @@
 
         @if($formationUser->trainerSignature)
         <div class="border-2 border-green-300 dark:border-green-600 rounded-lg p-4 bg-green-50 dark:bg-green-900/10">
-          <img src="data:image/png;base64,{{ $formationUser->trainerSignature->signature_data }}"
+          <img src="{{ $formationUser->trainerSignature->signature_data }}"
                alt="Signature du formateur"
                class="max-w-full h-auto border border-green-200 dark:border-green-700 rounded">
           <p class="text-xs text-green-600 dark:text-green-400 mt-2">
@@ -169,12 +222,30 @@
         <!-- Approve Form -->
         <div>
           <h3 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-3">Approuver la demande</h3>
-          <form method="POST" action="{{ route('superadmin.completion-requests.approve', $formationUser) }}" id="approve-form">
+          <form method="POST" action="{{ route('superadmin.completion-requests.approve', $formationUser) }}" enctype="multipart/form-data" id="approve-form">
             @csrf
             <div class="space-y-4">
               <div>
+                <label for="completion_documents" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Documents joints (optionnel)
+                  <span class="text-xs text-gray-500 dark:text-gray-400 block">Factures, certificats, documents administratifs...</span>
+                </label>
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50">
+                  <input type="file"
+                         name="completion_documents[]"
+                         id="completion_documents"
+                         multiple
+                         accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                         class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Formats acceptés : PDF, Word, Excel, Images. Taille max : 10MB par fichier.
+                  </p>
+                </div>
+              </div>
+
+              <div>
                 <label for="trainer_signature" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Votre signature
+                  Votre signature <span class="text-red-500">*</span>
                 </label>
                 <div class="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-900">
                   <canvas id="signature-canvas"
@@ -364,4 +435,4 @@
     });
   </script>
   @endif
-</x-superadmin-layout>
+</x-admin.global-layout>

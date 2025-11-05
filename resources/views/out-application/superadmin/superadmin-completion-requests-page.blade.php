@@ -1,6 +1,9 @@
-<x-superadmin-layout>
+<x-admin.global-layout
+    icon="check_circle"
+    :title="__('Demandes de validation')"
+    :subtitle="__('Gérer les demandes de validation de fin de formation des étudiants')"
+>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <x-superadmin.notification-messages />
 
     <!-- Header -->
     <div class="mb-8">
@@ -169,4 +172,4 @@
       @endif
     </div>
   </div>
-</x-superadmin-layout>
+</x-admin.global-layout>

@@ -17,6 +17,7 @@ Route::prefix('superadmin')
         Route::get('/formations/{formation}', [SuperadminPageController::class, 'formationShow'])->name('formations.show');
         Route::get('/completion-requests', [SuperadminPageController::class, 'completionRequestsIndex'])->name('completion-requests.index');
         Route::get('/completion-requests/{formationUser}', [SuperadminPageController::class, 'completionRequestShow'])->name('completion-requests.show');
+        Route::get('/completion-requests/{formationUser}/documents/{index}', [SuperadminPageController::class, 'downloadCompletionDocument'])->name('completion-requests.documents.download');
         Route::post('/completion-requests/{formationUser}/approve', [SuperadminPageController::class, 'approveCompletionRequest'])->name('completion-requests.approve');
         Route::post('/completion-requests/{formationUser}/reject', [SuperadminPageController::class, 'rejectCompletionRequest'])->name('completion-requests.reject');
         Route::get('/support', [SuperadminPageController::class, 'supportIndex'])->name('support.index');
