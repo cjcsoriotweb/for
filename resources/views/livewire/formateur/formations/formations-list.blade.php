@@ -14,25 +14,14 @@ FORMATIONS LIST - MAIN CONTAINER
     <x-formateur.formation.formation-header />
 
     {{-- ========================================
-    SEARCH SECTION
+    DASHBOARD SECTION
     ======================================== --}}
-    <x-formateur.formation.formation-search :search="$search" :formations="$formations" />
+    <x-formateur.formation.formation-dashboard :stats="$stats" />
 
     {{-- ========================================
-    FORMATIONS LIST SECTION
+    FEATURED FORMATIONS SECTION
     ======================================== --}}
-    <div class="space-y-8">
-      @forelse ($formations as $formation)
-      <x-formateur.formation.formation-card :formation="$formation" />
-      @empty
-      <x-formateur.formation.formation-empty-state />
-      @endforelse
-
-      {{-- ========================================
-      PAGINATION SECTION
-      ======================================== --}}
-      <x-formateur.formation.formation-pagination :formations="$formations" />
-    </div>
+    <x-formateur.formation.formation-featured :formations="$formations" />
   </div>
 
 </div>
@@ -83,27 +72,8 @@ FORMATIONS LIST - MAIN CONTAINER
           });
         }
 
-        function initSearchInput(root = document) {
-          const searchInput = root.querySelector('input[wire\\:model\\.live="search"]');
-
-          if (!searchInput || searchInput.dataset.formationsSearchBound) {
-            return;
-          }
-
-          searchInput.dataset.formationsSearchBound = 'true';
-
-          searchInput.addEventListener('focus', function () {
-            this.parentElement?.classList.add('ring-4', 'ring-blue-500/30');
-          });
-
-          searchInput.addEventListener('blur', function () {
-            this.parentElement?.classList.remove('ring-4', 'ring-blue-500/30');
-          });
-        }
-
         function hydrate(root = document) {
           initProgressBars(root);
-          initSearchInput(root);
         }
 
         function boot() {
@@ -166,6 +136,134 @@ FORMATIONS LIST - MAIN CONTAINER
         100% {
           background-position: 0% 50%;
         }
+      }
+
+      /* Enhanced animations */
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .fade-in-up.delay-1 { animation-delay: 0.1s; }
+      .fade-in-up.delay-2 { animation-delay: 0.2s; }
+      .fade-in-up.delay-3 { animation-delay: 0.3s; }
+      .fade-in-up.delay-4 { animation-delay: 0.4s; }
+      .fade-in-up.delay-5 { animation-delay: 0.5s; }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .slide-in-left {
+        animation: slideInLeft 0.8s ease-out forwards;
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+
+      @keyframes slideInLeft {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .bounce-in {
+        animation: bounceIn 0.8s ease-out forwards;
+        opacity: 0;
+        transform: scale(0.3);
+      }
+
+      @keyframes bounceIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.3);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+        70% {
+          transform: scale(0.9);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .pulse-glow {
+        animation: pulseGlow 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes pulseGlow {
+        from {
+          box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        to {
+          box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        }
+      }
+
+      /* Hover effects */
+      .hover-lift {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Loading shimmer effect */
+      .shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -200% 0;
+        }
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, #3b82f6, #6366f1);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #2563eb, #4f46e5);
       }
     </style>
   @endpush

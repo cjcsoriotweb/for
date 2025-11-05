@@ -3,27 +3,15 @@
 namespace App\Livewire\Formateur\Formations;
 
 use App\Models\Formation;
+use App\Models\FormationUser;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class FormationsList extends Component
 {
-    use WithPagination;
-
-    public $search = '';
-
-    public $perPage = 5;
-
-    protected $paginationTheme = 'tailwind';
-
-    public function updatedSearch()
-    {
-        $this->resetPage();
-    }
-
     protected function formationsQuery()
     {
         $query = Formation::withCount(['learners', 'lessons'])
@@ -31,20 +19,12 @@ class FormationsList extends Component
                 'lessons' => function ($query) {
                     $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
                 },
-                'lessons.lessonable',
+                'lessons.lessonable'
             ]);
 
         // Appliquer le filtre utilisateur seulement si ce n'est pas un superadmin
         if (! Auth::user()->superadmin) {
             $query->where('user_id', '=', Auth::user()->id);
-        }
-
-        // Recherche sécurisée avec scoping approprié
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('title', 'like', '%'.$this->search.'%')
-                    ->orWhere('description', 'like', '%'.$this->search.'%');
-            });
         }
 
         return $query;
@@ -60,7 +40,17 @@ class FormationsList extends Component
         $formation->card_lessons_count = $formation->lessons_count ?? 0;
         $formation->card_learners_count = $formation->learners_count ?? 0;
         $formation->card_description = Str::limit((string) $formation->description, 180);
-        $formation->card_completion_percentage = min(100, $formation->completion_percentage ?? 75);
+
+        // Calculate average completion percentage for this formation
+        // Since progress_percent column was removed, use a default value or calculate based on status
+        $completedCount = FormationUser::where('formation_id', $formation->id)
+            ->where('status', 'completed')
+            ->count();
+        $totalEnrolled = FormationUser::where('formation_id', $formation->id)->count();
+
+        $avgCompletion = $totalEnrolled > 0 ? ($completedCount / $totalEnrolled) * 100 : 0;
+        $formation->card_completion_percentage = min(100, round($avgCompletion, 1));
+
         $formation->card_created_label = $formation->created_at instanceof Carbon
             ? $formation->created_at->diffForHumans()
             : null;
@@ -89,22 +79,88 @@ class FormationsList extends Component
         return $formation;
     }
 
-    public function clearSearch()
-    {
-        $this->search = '';
-        $this->resetPage();
-    }
-
     public function render()
     {
         $formations = $this->formationsQuery()
-            ->paginate($this->perPage)
-            ->through(function ($formation) {
+            ->take(3)
+            ->get()
+            ->map(function ($formation) {
                 return $this->shapeFormationData($formation);
             });
 
+        // Calculate dashboard statistics
+        $stats = $this->calculateDashboardStats();
+
         return view('livewire.formateur.formations.formations-list', [
             'formations' => $formations,
+            'stats' => $stats,
         ]);
+    }
+
+    protected function calculateDashboardStats()
+    {
+        $userId = Auth::user()->id;
+        $isSuperadmin = Auth::user()->superadmin;
+
+        // Base query for formations
+        $formationsQuery = Formation::query();
+        if (!$isSuperadmin) {
+            $formationsQuery->where('user_id', $userId);
+        }
+
+        // Total formations
+        $totalFormations = $formationsQuery->count();
+
+        // Active formations
+        $activeFormations = (clone $formationsQuery)->where('active', true)->count();
+
+        // Total learners across all formations
+        $totalLearners = FormationUser::whereHas('formation', function ($query) use ($userId, $isSuperadmin) {
+            if (!$isSuperadmin) {
+                $query->where('user_id', $userId);
+            }
+        })->distinct('user_id')->count();
+
+        // Average completion rate - calculate based on completed status
+        $totalCompleted = FormationUser::whereHas('formation', function ($query) use ($userId, $isSuperadmin) {
+            if (!$isSuperadmin) {
+                $query->where('user_id', $userId);
+            }
+        })->where('status', 'completed')->count();
+
+        $totalEnrolledAll = FormationUser::whereHas('formation', function ($query) use ($userId, $isSuperadmin) {
+            if (!$isSuperadmin) {
+                $query->where('user_id', $userId);
+            }
+        })->count();
+
+        $avgCompletionRate = $totalEnrolledAll > 0 ? ($totalCompleted / $totalEnrolledAll) * 100 : 0;
+
+        // Recent formations (last 30 days)
+        $recentFormations = (clone $formationsQuery)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+
+        // Total lessons across all formations
+        $totalLessons = DB::table('lessons')
+            ->join('chapters', 'lessons.chapter_id', '=', 'chapters.id')
+            ->join('formations', 'chapters.formation_id', '=', 'formations.id')
+            ->when(!$isSuperadmin, function ($query) use ($userId) {
+                $query->where('formations.user_id', $userId);
+            })
+            ->count();
+
+        // Revenue calculation (if pricing exists)
+        $totalRevenue = 0; // This would need to be implemented based on your payment system
+
+        return [
+            'total_formations' => $totalFormations,
+            'active_formations' => $activeFormations,
+            'total_learners' => $totalLearners,
+            'avg_completion_rate' => round($avgCompletionRate, 1),
+            'recent_formations' => $recentFormations,
+            'total_lessons' => $totalLessons,
+            'total_revenue' => $totalRevenue,
+        ];
     }
 }
