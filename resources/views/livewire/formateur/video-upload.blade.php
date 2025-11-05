@@ -173,40 +173,37 @@
                             <h3 class="text-sm font-medium text-gray-900 mb-3">Aperçu de la Vidéo</h3>
 
                             <div id="video-preview-container" class="space-y-3">
-                                @if($video_file)
-                                    {{-- Aperçu du fichier temporaire --}}
-                                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
-                                        <video class="w-full h-full" controls preload="metadata">
-                                            <source src="{{ $video_file->temporaryUrl() }}" type="{{ $video_file->getMimeType() }}" />
-                                            Votre navigateur ne supporte pas la lecture de vidéos.
-                                        </video>
-                                    </div>
-                                    <div class="text-xs text-green-600 font-medium">
-                                        📹 Aperçu : {{ $video_file->getClientOriginalName() }}
-                                    </div>
-                                @elseif($video_content && $video_content->video_path)
-                                    {{-- Vidéo existante --}}
-                                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
-                                        <video class="w-full h-full" controls preload="metadata">
-                                            <source src="{{ Storage::disk('public')->url($video_content->video_path) }}" type="video/mp4" />
-                                            Votre navigateur ne supporte pas la lecture de vidéos.
-                                        </video>
-                                    </div>
-                                    <div class="text-xs text-blue-600 font-medium">
-                                        📁 Vidéo existante : {{ basename($video_content->video_path) }}
-                                    </div>
-                                @else
-                                    {{-- Aucun aperçu --}}
-                                    <div class="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                                        <div class="text-center text-gray-500">
-                                            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-                                            </svg>
-                                            <p class="text-sm">Aucun aperçu disponible</p>
-                                            <p class="text-xs mt-1">Sélectionnez un fichier vidéo pour voir l'aperçu</p>
-                                        </div>
-                                    </div>
-                                @endif
+{{-- Aperçu du fichier temporaire --}}
+@if($video_file)
+
+<p>Enregistez et actualisez.</p>
+@elseif($video_content && $video_content->video_path)
+    @php
+        $existingKey = 'existing-'.($video_content->id ?? '0').'-'.optional($video_content->updated_at)->timestamp;
+    @endphp
+    {{-- Vidéo existante --}}
+    <div class="aspect-video bg-black rounded-lg overflow-hidden" wire:key="preview-{{ $existingKey }}">
+        <video class="w-full h-full" controls preload="metadata">
+            <source src="{{ Storage::disk('public')->url($video_content->video_path) }}?v={{ time() }}" type="video/mp4" />
+            Votre navigateur ne supporte pas la lecture de vidéos.
+        </video>
+    </div>
+    <div class="text-xs text-blue-600 font-medium">
+        📁 Vidéo existante : {{ basename($video_content->video_path) }}
+    </div>
+@else
+    {{-- Aucun aperçu --}}
+    <div class="aspect-video bg-gray-200 rounded-lg flex items-center justify-center" wire:key="preview-empty">
+        <div class="text-center text-gray-500">
+            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-sm">Aucun aperçu disponible</p>
+            <p class="text-xs mt-1">Sélectionnez un fichier vidéo pour voir l'aperçu</p>
+        </div>
+    </div>
+@endif
+
                             </div>
                         </div>
 

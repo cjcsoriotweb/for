@@ -417,13 +417,14 @@ class FormationLessonController
         return view('out-application.formateur.formation.chapter.lesson.edit-video', compact('formation', 'chapter', 'lesson', 'videoContent'));
     }
 
-    public function updateVideo(Formation $formation, Chapter $chapter, Lesson $lesson)
+    public function updateVideotodelete(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $videoContent = $lesson->lessonable;
         if (! $videoContent || ! ($videoContent instanceof \App\Models\VideoContent)) {
             return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
                 ->withErrors(['error' => 'Vidéo non trouvée pour cette leçon.']);
         }
+
 
         // Validate the video data
         $validated = request()->validate([
