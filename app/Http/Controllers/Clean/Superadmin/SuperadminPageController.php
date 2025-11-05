@@ -154,7 +154,7 @@ class SuperadminPageController extends Controller
 
         $formation->loadCount([
             'teams',
-            'teams as active_teams_count' => fn ($query) => $query->wherePivot('visible', true),
+            'teams as active_teams_count' => fn ($query) => $query->where('formation_in_teams.visible', true),
             'learners',
             'chapters',
             'lessons',
@@ -166,7 +166,7 @@ class SuperadminPageController extends Controller
             ->select([
                 'teams.id',
                 'teams.name',
-                'teams.owner_id',
+                'teams.user_id',
                 'formation_in_teams.visible',
                 'formation_in_teams.approved_at',
                 'formation_in_teams.approved_by',
