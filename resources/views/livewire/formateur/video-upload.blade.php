@@ -63,24 +63,6 @@
                         </div>
                     </div>
 
-                    {{-- Debug (optionnel) --}}
-                    <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <h4 class="text-sm font-medium text-yellow-800 mb-2">Debug Info:</h4>
-                        <div class="text-xs text-yellow-700 space-y-1">
-                            <div>Video File: {{ $video_file ? 'YES (' . $video_file->getClientOriginalName() . ')' : 'NO' }}</div>
-                            <div>Upload Complete: {{ $upload_complete ? 'YES' : 'NO' }}</div>
-                            <div>Is Uploading: {{ $is_uploading ? 'YES' : 'NO' }}</div>
-                        </div>
-                        <div class="mt-2 space-x-2">
-                            <button type="button" wire:click="testLivewire" class="px-3 py-1 bg-blue-500 text-white text-xs rounded">
-                                Test Livewire
-                            </button>
-                            <button type="button" wire:click="$refresh" class="px-3 py-1 bg-green-500 text-white text-xs rounded">
-                                Refresh Component
-                            </button>
-                        </div>
-                    </div>
-
                     {{-- Formulaire principal --}}
                     <form wire:submit.prevent="save" class="space-y-6">
                         {{-- Titre --}}
