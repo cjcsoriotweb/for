@@ -204,6 +204,14 @@
               Télécharger le certificat PDF
             </a>
 
+            <a href="{{ route('eleve.formation.connection-report.pdf', [$team, $formationWithProgress]) }}"
+              class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+              Télécharger mon rapport de connexion
+            </a>
+
             <a href="{{ route('eleve.formation.show', [$team, $formationWithProgress]) }}"
               class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
               <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">

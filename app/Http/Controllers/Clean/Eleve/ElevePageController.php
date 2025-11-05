@@ -578,6 +578,122 @@ class ElevePageController extends Controller
     }
 
     /**
+     * Télécharger le rapport de connexion de l'étudiant pour cette formation en PDF
+     */
+    public function downloadConnectionReportPdf(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation est terminée
+        if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('warning', 'Cette formation n\'est pas encore terminée.');
+        }
+
+        // Récupérer les données de la formation
+        $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
+        $progress = $this->studentFormationService->getStudentProgress($user, $formation);
+
+        // Récupérer les données de completion de la formation
+        $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
+            ->where('user_id', $user->id)
+            ->where('team_id', $team->id)
+            ->first();
+
+        // Récupérer les logs d'activité pour cette formation
+        $startDate = $formationUser ? $formationUser->enrolled_at : now()->subMonths(6);
+        $endDate = $formationUser ? ($formationUser->completed_at ?? now()) : now();
+
+        $activityLogs = \App\Models\UserActivityLog::where('user_id', $user->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where(function ($query) use ($formation) {
+                // Filtrer les activités liées à cette formation
+                $query->where('url', 'like', '%/eleve/%/formations/' . $formation->id . '%')
+                      ->orWhere('url', 'like', '%/formation/' . $formation->id . '%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Grouper les activités par jour
+        $dailyActivities = $activityLogs->groupBy(function ($log) {
+            return $log->created_at->format('Y-m-d');
+        })->map(function ($logs, $date) {
+            $totalDuration = $logs->sum('duration_seconds');
+            $sessionCount = $logs->unique('session_id')->count();
+
+            return [
+                'date' => $date,
+                'formatted_date' => \Carbon\Carbon::parse($date)->format('d/m/Y'),
+                'total_duration' => $totalDuration,
+                'formatted_duration' => $this->formatDuration($totalDuration),
+                'session_count' => $sessionCount,
+                'activities' => $logs->take(10), // Limiter à 10 activités par jour pour le rapport
+            ];
+        })->sortByDesc('date')->take(30); // 30 derniers jours maximum
+
+        // Statistiques générales
+        $totalSessions = $activityLogs->unique('session_id')->count();
+        $totalDuration = $activityLogs->sum('duration_seconds');
+        $firstConnection = $activityLogs->min('created_at');
+        $lastConnection = $activityLogs->max('created_at');
+
+        // Générer le PDF
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.connection-report', [
+            'team' => $team,
+            'formation' => $formationWithProgress,
+            'user' => $user,
+            'formationUser' => $formationUser,
+            'progress' => $progress,
+            'dailyActivities' => $dailyActivities,
+            'totalSessions' => $totalSessions,
+            'totalDuration' => $totalDuration,
+            'formattedTotalDuration' => $this->formatDuration($totalDuration),
+            'firstConnection' => $firstConnection,
+            'lastConnection' => $lastConnection,
+        ]);
+
+        // Configuration du PDF
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOptions([
+            'defaultFont' => 'sans-serif',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+
+        // Nom du fichier
+        $filename = 'formation-' . $formation->id . '-rapport-connexion-' . $user->id . '.pdf';
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Formater la durée en heures, minutes, secondes
+     */
+    private function formatDuration(int $seconds): string
+    {
+        if ($seconds < 60) {
+            return $seconds . 's';
+        }
+
+        $minutes = floor($seconds / 60);
+        $remainingSeconds = $seconds % 60;
+
+        if ($minutes < 60) {
+            return $minutes . 'min ' . $remainingSeconds . 's';
+        }
+
+        $hours = floor($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+
+        return $hours . 'h ' . $remainingMinutes . 'min';
+    }
+
+    /**
      * Inscrire un etudiant a une formation
      */
     public function enroll(Team $team, Formation $formation)
