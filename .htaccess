@@ -1,18 +1,13 @@
-# Configuration pour les gros uploads de vidéos
-php_value upload_max_filesize 5G
-php_value post_max_size 5G
-php_value max_execution_time 3600
-php_value max_input_time 3600
-php_value memory_limit 1G
-php_value max_file_uploads 10
+# public/.htaccess
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
 
+    RewriteEngine On
 
-# Optimisations pour les gros fichiers
-php_value output_buffering Off
-php_value zlib.output_compression Off
-
-# Timeout pour les longues requêtes
-Timeout 3600
-
-# Taille maximale des requêtes
-LimitRequestBody 5368709120
+    # Si le fichier/dossier n'existe pas, on route vers index.php
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
