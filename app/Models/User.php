@@ -129,6 +129,16 @@ class User extends Authenticatable
         return $this->hasMany(Chat::class, 'receiver_user_id');
     }
 
+    public function signatures()
+    {
+        return $this->hasMany(Signature::class);
+    }
+
+    public function latestSignature()
+    {
+        return $this->hasOne(Signature::class)->latestOfMany();
+    }
+
     /**
      * Provide a textual context summary for AI prompts.
      */

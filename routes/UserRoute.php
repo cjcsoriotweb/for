@@ -37,4 +37,8 @@ Route::prefix('mon-compte')
         Route::get('/ai/conversations/{conversation}', [AiController::class, 'showConversation'])->name('ai.conversations.show');
         Route::get('/ai/users', [AiController::class, 'listUsers'])->name('ai.users');
 
+        // Signature management
+        Route::get('/signature', [AccountPageController::class, 'signature'])->name('signature');
+        Route::post('/signature', [AccountPageController::class, 'storeSignature'])->name('signature.store');
+
     });
