@@ -89,6 +89,39 @@ class SuperadminPageController extends Controller
         ]);
     }
 
+    public function userShow(User $user)
+    {
+        $user->load([
+            'teams:id,name,user_id,created_at',
+            'teams.owner:id,name,email',
+            'currentTeam:id,name,user_id',
+        ]);
+
+        // Charger les formations avec les données de la table pivot
+        $formations = $user->formations()
+            ->with(['teams:id,name'])
+            ->withPivot([
+                'team_id',
+                'completed_at',
+                'enrolled_at',
+                'status'
+            ])
+            ->get();
+
+        // Statistiques des formations
+        $formationStats = [
+            'total' => $formations->count(),
+            'completed' => $formations->whereNotNull('pivot.completed_at')->count(),
+            'in_progress' => $formations->whereNull('pivot.completed_at')->count(),
+        ];
+
+        return view('out-application.superadmin.superadmin-user-show-page', [
+            'user' => $user,
+            'formations' => $formations,
+            'formationStats' => $formationStats,
+        ]);
+    }
+
     public function formationsIndex(Request $request)
     {
         $search = trim((string) $request->input('search', ''));
