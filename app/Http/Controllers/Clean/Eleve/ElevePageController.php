@@ -28,6 +28,15 @@ class ElevePageController extends Controller
         private readonly FormationEnrollmentService $formationEnrollmentService,
     ) {}
 
+    /**
+     * Vérifie si le seuil de passage du quiz d'entrée est valide
+     * Le seuil doit être strictement entre 0% et 100%
+     */
+    private function isEntryQuizThresholdValid(?int $passingScore): bool
+    {
+        return $passingScore !== null && $passingScore > 0 && $passingScore < 100;
+    }
+
     public function home(Team $team)
     {
         $user = Auth::user();

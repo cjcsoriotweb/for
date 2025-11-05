@@ -57,8 +57,11 @@
                   class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                   Modifier la formation
                 </a>
-        
-       
+
+                <a href="{{ route('formateur.formation.chapters.index', $formation) }}"
+                  class="inline-flex items-center rounded-lg bg-slate-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+                  Gestion parcours
+                </a>
               </div>
             </div>
 
@@ -158,8 +161,8 @@
               <a href="{{ route('formateur.formation.ai.edit', $formation) }}"
                 class="flex items-center justify-between rounded-lg border border-slate-100 px-4 py-3 hover:border-indigo-200 hover:text-indigo-700">
                 <div>
-                  <p class="text-sm font-semibold text-slate-900">Parametrage IA</p>
-                  <span class="text-xs text-slate-500">Selectionnez la categorie et les assistants proposes.</span>
+                  <p class="text-sm font-semibold text-slate-900">Categorie</p>
+                  <span class="text-xs text-slate-500">Selectionnez la categorie de cette formation.</span>
                 </div>
                 <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -169,8 +172,8 @@
               <a href="{{ route('formateur.formation.entry-quiz.questions', $formation) }}"
                 class="flex items-center justify-between rounded-lg border border-slate-100 px-4 py-3 hover:border-indigo-200 hover:text-indigo-700">
                 <div>
-                  <p class="text-sm font-semibold text-slate-900">Questions du quiz d'entree</p>
-                  <span class="text-xs text-slate-500">Affinez les questions avant l acces a la formation.</span>
+                  <p class="text-sm font-semibold text-slate-900">Quiz Delta</p>
+                  <span class="text-xs text-slate-500">Affinez les questions avant d'acces a la formation.</span>
                 </div>
                 <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

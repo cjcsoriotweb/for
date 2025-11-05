@@ -25,7 +25,17 @@ class FormationEntryQuizController
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'passing_score' => 'nullable|integer|min:0|max:100',
+            'passing_score' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    if ($value !== null && ($value == 0 || $value == 100)) {
+                        $fail('Le seuil de passage doit être strictement entre 0% et 100%. Les valeurs 0% et 100% ne sont pas autorisées.');
+                    }
+                },
+            ],
         ]);
 
         $passingScore = $validated['passing_score'] ?? 80;

@@ -32,7 +32,7 @@ Route::prefix('formateur')
             Route::put('/formation/{formation}/edit/description', [FormateurFormationController::class, 'updateFormationDescription'])->name('formation.update.description');
             Route::get('/formation/{formation}/edit/cover', [FormateurFormationController::class, 'editFormationCoverImage'])->name('formation.edit.cover');
             Route::put('/formation/{formation}/edit/cover', [FormateurFormationController::class, 'updateFormationCoverImage'])->name('formation.update.cover');
-            Route::get('/formation/{formation}/pricing', [FormateurFormationController::class, 'editPricing'])->name('formation.pricing.edit');
+            Route::get('/formation/{formation}/contenu', [FormateurFormationController::class, 'editPricing'])->name('formation.pricing.edit');
             Route::get('/formation/{formation}/chapters', [FormateurFormationController::class, 'manageChapters'])->name('formation.chapters.index');
             Route::get('/formation/{formation}/ai', [FormateurFormationAiController::class, 'edit'])->name('formation.ai.edit');
             Route::put('/formation/{formation}/ai', [FormateurFormationAiController::class, 'update'])->name('formation.ai.update');
