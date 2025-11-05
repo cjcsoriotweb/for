@@ -70,10 +70,7 @@ class FormationUser extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function trainerSignature()
-    {
-        return $this->belongsTo(Signature::class, 'trainer_signature_id');
-    }
+
 
     public function completionValidatedBy()
     {

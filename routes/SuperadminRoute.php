@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('superadmin')
     ->name('superadmin.')
-    ->middleware(['auth', 'signature', AdminMiddleware::class])
+    ->middleware(['auth', AdminMiddleware::class])
     ->group(function (): void {
         Route::get('/', [SuperadminPageController::class, 'overview'])->name('overview');
         Route::get('/teams', [SuperadminPageController::class, 'teamsIndex'])->name('teams.index');
@@ -21,6 +21,7 @@ Route::prefix('superadmin')
         Route::get('/completion-requests/{formationUser}/documents/{index}', [SuperadminPageController::class, 'downloadCompletionDocument'])->name('completion-requests.documents.download');
         Route::post('/completion-requests/{formationUser}/approve', [SuperadminPageController::class, 'approveCompletionRequest'])->name('completion-requests.approve');
         Route::post('/completion-requests/{formationUser}/reject', [SuperadminPageController::class, 'rejectCompletionRequest'])->name('completion-requests.reject');
+        Route::post('/completion-requests/{formationUser}/cancel', [SuperadminPageController::class, 'cancelCompletionRequest'])->name('completion-requests.cancel');
         Route::get('/support', [SuperadminPageController::class, 'supportIndex'])->name('support.index');
         Route::prefix('ai')
             ->name('ai.')

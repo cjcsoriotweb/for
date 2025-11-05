@@ -17,6 +17,8 @@
       @php
       $progressPercent = (int) ($formation->progress_data['progress_percent'] ?? 0);
       $isCompleted = (bool) ($formation->is_completed ?? false);
+      $isPendingValidation = (bool) ($formation->is_pending_validation ?? false);
+      $isValidated = (bool) ($formation->is_validated ?? false);
       $fallbackTitle = $formation->title ?: 'Titre par d&eacute;faut';
       $fallbackDescription = $formation->description ?: 'Description par d&eacute;faut';
       @endphp
@@ -32,12 +34,21 @@
         <div class="space-y-5 p-6">
           @if($isCompleted)
           <div class="flex items-center justify-center">
+            @if($isPendingValidation)
+            <div class="flex items-center gap-2 rounded-full bg-amber-600/20 border border-amber-600 px-4 py-2 text-sm font-medium text-amber-400">
+              <svg class="h-4 w-4 animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+              </svg>
+              En attente de validation
+            </div>
+            @else
             <div class="flex items-center gap-2 rounded-full bg-green-600/20 border border-green-600 px-4 py-2 text-sm font-medium text-green-400">
               <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
               </svg>
               Formation terminée
             </div>
+            @endif
           </div>
           @else
           <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-300">
@@ -62,6 +73,31 @@
 
         <div class="space-y-4 border-t border-slate-800 px-6 py-5">
           @if($isCompleted)
+          @if($isPendingValidation)
+          <div class="flex items-center justify-center">
+            <div class="flex items-center gap-2 text-amber-400">
+              <svg class="h-5 w-5 animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm font-medium">En attente de validation par un administrateur</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="text-center text-xs text-slate-400">
+              Un superadmin doit valider votre formation avant que vous puissiez accéder à votre certificat.
+            </div>
+
+            <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700">
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z" clip-rule="evenodd" />
+              </svg>
+              Revoir la formation
+            </a>
+          </div>
+          @else
           <div class="flex items-center justify-center">
             <div class="flex items-center gap-2 text-green-400">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -90,6 +126,7 @@
               Revoir la formation
             </a>
           </div>
+          @endif
           @else
           <div class="h-2 w-full overflow-hidden rounded-full bg-slate-800">
             <div class="h-full rounded-full bg-slate-200 transition-all duration-300"

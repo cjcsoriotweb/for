@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\FormationUser;
-use App\Models\Signature;
+
 use App\Models\SupportTicket;
 use App\Models\Team;
 use App\Models\TeamInvitation;
@@ -303,16 +303,11 @@ class SuperadminPageController extends Controller
             'formation:id,title,description',
             'user:id,name,email',
             'team:id,name',
-            'trainerSignature',
             'completionValidatedBy:id,name'
         ]);
 
-        // Récupérer la signature de l'étudiant
-        $studentSignature = $formationUser->user && $formationUser->user->signatures()->exists() ? $formationUser->user->signatures()->latest()->first() : null;
-
         return view('out-application.superadmin.superadmin-completion-request-show-page', [
             'formationUser' => $formationUser,
-            'studentSignature' => $studentSignature,
         ]);
     }
 
@@ -322,20 +317,10 @@ class SuperadminPageController extends Controller
     public function approveCompletionRequest(FormationUser $formationUser, Request $request)
     {
         $request->validate([
-            'trainer_signature' => 'required|string',
             'completion_documents.*' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
         ]);
 
         $user = auth()->user();
-
-        // Créer la signature du formateur
-        $trainerSignature = Signature::create([
-            'user_id' => $user->id,
-            'signature_data' => $request->input('trainer_signature'),
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'signed_at' => now(),
-        ]);
 
         // Gérer les fichiers joints
         $completionDocuments = [];
@@ -364,7 +349,6 @@ class SuperadminPageController extends Controller
         // Mettre à jour la demande
         $formationUser->update([
             'completion_request_status' => 'approved',
-            'trainer_signature_id' => $trainerSignature->id,
             'completion_validated_at' => now(),
             'completion_validated_by' => $user->id,
             'completion_documents' => !empty($completionDocuments) ? $completionDocuments : null,
@@ -414,5 +398,26 @@ class SuperadminPageController extends Controller
         // TODO: Envoyer une notification à l'étudiant avec la raison du rejet
 
         return redirect()->back()->with('success', 'La demande de validation a été rejetée.');
+    }
+
+    /**
+     * Annuler une validation de formation approuvée
+     */
+    public function cancelCompletionRequest(FormationUser $formationUser, Request $request)
+    {
+        // Vérifier que la demande est approuvée
+        if ($formationUser->completion_request_status !== 'approved') {
+            return redirect()->back()->with('error', 'Cette demande ne peut pas être annulée car elle n\'est pas approuvée.');
+        }
+
+        // Remettre le statut en attente et supprimer les informations de validation
+        $formationUser->update([
+            'completion_request_status' => 'pending',
+            'completion_validated_at' => null,
+            'completion_validated_by' => null,
+            'completion_documents' => null, // Supprimer aussi les documents joints lors de l'annulation
+        ]);
+
+        return redirect()->back()->with('success', 'La validation de la demande a été annulée avec succès.');
     }
 }

@@ -36,7 +36,7 @@ class ElevePageController extends Controller
         $formations = $this->studentFormationService->listFormationCurrentByStudent($team, $user);
 
         // Ajouter les donnÃ©es de progression pour chaque formation
-        $formationsWithProgress = $formations->map(function ($formation) use ($user) {
+        $formationsWithProgress = $formations->map(function ($formation) use ($user, $team) {
             $progress = $this->studentFormationService->getStudentProgress($user, $formation);
             $formation->progress_data = $progress ?? [
                 'status' => 'enrolled',
@@ -49,6 +49,22 @@ class ElevePageController extends Controller
                 'max_score_total' => 0,
             ];
             $formation->is_completed = $this->studentFormationService->isFormationCompleted($user, $formation);
+
+            // Ajouter les informations de validation pour les formations terminées
+            if ($formation->is_completed) {
+                $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
+                    ->where('user_id', $user->id)
+                    ->where('team_id', $team->id)
+                    ->first();
+
+                $formation->validation_status = $formationUser ? $formationUser->completion_request_status : null;
+                $formation->is_validated = $formationUser && $formationUser->completion_request_status === 'approved';
+                $formation->is_pending_validation = $formationUser && $formationUser->completion_request_status === 'pending';
+            } else {
+                $formation->validation_status = null;
+                $formation->is_validated = false;
+                $formation->is_pending_validation = false;
+            }
 
             return $formation;
         });
@@ -261,14 +277,13 @@ class ElevePageController extends Controller
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
 
-        // Récupérer la signature de l'étudiant
-        $studentSignature = $user->signatures()->latest()->first();
+
 
         // Récupérer les données de completion de la formation
         $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
             ->where('user_id', $user->id)
             ->where('team_id', $team->id)
-            ->with(['trainerSignature', 'completionValidatedBy'])
+            ->with(['completionValidatedBy'])
             ->first();
 
         return view('in-application.eleve.formation.completed', [
@@ -281,7 +296,6 @@ class ElevePageController extends Controller
             'assistantTrainer' => $assistantTrainer,
             'assistantTrainerSlug' => $assistantTrainerSlug,
             'assistantTrainerName' => $assistantTrainerName,
-            'studentSignature' => $studentSignature,
             'formationUser' => $formationUser,
         ]);
     }
@@ -527,14 +541,11 @@ class ElevePageController extends Controller
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
 
-        // Récupérer la signature de l'étudiant
-        $studentSignature = $user->signatures()->latest()->first();
-
         // Récupérer les données de completion de la formation
         $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
             ->where('user_id', $user->id)
             ->where('team_id', $team->id)
-            ->with(['trainerSignature', 'completionValidatedBy'])
+            ->with(['completionValidatedBy'])
             ->first();
 
         // Générer le PDF
@@ -548,7 +559,6 @@ class ElevePageController extends Controller
             'assistantTrainer' => $assistantTrainer,
             'assistantTrainerSlug' => $assistantTrainerSlug,
             'assistantTrainerName' => $assistantTrainerName,
-            'studentSignature' => $studentSignature,
             'formationUser' => $formationUser,
             'user' => $user,
         ]);

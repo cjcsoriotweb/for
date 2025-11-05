@@ -150,51 +150,7 @@
             color: #6b7280;
         }
 
-        .signatures-section {
-            margin-top: 40px;
-            page-break-inside: avoid;
-        }
 
-        .signatures-grid {
-            display: table;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .signature-box {
-            display: table-cell;
-            width: 45%;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            vertical-align: top;
-        }
-
-        .signature-box:first-child {
-            margin-right: 10%;
-        }
-
-        .signature-label {
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #374151;
-        }
-
-        .signature-image {
-            max-width: 200px;
-            max-height: 100px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            margin: 0 auto 10px;
-            display: block;
-        }
-
-        .signature-date {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 10px;
-        }
 
         .footer {
             margin-top: 40px;
@@ -331,44 +287,7 @@
         @endforeach
     </div>
 
-    <div class="signatures-section">
-        <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #1f2937; text-align: center;">
-            Signatures de validation
-        </h3>
 
-        <div class="signatures-grid">
-            <!-- Signature de l'étudiant -->
-            <div class="signature-box">
-                <div class="signature-label">Signature de l'apprenant</div>
-                @if($studentSignature)
-                <img src="{{ $studentSignature->signature_data }}" alt="Signature de l'apprenant" class="signature-image">
-                <div class="signature-date">
-                    Signé le {{ $studentSignature->signed_at->format('d/m/Y à H:i') }}
-                </div>
-                @else
-                <div style="padding: 40px; color: #6b7280; font-style: italic;">
-                    Aucune signature enregistrée
-                </div>
-                @endif
-            </div>
-
-            <!-- Signature du formateur -->
-            <div class="signature-box">
-                <div class="signature-label">Signature du formateur</div>
-                @if($formationUser && $formationUser->trainerSignature)
-                <img src="{{ $formationUser->trainerSignature->signature_data }}" alt="Signature du formateur" class="signature-image">
-                <div class="signature-date">
-                    Validé par {{ $formationUser->completionValidatedBy->name ?? 'Formateur' }}<br>
-                    le {{ $formationUser->completion_validated_at->format('d/m/Y à H:i') }}
-                </div>
-                @else
-                <div style="padding: 40px; color: #6b7280; font-style: italic;">
-                    En attente de validation
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
 
     <div class="footer">
         <p>Ce certificat atteste que l'apprenant a successfully terminé la formation "{{ $formationWithProgress->title }}".</p>

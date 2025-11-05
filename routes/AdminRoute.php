@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('administrateur')
     ->name('application.admin.')
-    ->middleware(['auth', 'signature', AdminMiddleware::class])
+    ->middleware(['auth', AdminMiddleware::class])
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [AdminPageController::class, 'overview'])->name('overview');

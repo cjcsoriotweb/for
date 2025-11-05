@@ -27,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'organisateur' => \App\Http\Middleware\EnsureOrganisateurAccess::class,
             'eleve' => \App\Http\Middleware\EnsureEleveAccess::class,
-            'signature' => \App\Http\Middleware\EnsureSignatureExists::class,
+
 
         ]);
     })
