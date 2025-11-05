@@ -5,7 +5,7 @@
 ])
 
 <x-app-layout>
-    <x-slot name="header">
+    <header class="mb-5">
         <div class="bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
             <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-12">
                 <div class="flex items-start gap-4">
@@ -32,7 +32,7 @@
                 @endisset
             </div>
         </div>
-    </x-slot>
+    </header>
 
     {{ $slot }}
 </x-app-layout>
