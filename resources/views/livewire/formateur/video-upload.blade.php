@@ -1,20 +1,20 @@
 <div>
-    <!-- Formation Details -->
+    {{-- Alerte d'erreurs --}}
     @if($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-        <strong class="font-bold">Erreur!</strong>
-        <span class="block sm:inline">Veuillez corriger les erreurs suivantes:</span>
-        <ul class="mt-2 list-disc list-inside">
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <strong class="font-bold">Erreur!</strong>
+            <span class="block sm:inline">Veuillez corriger les erreurs suivantes:</span>
+            <ul class="mt-2 list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <!-- Breadcrumb -->
+            {{-- Fil d'Ariane --}}
             <div class="mb-6">
                 <nav class="flex" aria-label="Breadcrumb">
                     <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -63,54 +63,73 @@
                         </div>
                     </div>
 
-                    <!-- Main form for both upload and metadata -->
+                    {{-- Debug (optionnel) --}}
+                    <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <h4 class="text-sm font-medium text-yellow-800 mb-2">Debug Info:</h4>
+                        <div class="text-xs text-yellow-700 space-y-1">
+                            <div>Video File: {{ $video_file ? 'YES (' . $video_file->getClientOriginalName() . ')' : 'NO' }}</div>
+                            <div>Upload Complete: {{ $upload_complete ? 'YES' : 'NO' }}</div>
+                            <div>Is Uploading: {{ $is_uploading ? 'YES' : 'NO' }}</div>
+                        </div>
+                        <div class="mt-2 space-x-2">
+                            <button type="button" wire:click="testLivewire" class="px-3 py-1 bg-blue-500 text-white text-xs rounded">
+                                Test Livewire
+                            </button>
+                            <button type="button" wire:click="$refresh" class="px-3 py-1 bg-green-500 text-white text-xs rounded">
+                                Refresh Component
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Formulaire principal --}}
                     <form wire:submit.prevent="save" class="space-y-6">
-                        <!-- Video Title -->
+                        {{-- Titre --}}
                         <div>
                             <label for="video_title" class="block text-sm font-medium text-gray-700 mb-2">
                                 Titre de la Vidéo *
                             </label>
-                            <input type="text" id="video_title" wire:model="video_title"
+                            <input
+                                type="text"
+                                id="video_title"
+                                wire:model.defer="video_title"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('video_title') border-red-500 @enderror"
-                                placeholder="Ex: Introduction aux concepts de base" required />
-                            <p class="text-xs text-gray-500 mt-1">Saisissez le titre et la description, puis cliquez sur "Ajouter la Vidéo" pour enregistrer</p>
+                                placeholder="Ex: Introduction aux concepts de base"
+                                required
+                            />
+                            <p class="text-xs text-gray-500 mt-1">
+                                Saisissez le titre et la description, puis cliquez sur « Ajouter la Vidéo » pour enregistrer.
+                            </p>
                             @error('video_title')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Video Description -->
+                        {{-- Description --}}
                         <div>
                             <label for="video_description" class="block text-sm font-medium text-gray-700 mb-2">
                                 Description de la Vidéo
                             </label>
-                            <textarea id="video_description" wire:model="video_description" rows="3"
+                            <textarea
+                                id="video_description"
+                                wire:model.defer="video_description"
+                                rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('video_description') border-red-500 @enderror"
-                                placeholder="Décrivez brièvement le contenu de cette vidéo...">{{ $video_description }}</textarea>
+                                placeholder="Décrivez brièvement le contenu de cette vidéo..."></textarea>
                             @error('video_description')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- File Upload Area -->
-                        <div class="space-y-4"
-                             x-data="{
-                                 uploading: false,
-                                 progress: 0,
-                                 fileName: '',
-                                 fileSize: 0
-                             }"
-                             x-on:livewire-upload-start="uploading = true; progress = 0"
-                             x-on:livewire-upload-progress="progress = $event.detail.progress"
-                             x-on:livewire-upload-finish="uploading = false; progress = 100"
-                             x-on:livewire-upload-error="uploading = false; progress = 0">
+                        {{-- Upload fichier --}}
+                        <div class="space-y-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Fichier Vidéo *
                             </label>
+
                             <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
                                 <div class="text-center">
-                                    <!-- Upload Progress Animation -->
-                                    <div x-show="uploading" x-transition class="space-y-4">
+                                    {{-- Animation de chargement --}}
+                                    <div wire:loading wire:target="video_file" class="space-y-4">
                                         <div class="flex items-center justify-center">
                                             <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
                                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -118,93 +137,112 @@
                                             </svg>
                                         </div>
                                         <div class="space-y-2">
-                                            <p class="text-sm font-medium text-gray-900">Téléchargement en cours...</p>
-                                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300 ease-out"
-                                                     :style="`width: ${progress}%`"></div>
-                                            </div>
-                                            <p class="text-xs text-gray-600" x-text="`Progression: ${progress}%`"></p>
+                                            <p class="text-sm font-medium text-gray-900">Téléchargement en cours…</p>
+                                            <p class="text-xs text-gray-600">Veuillez patienter pendant l'upload du fichier.</p>
                                         </div>
                                     </div>
 
-                                    <!-- File Input - Hidden during upload -->
-                                    <div x-show="!uploading" x-transition class="space-y-1">
+                                    {{-- Sélecteur de fichier --}}
+                                    <div wire:loading.remove wire:target="video_file" class="space-y-1">
                                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                         <div class="flex text-sm text-gray-600">
                                             <label for="video_file" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                                 <span>Sélectionner un fichier vidéo</span>
-                                                <input id="video_file" wire:model="video_file" type="file" class="sr-only" accept="video/*"
-                                                       x-on:change="fileName = $event.target.files[0]?.name || '';
-                                                                   fileSize = $event.target.files[0] ? ($event.target.files[0].size / 1024 / 1024).toFixed(2) : 0;" />
+                                                <input
+                                                    id="video_file"
+                                                    wire:model="video_file"
+                                                    type="file"
+                                                    class="sr-only"
+                                                    accept="video/*"
+                                                />
                                             </label>
                                             <p class="pl-1">ou glisser-déposer</p>
                                         </div>
                                         <p class="text-xs text-gray-500">
-                                            MP4, AVI, MOV, WebM jusqu'à 5GB
+                                            MP4, AVI, MOV, WebM jusqu'à 512MB
                                         </p>
 
-                                        <!-- File selected status -->
+                                        {{-- Statut sélection --}}
                                         @if($video_file)
-                                        <div class="text-xs text-green-600 font-medium">
-                                            ✅ Fichier sélectionné: {{ $video_file->getClientOriginalName() }}
-                                            ({{ number_format($video_file->getSize() / 1024 / 1024, 2) }} MB)
-                                        </div>
+                                            <div class="text-xs text-green-600 font-medium mt-2">
+                                                ✅ Fichier sélectionné: {{ $video_file->getClientOriginalName() }}
+                                                ({{ number_format($video_file->getSize() / 1024 / 1024, 2) }} MB)
+                                            </div>
                                         @endif
 
                                         @if($video_content && $video_content->video_path)
-                                        <p class="text-xs text-blue-600">
-                                            📁 Fichier actuel: {{ basename($video_content->video_path) }}
-                                        </p>
+                                            <p class="text-xs text-blue-600 mt-1">
+                                                📁 Fichier actuel: {{ basename($video_content->video_path) }}
+                                            </p>
                                         @endif
                                     </div>
                                 </div>
-                            @error('video_file')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+
+                                @error('video_file')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <!-- Video Preview Section -->
+                        {{-- Aperçu --}}
                         <div class="bg-gray-50 rounded-lg p-4">
-                            <h3 class="text-sm font-medium text-gray-900 mb-3">
-                                Aperçu de la Vidéo
-                            </h3>
+                            <h3 class="text-sm font-medium text-gray-900 mb-3">Aperçu de la Vidéo</h3>
+
                             <div id="video-preview-container" class="space-y-3">
-                                @if($video_content && $video_content->video_path && !$video_file)
-                                <!-- Existing Video Preview -->
-                                <div class="aspect-video bg-black rounded-lg overflow-hidden">
-                                    <video class="w-full h-full" controls preload="metadata">
-                                        <source src="{{ Storage::disk('public')->url($video_content->video_path) }}" type="video/mp4" />
-                                        Votre navigateur ne supporte pas la lecture de vidéos.
-                                    </video>
-                                </div>
-                                @else
-                                <!-- No Video Preview -->
-                                <div class="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                                    <div class="text-center text-gray-500">
-                                        <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-                                        </svg>
-                                        <p class="text-sm">Aucun aperçu disponible</p>
-                                        <p class="text-xs mt-1">L'aperçu sera disponible après l'upload</p>
+                                @if($video_file)
+                                    {{-- Aperçu du fichier temporaire --}}
+                                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
+                                        <video class="w-full h-full" controls preload="metadata">
+                                            <source src="{{ $video_file->temporaryUrl() }}" type="{{ $video_file->getMimeType() }}" />
+                                            Votre navigateur ne supporte pas la lecture de vidéos.
+                                        </video>
                                     </div>
-                                </div>
+                                    <div class="text-xs text-green-600 font-medium">
+                                        📹 Aperçu : {{ $video_file->getClientOriginalName() }}
+                                    </div>
+                                @elseif($video_content && $video_content->video_path)
+                                    {{-- Vidéo existante --}}
+                                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
+                                        <video class="w-full h-full" controls preload="metadata">
+                                            <source src="{{ Storage::disk('public')->url($video_content->video_path) }}" type="video/mp4" />
+                                            Votre navigateur ne supporte pas la lecture de vidéos.
+                                        </video>
+                                    </div>
+                                    <div class="text-xs text-blue-600 font-medium">
+                                        📁 Vidéo existante : {{ basename($video_content->video_path) }}
+                                    </div>
+                                @else
+                                    {{-- Aucun aperçu --}}
+                                    <div class="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <div class="text-center text-gray-500">
+                                            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <p class="text-sm">Aucun aperçu disponible</p>
+                                            <p class="text-xs mt-1">Sélectionnez un fichier vidéo pour voir l'aperçu</p>
+                                        </div>
+                                    </div>
                                 @endif
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
+                        {{-- Actions --}}
                         <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                             <a href="{{ route('formateur.formation.show', $formation) }}" class="text-gray-600 hover:text-gray-900 text-sm font-medium">
                                 ← Retour aux leçons
                             </a>
                             <div class="space-x-3">
-                                <button type="button" wire:click="cancel"
+                                <button
+                                    type="button"
+                                    wire:click="cancel"
                                     class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                     Annuler
                                 </button>
-                                <button type="submit"
+
+                                <button
+                                    type="submit"
                                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     wire:loading.attr="disabled">
                                     <span wire:loading.remove>{{ $video_content ? 'Mettre à Jour' : 'Ajouter' }} la Vidéo</span>
@@ -213,8 +251,8 @@
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
+                </div> {{-- /.p-6 --}}
+            </div> {{-- /.card --}}
         </div>
     </div>
 </div>
