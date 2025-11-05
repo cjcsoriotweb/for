@@ -66,13 +66,24 @@ class Readtext extends Component
             ->first();
 
         if ($lessonUser) {
-            $this->watchedSeconds = $lessonUser->pivot->watched_seconds;
+            $this->watchedSeconds = $lessonUser->pivot->watched_seconds ?? 0;
             $this->elapsedTime = $this->watchedSeconds;
+
+            // If read_percent exists, use it to calculate elapsed time
+            if (isset($lessonUser->pivot->read_percent) && $lessonUser->pivot->read_percent > 0) {
+                // Recalculate elapsed time based on read_percent if it's more accurate
+                $calculatedElapsed = ($lessonUser->pivot->read_percent / 100) * $this->requiredTime;
+                if ($calculatedElapsed > $this->elapsedTime) {
+                    $this->elapsedTime = $calculatedElapsed;
+                    $this->watchedSeconds = $this->elapsedTime;
+                }
+            }
 
             Log::info('Loaded existing lesson reading progress', [
                 'lesson_id' => $this->lesson->id,
                 'user_id' => $user->id,
                 'watched_seconds' => $this->watchedSeconds,
+                'read_percent' => $lessonUser->pivot->read_percent ?? 0,
             ]);
         }
     }
@@ -116,13 +127,27 @@ class Readtext extends Component
 
         $user = Auth::user();
 
-        // Update watched_seconds in database
+        // Calculate read percentage based on elapsed time vs required time
+        $readPercent = 0;
+        if ($this->requiredTime > 0) {
+            $readPercent = min(100, ($this->elapsedTime / $this->requiredTime) * 100);
+        }
+
+        // Update both watched_seconds and read_percent in database
         $this->lesson->learners()->updateExistingPivot($user->id, [
             'watched_seconds' => $this->elapsedTime,
+            'read_percent' => round($readPercent, 1),
             'last_activity_at' => now(),
         ]);
 
         $this->watchedSeconds = $this->elapsedTime;
+
+        Log::info('Lesson reading progress updated', [
+            'lesson_id' => $this->lesson->id,
+            'user_id' => $user->id,
+            'watched_seconds' => $this->elapsedTime,
+            'read_percent' => $readPercent,
+        ]);
     }
 
     // Timer starts automatically in mount() method
