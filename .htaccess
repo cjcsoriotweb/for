@@ -6,6 +6,7 @@ php_value max_input_time 3600
 php_value memory_limit 1G
 php_value max_file_uploads 10
 
+
 # Optimisations pour les gros fichiers
 php_value output_buffering Off
 php_value zlib.output_compression Off
