@@ -9,6 +9,7 @@ $lessonContent->estimated_read_time, 'team'=> $team, 'formation'=>$formation, 'l
     $inlineAttachment = $attachments->firstWhere('display_mode', 'inline');
     $downloadAttachments = $attachments->where('display_mode', 'download');
     $isLessonCompleted = optional(optional($lessonProgress ?? null)->pivot)->status === 'completed';
+    $hasStartedFormation = true; // L'étudiant a accès aux documents dès qu'il peut voir la leçon (donc il est inscrit)
 @endphp
 
 <div class="prose dark:prose-invert max-w-none mb-6">
@@ -16,7 +17,7 @@ $lessonContent->estimated_read_time, 'team'=> $team, 'formation'=>$formation, 'l
 </div>
 
 @if($attachments->isNotEmpty())
-  @if($isLessonCompleted)
+  @if($hasStartedFormation)
     <details class="bg-gray-50 border border-gray-200 rounded-lg mb-6">
       <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-gray-800 font-semibold">
         <span>Ressources compl&eacute;mentaires</span>
@@ -59,7 +60,7 @@ $lessonContent->estimated_read_time, 'team'=> $team, 'formation'=>$formation, 'l
     </details>
   @else
     <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg px-4 py-3 mb-6">
-      Terminez la le&ccedil;on pour d&eacute;bloquer les documents compl&eacute;mentaires.
+      Inscrivez-vous Ã  la formation pour accÃ©der aux documents complÃ©mentaires.
     </div>
   @endif
 @endif

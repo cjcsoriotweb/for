@@ -30,6 +30,9 @@ class FormationUser extends Model
         'completion_validated_at',
         'completion_validated_by',
         'completion_documents',
+        'feedback_rating',
+        'feedback_comment',
+        'feedback_at',
     ];
 
     protected function casts(): array
@@ -52,6 +55,8 @@ class FormationUser extends Model
             'completion_request_at' => 'datetime',
             'completion_validated_at' => 'datetime',
             'completion_documents' => 'array',
+            'feedback_rating' => 'integer',
+            'feedback_at' => 'datetime',
         ];
     }
 

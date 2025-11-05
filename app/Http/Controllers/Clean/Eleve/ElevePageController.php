@@ -1471,5 +1471,48 @@ class ElevePageController extends Controller
         ));
     }
 
+    /**
+     * Soumettre un retour sur une formation terminée
+     */
+    public function submitFeedback(Team $team, Formation $formation, Request $request)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit à la formation
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation est terminée
+        if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
+            return back()->with('error', 'Vous devez d\'abord terminer la formation avant de donner votre retour.');
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        // Récupérer ou créer l'enregistrement FormationUser
+        $formationUser = \App\Models\FormationUser::firstOrNew([
+            'formation_id' => $formation->id,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+        ]);
+
+        // Vérifier si un retour a déjà été donné
+        if ($formationUser->feedback_at) {
+            return back()->with('warning', 'Vous avez déjà donné votre retour pour cette formation.');
+        }
+
+        // Sauvegarder le retour
+        $formationUser->feedback_rating = $request->input('rating');
+        $formationUser->feedback_comment = $request->input('comment');
+        $formationUser->feedback_at = now();
+        $formationUser->save();
+
+        return back()->with('success', 'Merci pour votre retour ! Votre avis nous aide à améliorer nos formations.');
+    }
+
 
 }

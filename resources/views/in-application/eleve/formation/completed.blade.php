@@ -212,14 +212,29 @@
               Télécharger mon rapport de connexion
             </a>
 
-            <a href="{{ route('eleve.formation.show', [$team, $formationWithProgress]) }}"
+            @if(!$formationUser || !$formationUser->feedback_at)
+            <button onclick="openFeedbackModal()"
               class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
               <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
               </svg>
-              Revoir la formation
-            </a>
+              Donner mon retour
+            </button>
+            @else
+            <div class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-green-700 bg-green-50 rounded-lg">
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              Retour donné
+              <div class="flex items-center ml-2">
+                @for($i = 1; $i <= 5; $i++)
+                <svg class="h-4 w-4 {{ $i <= $formationUser->feedback_rating ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                @endfor
+              </div>
+            </div>
+            @endif
 
             <a href="{{ route('eleve.index', $team) }}"
               class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
@@ -313,6 +328,31 @@
     </div>
     @endif
 
+    <!-- Modal de feedback -->
+    <div id="feedback-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50" data-feedback-modal>
+      <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="mt-3">
+          @include('in-application.eleve.formation.feedback')
+        </div>
+      </div>
+    </div>
+
+    <script>
+    function openFeedbackModal() {
+      document.getElementById('feedback-modal').classList.remove('hidden');
+    }
+
+    function closeFeedbackModal() {
+      document.getElementById('feedback-modal').classList.add('hidden');
+    }
+
+    // Fermer la modal en cliquant en dehors
+    document.getElementById('feedback-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeFeedbackModal();
+      }
+    });
+    </script>
 
   </div>
 </x-eleve-layout>

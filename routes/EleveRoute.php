@@ -21,6 +21,7 @@ Route::prefix('eleve')
             Route::get('/{team}/{formation}/documents/{document}', [ElevePageController::class, 'downloadCompletionDocument'])->name('documents.download');
             Route::post('/{team}/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('enroll');
             Route::post('/{team}/{formation}/request-completion', [ElevePageController::class, 'requestCompletion'])->name('request-completion');
+            Route::post('/{team}/{formation}/feedback', [ElevePageController::class, 'submitFeedback'])->name('feedback');
 
             // Entry quiz routes
             Route::prefix('entry-quiz')->name('entry-quiz.')->group(function () {
