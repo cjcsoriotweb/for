@@ -53,6 +53,7 @@ $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_c
       </div>
       @endif
     </div>
+          @if($featuredFormation)
 
     <div class="relative hidden w-full max-w-xs shrink-0 md:block">
       <div
@@ -66,8 +67,8 @@ $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_c
           @endif
 
         </div>
+
         <div class="absolute inset-0 flex flex-col justify-end p-6">
-          @if($featuredFormation)
           <h2 class="text-xl font-semibold text-white">
             {{ $featuredFormation->title }}
           </h2>
@@ -82,19 +83,13 @@ $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_c
           <p class="mt-2 text-xs font-medium uppercase tracking-wider text-white/70">
             Progression&nbsp;: {{ (int) ($featuredFormation->progress_data['progress_percent'] ?? 0) }}%
           </p>
-          @else
-          <div class="space-y-3 text-white/80">
-            <h2 class="text-lg font-semibold">Aucune formation en cours</h2>
-            <p class="text-sm">S&eacute;lectionnez une formation pour commencer votre parcours et recevoir vos
-              recommandations personnalis&eacute;es.</p>
-          </div>
-          @endif
+  
         </div>
+
       </div>
-      <div class="absolute -left-10 -top-10 h-24 w-24 rounded-full border border-white/20 bg-white/10 blur-xl"></div>
-      <div
-        class="absolute -right-8 top-24 h-20 w-20 rounded-full border border-white/10 bg-gradient-to-br from-blue-500/20 to-purple-500/30 blur-xl">
-      </div>
+   
     </div>
+          @endif
+
   </div>
 </section>

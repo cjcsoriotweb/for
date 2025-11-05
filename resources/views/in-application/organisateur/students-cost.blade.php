@@ -28,8 +28,8 @@
         <div class="relative flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Coût total</p>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($monthlyCost, 0, ',', ' ') }} €
-            </p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($monthlyCost, 0, ',', ' ') }} €</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Système de tarification désactivé</p>
           </div>
           <div
             class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-lg">
@@ -80,7 +80,7 @@
               {{ optional(\Carbon\Carbon::make($student->pivot->enrolled_at))->format('d/m/Y') ?? 'Non renseigné' }}
             </td>
             <td class="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {{ number_format($student->pivot->enrollment_cost ?? $formation->money_amount ?? 0, 0, ',', ' ') }} €
+              0 €
             </td>
           </tr>
           @empty

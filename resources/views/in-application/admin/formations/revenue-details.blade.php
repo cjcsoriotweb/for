@@ -29,6 +29,7 @@
                         </h1>
                         <p class="text-sm text-gray-600">
                             Visualisez les jetons générés par formation, par équipe et par utilisateur.
+                            <span class="text-orange-600 font-medium">Système de tarification désactivé.</span>
                         </p>
                     </div>
                     <form
@@ -166,7 +167,7 @@
                             @forelse($enrollments as $enrollment)
                                 @php
                                     $enrollmentDate = Carbon::make($enrollment->enrolled_at ?? $enrollment->created_at);
-                                    $tokenAmount = (int) ($enrollment->enrollment_cost ?? $formation->money_amount ?? 0);
+                                    $tokenAmount = 0; // Pricing system removed
                                 @endphp
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-3 font-medium text-gray-900">

@@ -34,7 +34,7 @@
                 @if(!is_null($formation['usage_remaining']))
                   {{ trans_choice(':count activation restante|:count activations restantes', $formation['usage_remaining'], ['count' => $formation['usage_remaining']]) }}
                 @else
-                  Utilisation illimitée
+                  30 activations restantes
                 @endif
               </span>
             </div>
@@ -109,6 +109,3 @@
   </div>
   @endif
 </section>
-
-
-

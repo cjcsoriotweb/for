@@ -268,11 +268,7 @@ class OrganisateurService
             return $enrolledAt && $enrolledAt->between($periodStart, $periodEnd);
         });
 
-        $monthlyCost = $monthlyEnrollments->reduce(function ($carry, $student) use ($formation) {
-            $enrollmentCost = $student->pivot->enrollment_cost ?? $formation->money_amount ?? 0;
-
-            return $carry + (int) $enrollmentCost;
-        }, 0);
+        $monthlyCost = 0; // Pricing system removed
 
         if ($availableMonths->doesntContain($selectedMonth)) {
             $availableMonths = $availableMonths->prepend($selectedMonth)->unique()->sortDesc()->values();
@@ -319,7 +315,6 @@ class OrganisateurService
                 'completed_at',
                 'score_total',
                 'max_score_total',
-                'enrollment_cost',
             ])
             ->first();
 
