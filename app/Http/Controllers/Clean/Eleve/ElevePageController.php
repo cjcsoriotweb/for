@@ -19,7 +19,6 @@ use App\Services\FormationEnrollmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class ElevePageController extends Controller
 {
@@ -1142,35 +1141,5 @@ class ElevePageController extends Controller
         ));
     }
 
-    /**
-     * Afficher la page de gestion de signature
-     */
-    public function signature(Team $team)
-    {
-        $user = Auth::user();
 
-        return view('in-application.eleve.signature', compact('team', 'user'));
-    }
-
-    /**
-     * Enregistrer la signature de l'utilisateur
-     */
-    public function storeSignature(Team $team, Request $request)
-    {
-        $user = Auth::user();
-
-        $request->validate([
-            'signature' => 'required|string',
-        ]);
-
-        try {
-            $user->update([
-                'signature' => $request->signature,
-            ]);
-
-            return back()->with('success', 'Votre signature a été enregistrée avec succès.');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Une erreur est survenue lors de l\'enregistrement de votre signature.');
-        }
-    }
 }

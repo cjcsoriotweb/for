@@ -23,8 +23,12 @@ class SignaturePad extends Component
         }
     }
 
-    public function saveSignature()
+    public function saveSignature($signatureData = null)
     {
+        if ($signatureData) {
+            $this->signatureData = $signatureData;
+        }
+
         $this->validate([
             'signatureData' => 'required|string',
         ]);
@@ -49,6 +53,9 @@ class SignaturePad extends Component
     {
         $this->signatureData = '';
         $this->hasSignature = false;
+
+        // Dispatch un événement pour effacer le canvas
+        $this->dispatch('clear-canvas');
     }
 
     public function deleteSignature()

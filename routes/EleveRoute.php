@@ -11,10 +11,6 @@ Route::prefix('eleve')
         // Main routes - ordered by specificity (most specific first)
         Route::get('/{team}', [ElevePageController::class, 'home'])->name('index');
 
-        // Signature routes
-        Route::get('/{team}/signature', [ElevePageController::class, 'signature'])->name('signature');
-        Route::post('/{team}/signature', [ElevePageController::class, 'storeSignature'])->name('signature.store');
-
         // Formation management routes
         Route::prefix('formation')->name('formation.')->group(function () {
             Route::get('/{team}/{formation}', [ElevePageController::class, 'showFormation'])->name('show');
