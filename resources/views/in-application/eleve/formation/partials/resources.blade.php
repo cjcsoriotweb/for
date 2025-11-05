@@ -110,7 +110,7 @@
       @endphp
 
       <!-- Lesson Resources Section -->
-      <details class="group bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200/60 dark:border-blue-700/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300" open>
+      <details class="group bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200/60 dark:border-blue-700/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
         <summary class="flex items-center justify-between px-6 py-5 cursor-pointer text-gray-900 dark:text-gray-100 font-semibold hover:bg-blue-100/50 dark:hover:bg-blue-900/30 rounded-t-2xl transition-colors duration-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
@@ -146,6 +146,7 @@
               @php
                 $attachments = $resource['attachments'];
                 $isLessonCompleted = $resource['is_completed'];
+                $canDownloadResources = $resource['can_download_resources'] ?? $isLessonCompleted;
               @endphp
               <div class="border-2 {{ $isLessonCompleted ? 'border-green-200/60 dark:border-green-700/40 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-900/10 dark:to-emerald-900/10' : 'border-gray-200/60 dark:border-gray-700/40 bg-gradient-to-br from-gray-50/50 to-slate-50/50 dark:from-gray-800/50 dark:to-slate-800/50' }} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -166,13 +167,13 @@
                       </div>
                     </div>
                   </div>
-                  @if(! $isLessonCompleted)
+                  @if(! $canDownloadResources)
                   <div class="lg:flex-shrink-0">
                     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-gray-400 to-slate-500 text-white shadow-lg">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                       </svg>
-                      Terminer la leçon pour débloquer
+                      Commencer la leçon pour débloquer
                     </span>
                   </div>
                   @endif
@@ -209,7 +210,7 @@
                       </div>
                     </div>
                     <div class="sm:flex-shrink-0">
-                      @if($isLessonCompleted)
+                      @if($canDownloadResources)
                       <a
                         href="{{ $downloadUrl }}"
                         target="_blank"

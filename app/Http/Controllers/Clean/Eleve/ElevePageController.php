@@ -164,7 +164,10 @@ class ElevePageController extends Controller
                 }
 
                 $lessonLearner = $lesson->learners->first();
-                $isCompleted = optional($lessonLearner?->pivot)->status === 'completed';
+                $lessonStatus = optional($lessonLearner?->pivot)->status;
+                $isCompleted = $lessonStatus === 'completed';
+                $isInProgress = $lessonStatus === 'in_progress';
+                $canDownloadResources = $isCompleted || $isInProgress;
 
                 return [
                     'chapter_title' => $lesson->chapter?->title,
@@ -174,6 +177,8 @@ class ElevePageController extends Controller
                     'lesson_position' => $lesson->position ?? 0,
                     'attachments' => $attachments,
                     'is_completed' => $isCompleted,
+                    'is_in_progress' => $isInProgress,
+                    'can_download_resources' => $canDownloadResources,
                 ];
             })
             ->filter()
@@ -285,8 +290,6 @@ class ElevePageController extends Controller
         $assistantTrainer = $formationWithProgress->category?->aiTrainer;
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
-
-
 
         // Récupérer les données de completion de la formation
         $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
@@ -407,6 +410,7 @@ class ElevePageController extends Controller
             }
 
             $downloadName = $document->title ?: $document->original_name;
+
             return \Illuminate\Support\Facades\Storage::disk('public')->download($document->file_path, $downloadName);
         }
 
@@ -419,13 +423,13 @@ class ElevePageController extends Controller
                 ->where('team_id', $team->id)
                 ->first();
 
-            if (!$formationUser || !$formationUser->completion_documents || !isset($formationUser->completion_documents[$index])) {
+            if (! $formationUser || ! $formationUser->completion_documents || ! isset($formationUser->completion_documents[$index])) {
                 abort(404, 'Document non trouvé.');
             }
 
             $document = $formationUser->completion_documents[$index];
 
-            if (!Storage::disk('public')->exists($document['path'])) {
+            if (! Storage::disk('public')->exists($document['path'])) {
                 abort(404, 'Fichier non trouvé sur le serveur.');
             }
 
@@ -581,7 +585,7 @@ class ElevePageController extends Controller
         ]);
 
         // Nom du fichier
-        $filename = 'formation-' . $formation->id . '-certificat-' . $user->id . '.pdf';
+        $filename = 'formation-'.$formation->id.'-certificat-'.$user->id.'.pdf';
 
         return $pdf->download($filename);
     }
@@ -622,8 +626,8 @@ class ElevePageController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->where(function ($query) use ($formation) {
                 // Filtrer les activités liées à cette formation
-                $query->where('url', 'like', '%/eleve/%/formations/' . $formation->id . '%')
-                      ->orWhere('url', 'like', '%/formation/' . $formation->id . '%');
+                $query->where('url', 'like', '%/eleve/%/formations/'.$formation->id.'%')
+                    ->orWhere('url', 'like', '%/formation/'.$formation->id.'%');
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -675,7 +679,7 @@ class ElevePageController extends Controller
         ]);
 
         // Nom du fichier
-        $filename = 'formation-' . $formation->id . '-rapport-connexion-' . $user->id . '.pdf';
+        $filename = 'formation-'.$formation->id.'-rapport-connexion-'.$user->id.'.pdf';
 
         return $pdf->download($filename);
     }
@@ -686,20 +690,20 @@ class ElevePageController extends Controller
     private function formatDuration(int $seconds): string
     {
         if ($seconds < 60) {
-            return $seconds . 's';
+            return $seconds.'s';
         }
 
         $minutes = floor($seconds / 60);
         $remainingSeconds = $seconds % 60;
 
         if ($minutes < 60) {
-            return $minutes . 'min ' . $remainingSeconds . 's';
+            return $minutes.'min '.$remainingSeconds.'s';
         }
 
         $hours = floor($minutes / 60);
         $remainingMinutes = $minutes % 60;
 
-        return $hours . 'h ' . $remainingMinutes . 'min';
+        return $hours.'h '.$remainingMinutes.'min';
     }
 
     /**
@@ -1094,7 +1098,6 @@ class ElevePageController extends Controller
     /**
      * Soumettre les rÃ©ponses d'un quiz
      */
-
     public function submitQuiz(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, Request $request)
     {
         $user = Auth::user();
@@ -1200,7 +1203,7 @@ class ElevePageController extends Controller
 
         if ($passed) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de '.round($score, 1).'%.' );
+                ->with('success', 'Félicitations ! Vous avez réussi le quiz avec un score de '.round($score, 1).'%.');
         }
 
         return response()->json([
@@ -1513,6 +1516,4 @@ class ElevePageController extends Controller
 
         return back()->with('success', 'Merci pour votre retour ! Votre avis nous aide à améliorer nos formations.');
     }
-
-
 }

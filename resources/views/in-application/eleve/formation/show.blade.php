@@ -21,17 +21,19 @@
     @else
     <x-eleve.formation-header :formation="$formationWithProgress" :progress="$progress" />
 
-    <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
-
     <x-eleve.formation-actions :team="$team" :formation="$formationWithProgress" :progress="$progress" />
 
-    @include('in-application.eleve.formation.partials.resources', [
-      'formationDocuments' => $formationDocuments ?? collect(),
-      'lessonResources' => $lessonResources ?? collect(),
-      'isFormationCompleted' => $isFormationCompleted ?? false,
-      'team' => $team,
-      'formation' => $formationWithProgress,
-    ])
+    <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
+
+    <div id="resources-section">
+      @include('in-application.eleve.formation.partials.resources', [
+        'formationDocuments' => $formationDocuments ?? collect(),
+        'lessonResources' => $lessonResources ?? collect(),
+        'isFormationCompleted' => $isFormationCompleted ?? false,
+        'team' => $team,
+        'formation' => $formationWithProgress,
+      ])
+    </div>
     @endif
   </div>
 
