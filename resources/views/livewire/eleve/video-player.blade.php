@@ -103,14 +103,11 @@
 
         $wire.on("leave", (event) => {
             window.location.reload();
-            console.log("ok");
 
             // ...
         });
         // Function to run when video ends
         function onVideoEnd() {
-            console.log("Vidéo terminée");
-
             $wire.dispatch("videoEnded", { endEvent: true });
 
             // Add your custom logic here - could dispatch an event, make an API call, etc.

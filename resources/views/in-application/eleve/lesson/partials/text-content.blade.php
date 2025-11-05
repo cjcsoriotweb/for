@@ -105,13 +105,9 @@
                     {{-- Script JavaScript pour gérer l'affichage du PDF --}}
                     <script>
                         function togglePdfViewer(button) {
-                            console.log('Toggle PDF clicked');
                             const attachmentId = {{ $inlineAttachment->id }};
                             const container = document.getElementById('pdf-viewer-' + attachmentId);
                             const toggleText = button.querySelector('.pdf-toggle-text');
-
-                            console.log('Container found:', container);
-                            console.log('Toggle text found:', toggleText);
 
                             if (container && toggleText) {
                                 if (container.classList.contains('hidden')) {
@@ -119,21 +115,16 @@
                                     toggleText.textContent = 'Masquer';
                                     button.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
                                     button.classList.add('bg-orange-600', 'hover:bg-orange-700');
-                                    console.log('PDF shown');
                                 } else {
                                     container.classList.add('hidden');
                                     toggleText.textContent = 'Afficher';
                                     button.classList.remove('bg-orange-600', 'hover:bg-orange-700');
                                     button.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
-                                    console.log('PDF hidden');
                                 }
-                            } else {
-                                console.error('Container or toggle text not found');
                             }
                         }
 
                         function closePdfViewer(attachmentId) {
-                            console.log('Close PDF clicked for attachment:', attachmentId);
                             const container = document.getElementById('pdf-viewer-' + attachmentId);
                             const toggleButton = document.querySelector('button[onclick="togglePdfViewer(this)"]');
                             const toggleText = toggleButton ? toggleButton.querySelector('.pdf-toggle-text') : null;
@@ -143,9 +134,6 @@
                                 toggleText.textContent = 'Afficher';
                                 toggleButton.classList.remove('bg-orange-600', 'hover:bg-orange-700');
                                 toggleButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
-                                console.log('PDF closed');
-                            } else {
-                                console.error('Elements not found for closing PDF');
                             }
                         }
                     </script>
