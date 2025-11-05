@@ -26,7 +26,6 @@ class UpdateFormationRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'money_amount' => 'nullable|numeric|min:0',
             'active' => 'nullable|boolean',
             'cover_image' => 'nullable|image|max:4096',
         ];
@@ -40,8 +39,6 @@ class UpdateFormationRequest extends FormRequest
             'title.max' => 'Le titre ne peut pas dépasser 255 caractères.',
             'description.required' => 'La description de la formation est obligatoire.',
             'description.string' => 'La description doit être une chaîne de caractères.',
-            'money_amount.numeric' => 'Le prix doit être un nombre.',
-            'money_amount.min' => 'Le prix ne peut pas être négatif.',
             'active.boolean' => 'Le statut de la formation doit être un booléen.',
             'cover_image.image' => 'Le fichier téléchargé doit être une image.',
             'cover_image.max' => 'L\'image ne doit pas dépasser 4 Mo.',

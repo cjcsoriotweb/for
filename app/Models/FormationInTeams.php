@@ -11,6 +11,8 @@ class FormationInTeams extends Model
         'formation_id',
         'team_id',
         'visible',
+        'usage_quota',
+        'usage_consumed',
     ];
 
     public function formation()

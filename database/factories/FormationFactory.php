@@ -14,47 +14,37 @@ class FormationFactory extends Factory
         return [
             'title' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(3),
-            'level' => $this->faker->randomElement(['debutant', 'intermediaire', 'avancé']),
-            'money_amount' => $this->faker->numberBetween(0, 1000),
+            'level' => $this->faker->randomElement(['debutant', 'intermediaire', 'avancee']),
         ];
     }
 
     /**
-     * Formation débutant
+     * Formation debutant
      */
-    public function beginner()
+    public function beginner(): Factory
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'level' => 'debutant',
-                'money_amount' => $this->faker->numberBetween(0, 200),
-            ];
-        });
+        return $this->state(fn () => [
+            'level' => 'debutant',
+        ]);
     }
 
     /**
-     * Formation intermédiaire
+     * Formation intermediaire
      */
-    public function intermediate()
+    public function intermediate(): Factory
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'level' => 'intermediaire',
-                'money_amount' => $this->faker->numberBetween(100, 500),
-            ];
-        });
+        return $this->state(fn () => [
+            'level' => 'intermediaire',
+        ]);
     }
 
     /**
-     * Formation avancée
+     * Formation avancee
      */
-    public function advanced()
+    public function advanced(): Factory
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'level' => 'avancé',
-                'money_amount' => $this->faker->numberBetween(300, 1000),
-            ];
-        });
+        return $this->state(fn () => [
+            'level' => 'avancee',
+        ]);
     }
 }

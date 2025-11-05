@@ -39,7 +39,6 @@ class FormationService
             'title' => 'Titre par defaut',
             'description' => 'Description par defaut',
             'level' => 'debutant',
-            'money_amount' => 0,
             'user_id' => Auth::user()->id,
         ], $attributes);
 

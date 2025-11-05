@@ -54,19 +54,22 @@ class FormationChoice extends Component
             $canAfford = $formationEnrollmentService->canTeamAffordFormation($team, $formation);
 
             $canJoin = ! $isEnrolled && $canAfford;
+            $usageQuota = $formation->pivot->usage_quota ?? null;
+            $usageConsumed = $formation->pivot->usage_consumed ?? 0;
+            $remainingSlots = $usageQuota !== null
+                ? max($usageQuota - $usageConsumed, 0)
+                : null;
 
             return [
                 'id' => $formation->id,
                 'title' => $formation->title ?: 'Titre par defaut',
                 'description' => $formation->description ?: 'Description par defaut',
                 'cover_image_url' => $formation->cover_image_url ?: asset('images/formation-placeholder.svg'),
-                'price_label' => $formation->money_amount
-                    ? number_format((int) $formation->money_amount, 0, ',', ' ')
-                    : 'Gratuit',
                 'status_label' => $isEnrolled ? 'Deja inscrit' : 'Nouvelle formation',
                 'is_enrolled' => $isEnrolled,
                 'has_progress' => $isEnrolled && $progress !== null,
                 'progress_percent' => $progressPercent,
+                'usage_remaining' => $remainingSlots,
                 'show_route' => route('eleve.formation.show', [$team, $formation->id]),
                 'enroll_route' => route('eleve.formation.enroll', [
                     'team' => $team,

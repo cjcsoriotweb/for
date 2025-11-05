@@ -28,7 +28,6 @@ class Formation extends Model
         'title',
         'description',
         'level',
-        'money_amount',
         'active',
         'cover_image_path',
         'user_id',
@@ -41,7 +40,6 @@ class Formation extends Model
             'title' => 'string',
             'description' => 'string',
             'level' => 'string',
-            'money_amount' => 'integer',
             'active' => 'boolean',
         ];
     }
@@ -49,7 +47,7 @@ class Formation extends Model
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'formation_in_teams')
-            ->withPivot(['visible', 'approved_at', 'approved_by'])
+            ->withPivot(['visible', 'approved_at', 'approved_by', 'usage_quota', 'usage_consumed'])
             ->withTimestamps();
     }
 

@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Formation;
+use App\Models\FormationInTeams;
 use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Service de gestion des inscriptions aux formations
@@ -12,11 +14,20 @@ use Illuminate\Support\Facades\Auth;
 class FormationEnrollmentService
 {
     /**
-     * Vérifie si l'équipe a les fonds nécessaires pour commencer une formation
+     * Vérifie si l'équipe dispose encore d'unités d'usage pour une formation donnée.
      */
     public function canTeamAffordFormation(Team $team, Formation $formation): bool
     {
-        return $team->money >= $formation->money_amount;
+        $pivot = FormationInTeams::query()
+            ->where('formation_id', $formation->id)
+            ->where('team_id', $team->id)
+            ->first();
+
+        if (! $pivot || ! $pivot->visible) {
+            return false;
+        }
+
+        return $pivot->usage_quota === null || $pivot->usage_quota > $pivot->usage_consumed;
     }
 
     /**
@@ -30,42 +41,48 @@ class FormationEnrollmentService
     }
 
     /**
-     * Inscrit un utilisateur à une formation et débite les fonds
+     * Inscrit un utilisateur à une formation et consomme une unité d'usage
      */
     public function enrollUser(Formation $formation, Team $team, ?int $userId = null): bool
     {
         $userId = $userId ?? Auth::id();
 
-        // Vérifier que l'équipe a les fonds nécessaires
-        if (! $this->canTeamAffordFormation($team, $formation)) {
-            return false;
-        }
+        return (bool) DB::transaction(function () use ($formation, $team, $userId) {
+            $pivot = FormationInTeams::query()
+                ->where('formation_id', $formation->id)
+                ->where('team_id', $team->id)
+                ->lockForUpdate()
+                ->first();
 
-        // Récupérer la première leçon de la formation pour initialiser current_lesson_id
-        $firstLesson = $formation->chapters()
-            ->orderBy('position')
-            ->first()
-            ?->lessons()
-            ->orderBy('position')
-            ->first();
+            if (! $pivot || ! $pivot->visible) {
+                return false;
+            }
 
-        $enrollmentCost = $formation->money_amount;
+            if ($pivot->usage_quota !== null && $pivot->usage_quota <= $pivot->usage_consumed) {
+                return false;
+            }
 
-        $formation->learners()->attach($userId, [
-            'team_id' => $team->id,
-            'status' => 'in_progress',
-            'enrolled_at' => now(),
-            'last_seen_at' => now(),
-            'current_lesson_id' => $firstLesson?->id,
-            'enrollment_cost' => $enrollmentCost ?: null,
-        ]);
+            $firstLesson = $formation->chapters()
+                ->orderBy('position')
+                ->first()
+                ?->lessons()
+                ->orderBy('position')
+                ->first();
 
-        // Débiter les fonds de l'équipe
-        if ($enrollmentCost) {
-            $team->decrement('money', $enrollmentCost);
-        }
+            $formation->learners()->syncWithoutDetaching([
+                $userId => [
+                    'team_id' => $team->id,
+                    'status' => 'in_progress',
+                    'enrolled_at' => now(),
+                    'last_seen_at' => now(),
+                    'current_lesson_id' => $firstLesson?->id,
+                ],
+            ]);
 
-        return true;
+            $pivot->increment('usage_consumed');
+
+            return true;
+        });
     }
 
     /**

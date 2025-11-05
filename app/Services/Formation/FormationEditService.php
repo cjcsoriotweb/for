@@ -15,7 +15,6 @@ class FormationEditService extends BaseFormationService
             'title' => 'Titre par defaut',
             'description' => 'Description par defaut',
             'level' => 'debutant',
-            'money_amount' => 0,
         ], $attributes);
 
         return Formation::create($payload);
