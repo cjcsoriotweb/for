@@ -57,94 +57,50 @@
             @endif
 
             <!-- Import Options -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <!-- JSON Import -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <div class="max-w-2xl mx-auto mb-8">
+                <!-- ZIP Import -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Import JSON</h3>
-                            <p class="text-sm text-gray-600">Format structuré</p>
-                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Import de formation</h3>
+                        <p class="text-gray-600 mt-2">Importez une formation complète depuis un fichier ZIP exporté</p>
                     </div>
-                    <p class="text-gray-700 text-sm mb-4">
-                        Importez vos formations depuis un fichier JSON avec une structure complète incluant chapitres, leçons et contenu.
-                    </p>
-                    <form action="{{ route('formateur.import.json') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
-                        @csrf
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Fichier JSON</label>
-                            <input type="file" name="json_file" accept=".json"
-                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        </div>
-                        <button type="submit"
-                                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
-                            Importer JSON
-                        </button>
-                    </form>
-                </div>
 
-                <!-- CSV Import -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Import CSV</h3>
-                            <p class="text-sm text-gray-600">Données tabulaires</p>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-start">
+                            <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                                <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-blue-800">Format compatible</h4>
+                                <p class="text-sm text-blue-700 mt-1">
+                                    Ce formulaire accepte uniquement les fichiers ZIP générés par la fonctionnalité d'export de cette plateforme.
+                                    Le fichier doit contenir un <code class="bg-blue-100 px-1 rounded">orchestre.json</code> valide.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-gray-700 text-sm mb-4">
-                        Importez vos formations depuis un fichier CSV avec colonnes pour titre, description, contenu, etc.
-                    </p>
-                    <form action="{{ route('formateur.import.csv') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
-                        @csrf
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Fichier CSV</label>
-                            <input type="file" name="csv_file" accept=".csv"
-                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
-                        </div>
-                        <button type="submit"
-                                class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-medium py-2 px-4 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200">
-                            Importer CSV
-                        </button>
-                    </form>
-                </div>
 
-                <!-- SCORM Import -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Import SCORM</h3>
-                            <p class="text-sm text-gray-600">Paquet standard</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-700 text-sm mb-4">
-                        Importez vos formations depuis un paquet SCORM (.zip) conforme aux standards e-learning.
-                    </p>
-                    <form action="{{ route('formateur.import.scorm') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                    <form action="{{ route('formateur.import.zip') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Fichier SCORM (.zip)</label>
-                            <input type="file" name="scorm_file" accept=".zip"
-                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fichier ZIP de formation</label>
+                            <input type="file" name="zip_file" accept=".zip" required
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer">
+                            <p class="text-xs text-gray-500 mt-1">Taille maximale : 100 Mo</p>
                         </div>
                         <button type="submit"
-                                class="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium py-2 px-4 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200">
-                            Importer SCORM
+                                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-3 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                            </svg>
+                            Importer la formation
                         </button>
                     </form>
                 </div>

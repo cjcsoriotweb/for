@@ -33,7 +33,7 @@ class FormationImportController extends Controller
         ]);
 
         $zipFile = $request->file('zip_file');
-        $tempDir = storage_path('app/temp/import_' . Str::uuid());
+        $tempDir = storage_path('app/temp/import_'.Str::uuid());
 
         try {
             // Créer le dossier temporaire
@@ -41,7 +41,7 @@ class FormationImportController extends Controller
 
             // Extraire le ZIP
             $zipPath = $zipFile->getRealPath();
-            $zip = new ZipArchive();
+            $zip = new ZipArchive;
 
             if ($zip->open($zipPath) !== true) {
                 throw new \Exception('Impossible d\'ouvrir le fichier ZIP');
@@ -50,26 +50,22 @@ class FormationImportController extends Controller
             $zip->extractTo($tempDir);
             $zip->close();
 
-            // Trouver le dossier de la formation (il devrait y en avoir un)
-            $formationDirs = array_filter(scandir($tempDir), function($item) use ($tempDir) {
-                return is_dir($tempDir . '/' . $item) && !in_array($item, ['.', '..']);
-            });
+            // Trouver le dossier contenant orchestre.json
+            $formationDir = $this->findFormationDirectory($tempDir);
 
-            if (empty($formationDirs)) {
-                throw new \Exception('Aucun dossier de formation trouvé dans le ZIP');
+            if (! $formationDir) {
+                throw new \Exception('Fichier orchestre.json manquant. Ce ZIP n\'est pas compatible avec l\'import.');
             }
 
-            $formationDir = $tempDir . '/' . reset($formationDirs);
-
             // Vérifier la présence du fichier orchestre.json
-            $orchestrePath = $formationDir . '/orchestre.json';
-            if (!file_exists($orchestrePath)) {
+            $orchestrePath = $formationDir.'/orchestre.json';
+            if (! file_exists($orchestrePath)) {
                 throw new \Exception('Fichier orchestre.json manquant. Ce ZIP n\'est pas compatible avec l\'import.');
             }
 
             // Lire le fichier orchestre
             $orchestre = json_decode(file_get_contents($orchestrePath), true);
-            if (!$orchestre) {
+            if (! $orchestre) {
                 throw new \Exception('Fichier orchestre.json invalide');
             }
 
@@ -80,13 +76,13 @@ class FormationImportController extends Controller
             $this->cleanupTempDir($tempDir);
 
             return redirect()->route('formateur.formation.show', $formation)
-                ->with('success', 'Formation "' . $formation->title . '" importée avec succès !');
+                ->with('success', 'Formation "'.$formation->title.'" importée avec succès !');
 
         } catch (\Exception $e) {
             // Nettoyer en cas d'erreur
             $this->cleanupTempDir($tempDir);
 
-            return back()->with('error', 'Erreur lors de l\'import : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'import : '.$e->getMessage());
         }
     }
 
@@ -114,21 +110,25 @@ class FormationImportController extends Controller
 
     private function getFormationDescription(string $formationDir): string
     {
-        $metadataPath = $formationDir . '/formation_metadata.json';
+        $metadataPath = $formationDir.'/formation_metadata.json';
         if (file_exists($metadataPath)) {
             $metadata = json_decode(file_get_contents($metadataPath), true);
+
             return $metadata['description'] ?? 'Formation importée';
         }
+
         return 'Formation importée';
     }
 
     private function getFormationLevel(string $formationDir): string
     {
-        $metadataPath = $formationDir . '/formation_metadata.json';
+        $metadataPath = $formationDir.'/formation_metadata.json';
         if (file_exists($metadataPath)) {
             $metadata = json_decode(file_get_contents($metadataPath), true);
+
             return $metadata['level'] ?? 'beginner';
         }
+
         return 'beginner';
     }
 
@@ -146,7 +146,7 @@ class FormationImportController extends Controller
         }
 
         // Recalculer les positions
-        $formation->chapters()->orderBy('id')->get()->each(function($chap, $index) {
+        $formation->chapters()->orderBy('id')->get()->each(function ($chap, $index) {
             $chap->update(['position' => $index + 1]);
         });
 
@@ -172,17 +172,17 @@ class FormationImportController extends Controller
 
     private function getLessonableType(string $type): string
     {
-        return match($type) {
+        return match ($type) {
             'video' => VideoContent::class,
             'text' => TextContent::class,
             'quiz' => Quiz::class,
-            default => throw new \Exception('Type de leçon inconnu: ' . $type),
+            default => throw new \Exception('Type de leçon inconnu: '.$type),
         };
     }
 
     private function createLessonContent(Lesson $lesson, string $formationDir, array $lessonData)
     {
-        return match($lessonData['type']) {
+        return match ($lessonData['type']) {
             'video' => $this->createVideoContent($lesson, $formationDir, $lessonData),
             'text' => $this->createTextContent($lesson, $formationDir, $lessonData),
             'quiz' => $this->createQuizContent($lesson, $formationDir, $lessonData),
@@ -191,14 +191,14 @@ class FormationImportController extends Controller
 
     private function createVideoContent(Lesson $lesson, string $formationDir, array $lessonData): VideoContent
     {
-        $metadataPath = $formationDir . '/' . $lessonData['metadata_file'];
+        $metadataPath = $this->resolveFilePath($formationDir, $lessonData['metadata_file']);
         $metadata = json_decode(file_get_contents($metadataPath), true);
 
         $videoPath = null;
         if (isset($lessonData['video_file'])) {
-            $sourceVideoPath = $formationDir . '/' . $lessonData['video_file'];
+            $sourceVideoPath = $formationDir.'/'.$lessonData['video_file'];
             if (file_exists($sourceVideoPath)) {
-                $videoPath = 'formations/videos/' . Str::uuid() . '_' . basename($lessonData['video_file']);
+                $videoPath = 'formations/videos/'.Str::uuid().'_'.basename($lessonData['video_file']);
                 Storage::disk('public')->put($videoPath, file_get_contents($sourceVideoPath));
             }
         }
@@ -215,10 +215,10 @@ class FormationImportController extends Controller
 
     private function createTextContent(Lesson $lesson, string $formationDir, array $lessonData): TextContent
     {
-        $metadataPath = $formationDir . '/' . $lessonData['metadata_file'];
+        $metadataPath = $this->resolveFilePath($formationDir, $lessonData['metadata_file']);
         $metadata = json_decode(file_get_contents($metadataPath), true);
 
-        $contentPath = $formationDir . '/' . $lessonData['content_file'];
+        $contentPath = $this->resolveFilePath($formationDir, $lessonData['content_file']);
         $content = file_exists($contentPath) ? file_get_contents($contentPath) : '';
 
         $textContent = TextContent::create([
@@ -234,10 +234,10 @@ class FormationImportController extends Controller
         // Importer les pièces jointes
         if (isset($lessonData['attachments'])) {
             foreach ($lessonData['attachments'] as $attachmentPath) {
-                $sourcePath = $formationDir . '/' . $attachmentPath;
+                $sourcePath = $formationDir.'/'.$attachmentPath;
                 if (file_exists($sourcePath)) {
                     $fileName = basename($attachmentPath);
-                    $storagePath = 'formations/attachments/' . Str::uuid() . '_' . $fileName;
+                    $storagePath = 'formations/attachments/'.Str::uuid().'_'.$fileName;
                     Storage::disk('public')->put($storagePath, file_get_contents($sourcePath));
 
                     TextContentAttachment::create([
@@ -254,7 +254,7 @@ class FormationImportController extends Controller
 
     private function createQuizContent(Lesson $lesson, string $formationDir, array $lessonData): Quiz
     {
-        $quizPath = $formationDir . '/' . $lessonData['quiz_file'];
+        $quizPath = $this->resolveFilePath($formationDir, $lessonData['quiz_file']);
         $quizData = json_decode(file_get_contents($quizPath), true);
 
         $quiz = Quiz::create([
@@ -291,10 +291,10 @@ class FormationImportController extends Controller
     private function importCompletionDocuments(Formation $formation, string $formationDir, array $completionData): void
     {
         foreach ($completionData['documents'] as $documentData) {
-            $sourcePath = $formationDir . '/' . $documentData['file_path'];
+            $sourcePath = $formationDir.'/'.$documentData['file_path'];
             if (file_exists($sourcePath)) {
                 $fileName = $documentData['original_name'];
-                $storagePath = 'formations/completion/' . Str::uuid() . '_' . $fileName;
+                $storagePath = 'formations/completion/'.Str::uuid().'_'.$fileName;
                 Storage::disk('public')->put($storagePath, file_get_contents($sourcePath));
 
                 FormationCompletionDocument::create([
@@ -309,6 +309,76 @@ class FormationImportController extends Controller
         }
     }
 
+    private function resolveFilePath(string $formationDir, string $relativePath): string
+    {
+        // Essayer d'abord le chemin tel quel depuis orchestre.json
+        $directPath = $formationDir.'/'.$relativePath;
+        if (file_exists($directPath)) {
+            return $directPath;
+        }
+
+        // Si ça ne marche pas, essayer d'ajouter le préfixe chapters/chapter_slug/
+        // Extraire le nom de la leçon du chemin relatif
+        $pathParts = explode('/', $relativePath);
+        if (count($pathParts) >= 1) {
+            $lessonSlug = $pathParts[0]; // ex: "lesson_1_text_nouvelle-lecon"
+
+            // Chercher dans tous les chapitres
+            $chaptersDir = $formationDir.'/chapters';
+            if (is_dir($chaptersDir)) {
+                $chapterDirs = scandir($chaptersDir);
+                foreach ($chapterDirs as $chapterDir) {
+                    if ($chapterDir === '.' || $chapterDir === '..') {
+                        continue;
+                    }
+
+                    $fullChapterPath = $chaptersDir.'/'.$chapterDir;
+                    if (is_dir($fullChapterPath)) {
+                        // Chercher la leçon dans ce chapitre
+                        $lessonPath = $fullChapterPath.'/'.$lessonSlug;
+                        if (is_dir($lessonPath)) {
+                            // Reconstruire le chemin complet
+                            $remainingPath = implode('/', array_slice($pathParts, 1));
+                            $fullPath = $lessonPath.'/'.$remainingPath;
+                            if (file_exists($fullPath)) {
+                                return $fullPath;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Si rien ne marche, retourner le chemin direct (qui va échouer avec une erreur claire)
+        return $directPath;
+    }
+
+    private function findFormationDirectory(string $baseDir): ?string
+    {
+        // Chercher orchestre.json dans ce répertoire
+        if (file_exists($baseDir.'/orchestre.json')) {
+            return $baseDir;
+        }
+
+        // Chercher récursivement dans les sous-répertoires
+        $items = scandir($baseDir);
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $path = $baseDir.'/'.$item;
+            if (is_dir($path)) {
+                $result = $this->findFormationDirectory($path);
+                if ($result) {
+                    return $result;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private function cleanupTempDir(string $tempDir): void
     {
         if (is_dir($tempDir)) {
@@ -316,16 +386,41 @@ class FormationImportController extends Controller
         }
     }
 
+    private function exploreDirectory(string $dir, string &$output, int $level = 0, int $maxDepth = 3): void
+    {
+        if ($level > $maxDepth) {
+            return;
+        }
+
+        $indent = str_repeat('  ', $level);
+        $items = scandir($dir);
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $path = $dir.'/'.$item;
+            $isDir = is_dir($path);
+
+            $output .= $indent.($isDir ? '[DIR] ' : '[FILE] ').$item."\n";
+
+            if ($isDir && $level < $maxDepth) {
+                $this->exploreDirectory($path, $output, $level + 1, $maxDepth);
+            }
+        }
+    }
+
     private function deleteDirectory(string $dir): void
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             return;
         }
 
         $files = array_diff(scandir($dir), ['.', '..']);
 
         foreach ($files as $file) {
-            $filePath = $dir . '/' . $file;
+            $filePath = $dir.'/'.$file;
 
             if (is_dir($filePath)) {
                 $this->deleteDirectory($filePath);

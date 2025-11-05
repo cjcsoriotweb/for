@@ -4,18 +4,17 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use ZipArchive;
 use Illuminate\Support\Str;
+use ZipArchive;
 
 class FormationExportController extends Controller
 {
     public function export(Formation $formation)
     {
         // Créer un dossier temporaire pour l'export
-        $tempDir = storage_path('app/temp/' . Str::uuid());
-        $formationDir = $tempDir . '/' . Str::slug($formation->title);
+        $tempDir = storage_path('app/temp/'.Str::uuid());
+        $formationDir = $tempDir.'/'.Str::slug($formation->title);
 
         // Créer les dossiers nécessaires
         $this->createDirectories($formationDir);
@@ -40,8 +39,8 @@ class FormationExportController extends Controller
         $this->createOrchestreFile($formation, $formationDir, $chaptersStructure, $completionDocumentsStructure);
 
         // Créer le fichier ZIP
-        $zipFileName = Str::slug($formation->title) . '_export_' . now()->format('Y-m-d_H-i-s') . '.zip';
-        $zipPath = storage_path('app/temp/' . $zipFileName);
+        $zipFileName = Str::slug($formation->title).'_export_'.now()->format('Y-m-d_H-i-s').'.zip';
+        $zipPath = storage_path('app/temp/'.$zipFileName);
 
         $this->createZip($tempDir, $zipPath);
 
@@ -56,15 +55,15 @@ class FormationExportController extends Controller
     {
         $directories = [
             $formationDir,
-            $formationDir . '/videos',
-            $formationDir . '/documents',
-            $formationDir . '/quizzes',
-            $formationDir . '/texts',
-            $formationDir . '/completion_documents',
+            $formationDir.'/videos',
+            $formationDir.'/documents',
+            $formationDir.'/quizzes',
+            $formationDir.'/texts',
+            $formationDir.'/completion_documents',
         ];
 
         foreach ($directories as $dir) {
-            if (!is_dir($dir)) {
+            if (! is_dir($dir)) {
                 mkdir($dir, 0755, true);
             }
         }
@@ -77,12 +76,12 @@ class FormationExportController extends Controller
             'description' => $formation->description,
             'level' => $formation->level,
             'chapters_count' => $formation->chapters->count(),
-            'lessons_count' => $formation->chapters->sum(fn($chapter) => $chapter->lessons->count()),
+            'lessons_count' => $formation->chapters->sum(fn ($chapter) => $chapter->lessons->count()),
             'exported_at' => now()->toISOString(),
         ];
 
         file_put_contents(
-            $formationDir . '/formation_metadata.json',
+            $formationDir.'/formation_metadata.json',
             json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
     }
@@ -92,10 +91,10 @@ class FormationExportController extends Controller
         $chaptersStructure = [];
 
         foreach ($formation->chapters as $chapterIndex => $chapter) {
-            $chapterSlug = 'chapter_' . ($chapterIndex + 1) . '_' . Str::slug($chapter->title);
-            $chapterDir = $formationDir . '/chapters/' . $chapterSlug;
+            $chapterSlug = 'chapter_'.($chapterIndex + 1).'_'.Str::slug($chapter->title);
+            $chapterDir = $formationDir.'/chapters/'.$chapterSlug;
 
-            if (!is_dir($chapterDir)) {
+            if (! is_dir($chapterDir)) {
                 mkdir($chapterDir, 0755, true);
             }
 
@@ -107,14 +106,14 @@ class FormationExportController extends Controller
             ];
 
             file_put_contents(
-                $chapterDir . '/chapter_metadata.json',
+                $chapterDir.'/chapter_metadata.json',
                 json_encode($chapterData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
             );
 
             // Exporter les leçons
             $lessonsStructure = [];
             foreach ($chapter->lessons as $lessonIndex => $lesson) {
-                $lessonStructure = $this->exportLesson($lesson, $chapterDir, $lessonIndex + 1);
+                $lessonStructure = $this->exportLesson($lesson, $chapterDir, $chapterSlug, $lessonIndex + 1);
                 if ($lessonStructure) {
                     $lessonsStructure[] = $lessonStructure;
                 }
@@ -123,7 +122,7 @@ class FormationExportController extends Controller
             $chaptersStructure[] = [
                 'id' => $chapter->id,
                 'slug' => $chapterSlug,
-                'metadata_file' => 'chapters/' . $chapterSlug . '/chapter_metadata.json',
+                'metadata_file' => 'chapters/'.$chapterSlug.'/chapter_metadata.json',
                 'lessons' => $lessonsStructure,
             ];
         }
@@ -131,27 +130,27 @@ class FormationExportController extends Controller
         return $chaptersStructure;
     }
 
-    private function exportLesson($lesson, string $chapterDir, int $lessonNumber): ?array
+    private function exportLesson($lesson, string $chapterDir, string $chapterSlug, int $lessonNumber): ?array
     {
         $lessonable = $lesson->lessonable;
 
         if ($lessonable instanceof \App\Models\VideoContent) {
-            return $this->exportVideoLesson($lesson, $lessonable, $chapterDir, $lessonNumber);
+            return $this->exportVideoLesson($lesson, $lessonable, $chapterDir, $chapterSlug, $lessonNumber);
         } elseif ($lessonable instanceof \App\Models\TextContent) {
-            return $this->exportTextLesson($lesson, $lessonable, $chapterDir, $lessonNumber);
+            return $this->exportTextLesson($lesson, $lessonable, $chapterDir, $chapterSlug, $lessonNumber);
         } elseif ($lessonable instanceof \App\Models\Quiz) {
-            return $this->exportQuizLesson($lesson, $lessonable, $chapterDir, $lessonNumber);
+            return $this->exportQuizLesson($lesson, $lessonable, $chapterDir, $chapterSlug, $lessonNumber);
         }
 
         return null;
     }
 
-    private function exportVideoLesson($lesson, $videoContent, string $chapterDir, int $lessonNumber): array
+    private function exportVideoLesson($lesson, $videoContent, string $chapterDir, string $chapterSlug, int $lessonNumber): array
     {
-        $lessonSlug = 'lesson_' . $lessonNumber . '_video_' . Str::slug($lesson->title);
-        $lessonDir = $chapterDir . '/' . $lessonSlug;
+        $lessonSlug = 'lesson_'.$lessonNumber.'_video_'.Str::slug($lesson->title);
+        $lessonDir = $chapterDir.'/'.$lessonSlug;
 
-        if (!is_dir($lessonDir)) {
+        if (! is_dir($lessonDir)) {
             mkdir($lessonDir, 0755, true);
         }
 
@@ -163,18 +162,18 @@ class FormationExportController extends Controller
             $sourcePath = Storage::disk('public')->path($videoContent->video_path);
             $fileName = basename($videoContent->video_path);
 
-            if (!empty($fileName)) {
-                $destPath = $lessonDir . '/' . $fileName;
+            if (! empty($fileName)) {
+                $destPath = $lessonDir.'/'.$fileName;
 
                 // S'assurer que le répertoire destination existe
-                if (!is_dir($lessonDir)) {
+                if (! is_dir($lessonDir)) {
                     mkdir($lessonDir, 0755, true);
                 }
 
                 // Vérifier que le fichier source est bien un fichier
                 if (is_file($sourcePath)) {
                     copy($sourcePath, $destPath);
-                    $videoFile = $lessonSlug . '/' . $fileName;
+                    $videoFile = $lessonSlug.'/'.$fileName;
                     $files[] = $videoFile;
                 }
             }
@@ -190,9 +189,9 @@ class FormationExportController extends Controller
             'duration_minutes' => $videoContent->duration_minutes,
         ];
 
-        $metadataFile = $lessonSlug . '/metadata.json';
+        $metadataFile = 'chapters/'.$chapterSlug.'/'.$lessonSlug.'/metadata.json';
         file_put_contents(
-            $lessonDir . '/metadata.json',
+            $lessonDir.'/metadata.json',
             json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
 
@@ -201,43 +200,43 @@ class FormationExportController extends Controller
             'type' => 'video',
             'slug' => $lessonSlug,
             'metadata_file' => $metadataFile,
-            'files' => array_merge([$metadataFile], $files),
-            'video_file' => $videoFile,
+            'files' => array_merge([$metadataFile], array_map(fn ($f) => 'chapters/'.$chapterSlug.'/'.$f, $files)),
+            'video_file' => $videoFile ? 'chapters/'.$chapterSlug.'/'.$videoFile : null,
         ];
     }
 
-    private function exportTextLesson($lesson, $textContent, string $chapterDir, int $lessonNumber): array
+    private function exportTextLesson($lesson, $textContent, string $chapterDir, string $chapterSlug, int $lessonNumber): array
     {
-        $lessonSlug = 'lesson_' . $lessonNumber . '_text_' . Str::slug($lesson->title);
-        $lessonDir = $chapterDir . '/' . $lessonSlug;
+        $lessonSlug = 'lesson_'.$lessonNumber.'_text_'.Str::slug($lesson->title);
+        $lessonDir = $chapterDir.'/'.$lessonSlug;
 
-        if (!is_dir($lessonDir)) {
+        if (! is_dir($lessonDir)) {
             mkdir($lessonDir, 0755, true);
         }
 
         $files = [];
 
         // Exporter le contenu texte
-        $contentFile = $lessonSlug . '/content.html';
-        file_put_contents($lessonDir . '/content.html', $textContent->content);
+        $contentFile = $lessonSlug.'/content.html';
+        file_put_contents($lessonDir.'/content.html', $textContent->content);
         $files[] = $contentFile;
 
         // Copier les pièces jointes
         $attachments = [];
         foreach ($textContent->attachments as $attachment) {
-            if (Storage::disk('public')->exists($attachment->file_path) && !empty($attachment->original_name)) {
+            if (Storage::disk('public')->exists($attachment->file_path) && ! empty($attachment->original_name)) {
                 $sourcePath = Storage::disk('public')->path($attachment->file_path);
-                $destPath = $lessonDir . '/' . $attachment->original_name;
+                $destPath = $lessonDir.'/'.$attachment->original_name;
 
                 // S'assurer que le répertoire destination existe
-                if (!is_dir($lessonDir)) {
+                if (! is_dir($lessonDir)) {
                     mkdir($lessonDir, 0755, true);
                 }
 
                 // Vérifier que le fichier source est bien un fichier et pas un répertoire
                 if (is_file($sourcePath)) {
                     copy($sourcePath, $destPath);
-                    $attachmentFile = $lessonSlug . '/' . $attachment->original_name;
+                    $attachmentFile = $lessonSlug.'/'.$attachment->original_name;
                     $files[] = $attachmentFile;
                     $attachments[] = $attachmentFile;
                 }
@@ -255,9 +254,9 @@ class FormationExportController extends Controller
             'attachments_count' => $textContent->attachments->count(),
         ];
 
-        $metadataFile = $lessonSlug . '/metadata.json';
+        $metadataFile = 'chapters/'.$chapterSlug.'/'.$lessonSlug.'/metadata.json';
         file_put_contents(
-            $lessonDir . '/metadata.json',
+            $lessonDir.'/metadata.json',
             json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
 
@@ -266,18 +265,18 @@ class FormationExportController extends Controller
             'type' => 'text',
             'slug' => $lessonSlug,
             'metadata_file' => $metadataFile,
-            'files' => array_merge([$metadataFile], $files),
-            'content_file' => $contentFile,
-            'attachments' => $attachments,
+            'files' => array_merge([$metadataFile], array_map(fn ($f) => 'chapters/'.$chapterSlug.'/'.$f, $files)),
+            'content_file' => 'chapters/'.$chapterSlug.'/'.$contentFile,
+            'attachments' => array_map(fn ($f) => 'chapters/'.$chapterSlug.'/'.$f, $attachments),
         ];
     }
 
-    private function exportQuizLesson($lesson, $quiz, string $chapterDir, int $lessonNumber): array
+    private function exportQuizLesson($lesson, $quiz, string $chapterDir, string $chapterSlug, int $lessonNumber): array
     {
-        $lessonSlug = 'lesson_' . $lessonNumber . '_quiz_' . Str::slug($lesson->title);
-        $lessonDir = $chapterDir . '/' . $lessonSlug;
+        $lessonSlug = 'lesson_'.$lessonNumber.'_quiz_'.Str::slug($lesson->title);
+        $lessonDir = $chapterDir.'/'.$lessonSlug;
 
-        if (!is_dir($lessonDir)) {
+        if (! is_dir($lessonDir)) {
             mkdir($lessonDir, 0755, true);
         }
 
@@ -302,9 +301,9 @@ class FormationExportController extends Controller
             }),
         ];
 
-        $quizFile = $lessonSlug . '/quiz.json';
+        $quizFile = $lessonSlug.'/quiz.json';
         file_put_contents(
-            $lessonDir . '/quiz.json',
+            $lessonDir.'/quiz.json',
             json_encode($quizData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
 
@@ -315,9 +314,9 @@ class FormationExportController extends Controller
             'questions_count' => $quiz->quizQuestions->count(),
         ];
 
-        $metadataFile = $lessonSlug . '/metadata.json';
+        $metadataFile = 'chapters/'.$chapterSlug.'/'.$lessonSlug.'/metadata.json';
         file_put_contents(
-            $lessonDir . '/metadata.json',
+            $lessonDir.'/metadata.json',
             json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
 
@@ -326,31 +325,31 @@ class FormationExportController extends Controller
             'type' => 'quiz',
             'slug' => $lessonSlug,
             'metadata_file' => $metadataFile,
-            'files' => [$metadataFile, $quizFile],
-            'quiz_file' => $quizFile,
+            'files' => [$metadataFile, 'chapters/'.$chapterSlug.'/'.$quizFile],
+            'quiz_file' => 'chapters/'.$chapterSlug.'/'.$quizFile,
         ];
     }
 
     private function exportCompletionDocuments(Formation $formation, string $formationDir): array
     {
-        $completionDir = $formationDir . '/completion_documents';
+        $completionDir = $formationDir.'/completion_documents';
         $files = [];
         $documents = [];
 
         foreach ($formation->completionDocuments as $document) {
-            if (Storage::disk('public')->exists($document->file_path) && !empty($document->original_name)) {
+            if (Storage::disk('public')->exists($document->file_path) && ! empty($document->original_name)) {
                 $sourcePath = Storage::disk('public')->path($document->file_path);
-                $destPath = $completionDir . '/' . $document->original_name;
+                $destPath = $completionDir.'/'.$document->original_name;
 
                 // S'assurer que le répertoire destination existe
-                if (!is_dir($completionDir)) {
+                if (! is_dir($completionDir)) {
                     mkdir($completionDir, 0755, true);
                 }
 
                 // Vérifier que le fichier source est bien un fichier
                 if (is_file($sourcePath)) {
                     copy($sourcePath, $destPath);
-                    $documentFile = 'completion_documents/' . $document->original_name;
+                    $documentFile = 'completion_documents/'.$document->original_name;
                     $files[] = $documentFile;
 
                     $documents[] = [
@@ -377,7 +376,7 @@ class FormationExportController extends Controller
         });
 
         file_put_contents(
-            $completionDir . '/documents_list.json',
+            $completionDir.'/documents_list.json',
             json_encode($documentsList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
 
@@ -391,7 +390,7 @@ class FormationExportController extends Controller
 
     private function createZip(string $sourceDir, string $zipPath): void
     {
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
 
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
             $this->addDirectoryToZip($zip, $sourceDir, basename($sourceDir));
@@ -410,8 +409,8 @@ class FormationExportController extends Controller
                 continue;
             }
 
-            $filePath = $dir . '/' . $file;
-            $relativeFilePath = $relativePath ? $relativePath . '/' . $file : $file;
+            $filePath = $dir.'/'.$file;
+            $relativeFilePath = $relativePath ? $relativePath.'/'.$file : $file;
 
             if (is_dir($filePath)) {
                 $zip->addEmptyDir($relativeFilePath);
@@ -477,21 +476,21 @@ class FormationExportController extends Controller
         ];
 
         file_put_contents(
-            $formationDir . '/orchestre.json',
+            $formationDir.'/orchestre.json',
             json_encode($orchestre, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
     }
 
     private function deleteDirectory(string $dir): void
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             return;
         }
 
         $files = array_diff(scandir($dir), ['.', '..']);
 
         foreach ($files as $file) {
-            $filePath = $dir . '/' . $file;
+            $filePath = $dir.'/'.$file;
 
             if (is_dir($filePath)) {
                 $this->deleteDirectory($filePath);

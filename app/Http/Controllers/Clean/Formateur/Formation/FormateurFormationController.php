@@ -157,4 +157,39 @@ class FormateurFormationController extends Controller
 
         return redirect()->route('formateur.formation.show', [$formation]);
     }
+
+    public function deleteFormation(Formation $formation)
+    {
+        $confirmationCode = rand(1, 6000);
+
+        session(['formation_delete_code' => $confirmationCode]);
+
+        return view('out-application.formateur.formation.formation-delete', compact('formation', 'confirmationCode'));
+    }
+
+    public function destroyFormation(Request $request, Formation $formation)
+    {
+        $request->validate([
+            'confirmation_code' => 'required|integer|min:1|max:6000',
+        ]);
+
+        $expectedCode = session('formation_delete_code');
+
+        if ((int) $request->confirmation_code !== $expectedCode) {
+            return back()->withErrors(['confirmation_code' => 'Le code de confirmation est incorrect.']);
+        }
+
+        // Supprimer l'image de couverture si elle existe
+        if ($formation->cover_image_path && Storage::disk('public')->exists($formation->cover_image_path)) {
+            Storage::disk('public')->delete($formation->cover_image_path);
+        }
+
+        // Supprimer la formation (les relations seront supprimées en cascade grâce aux foreign keys)
+        $formation->delete();
+
+        // Nettoyer la session
+        session()->forget('formation_delete_code');
+
+        return redirect()->route('formateur.home')->with('success', 'Formation supprimée avec succès.');
+    }
 }

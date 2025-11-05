@@ -3,10 +3,11 @@
 use App\Http\Controllers\Clean\Formateur\FormateurPageController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationAiController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationController;
-use App\Http\Controllers\Clean\Formateur\Formation\FormationEntryQuizController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationCompletionDocumentController;
+use App\Http\Controllers\Clean\Formateur\Formation\FormationEntryQuizController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationExportController;
+use App\Http\Controllers\Clean\Formateur\Formation\FormationImportController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
 use App\Http\Middleware\FormateurMiddleware;
 use App\Http\Middleware\FormateurOwner;
@@ -18,10 +19,8 @@ Route::prefix('formateur')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [FormateurPageController::class, 'home'])->name('home');
-        Route::get('/import', [FormateurPageController::class, 'import'])->name('import');
-        Route::post('/import/json', [FormateurPageController::class, 'importJson'])->name('import.json');
-        Route::post('/import/csv', [FormateurPageController::class, 'importCsv'])->name('import.csv');
-        Route::post('/import/scorm', [FormateurPageController::class, 'importScorm'])->name('import.scorm');
+        Route::get('/import', [FormationImportController::class, 'showImportForm'])->name('import');
+        Route::post('/import', [FormationImportController::class, 'import'])->name('import.zip');
 
         // Formation routes
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
@@ -50,6 +49,12 @@ Route::prefix('formateur')
 
             // Export formation
             Route::get('/formation/{formation}/export', [FormationExportController::class, 'export'])->name('formation.export');
+
+            // Delete formation (superadmin only)
+            Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->group(function () {
+                Route::get('/formation/{formation}/delete', [FormateurFormationController::class, 'deleteFormation'])->name('formation.delete.show');
+                Route::delete('/formation/{formation}/delete', [FormateurFormationController::class, 'destroyFormation'])->name('formation.delete.destroy');
+            });
 
             // Entry quiz management
             Route::get('/formation/{formation}/entry-quiz', [FormationEntryQuizController::class, 'edit'])->name('formation.entry-quiz.edit');
