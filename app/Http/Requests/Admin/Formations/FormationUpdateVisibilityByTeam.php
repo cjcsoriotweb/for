@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin\Formations;
 use App\Models\Team;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class FormationUpdateVisibilityByTeam extends FormRequest
 {
@@ -35,10 +36,16 @@ class FormationUpdateVisibilityByTeam extends FormRequest
             ],
             'formation_id' => [
                 'required',
+                'exists:formations,id',
             ],
 
             'enabled' => [
                 'required', 'boolean',
+            ],
+            'usage_quota' => [
+                Rule::requiredIf(fn () => (bool) $this->boolean('enabled')),
+                'integer',
+                'min:1',
             ],
         ];
     }

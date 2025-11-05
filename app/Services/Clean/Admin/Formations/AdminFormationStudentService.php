@@ -89,11 +89,11 @@ class AdminFormationStudentService
         });
     }
 
-    public function unenrollStudent(Formation $formation, Team $team, User $student, bool $refund = true): int
+    public function unenrollStudent(Formation $formation, Team $team, User $student): void
     {
-        $enrollment = $this->getEnrollment($formation, $team, $student);
+        $this->getEnrollment($formation, $team, $student);
 
-        return DB::transaction(function () use ($formation, $team, $student, $enrollment, $refund): int {
+        DB::transaction(function () use ($formation, $team, $student): void {
             $lessonIds = $formation->lessons()->pluck('lessons.id');
 
             if ($lessonIds->isNotEmpty()) {
@@ -104,14 +104,6 @@ class AdminFormationStudentService
             }
 
             $formation->learners()->detach($student->id);
-
-            $refundAmount = (int) ($enrollment->enrollment_cost ?? $formation->money_amount ?? 0);
-
-            if ($refund && $refundAmount > 0) {
-                $team->increment('money', $refundAmount);
-            }
-
-            return $refund ? $refundAmount : 0;
         });
     }
 

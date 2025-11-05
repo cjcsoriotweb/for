@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AdminFormationService extends BaseFormationService
 {
-    public function makeFormationVisibleForTeam(Formation $formation, Team $team)
+    public function makeFormationVisibleForTeam(Formation $formation, Team $team, int $usageQuota)
     {
         return FormationInTeams::updateOrCreate(
             [
@@ -20,16 +20,17 @@ class AdminFormationService extends BaseFormationService
             ],
             [
                 'visible' => true,
+                'usage_quota' => $usageQuota,
             ],
         );
     }
 
     public function makeFormationInvisibleForTeam(Formation $formation, Team $team)
     {
-        return FormationInTeams::where([
-            'formation_id' => $formation->id,
-            'team_id' => $team->id,
-        ])->delete();
+        return FormationInTeams::query()
+            ->where('formation_id', $formation->id)
+            ->where('team_id', $team->id)
+            ->update(['visible' => false]);
     }
 
     public function listWithTeamFlags(Team $team, array $options = []): Collection
@@ -81,6 +82,7 @@ class AdminFormationService extends BaseFormationService
                 ->where('teams.id', $team->id)
                 ->where('formation_in_teams.visible', true),
         ]);
+        $query->with(['teams' => fn ($subQuery) => $subQuery->where('teams.id', $team->id)]);
 
         if ($onlyVisible) {
             $query->whereHas('teams', function ($subQuery) use ($team): void {

@@ -17,7 +17,6 @@ Route::prefix('administrateur')
             ->name('index');
         Route::get('{team}/users', [AdminPageController::class, 'users'])->name('users.index');
         Route::get('{team}/formations', [AdminPageController::class, 'formations'])->name('formations.index');
-        Route::get('{team}/formations/{formation}/revenue', [AdminFormationController::class, 'revenueSummary'])->name('formations.revenue');
         Route::get('{team}/formations/{formation}/students/{student}', [AdminFormationStudentController::class, 'show'])->name('formations.students.show');
         Route::post('{team}/formations/{formation}/students/{student}/lessons/{lesson}/complete', [AdminFormationStudentController::class, 'completeLesson'])->name('formations.students.lessons.complete');
         Route::post('{team}/formations/{formation}/students/{student}/reset', [AdminFormationStudentController::class, 'reset'])->name('formations.students.reset');

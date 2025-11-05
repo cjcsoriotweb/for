@@ -90,8 +90,8 @@
                             {{ optional($enrollment->last_seen_at)->diffForHumans() ?? 'â€”' }}
                         </div>
                         <div>
-                            <span class="text-gray-500 dark:text-white/60">Montant:</span>
-                            {{ number_format((int) ($enrollment->enrollment_cost ?? $formation->money_amount ?? 0), 0, ',', ' ') }} jetons
+                            <span class="text-gray-500 dark:text-white/60">Utilisation facturée:</span>
+                              <span class="text-gray-900 dark:text-white">{{ __("Non applicable") }}</span>
                         </div>
                     </div>
                 </div>

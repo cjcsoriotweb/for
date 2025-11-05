@@ -38,7 +38,9 @@
     </div>
 
     @forelse($formations as $formation)
-      @include('in-application.admin.formations.components.formation-item')
+      @include('in-application.admin.formations.components.formation-item', [
+        'usagePivot' => $formationUsages->get($formation->id),
+      ])
     @empty
       @include('in-application.admin.formations.components.empty-state')
     @endforelse
