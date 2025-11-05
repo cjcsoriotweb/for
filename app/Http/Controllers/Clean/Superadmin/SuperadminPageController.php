@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Clean\Superadmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\SupportTicket;
 use App\Models\Team;
@@ -24,7 +25,12 @@ class SuperadminPageController extends Controller
             'tickets' => SupportTicket::count(),
         ];
 
-        return view('out-application.superadmin.superadmin-overview-page', compact('stats'));
+        $trainerCount = AiTrainer::count();
+
+        return view('out-application.superadmin.superadmin-overview-page', [
+            'stats' => $stats,
+            'trainerCount' => $trainerCount,
+        ]);
     }
 
     public function teamsIndex(Request $request)
