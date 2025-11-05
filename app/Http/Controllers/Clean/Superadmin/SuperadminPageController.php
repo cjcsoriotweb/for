@@ -147,4 +147,62 @@ class SuperadminPageController extends Controller
     {
         return view('out-application.superadmin.superadmin-support-page');
     }
+
+    public function formationShow(Formation $formation)
+    {
+        $formation->load(['category:id,name,color']);
+
+        $formation->loadCount([
+            'teams',
+            'teams as active_teams_count' => fn ($query) => $query->wherePivot('visible', true),
+            'learners',
+            'chapters',
+            'lessons',
+        ]);
+
+        $teamRows = $formation->teams()
+            ->with(['owner:id,name,email'])
+            ->withCount('users')
+            ->select([
+                'teams.id',
+                'teams.name',
+                'teams.owner_id',
+                'formation_in_teams.visible',
+                'formation_in_teams.approved_at',
+                'formation_in_teams.approved_by',
+                'formation_in_teams.created_at',
+            ])
+            ->orderByDesc('formation_in_teams.visible')
+            ->orderBy('teams.name')
+            ->get();
+
+        $enrollmentStatsRow = DB::table('formation_user')
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('SUM(CASE WHEN completed_at IS NOT NULL THEN 1 ELSE 0 END) as completed')
+            ->selectRaw('SUM(CASE WHEN completed_at IS NULL THEN 1 ELSE 0 END) as in_progress')
+            ->selectRaw('SUM(COALESCE(enrollment_cost, ?, 0)) as revenue_sum', [$formation->money_amount ?? 0])
+            ->where('formation_id', $formation->id)
+            ->first();
+
+        $enrollmentStats = [
+            'total' => (int) ($enrollmentStatsRow->total ?? 0),
+            'completed' => (int) ($enrollmentStatsRow->completed ?? 0),
+            'in_progress' => (int) ($enrollmentStatsRow->in_progress ?? 0),
+            'revenue_sum' => (int) ($enrollmentStatsRow->revenue_sum ?? 0),
+        ];
+
+        $recentLearners = $formation->learners()
+            ->select(['users.id', 'users.name', 'users.email', 'users.current_team_id'])
+            ->with(['currentTeam:id,name'])
+            ->orderByDesc('formation_user.created_at')
+            ->limit(15)
+            ->get();
+
+        return view('out-application.superadmin.superadmin-formation-show-page', [
+            'formation' => $formation,
+            'teamRows' => $teamRows,
+            'enrollmentStats' => $enrollmentStats,
+            'recentLearners' => $recentLearners,
+        ]);
+    }
 }

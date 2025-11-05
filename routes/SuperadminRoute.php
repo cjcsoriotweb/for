@@ -14,6 +14,7 @@ Route::prefix('superadmin')
         Route::get('/teams', [SuperadminPageController::class, 'teamsIndex'])->name('teams.index');
         Route::get('/users', [SuperadminPageController::class, 'usersIndex'])->name('users.index');
         Route::get('/formations', [SuperadminPageController::class, 'formationsIndex'])->name('formations.index');
+        Route::get('/formations/{formation}', [SuperadminPageController::class, 'formationShow'])->name('formations.show');
         Route::get('/support', [SuperadminPageController::class, 'supportIndex'])->name('support.index');
         Route::prefix('ai')
             ->name('ai.')

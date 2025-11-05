@@ -42,15 +42,6 @@
                 />
             </form>
             <div class="flex flex-wrap items-center gap-3">
-                @if ($defaultTeam)
-                    <a
-                        href="{{ route('application.admin.formations.index', ['team' => $defaultTeam]) }}"
-                        class="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
-                    >
-                        <span class="material-symbols-outlined text-base">open_in_new</span>
-                        {{ __('Gérer les formations') }}
-                    </a>
-                @endif
                 <a
                     href="{{ route('superadmin.formation-categories.index') }}"
                     class="inline-flex items-center gap-2 rounded-full border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-50"
@@ -63,7 +54,11 @@
 
         <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             @forelse ($formations as $formation)
-                <article class="flex h-full flex-col justify-between rounded-3xl border border-slate-200/70 bg-white p-6 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl dark:border-slate-700/70 dark:bg-slate-900">
+                <a
+                    href="{{ route('superadmin.formations.show', $formation) }}"
+                    class="group block h-full"
+                >
+                <article class="flex h-full flex-col justify-between rounded-3xl border border-slate-200/70 bg-white p-6 shadow-lg transition group-hover:-translate-y-0.5 group-hover:border-indigo-200 group-hover:shadow-xl dark:border-slate-700/70 dark:bg-slate-900 dark:group-hover:border-indigo-500/40">
                     <div class="space-y-4">
                         <div class="flex items-start justify-between gap-3">
                             <div>
@@ -108,6 +103,7 @@
                         <span>ID #{{ $formation->id }}</span>
                     </div>
                 </article>
+                </a>
             @empty
                 <div class="col-span-full rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
                     {{ __("Aucune formation ne correspond à votre recherche.") }}
