@@ -188,11 +188,14 @@ class ElevePageController extends Controller
             abort(403, 'Vous n\'etes pas inscrit Ã  cette formation.');
         }
 
-        // Verifier si la formation est terminee
-        if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
-            return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('warning', 'La formation n\'est pas encore terminee.');
-        }
+        // Marquer la formation comme terminÃ©e (forcer le statut completed)
+        $formation->learners()->syncWithoutDetaching([
+            $user->id => [
+                'status' => 'completed',
+                'completed_at' => now(),
+                'last_seen_at' => now(),
+            ],
+        ]);
 
         // Recuperer la formation avec le progrÃ¨s de l'etudiant
         $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
@@ -1039,4 +1042,3 @@ class ElevePageController extends Controller
         ));
     }
 }
-

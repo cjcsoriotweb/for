@@ -22,7 +22,7 @@
       @endphp
 
       <article
-        class="group flex min-w-[260px] max-w-xs snap-start flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 transition-colors duration-200 hover:border-slate-700">
+        class="group flex min-w-[260px] max-w-xs snap-start flex-col overflow-hidden rounded-2xl border {{ $isCompleted ? 'border-green-600 bg-slate-900/80' : 'border-slate-800 bg-slate-900/70' }} transition-colors duration-200 hover:border-slate-700">
         <div class="h-36 w-full overflow-hidden border-b border-slate-800 bg-slate-900 sm:h-40">
           <img src="{{ $formation->cover_image_url }}" alt="Image de couverture de {{ $fallbackTitle }}"
             class="h-full w-full object-cover" loading="lazy"
@@ -30,15 +30,25 @@
         </div>
 
         <div class="space-y-5 p-6">
+          @if($isCompleted)
+          <div class="flex items-center justify-center">
+            <div class="flex items-center gap-2 rounded-full bg-green-600/20 border border-green-600 px-4 py-2 text-sm font-medium text-green-400">
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              Formation terminée
+            </div>
+          </div>
+          @else
           <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-300">
-            <span
-              class="rounded-full border border-slate-700 px-3 py-1 text-slate-200">
-              {{ $isCompleted ? 'Termin&eacute;' : 'Continuer' }}
+            <span class="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-slate-200">
+              Continuer
             </span>
             <span class="rounded-full bg-slate-800 px-3 py-1 text-slate-200">
               {{ $progressPercent }}&nbsp;%
             </span>
           </div>
+          @endif
 
           <div class="space-y-3 text-slate-200">
             <h3 class="text-lg font-semibold leading-snug text-white line-clamp-2">
@@ -51,9 +61,39 @@
         </div>
 
         <div class="space-y-4 border-t border-slate-800 px-6 py-5">
+          @if($isCompleted)
+          <div class="flex items-center justify-center">
+            <div class="flex items-center gap-2 text-green-400">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm font-medium">Formation réussie à 100%</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
+                <path fill-rule="evenodd" d="M4 13a2 2 0 100 4h12a2 2 0 100-4H4zm11.24 2a.75.75 0 01.75-.75H16a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V15zm-2.25-.75a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 00.75-.75V15a.75.75 0 00-.75-.75h-.01z" clip-rule="evenodd" />
+              </svg>
+              Voir mon certificat
+            </a>
+
+            <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700">
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z" clip-rule="evenodd" />
+              </svg>
+              Revoir la formation
+            </a>
+          </div>
+          @else
           <div class="h-2 w-full overflow-hidden rounded-full bg-slate-800">
             <div class="h-full rounded-full bg-slate-200 transition-all duration-300"
-              style="width: {{ $isCompleted ? 100 : $progressPercent }}%;"></div>
+              style="width: {{ $progressPercent }}%;"></div>
           </div>
 
           <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-300">
@@ -63,7 +103,7 @@
 
           <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
             class="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-white">
-            {{ $isCompleted ? 'Revoir la formation' : 'Voir les d&eacute;tails' }}
+            Voir les détails
             <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fill-rule="evenodd"
                 d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z"
@@ -73,6 +113,7 @@
                 clip-rule="evenodd" />
             </svg>
           </a>
+          @endif
         </div>
       </article>
       @endforeach
@@ -93,7 +134,3 @@
   </div>
   @endif
 </section>
-
-
-
-
