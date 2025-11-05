@@ -87,7 +87,6 @@ class Formation extends Model
                 'post_quiz_score',
                 'post_quiz_completed_at',
                 'quiz_progress_delta',
-                'enrollment_cost',
             ])
             ->withTimestamps();
     }

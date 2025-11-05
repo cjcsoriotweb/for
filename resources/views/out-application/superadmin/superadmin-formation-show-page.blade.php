@@ -267,12 +267,6 @@
                                 {{ number_format($enrollmentStats['in_progress']) }}
                             </p>
                         </div>
-                        <div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">{{ __('Revenu estimé') }}</p>
-                            <p class="text-2xl font-semibold text-slate-900 dark:text-white">
-                                {{ number_format($enrollmentStats['revenue_sum'], 0, ',', ' ') }} €
-                            </p>
-                        </div>
                     </div>
                 </section>
 

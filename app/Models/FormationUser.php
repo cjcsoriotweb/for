@@ -24,7 +24,6 @@ class FormationUser extends Model
         'completed_at',
         'score_total',
         'max_score_total',
-        'enrollment_cost',
     ];
 
     protected function casts(): array

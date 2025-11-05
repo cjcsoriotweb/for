@@ -10,10 +10,8 @@ use App\Models\FormationInTeams;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
 use App\Services\FormationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 
 class AdminFormationController extends Controller
 {
@@ -29,7 +27,7 @@ class AdminFormationController extends Controller
 
         app(FormationService::class)->createFormation(['title' => $title, 'description' => $description]);
 
-        return redirect()->back()->with('status', __('Formation crÃ©Ã©e avec succÃ¨s!'));
+        return redirect()->back()->with('status', __('Formation crÃƒÂ©ÃƒÂ©e avec succÃƒÂ¨s!'));
     }
 
     public function updateVisibilityByTeam(FormationUpdateVisibilityByTeam $request, Team $team, FormationService $formationService)
@@ -51,7 +49,7 @@ class AdminFormationController extends Controller
                 return redirect()
                     ->route('application.admin.formations.index', $team)
                     ->withErrors([
-                        'usage_quota' => __('Le quota doit être supérieur ou égal aux utilisations déjà consommées (:count).', [
+                        'usage_quota' => __('Le quota doit Ãªtre supÃ©rieur ou Ã©gal aux utilisations dÃ©jÃ  consommÃ©es (:count).', [
                             'count' => $existingPivot->usage_consumed,
                         ]),
                     ]);
@@ -61,19 +59,20 @@ class AdminFormationController extends Controller
 
             return redirect()
                 ->route('application.admin.formations.index', $team)
-                ->with('status', __('Formation activée ou mise à jour avec succès !'));
+                ->with('status', __('Formation activÃ©e ou mise Ã  jour avec succÃ¨s !'));
         }
 
         $formationService->admin()->makeFormationInvisibleForTeam($formation, $team);
 
         return redirect()
             ->route('application.admin.formations.index', $team)
-            ->with('status', __('Formation désactivée avec succès !'));
+            ->with('status', __('Formation dÃ©sactivÃ©e avec succÃ¨s !'));
     }
 
     public function revenueSummary(Request $request, Team $team, Formation $formation): RedirectResponse
     {
         return redirect()
             ->route('application.admin.formations.index', $team)
-            ->with('status', __('La page de revenus n’est plus disponible.'));
+            ->with('status', __('La page de revenus nâ€™est plus disponible.'));
     }
+}

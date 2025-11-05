@@ -63,7 +63,6 @@ class OrganisateurService
                 'completed_at',
                 'score_total',
                 'max_score_total',
-                'enrollment_cost',
             ])
             ->wherePivot('team_id', $team->id)
             ->orderByDesc('formation_user.enrolled_at')
@@ -197,11 +196,7 @@ class OrganisateurService
             return $enrolledAt && $enrolledAt->between($currentMonthStart, $currentMonthEnd);
         });
 
-        $monthlyCost = $monthlyEnrollments->reduce(function ($carry, $student) use ($formation) {
-            $enrollmentCost = $student->pivot->enrollment_cost ?? $formation->money_amount ?? 0;
-
-            return $carry + (int) $enrollmentCost;
-        }, 0);
+        $monthlyCost = 0; // Pricing system removed
 
         $stats = [
             'total' => $students->count(),
@@ -242,7 +237,6 @@ class OrganisateurService
                 'completed_at',
                 'score_total',
                 'max_score_total',
-                'enrollment_cost',
             ])
             ->wherePivot('team_id', $team->id)
             ->orderByDesc('formation_user.enrolled_at')

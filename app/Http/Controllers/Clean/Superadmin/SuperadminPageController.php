@@ -95,8 +95,7 @@ class SuperadminPageController extends Controller
         $sortDirection = Str::endsWith($sort, '_asc') ? 'asc' : 'desc';
 
         $aggregatesSub = DB::table('formation_user')
-            ->selectRaw('formation_user.formation_id, COUNT(*) as enrollments_count, SUM(COALESCE(formation_user.enrollment_cost, f.money_amount, 0)) as revenue_sum, MAX(COALESCE(formation_user.enrolled_at, formation_user.created_at)) as last_enrollment_at')
-            ->join('formations as f', 'f.id', '=', 'formation_user.formation_id')
+            ->selectRaw('formation_user.formation_id, COUNT(*) as enrollments_count, 0 as revenue_sum, MAX(COALESCE(formation_user.enrolled_at, formation_user.created_at)) as last_enrollment_at')
             ->groupBy('formation_user.formation_id');
 
         $baseQuery = Formation::query()
@@ -180,7 +179,7 @@ class SuperadminPageController extends Controller
             ->selectRaw('COUNT(*) as total')
             ->selectRaw('SUM(CASE WHEN completed_at IS NOT NULL THEN 1 ELSE 0 END) as completed')
             ->selectRaw('SUM(CASE WHEN completed_at IS NULL THEN 1 ELSE 0 END) as in_progress')
-            ->selectRaw('SUM(COALESCE(enrollment_cost, ?, 0)) as revenue_sum', [$formation->money_amount ?? 0])
+            ->selectRaw('0 as revenue_sum')
             ->where('formation_id', $formation->id)
             ->first();
 
