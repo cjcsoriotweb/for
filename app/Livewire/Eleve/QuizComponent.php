@@ -117,13 +117,11 @@ class QuizComponent extends Component
     public function selectChoice(int $choiceId): void
     {
         $choice = QuizChoice::query()
-            ->select(['id', 'question_id', 'question_id']) // on prend les deux au cas où
+            ->select(['id', 'question_id'])
             ->findOrFail($choiceId);
 
-        // Détecter le bon question_id (selon ton schéma)
-        $questionId = $choice->question_id
-            ?? $choice->question_id
-            ?? null;
+        // Récupérer le question_id
+        $questionId = $choice->question_id;
 
         // Fallback ultra-sûr via la relation, si elle existe
         if (! $questionId && method_exists($choice, 'question')) {
@@ -163,7 +161,13 @@ class QuizComponent extends Component
             }
         } else {
             // single / true_false
-            $this->reponse[$questionId] = $choiceId;
+            if (isset($this->reponse[$questionId]) && (int) $this->reponse[$questionId] === (int) $choiceId) {
+                // Si c'est le même choix, on le désélectionne
+                unset($this->reponse[$questionId]);
+            } else {
+                // Sinon, on sélectionne ce choix
+                $this->reponse[$questionId] = $choiceId;
+            }
         }
     }
 

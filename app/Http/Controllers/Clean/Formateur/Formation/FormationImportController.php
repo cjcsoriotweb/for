@@ -278,8 +278,8 @@ class FormationImportController extends Controller
             // Importer les choix
             foreach ($questionData['choices'] as $choiceData) {
                 QuizChoice::create([
-                    'quiz_question_id' => $question->id,
-                    'choice' => $choiceData['choice'],
+                    'question_id' => $question->id,
+                    'choice_text' => $choiceData['choice'],
                     'is_correct' => $choiceData['is_correct'] ?? false,
                 ]);
             }

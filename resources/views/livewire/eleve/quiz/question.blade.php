@@ -41,8 +41,7 @@ $isMulti = $q ? in_array(strtolower($q->type), ['multiple_choice','multiple_choi
             @foreach($q->quizChoices as $choice)
             @php $selected = $this->isSelected($choice->id, $q->id); @endphp
 
-            <label @if($selected) wire:click="unselectChoice({{ $q->id }}, {{ $choice->id }})" @else
-              wire:click="selectChoice({{ $choice->id }})" @endif role="{{ $isMulti ? 'checkbox' : 'radio' }}"
+            <label wire:click="{{ $isMulti && $selected ? 'unselectChoice('.$q->id.', '.$choice->id.')' : 'selectChoice('.$choice->id.')' }}" role="{{ $isMulti ? 'checkbox' : 'radio' }}"
               aria-checked="{{ $selected ? 'true' : 'false' }}"
               @class([ 'flex items-center gap-4 rounded-lg border p-4 cursor-pointer transition' , $selected
               ? 'border-blue-700 bg-blue-600 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-600'

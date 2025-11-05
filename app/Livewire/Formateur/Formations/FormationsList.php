@@ -62,14 +62,16 @@ class FormationsList extends Component
         foreach ($formation->lessons as $lesson) {
             switch ($lesson->lessonable_type) {
                 case 'App\\Models\\VideoContent':
-                    $totalDuration += $lesson->lessonable->duration_minutes ?? 0;
+                    $totalDuration += $lesson->lessonable?->duration_minutes ?? 0;
                     break;
                 case 'App\\Models\\TextContent':
-                    $totalDuration += $lesson->lessonable->estimated_read_time ?? 0;
+                    $totalDuration += $lesson->lessonable?->estimated_read_time ?? 0;
                     break;
                 case 'App\\Models\\Quiz':
-                    $questionCount = $lesson->lessonable->quizQuestions()->count();
-                    $totalDuration += max($questionCount * 2, 5);
+                    if ($lesson->lessonable) {
+                        $questionCount = $lesson->lessonable->quizQuestions()->count();
+                        $totalDuration += max($questionCount * 2, 5);
+                    }
                     break;
             }
         }
