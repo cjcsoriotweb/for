@@ -423,14 +423,14 @@
                                 <form
                                     action="{{
                                         route(
-                                            'formateur.formation.chapter.delete.post',
+                                            'formateur.formation.chapter.delete',
                                             [$formation, $chapter]
                                         )
                                     }}"
                                     method="post"
                                     onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce chapitre ? Cette action est irréversible.')"
                                 >
-                                    @method('POST') @csrf
+                                    @method('DELETE') @csrf
 
                                     <input
                                         type="hidden"

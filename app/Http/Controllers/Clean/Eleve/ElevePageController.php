@@ -177,6 +177,104 @@ class ElevePageController extends Controller
     }
 
     /**
+     * Afficher la page dédiée aux formations terminées
+     */
+    public function showCompletedFormation(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation est terminée
+        if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('warning', 'Cette formation n\'est pas encore terminée.');
+        }
+
+        // Récupérer la formation avec le progrès de l'étudiant
+        $formationWithProgress = $this->studentFormationService->getFormationWithProgress($formation, $user);
+
+        if (! $formationWithProgress) {
+            abort(404, 'Formation non trouvée ou non accessible.');
+        }
+
+        // Récupérer le progrès détaillé
+        $progress = $this->studentFormationService->getStudentProgress($user, $formation);
+
+        $formationDocuments = $formation->completionDocuments()->get();
+
+        // Récupérer toutes les leçons de la formation avec leur statut
+        $chapters = $formation->chapters()
+            ->with(['lessons' => function ($lessonQuery) use ($user) {
+                $lessonQuery->with(['learners' => function ($learnerQuery) use ($user) {
+                    $learnerQuery->where('user_id', $user->id);
+                }]);
+            }])
+            ->orderBy('position')
+            ->get();
+
+        $lessonResources = collect();
+        foreach ($chapters as $chapter) {
+            foreach ($chapter->lessons as $lesson) {
+                $lessonLearner = $lesson->learners->first();
+                $isCompleted = optional($lessonLearner?->pivot)->status === 'completed';
+
+                // Récupérer les pièces jointes si c'est du contenu texte
+                $attachments = collect();
+                if ($lesson->lessonable_type === TextContent::class && $lesson->lessonable) {
+                    $attachments = $lesson->lessonable->attachments ?? collect();
+                }
+
+                $lessonResources->push([
+                    'chapter_title' => $chapter->title,
+                    'chapter_position' => $chapter->position ?? 0,
+                    'lesson_id' => $lesson->id,
+                    'lesson_title' => $lesson->title,
+                    'lesson_position' => $lesson->position ?? 0,
+                    'lesson_type' => $lesson->lessonable_type,
+                    'attachments' => $attachments,
+                    'is_completed' => $isCompleted,
+                    'completed_at' => optional($lessonLearner?->pivot)->completed_at,
+                ]);
+            }
+        }
+
+        $lessonResources = $lessonResources->sortBy([
+            fn ($item) => $item['chapter_position'],
+            fn ($item) => $item['lesson_position'],
+        ])->values();
+
+        // Grouper par chapitre pour un meilleur affichage
+        $chaptersWithLessons = $lessonResources->groupBy('chapter_title')->map(function ($lessons, $chapterTitle) {
+            return [
+                'title' => $chapterTitle,
+                'lessons' => $lessons,
+                'completed_count' => $lessons->where('is_completed', true)->count(),
+                'total_count' => $lessons->count(),
+            ];
+        });
+
+        $assistantTrainer = $formationWithProgress->category?->aiTrainer;
+        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
+        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
+
+        return view('in-application.eleve.formation.completed', [
+            'team' => $team,
+            'formationWithProgress' => $formationWithProgress,
+            'progress' => $progress,
+            'formationDocuments' => $formationDocuments,
+            'chaptersWithLessons' => $chaptersWithLessons,
+            'lessonResources' => $lessonResources,
+            'assistantTrainer' => $assistantTrainer,
+            'assistantTrainerSlug' => $assistantTrainerSlug,
+            'assistantTrainerName' => $assistantTrainerName,
+        ]);
+    }
+
+    /**
      * Afficher la page de fÃ©licitations pour une formation terminÃ©e
      */
     public function formationCongratulation(Team $team, Formation $formation)
@@ -188,10 +286,11 @@ class ElevePageController extends Controller
             abort(403, 'Vous n\'etes pas inscrit Ã  cette formation.');
         }
 
-        // Marquer la formation comme terminÃ©e (forcer le statut completed)
+        // Marquer la formation comme terminÃ©e (forcer le statut completed et progression à 100%)
         $formation->learners()->syncWithoutDetaching([
             $user->id => [
                 'status' => 'completed',
+                'progress_percent' => 100,
                 'completed_at' => now(),
                 'last_seen_at' => now(),
             ],

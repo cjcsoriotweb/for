@@ -14,6 +14,7 @@ Route::prefix('eleve')
         // Formation management routes
         Route::prefix('formation')->name('formation.')->group(function () {
             Route::get('/{team}/{formation}', [ElevePageController::class, 'showFormation'])->name('show');
+            Route::get('/{team}/{formation}/completed', [ElevePageController::class, 'showCompletedFormation'])->name('completed');
             Route::get('/{team}/{formation}/congratulation', [ElevePageController::class, 'formationCongratulation'])->name('congratulation');
             Route::get('/{team}/{formation}/documents/{document}', [ElevePageController::class, 'downloadCompletionDocument'])->name('documents.download');
             Route::post('/{team}/{formation}/enroll', [ElevePageController::class, 'enroll'])->name('enroll');

@@ -72,7 +72,7 @@
           </div>
 
           <div class="space-y-3">
-            <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
+            <a href="{{ route('eleve.formation.completed', [$team, $formation->id]) }}"
               class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
               <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
