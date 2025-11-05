@@ -27,7 +27,7 @@ final class VideoUpload extends Component
     public ?string $video_description = '';
 
     // 51200 = 50 MB (ajustez selon votre php.ini / post_max_size / upload_max_filesize)
-    #[Validate('required|file|mimes:mp4,avi,mov,webm|max:51200', message: 'Veuillez sélectionner un fichier vidéo valide (MP4, AVI, MOV, WebM) de 512MB max.')]
+    #[Validate('required|file|mimes:mp4,avi,mov,webm|max:512000', message: 'Veuillez sélectionner un fichier vidéo valide (MP4, AVI, MOV, WebM) de 512MB max.')]
     public $video_file;
 
     /** en minutes (détectée auto) */
