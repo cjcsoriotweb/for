@@ -261,6 +261,16 @@ class ElevePageController extends Controller
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
 
+        // Récupérer la signature de l'étudiant
+        $studentSignature = $user->signatures()->latest()->first();
+
+        // Récupérer les données de completion de la formation
+        $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
+            ->where('user_id', $user->id)
+            ->where('team_id', $team->id)
+            ->with(['trainerSignature', 'completionValidatedBy'])
+            ->first();
+
         return view('in-application.eleve.formation.completed', [
             'team' => $team,
             'formationWithProgress' => $formationWithProgress,
@@ -271,6 +281,8 @@ class ElevePageController extends Controller
             'assistantTrainer' => $assistantTrainer,
             'assistantTrainerSlug' => $assistantTrainerSlug,
             'assistantTrainerName' => $assistantTrainerName,
+            'studentSignature' => $studentSignature,
+            'formationUser' => $formationUser,
         ]);
     }
 
@@ -370,6 +382,43 @@ class ElevePageController extends Controller
         $downloadName = $document->title ?: $document->original_name;
 
         return Storage::disk('public')->download($document->file_path, $downloadName);
+    }
+
+    /**
+     * Demander la validation de fin de formation
+     */
+    public function requestCompletion(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'étudiant est inscrit à la formation
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
+        }
+
+        // Vérifier si la formation est terminée
+        if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
+            return back()->with('error', 'Vous devez d\'abord terminer la formation avant de demander sa validation.');
+        }
+
+        // Récupérer ou créer l'enregistrement FormationUser
+        $formationUser = \App\Models\FormationUser::firstOrNew([
+            'formation_id' => $formation->id,
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+        ]);
+
+        // Vérifier si une demande n'a pas déjà été faite
+        if ($formationUser->completion_request_at && $formationUser->completion_request_status === 'pending') {
+            return back()->with('warning', 'Une demande de validation est déjà en cours de traitement.');
+        }
+
+        // Créer la demande de validation
+        $formationUser->completion_request_at = now();
+        $formationUser->completion_request_status = 'pending';
+        $formationUser->save();
+
+        return back()->with('success', 'Votre demande de validation de fin de formation a été envoyée avec succès. Un superadmin la traitera dans les plus brefs délais.');
     }
 
     /**

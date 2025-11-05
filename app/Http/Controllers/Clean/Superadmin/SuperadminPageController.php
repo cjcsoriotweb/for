@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Clean\Superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\AiTrainer;
 use App\Models\Formation;
+use App\Models\FormationUser;
+use App\Models\Signature;
 use App\Models\SupportTicket;
 use App\Models\Team;
 use App\Models\TeamInvitation;
@@ -203,5 +205,134 @@ class SuperadminPageController extends Controller
             'enrollmentStats' => $enrollmentStats,
             'recentLearners' => $recentLearners,
         ]);
+    }
+
+    /**
+     * Afficher la liste des demandes de validation de formation
+     */
+    public function completionRequestsIndex(Request $request)
+    {
+        $search = trim((string) $request->input('search', ''));
+        $status = $request->input('status', 'pending');
+
+        $completionRequests = FormationUser::query()
+            ->with([
+                'formation:id,title',
+                'user:id,name,email',
+                'team:id,name',
+                'completionValidatedBy:id,name'
+            ])
+            ->whereNotNull('completion_request_at')
+            ->when($status !== 'all', function ($query) use ($status) {
+                $query->where('completion_request_status', $status);
+            })
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->whereHas('formation', function ($formationQuery) use ($search) {
+                            $formationQuery->where('title', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery
+                                ->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('team', function ($teamQuery) use ($search) {
+                            $teamQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->orderByDesc('completion_request_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $stats = [
+            'pending' => FormationUser::where('completion_request_status', 'pending')->count(),
+            'approved' => FormationUser::where('completion_request_status', 'approved')->count(),
+            'rejected' => FormationUser::where('completion_request_status', 'rejected')->count(),
+        ];
+
+        return view('out-application.superadmin.superadmin-completion-requests-page', [
+            'completionRequests' => $completionRequests,
+            'search' => $search,
+            'status' => $status,
+            'stats' => $stats,
+        ]);
+    }
+
+    /**
+     * Afficher les détails d'une demande de validation
+     */
+    public function completionRequestShow(FormationUser $formationUser)
+    {
+        $formationUser->load([
+            'formation:id,title,description',
+            'user:id,name,email',
+            'team:id,name',
+            'trainerSignature',
+            'completionValidatedBy:id,name'
+        ]);
+
+        // Récupérer la signature de l'étudiant
+        $studentSignature = $formationUser->user ? $formationUser->user->signatures()->latest()->first() : null;
+
+        return view('out-application.superadmin.superadmin-completion-request-show-page', [
+            'formationUser' => $formationUser,
+            'studentSignature' => $studentSignature,
+        ]);
+    }
+
+    /**
+     * Approuver une demande de validation de formation
+     */
+    public function approveCompletionRequest(FormationUser $formationUser, Request $request)
+    {
+        $request->validate([
+            'trainer_signature' => 'required|string',
+        ]);
+
+        $user = auth()->user();
+
+        // Créer la signature du formateur
+        $trainerSignature = Signature::create([
+            'user_id' => $user->id,
+            'signature_data' => $request->input('trainer_signature'),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'signed_at' => now(),
+        ]);
+
+        // Mettre à jour la demande
+        $formationUser->update([
+            'completion_request_status' => 'approved',
+            'trainer_signature_id' => $trainerSignature->id,
+            'completion_validated_at' => now(),
+            'completion_validated_by' => $user->id,
+        ]);
+
+        return redirect()->back()->with('success', 'La demande de validation a été approuvée avec succès.');
+    }
+
+    /**
+     * Rejeter une demande de validation de formation
+     */
+    public function rejectCompletionRequest(FormationUser $formationUser, Request $request)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        $user = auth()->user();
+
+        // Mettre à jour la demande
+        $formationUser->update([
+            'completion_request_status' => 'rejected',
+            'completion_validated_at' => now(),
+            'completion_validated_by' => $user->id,
+        ]);
+
+        // TODO: Envoyer une notification à l'étudiant avec la raison du rejet
+
+        return redirect()->back()->with('success', 'La demande de validation a été rejetée.');
     }
 }

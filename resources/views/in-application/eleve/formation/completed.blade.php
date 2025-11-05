@@ -246,5 +246,110 @@
         @endif
       </div>
     </div>
+
+    <!-- Section signatures -->
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Signatures de validation</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Signature de l'élève -->
+        <div class="space-y-3">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Signature de l'élève</h4>
+          @if($studentSignature)
+          <div class="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50">
+            <img src="data:image/png;base64,{{ $studentSignature->signature_data }}"
+                 alt="Signature de l'élève"
+                 class="max-w-full h-auto border border-gray-200 dark:border-gray-600 rounded">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              Signé le {{ $studentSignature->signed_at->format('d/m/Y à H:i') }}
+            </p>
+          </div>
+          @else
+          <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Aucune signature enregistrée</p>
+          </div>
+          @endif
+        </div>
+
+        <!-- Signature du formateur -->
+        <div class="space-y-3">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Signature du formateur</h4>
+          @if($formationUser && $formationUser->trainerSignature)
+          <div class="border-2 border-green-300 dark:border-green-600 rounded-lg p-4 bg-green-50 dark:bg-green-900/10">
+            <img src="data:image/png;base64,{{ $formationUser->trainerSignature->signature_data }}"
+                 alt="Signature du formateur"
+                 class="max-w-full h-auto border border-green-200 dark:border-green-700 rounded">
+            <p class="text-xs text-green-600 dark:text-green-400 mt-2">
+              Validé par {{ $formationUser->completionValidatedBy->name ?? 'Formateur' }} le {{ $formationUser->completion_validated_at->format('d/m/Y à H:i') }}
+            </p>
+          </div>
+          @else
+          <div class="border-2 border-dashed border-amber-300 dark:border-amber-600 rounded-lg p-8 text-center bg-amber-50 dark:bg-amber-900/10">
+            <svg class="mx-auto h-12 w-12 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-sm text-amber-700 dark:text-amber-300 mt-2 font-medium">Signature Formateur : en attente</p>
+            <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              @if($formationUser && $formationUser->completion_request_status === 'pending')
+                Demande de validation envoyée
+              @elseif($formationUser && $formationUser->completion_request_status === 'rejected')
+                Demande rejetée - Contactez un administrateur
+              @else
+                En attente de votre demande de validation
+              @endif
+            </p>
+          </div>
+          @endif
+        </div>
+      </div>
+
+      <!-- Bouton de demande de validation -->
+      @if(!$formationUser || !$formationUser->completion_request_at)
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+        <div class="text-center">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Pour finaliser votre formation, une validation du formateur est requise.
+          </p>
+          <form method="POST" action="{{ route('eleve.formation.request-completion', [$team, $formationWithProgress]) }}" class="inline">
+            @csrf
+            <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Demander la validation de fin de formation
+            </button>
+          </form>
+        </div>
+      </div>
+      @elseif($formationUser && $formationUser->completion_request_status === 'pending')
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 rounded-lg">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+            </svg>
+            Demande de validation en cours de traitement
+          </div>
+        </div>
+      </div>
+      @elseif($formationUser && $formationUser->completion_request_status === 'rejected')
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-lg">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+            Demande de validation rejetée
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+            Contactez un administrateur pour plus d'informations.
+          </p>
+        </div>
+      </div>
+      @endif
+    </div>
   </div>
 </x-eleve-layout>

@@ -24,6 +24,13 @@
             'route' => route('superadmin.formations.index'),
         ],
         [
+            'title' => __('Validations'),
+            'description' => __('Validez les demandes de fin de formation.'),
+            'stat' => '0 ' . __('demandes'), // TODO: Add actual count
+            'icon' => 'check_circle',
+            'route' => route('superadmin.completion-requests.index'),
+        ],
+        [
             'title' => __('Assistants IA'),
             'description' => __('Creez ou ajustez les formateurs IA.'),
             'stat' => number_format($trainerCount) . ' ' . __('assistants'),

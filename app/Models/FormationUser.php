@@ -24,6 +24,11 @@ class FormationUser extends Model
         'completed_at',
         'score_total',
         'max_score_total',
+        'completion_request_at',
+        'completion_request_status',
+        'trainer_signature_id',
+        'completion_validated_at',
+        'completion_validated_by',
     ];
 
     protected function casts(): array
@@ -43,6 +48,8 @@ class FormationUser extends Model
             'completed_at' => 'datetime',
             'score_total' => 'integer',
             'max_score_total' => 'integer',
+            'completion_request_at' => 'datetime',
+            'completion_validated_at' => 'datetime',
         ];
     }
 
@@ -59,5 +66,15 @@ class FormationUser extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function trainerSignature()
+    {
+        return $this->belongsTo(Signature::class, 'trainer_signature_id');
+    }
+
+    public function completionValidatedBy()
+    {
+        return $this->belongsTo(User::class, 'completion_validated_by');
     }
 }
