@@ -19,20 +19,29 @@
     @if($isCompleted)
     @include('in-application.eleve.formation.congratulation')
     @else
-    <x-eleve.formation-header :formation="$formationWithProgress" :progress="$progress" />
+    <!-- Layout responsive : grid sur PC, stack sur mobile -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Présentation à gauche sur PC -->
+      <div class="order-1 lg:order-1">
+        <x-eleve.formation-header :formation="$formationWithProgress" :progress="$progress" />
+      </div>
 
-    <x-eleve.formation-actions :team="$team" :formation="$formationWithProgress" :progress="$progress" />
+      <!-- Contenu principal à droite sur PC -->
+      <div class="order-2 lg:order-2 space-y-8">
+        <x-eleve.formation-actions :team="$team" :formation="$formationWithProgress" :progress="$progress" />
 
-    <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
+        <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
 
-    <div id="resources-section">
-      @include('in-application.eleve.formation.partials.resources', [
-        'formationDocuments' => $formationDocuments ?? collect(),
-        'lessonResources' => $lessonResources ?? collect(),
-        'isFormationCompleted' => $isFormationCompleted ?? false,
-        'team' => $team,
-        'formation' => $formationWithProgress,
-      ])
+        <div id="resources-section">
+          @include('in-application.eleve.formation.partials.resources', [
+            'formationDocuments' => $formationDocuments ?? collect(),
+            'lessonResources' => $lessonResources ?? collect(),
+            'isFormationCompleted' => $isFormationCompleted ?? false,
+            'team' => $team,
+            'formation' => $formationWithProgress,
+          ])
+        </div>
+      </div>
     </div>
     @endif
   </div>

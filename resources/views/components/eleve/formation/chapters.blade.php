@@ -1,13 +1,13 @@
 @props(['formation', 'team' => null])
 
-<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-xl border border-gray-200 dark:border-gray-700">
-  <div class="p-6 text-gray-900 dark:text-gray-100">
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
+  <div class="p-4 text-gray-900 dark:text-gray-100">
     <!-- Header Section -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
         Contenu de la formation
       </h2>
-      <div class="text-sm text-gray-500 dark:text-gray-400">
+      <div class="text-xs text-gray-500 dark:text-gray-400">
         {{ $formation->chapters ? $formation->chapters->count() : 0 }} chapitre{{ ($formation->chapters ? $formation->chapters->count() : 0) > 1 ? 's' : '' }}
       </div>
     </div>
@@ -19,7 +19,7 @@
     $currentLesson = $studentFormationService->getCurrentLesson($formation,
     auth()->user()); @endphp @if($currentLesson)
 
-    <div class="mb-5">
+    <div class="mb-3">
       @livewire('eleve.formation.autoplay', [
           'formation' => $formation,
           'currentLesson' => $currentLesson,
@@ -29,9 +29,9 @@
 
     @endif
 
-    <div class="space-y-4">
+    <div class="space-y-3">
       @foreach($formation->chapters as $index => $chapter)
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
+      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm transition-shadow">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <!-- Chapter Number -->
@@ -77,21 +77,21 @@
           </div>
 
           <!-- Action Button -->
-          <div class="ml-4">
+          <div class="ml-3">
             @if($chapter->is_accessible && $chapter->lessons && $chapter->lessons->count() > 0)
             <a href="{{ route('eleve.lesson.show', [$team, $formation, $chapter, $chapter->lessons->first()]) }}"
-               class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+               class="inline-flex items-center px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-md border border-blue-200 dark:border-blue-800 transition-colors">
               @if($chapter->is_current)
               Continuer
               @else
               Commencer
               @endif
-              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3 h-3 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </a>
             @else
-            <span class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg cursor-not-allowed">
+            <span class="inline-flex items-center px-3 py-1.5 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-medium rounded-md border border-gray-200 dark:border-gray-600 cursor-not-allowed">
               Verrouillé
             </span>
             @endif
