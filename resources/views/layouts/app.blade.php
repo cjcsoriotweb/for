@@ -10,7 +10,7 @@
 
   <div class="min-h-screen flex flex-col">
     <!-- Layouts Parts Header from layouts/app.blade -->
-    @include('layouts.parts.header')
+    @include('components.app.layout.header.this')
     @include('layouts.parts.status')
     @include('layouts.parts.main')
     @include('layouts.parts.footer')
