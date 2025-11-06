@@ -48,7 +48,7 @@ class FormationImportExportLog extends Model
     /**
      * Get the user who performed the import/export.
      *
-     * @return BelongsTo<User, FormationImportExportLog>
+     * @return BelongsTo<User>
      */
     public function user(): BelongsTo
     {
@@ -58,7 +58,7 @@ class FormationImportExportLog extends Model
     /**
      * Get the formation associated with this log.
      *
-     * @return BelongsTo<Formation, FormationImportExportLog>
+     * @return BelongsTo<Formation>
      */
     public function formation(): BelongsTo
     {

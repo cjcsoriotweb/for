@@ -296,7 +296,7 @@ class FormationExportController extends Controller
      * Serialize a lesson to CSV format.
      *
      * @param mixed $lesson The lesson to serialize
-     * @return array{type: string, content: string, duration: int}
+     * @return array<string, mixed>
      */
     private function serializeLessonToCsv($lesson)
     {
