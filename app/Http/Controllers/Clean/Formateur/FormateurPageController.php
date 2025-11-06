@@ -18,6 +18,21 @@ use Illuminate\Support\Facades\Log;
 class FormateurPageController extends Controller
 {
     /**
+     * Maximum file size for JSON imports in kilobytes (10 MB).
+     */
+    private const MAX_JSON_SIZE_KB = 10240;
+
+    /**
+     * Maximum file size for CSV imports in kilobytes (5 MB).
+     */
+    private const MAX_CSV_SIZE_KB = 5120;
+
+    /**
+     * Maximum file size for SCORM imports in kilobytes (50 MB).
+     */
+    private const MAX_SCORM_SIZE_KB = 51200;
+
+    /**
      * CSV expected headers for import.
      */
     private const CSV_HEADERS = [
@@ -64,7 +79,7 @@ class FormateurPageController extends Controller
         try {
             // Validation du fichier
             $request->validate([
-                'json_file' => 'required|file|mimes:json|max:10240', // 10MB max
+                'json_file' => 'required|file|mimes:json|max:' . self::MAX_JSON_SIZE_KB,
             ]);
 
             Log::info('Import JSON started', [
@@ -466,7 +481,7 @@ class FormateurPageController extends Controller
     {
         try {
             $request->validate([
-                'csv_file' => 'required|file|mimes:csv,txt|max:5120', // 5MB max
+                'csv_file' => 'required|file|mimes:csv,txt|max:' . self::MAX_CSV_SIZE_KB,
             ]);
 
             $file = $request->file('csv_file');
@@ -670,7 +685,7 @@ class FormateurPageController extends Controller
     public function importScorm(Request $request)
     {
         $request->validate([
-            'scorm_file' => 'required|file|mimes:zip|max:51200', // 50MB max
+            'scorm_file' => 'required|file|mimes:zip|max:' . self::MAX_SCORM_SIZE_KB,
         ]);
 
         // TODO: Implement SCORM import logic

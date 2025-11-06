@@ -25,6 +25,11 @@ use ZipArchive;
 class FormationImportController extends Controller
 {
     /**
+     * Maximum file size for ZIP imports in kilobytes (100 MB).
+     */
+    private const MAX_ZIP_SIZE_KB = 102400;
+
+    /**
      * Display the formation import form.
      *
      * @return View
@@ -56,7 +61,7 @@ class FormationImportController extends Controller
         
         try {
             $request->validate([
-                'zip_file' => 'required|file|mimes:zip|max:102400', // 100MB max
+                'zip_file' => 'required|file|mimes:zip|max:' . self::MAX_ZIP_SIZE_KB,
             ]);
 
             $zipFile = $request->file('zip_file');
