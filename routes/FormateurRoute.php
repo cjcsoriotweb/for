@@ -96,6 +96,7 @@ Route::prefix('formateur')
 
             // Quiz Questions Management
             Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions', [FormationLessonController::class, 'manageQuestions'])->name('formation.chapter.lesson.quiz.questions');
+            Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/test', [FormationLessonController::class, 'testQuiz'])->name('formation.chapter.lesson.quiz.test');
             Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions', [FormationLessonController::class, 'storeQuestion'])->name('formation.chapter.lesson.quiz.questions.store');
             Route::put('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions/{question}', [FormationLessonController::class, 'updateQuestion'])->name('formation.chapter.lesson.quiz.questions.update');
             Route::delete('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/quiz/{quiz}/questions/{question}', [FormationLessonController::class, 'deleteQuestion'])->name('formation.chapter.lesson.quiz.questions.delete');

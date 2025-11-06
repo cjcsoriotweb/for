@@ -104,7 +104,7 @@ class FormationLessonController
                 'lessonable_id' => $quiz->id,
             ]);
 
-            return redirect()->route('formateur.formation.show', $formation)
+            return redirect()->route('formateur.formation.chapters.index', [$formation,$chapter])
                 ->with('success', 'Quiz créé avec succès! Vous pouvez maintenant ajouter des questions.');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du quiz: '.$e->getMessage()]);
@@ -298,6 +298,25 @@ class FormationLessonController
         $questions = $quiz->quizQuestions()->with('quizChoices')->get();
 
         return view('out-application.formateur.formation.chapter.lesson.manage-questions', compact('formation', 'chapter', 'lesson', 'quiz', 'questions'));
+    }
+
+    public function testQuiz(Formation $formation, Chapter $chapter, Lesson $lesson, \App\Models\Quiz $quiz)
+    {
+        // Ensure the quiz belongs to this lesson
+        if ($quiz->lesson_id !== $lesson->id) {
+            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
+                ->withErrors(['error' => 'Quiz non trouve pour cette lecon.']);
+        }
+
+        $questions = $quiz->quizQuestions()->with('quizChoices')->get();
+
+        return view('out-application.formateur.formation.chapter.lesson.test-quiz', compact(
+            'formation',
+            'chapter',
+            'lesson',
+            'quiz',
+            'questions'
+        ));
     }
 
     public function storeQuestion(Formation $formation, Chapter $chapter, Lesson $lesson, \App\Models\Quiz $quiz)

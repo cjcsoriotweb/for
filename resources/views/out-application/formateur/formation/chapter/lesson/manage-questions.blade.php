@@ -117,7 +117,7 @@
                         class="bg-white overflow-hidden shadow-sm sm:rounded-lg"
                     >
                         <div class="p-6 bg-white border-b border-gray-200">
-                            <div class="flex items-center justify-between mb-6">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
                                 <div>
                                     <h2 class="text-xl font-bold text-gray-900">
                                         Questions du Quiz
@@ -127,24 +127,50 @@
                                         dans ce quiz
                                     </p>
                                 </div>
-                                <button
-                                    onclick="openQuestionModal()"
-                                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 inline-flex items-center"
-                                >
-                                    <svg
-                                        class="w-4 h-4 mr-2"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                    <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M12 4v16m8-8H4"
-                                        ></path>
-                                    </svg>
-                                    Ajouter une Question
-                                </button>
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <a
+                                        href="{{ route('formateur.formation.chapter.lesson.quiz.test', [$formation, $chapter, $lesson, $quiz]) }}"
+                                        class="inline-flex items-center justify-center px-4 py-2 border border-indigo-600 text-indigo-600 font-medium rounded-lg hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    >
+                                        <svg
+                                            class="w-4 h-4 mr-2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.868v4.264a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                                            ></path>
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            ></path>
+                                        </svg>
+                                        Tester le quiz
+                                    </a>
+                                    <button
+                                        onclick="openQuestionModal()"
+                                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 inline-flex items-center"
+                                    >
+                                        <svg
+                                            class="w-4 h-4 mr-2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                        <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 4v16m8-8H4"
+                                            ></path>
+                                        </svg>
+                                        Ajouter une Question
+                                    </button>
+                                </div>
                             </div>
 
                             @if($questions->count() > 0)
