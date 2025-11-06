@@ -7,7 +7,6 @@
 </head>
 
 <body>
-  <x-banner />
 
   <div class="min-h-screen flex flex-col">
     <!-- Layouts Parts Header from layouts/app.blade -->
