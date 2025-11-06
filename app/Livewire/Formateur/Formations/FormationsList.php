@@ -151,9 +151,6 @@ class FormationsList extends Component
             })
             ->count();
 
-        // Revenue calculation (if pricing exists)
-        $totalRevenue = 0; // This would need to be implemented based on your payment system
-
         return [
             'total_formations' => $totalFormations,
             'active_formations' => $activeFormations,
@@ -161,7 +158,6 @@ class FormationsList extends Component
             'avg_completion_rate' => round($avgCompletionRate, 1),
             'recent_formations' => $recentFormations,
             'total_lessons' => $totalLessons,
-            'total_revenue' => $totalRevenue,
         ];
     }
 }

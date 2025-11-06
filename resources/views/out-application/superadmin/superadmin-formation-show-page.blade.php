@@ -100,14 +100,6 @@
                                 {{ optional($formation->updated_at ?? $formation->created_at)->diffForHumans() ?? __('Inconnu') }}
                             </dd>
                         </div>
-                        <div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60">
-                            <dt class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">
-                                {{ __('Tarif catalogue') }}
-                            </dt>
-                            <dd class="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
-                                {{ number_format((int) $formation->money_amount, 0, ',', ' ') }} €
-                            </dd>
-                        </div>
                     </dl>
                 </section>
 

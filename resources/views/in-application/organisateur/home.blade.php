@@ -31,36 +31,7 @@
 
   {{-- Quick Stats --}}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {{-- Balance Card --}}
-      <div
-        class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 p-6 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-gray-900">
-
-        <div class="relative flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Solde disponible</p>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($team->money, 0, ',', ' ') }} €
-            </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Dernière mise à jour: {{ now()->format('d/m/Y') }}
-            </p>
-          </div>
-          <div
-            class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
-              </path>
-            </svg>
-          </div>
-        </div>
-        <div class="mt-4">
-          <a href="{{ route('organisateur.recharge.show', $team) }}"
-            class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-emerald-600 hover:to-teal-700 inline-block text-center">
-            Recharger le solde
-          </a>
-        </div>
-      </div>
-
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
       {{-- Users Card --}}
       <div

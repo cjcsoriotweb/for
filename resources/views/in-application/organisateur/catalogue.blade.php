@@ -9,7 +9,7 @@
             Catalogue des formations
           </h1>
           <p class="text-xl text-gray-600 dark:text-gray-400">
-            Découvrez toutes les formations disponibles et leurs tarifs
+            Découvrez toutes les formations disponibles
           </p>
         </div>
         <div class="hidden md:block">
@@ -100,7 +100,6 @@
             <select name="sort" id="sort"
               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="title" {{ $sortBy==='title' ? 'selected' : '' }}>Titre</option>
-              <option value="money_amount" {{ $sortBy==='money_amount' ? 'selected' : '' }}>Prix</option>
               <option value="total_duration_minutes" {{ $sortBy==='total_duration_minutes' ? 'selected' : '' }}>Durée
               </option>
               <option value="created_at" {{ $sortBy==='created_at' ? 'selected' : '' }}>Date de création</option>

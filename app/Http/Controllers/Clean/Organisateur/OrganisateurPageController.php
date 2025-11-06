@@ -31,7 +31,7 @@ class OrganisateurPageController extends Controller
     {
         $search = $request->query('search', '');
         $filter = $request->query('filter', 'all'); // all, visible, hidden
-        $sortBy = $request->query('sort', 'title'); // title, price, created_at
+        $sortBy = $request->query('sort', 'title'); // title, created_at, learners_count, lessons_count, total_duration_minutes
         $sortDirection = $request->query('direction', 'asc'); // asc, desc
 
         $visibleFormations = $this->organisateurService->listVisibleFormations($team);
@@ -66,7 +66,7 @@ class OrganisateurPageController extends Controller
         }
 
         // Apply sorting
-        $validSortFields = ['title', 'money_amount', 'created_at', 'learners_count', 'lessons_count', 'total_duration_minutes'];
+        $validSortFields = ['title', 'created_at', 'learners_count', 'lessons_count', 'total_duration_minutes'];
         if (in_array($sortBy, $validSortFields)) {
             $formationsQuery->orderBy($sortBy, $sortDirection);
         } else {

@@ -50,15 +50,12 @@
             </div>
           </div>
 
-          {{-- Level and Price --}}
+          {{-- Level --}}
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
             <span
               class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-200 w-fit">
               {{ $formation->level ?? 'Débutant' }}
             </span>
-            <div class="text-3xl font-bold text-gray-900 dark:text-white">
-              {{ number_format($formation->money_amount, 0, ',', ' ') }} €
-            </div>
           </div>
         </div>
 

@@ -1,9 +1,6 @@
 <div class="ml-8 w-80">
-  <!-- Carte principale avec prix et actions -->
+  <!-- Carte principale avec actions et status -->
   <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 space-y-6">
-
-    <!-- Section Prix -->
-    <x-formateur.formation.price-section :formation="$formation" />
 
     <!-- Section Actions -->
     <x-formateur.formation.action-buttons :formation="$formation" />
