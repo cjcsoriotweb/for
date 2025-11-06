@@ -12,7 +12,9 @@
 </button>
 
 <el-disclosure id="products" hidden class="mt-2 block space-y-2">
-    <a href="{{ route('formateur.formations.create') }}"
+    <a href="{{ route('formateur.home') }}"
+        class="block rounded-lg py-2 pr-3 pl-6 text-sm/7 font-semibold text-gray-900 hover:bg-gray-50">{{ __('Vos formations') }}</a>
+            <a href="{{ route('formateur.formations.create') }}"
         class="block rounded-lg py-2 pr-3 pl-6 text-sm/7 font-semibold text-gray-900 hover:bg-gray-50">{{ __('Nouvelle formation') }}</a>
     <a href="{{ route('formateur.import') }}"
         class="block rounded-lg py-2 pr-3 pl-6 text-sm/7 font-semibold text-gray-900 hover:bg-gray-50">{{ __('Importer formations') }}</a>
