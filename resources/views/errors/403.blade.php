@@ -185,7 +185,7 @@
                         </a>
 
                         <a
-                            href="{{ url('home') }}"
+                            href="{{ url('') }}"
                             class="group inline-flex items-center px-6 py-3 bg-white/50 dark:bg-gray-700/50 hover:bg-white/70 dark:hover:bg-gray-700/70 text-gray-700 dark:text-gray-200 font-medium rounded-xl border border-gray-200 dark:border-gray-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
                         >
                             <svg
