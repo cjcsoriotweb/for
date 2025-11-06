@@ -280,7 +280,7 @@ class FormationExportController extends Controller
                         'points' => $question->points,
                         'choices' => $question->quizChoices->map(function ($choice) {
                             return [
-                                'choice' => $choice->choice,
+                                'choice' => $choice->choice_text,
                                 'is_correct' => $choice->is_correct,
                             ];
                         })->toArray(),
@@ -630,7 +630,7 @@ class FormationExportController extends Controller
                     'points' => $question->points,
                     'choices' => $question->quizChoices->map(function ($choice) {
                         return [
-                            'choice' => $choice->choice,
+                            'choice' => $choice->choice_text,
                             'is_correct' => $choice->is_correct,
                         ];
                     }),
