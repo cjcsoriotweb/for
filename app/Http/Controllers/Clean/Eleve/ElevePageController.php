@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Clean\Eleve;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Clean\Eleve\Traits\AuthorizesFormationAccess;
 use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\FormationCompletionDocument;
@@ -14,6 +15,7 @@ use App\Models\TextContent;
 use App\Models\TextContentAttachment;
 use App\Models\User;
 use App\Services\Clean\Account\AccountService;
+use App\Services\Formation\LessonResourceService;
 use App\Services\Formation\StudentFormationService;
 use App\Services\FormationEnrollmentService;
 use Illuminate\Http\Request;
@@ -22,10 +24,12 @@ use Illuminate\Support\Facades\Storage;
 
 class ElevePageController extends Controller
 {
+    use AuthorizesFormationAccess;
     public function __construct(
         private readonly AccountService $accountService,
         private readonly StudentFormationService $studentFormationService,
         private readonly FormationEnrollmentService $formationEnrollmentService,
+        private readonly LessonResourceService $lessonResourceService,
     ) {}
 
     /**
@@ -93,12 +97,7 @@ class ElevePageController extends Controller
      */
     public function showFormation(Team $team, Formation $formation)
     {
-        $user = Auth::user();
-
-        // VÃ©rifier si l'Ã©tudiant est inscrit
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // VÃ©rifier le quiz d'entrÃ©e si la formation en a un
         $entryQuiz = $formation->entryQuiz;
@@ -136,57 +135,11 @@ class ElevePageController extends Controller
         $formationDocuments = $formation->completionDocuments()->get();
         $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
 
-        $lessonAttachments = TextContentAttachment::query()
-            ->whereHas('textContent.lessonable', function ($lessonQuery) use ($formation) {
-                $lessonQuery->whereHas('chapter', function ($chapterQuery) use ($formation) {
-                    $chapterQuery->where('formation_id', $formation->id);
-                });
-            })
-            ->with([
-                'textContent',
-                'textContent.lessonable.chapter',
-                'textContent.lessonable.learners' => function ($learnerQuery) use ($user) {
-                    $learnerQuery->where('user_id', $user->id);
-                },
-            ])
-            ->get();
-
-        $lessonResources = $lessonAttachments
-            ->groupBy('text_content_id')
-            ->map(function ($attachments) {
-                /** @var \Illuminate\Support\Collection<int, TextContentAttachment> $attachments */
-                $firstAttachment = $attachments->first();
-                $textContent = $firstAttachment?->textContent;
-                $lesson = $textContent?->lessonable;
-
-                if (! $lesson) {
-                    return null;
-                }
-
-                $lessonLearner = $lesson->learners->first();
-                $lessonStatus = optional($lessonLearner?->pivot)->status;
-                $isCompleted = $lessonStatus === 'completed';
-                $isInProgress = $lessonStatus === 'in_progress';
-                $canDownloadResources = $isCompleted || $isInProgress;
-
-                return [
-                    'chapter_title' => $lesson->chapter?->title,
-                    'chapter_position' => $lesson->chapter?->position ?? 0,
-                    'lesson_id' => $lesson->id,
-                    'lesson_title' => $lesson->title,
-                    'lesson_position' => $lesson->position ?? 0,
-                    'attachments' => $attachments,
-                    'is_completed' => $isCompleted,
-                    'is_in_progress' => $isInProgress,
-                    'can_download_resources' => $canDownloadResources,
-                ];
-            })
-            ->filter()
-            ->sortBy([
-                fn ($item) => $item['chapter_position'],
-                fn ($item) => $item['lesson_position'],
-            ])
-            ->values();
+        $lessonResources = $this->lessonResourceService->getLessonResourcesForFormation(
+            $formation,
+            $user,
+            includeProgressStatus: true
+        );
 
         $assistantTrainer = $formationWithProgress->category?->aiTrainer;
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
@@ -211,12 +164,7 @@ class ElevePageController extends Controller
      */
     public function showCompletedFormation(Team $team, Formation $formation)
     {
-        $user = Auth::user();
-
-        // Vérifier si l'étudiant est inscrit
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // Vérifier si la formation est terminée
         if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
@@ -317,12 +265,7 @@ class ElevePageController extends Controller
      */
     public function formationCongratulation(Team $team, Formation $formation)
     {
-        $user = Auth::user();
-
-        // Verifier si l'etudiant est inscrit
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'etes pas inscrit Ã  cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // Marquer la formation comme terminÃ©e (forcer le statut completed et progression à 100%)
         $formation->learners()->syncWithoutDetaching([
@@ -343,43 +286,11 @@ class ElevePageController extends Controller
 
         $formationDocuments = $formation->completionDocuments()->get();
 
-        $lessonAttachments = TextContentAttachment::query()
-            ->whereHas('textContent.lessonable', function ($lessonQuery) use ($formation) {
-                $lessonQuery->whereHas('chapter', function ($chapterQuery) use ($formation) {
-                    $chapterQuery->where('formation_id', $formation->id);
-                });
-            })
-            ->with(['textContent', 'textContent.lessonable.chapter'])
-            ->get();
-
-        $lessonResources = $lessonAttachments
-            ->groupBy('text_content_id')
-            ->map(function ($attachments) {
-                /** @var \Illuminate\Support\Collection<int, TextContentAttachment> $attachments */
-                $firstAttachment = $attachments->first();
-                $textContent = $firstAttachment?->textContent;
-                $lesson = $textContent?->lessonable;
-
-                if (! $lesson) {
-                    return null;
-                }
-
-                return [
-                    'chapter_title' => $lesson->chapter?->title,
-                    'chapter_position' => $lesson->chapter?->position ?? 0,
-                    'lesson_id' => $lesson->id,
-                    'lesson_title' => $lesson->title,
-                    'lesson_position' => $lesson->position ?? 0,
-                    'attachments' => $attachments,
-                    'is_completed' => true,
-                ];
-            })
-            ->filter()
-            ->sortBy([
-                fn ($item) => $item['chapter_position'],
-                fn ($item) => $item['lesson_position'],
-            ])
-            ->values();
+        $lessonResources = $this->lessonResourceService->getLessonResourcesForFormation(
+            $formation,
+            $user,
+            includeProgressStatus: false
+        );
 
         return view('in-application.eleve.formation.congratulation', compact(
             'team',
@@ -444,12 +355,7 @@ class ElevePageController extends Controller
      */
     public function requestCompletion(Team $team, Formation $formation)
     {
-        $user = Auth::user();
-
-        // Vérifier si l'étudiant est inscrit à la formation
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // Vérifier si la formation est terminée
         if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
@@ -481,12 +387,7 @@ class ElevePageController extends Controller
      */
     public function downloadCompletedFormationPdf(Team $team, Formation $formation)
     {
-        $user = Auth::user();
-
-        // Vérifier si l'étudiant est inscrit
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // Vérifier si la formation est terminée
         if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
@@ -595,12 +496,7 @@ class ElevePageController extends Controller
      */
     public function downloadConnectionReportPdf(Team $team, Formation $formation)
     {
-        $user = Auth::user();
-
-        // Vérifier si l'étudiant est inscrit
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // Vérifier si la formation est terminée
         if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
@@ -831,12 +727,7 @@ class ElevePageController extends Controller
      */
     public function showLesson(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
-        $user = Auth::user();
-
-        // VÃ©rifier si l'Ã©tudiant est inscrit Ã  la formation
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // VÃ©rifier que la leÃ§on appartient bien au chapitre et Ã  la formation
         if ($lesson->chapter_id !== $chapter->id || $chapter->formation_id !== $formation->id) {
@@ -1044,12 +935,7 @@ class ElevePageController extends Controller
      */
     public function attemptQuiz(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson)
     {
-        $user = Auth::user();
-
-        // VÃ©rifier les permissions
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // VÃ©rifier que la leÃ§on est bien un quiz
         if ($lesson->lessonable_type !== \App\Models\Quiz::class) {
@@ -1219,12 +1105,7 @@ class ElevePageController extends Controller
      */
     public function quizResults(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, QuizAttempt $attempt)
     {
-        $user = Auth::user();
-
-        // VÃ©rifier les permissions
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // VÃ©rifier que la leÃ§on est bien un quiz
         if ($lesson->lessonable_type !== \App\Models\Quiz::class) {
@@ -1344,12 +1225,7 @@ class ElevePageController extends Controller
      */
     public function attemptEntryQuiz(Team $team, Formation $formation)
     {
-        $user = Auth::user();
-
-        // VÃ©rifier si l'Ã©tudiant est inscrit Ã  la formation
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // VÃ©rifier si la formation a un quiz d'entrÃ©e
         $entryQuiz = $formation->entryQuiz;
@@ -1436,12 +1312,7 @@ class ElevePageController extends Controller
      */
     public function entryQuizResults(Team $team, Formation $formation, QuizAttempt $attempt)
     {
-        $user = Auth::user();
-
-        // VÃ©rifier si l'Ã©tudiant est inscrit Ã  la formation
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'Ãªtes pas inscrit Ã  cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // VÃ©rifier que la tentative appartient Ã  l'utilisateur connectÃ©
         if ($attempt->user_id !== $user->id) {
@@ -1479,12 +1350,7 @@ class ElevePageController extends Controller
      */
     public function submitFeedback(Team $team, Formation $formation, Request $request)
     {
-        $user = Auth::user();
-
-        // Vérifier si l'étudiant est inscrit à la formation
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'êtes pas inscrit à cette formation.');
-        }
+        $user = $this->authorizeFormationEnrollment($team, $formation);
 
         // Vérifier si la formation est terminée
         if (! $this->studentFormationService->isFormationCompleted($user, $formation)) {
