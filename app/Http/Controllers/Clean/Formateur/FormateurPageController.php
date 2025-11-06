@@ -679,6 +679,7 @@ class FormateurPageController extends Controller
     /**
      * Import a SCORM package (not yet implemented).
      *
+     * @todo Implement SCORM import functionality
      * @param Request $request The HTTP request containing the SCORM file
      * @return \Illuminate\Http\RedirectResponse
      */
