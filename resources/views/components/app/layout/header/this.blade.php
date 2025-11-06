@@ -17,16 +17,14 @@
             </button>
         </div>
         <el-popover-group class="hidden lg:flex lg:gap-x-12">
+            @include('components.app.layout.header.superadmin.superadmin-header')
             @include('components.app.layout.header.formateur.formateur-header')
 
-            <a href="#" class="text-sm/6 font-semibold text-gray-900">Features</a>
-            <a href="#" class="text-sm/6 font-semibold text-gray-900">Marketplace</a>
-            <a href="#" class="text-sm/6 font-semibold text-gray-900">Company</a>
+
         </el-popover-group>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-            @if (Auth())
-                @include('components.app.layout.header.user.user-header')
-            @else
+            @include('components.app.layout.header.user.user-header')
+            @if (!Auth::check())
                 <a href="{{ route('login') }}" class="text-sm/6 font-semibold text-gray-900">{{ __('Connexion') }}<span
                         aria-hidden="true">&rarr;</span></a>
             @endif
@@ -39,9 +37,9 @@
                     class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div class="flex items-center justify-between">
                         <a href="#" class="-m-1.5 p-1.5">
-                            <span class="sr-only">Your Company</span>
-                            <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-                                alt="" class="h-8 w-auto" />
+                            <span class="sr-only">{{ config('app.name')}}</span>
+                                            <x-application-logo size="2xl" />
+
                         </a>
                         <button type="button" command="close" commandfor="mobile-menu"
                             class="-m-2.5 rounded-md p-2.5 text-gray-700">
@@ -56,14 +54,12 @@
                         <div class="-my-6 divide-y divide-gray-500/10">
                             <div class="space-y-2 py-6">
                                 <div class="-mx-3">
+                                    @include('components.app.layout.header.superadmin.superadmin-header-mobile')
                                     @include('components.app.layout.header.formateur.formateur-header-mobile')
                                 </div>
-                                <a href="#"
-                                    class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Company</a>
                             </div>
-                            @if (Auth())
-                                @include('components.app.layout.header.user.user-header-mobile')
-                            @else
+                            @include('components.app.layout.header.user.user-header-mobile')
+                            @if (!Auth::check())
                                 <div class="py-6">
                                     <a href="#"
                                         class="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Log
