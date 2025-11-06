@@ -1,21 +1,24 @@
 @component('mail::message')
-{{ __('Vous êtes invité à rejoindre :team !', ['team' => $invitation->team->name]) }}
+{{ __('Vous êtes invité(e) à rejoindre <b>:team !</b>', ['team' => $invitation->team->name]) }}
+{{ __('Vous pouvez vous inscrire ou créer un compte pour suivre vos formations:') }}
 
+
+<div style="flex;">
 @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::registration()))
-{{ __("Vous pouvez vous inscrire ou creer un compte pour suivre vos formations :") }}
 
-@component('mail::button', ['url' => route('register')])
-{{ __("S'inscrire") }}
-@endcomponent
+    @component('mail::button', ['url' => route('register')])
+    {{ __("S'inscrire") }}
+    @endcomponent
 
-@component('mail::button', ['url' => route('login')])
-{{ __("Se connecter") }}
-@endcomponent
+    @component('mail::button', ['url' => route('login')])
+    {{ __("Se connecter") }}
+    @endcomponent
 
 @endif
+</div>
+
+<b>{{__('Ne tardez pas ! Inscrivez-vous dès maintenant et commencez vos formations sans attendre pour ne rien manquer.')}}</b>
 
 
-
-
-{{ __("Si ce mail ne vous est pas déstiné vous pouvez l'ignorer.") }}
+{{ __("Si vous n’êtes pas le destinataire de ce message, vous pouvez simplement l’ignorer.") }}
 @endcomponent
