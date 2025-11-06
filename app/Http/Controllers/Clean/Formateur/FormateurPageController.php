@@ -54,9 +54,60 @@ class FormateurPageController extends Controller
                 return back()->with('error', 'Le fichier JSON n\'est pas valide : ' . json_last_error_msg());
             }
 
-            // Valider la structure attendue
-            if (!isset($data['title']) || !isset($data['chapters']) || !is_array($data['chapters'])) {
-                return back()->with('error', 'Structure JSON invalide. Le fichier doit contenir au minimum "title" et "chapters" (array).');
+            // Valider la structure attendue avec messages détaillés
+            $errors = [];
+            
+            if (!isset($data['title']) || empty(trim($data['title']))) {
+                $errors[] = 'Le champ "title" est requis et ne peut pas être vide';
+            }
+            
+            if (!isset($data['chapters'])) {
+                $errors[] = 'Le champ "chapters" est requis';
+            } elseif (!is_array($data['chapters'])) {
+                $errors[] = 'Le champ "chapters" doit être un tableau';
+            } elseif (empty($data['chapters'])) {
+                $errors[] = 'La formation doit contenir au moins un chapitre';
+            }
+            
+            if (!empty($errors)) {
+                return back()->with('error', 'Structure JSON invalide : ' . implode(', ', $errors));
+            }
+
+            // Valider chaque chapitre
+            foreach ($data['chapters'] as $index => $chapter) {
+                if (!isset($chapter['title']) || empty(trim($chapter['title']))) {
+                    return back()->with('error', "Chapitre #" . ($index + 1) . " : le champ 'title' est requis");
+                }
+                
+                if (!isset($chapter['lessons']) || !is_array($chapter['lessons'])) {
+                    return back()->with('error', "Chapitre '{$chapter['title']}' : le champ 'lessons' doit être un tableau");
+                }
+                
+                if (empty($chapter['lessons'])) {
+                    return back()->with('error', "Chapitre '{$chapter['title']}' : au moins une leçon est requise");
+                }
+                
+                // Valider chaque leçon
+                foreach ($chapter['lessons'] as $lessonIndex => $lesson) {
+                    if (!isset($lesson['title']) || empty(trim($lesson['title']))) {
+                        return back()->with('error', "Chapitre '{$chapter['title']}', leçon #" . ($lessonIndex + 1) . " : le champ 'title' est requis");
+                    }
+                    
+                    if (!isset($lesson['type'])) {
+                        return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}' : le champ 'type' est requis");
+                    }
+                    
+                    $validTypes = ['text', 'video', 'quiz'];
+                    $lessonType = trim(strtolower($lesson['type']));
+                    
+                    if (!in_array($lessonType, $validTypes)) {
+                        return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}' : type '{$lesson['type']}' invalide. Types acceptés : " . implode(', ', $validTypes));
+                    }
+                    
+                    if (!isset($lesson['content'])) {
+                        return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}' : le champ 'content' est requis");
+                    }
+                }
             }
 
             Log::info('JSON structure validated', [
@@ -70,6 +121,7 @@ class FormateurPageController extends Controller
             $formation = Formation::create([
                 'title' => $data['title'],
                 'description' => $data['description'] ?? '',
+                'level' => $data['level'] ?? 'beginner',
                 'user_id' => Auth::id(),
                 'active' => false, // Désactivée par défaut jusqu'à validation
             ]);
@@ -78,52 +130,28 @@ class FormateurPageController extends Controller
 
             // Traiter chaque chapitre
             foreach ($data['chapters'] as $chapterIndex => $chapterData) {
-                if (!isset($chapterData['title']) || !isset($chapterData['lessons']) || !is_array($chapterData['lessons'])) {
-                    DB::rollBack();
-                    return back()->with('error', "Chapitre " . ($chapterIndex + 1) . " : structure invalide (title et lessons requis).");
-                }
-
                 // Créer le chapitre
                 $chapter = Chapter::create([
                     'formation_id' => $formation->id,
                     'title' => $chapterData['title'],
                     'description' => $chapterData['description'] ?? '',
-                    'order' => $chapterIndex + 1,
+                    'position' => $chapterData['position'] ?? ($chapterIndex + 1),
                 ]);
 
                 // Traiter chaque leçon du chapitre
                 foreach ($chapterData['lessons'] as $lessonIndex => $lessonData) {
-                    if (!isset($lessonData['title']) || !isset($lessonData['type']) || !isset($lessonData['content'])) {
-                        DB::rollBack();
-                        return back()->with('error', "Chapitre '{$chapterData['title']}', leçon " . ($lessonIndex + 1) . " : structure invalide (title, type et content requis).");
-                    }
-
-                    // Valider le type de leçon
-                    $validTypes = ['text', 'video', 'quiz'];
-                    $lessonType = trim(strtolower($lessonData['type'])); // Normaliser le type
-
-                    Log::info('Processing lesson type', [
-                        'original_type' => $lessonData['type'],
-                        'normalized_type' => $lessonType,
-                        'valid_types' => $validTypes,
-                        'is_valid' => in_array($lessonType, $validTypes)
-                    ]);
-
-                    if (!in_array($lessonType, $validTypes)) {
-                        DB::rollBack();
-                        return back()->with('error', "Chapitre '{$chapterData['title']}', leçon '{$lessonData['title']}' : type '{$lessonData['type']}' invalide. Types acceptés : " . implode(', ', $validTypes));
-                    }
+                    $lessonType = trim(strtolower($lessonData['type']));
 
                     // Créer la leçon d'abord (sans lessonable_id pour l'instant)
                     $lesson = Lesson::create([
                         'chapter_id' => $chapter->id,
                         'title' => $lessonData['title'],
                         'lessonable_type' => $this->getLessonableType($lessonType),
-                        'order' => $lessonIndex + 1,
+                        'position' => $lessonData['position'] ?? ($lessonIndex + 1),
                     ]);
 
-                    // Créer le contenu selon le type normalisé avec lesson_id
-                    $lessonData['type'] = $lessonType; // Utiliser le type normalisé
+                    // Créer le contenu selon le type avec lesson_id
+                    $lessonData['type'] = $lessonType;
                     $content = $this->createLessonContent($lessonData, $lesson->id);
 
                     // Mettre à jour la leçon avec lessonable_id
@@ -137,12 +165,21 @@ class FormateurPageController extends Controller
 
             DB::commit();
 
+            Log::info('JSON Import completed', [
+                'formation_id' => $formation->id,
+                'total_lessons' => $totalLessons
+            ]);
+
             return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', "Formation '{$formation->title}' importée avec succès ! {$totalLessons} leçons créées dans " . count($data['chapters']) . " chapitres.");
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erreur lors de l\'import : ' . $e->getMessage());
+            Log::error('JSON Import Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Erreur lors de l\'import JSON : ' . $e->getMessage());
         }
     }
 
@@ -361,5 +398,152 @@ class FormateurPageController extends Controller
 
         // TODO: Implement SCORM import logic
         return back()->with('success', 'Import SCORM - Fonctionnalité à implémenter');
+    }
+
+    public function downloadCsvTemplate()
+    {
+        $rows = [];
+        
+        // En-tête CSV
+        $rows[] = [
+            'Formation',
+            'Description Formation',
+            'Niveau',
+            'Chapitre',
+            'Position Chapitre',
+            'Leçon',
+            'Type Leçon',
+            'Contenu',
+            'Durée (minutes)',
+            'Position Leçon',
+        ];
+
+        // Exemples de données
+        $rows[] = [
+            'Formation de démonstration',
+            'Ceci est un exemple de formation pour montrer le format CSV',
+            'beginner',
+            'Introduction',
+            '1',
+            'Bienvenue dans cette formation',
+            'text',
+            'Bienvenue ! Cette leçon d\'introduction vous explique les objectifs de la formation.',
+            '5',
+            '1',
+        ];
+
+        $rows[] = [
+            'Formation de démonstration',
+            'Ceci est un exemple de formation pour montrer le format CSV',
+            'beginner',
+            'Introduction',
+            '1',
+            'Vidéo de présentation',
+            'video',
+            'https://www.youtube.com/watch?v=exemple',
+            '10',
+            '2',
+        ];
+
+        $rows[] = [
+            'Formation de démonstration',
+            'Ceci est un exemple de formation pour montrer le format CSV',
+            'beginner',
+            'Chapitre 1 - Les bases',
+            '2',
+            'Premiers concepts',
+            'text',
+            'Dans cette leçon nous allons voir les concepts fondamentaux.',
+            '15',
+            '1',
+        ];
+
+        $rows[] = [
+            'Formation de démonstration',
+            'Ceci est un exemple de formation pour montrer le format CSV',
+            'beginner',
+            'Chapitre 1 - Les bases',
+            '2',
+            'Quiz de validation',
+            'quiz',
+            'Quiz avec 5 questions pour valider vos connaissances',
+            '10',
+            '2',
+        ];
+
+        $fileName = 'modele_import_formation_'.now()->format('Y-m-d').'.csv';
+        $handle = fopen('php://temp', 'r+');
+        
+        foreach ($rows as $row) {
+            fputcsv($handle, $row, ';');
+        }
+        
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($csv)
+            ->header('Content-Type', 'text/csv; charset=UTF-8')
+            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"')
+            ->header('Content-Transfer-Encoding', 'binary');
+    }
+
+    public function downloadJsonTemplate()
+    {
+        $template = [
+            'title' => 'Formation de démonstration',
+            'description' => 'Ceci est un exemple de formation pour montrer le format JSON',
+            'level' => 'beginner',
+            'chapters' => [
+                [
+                    'title' => 'Introduction',
+                    'description' => 'Chapitre d\'introduction',
+                    'position' => 1,
+                    'lessons' => [
+                        [
+                            'title' => 'Bienvenue dans cette formation',
+                            'type' => 'text',
+                            'content' => 'Bienvenue ! Cette leçon d\'introduction vous explique les objectifs de la formation.',
+                            'estimated_read_time' => 5,
+                            'position' => 1,
+                        ],
+                        [
+                            'title' => 'Vidéo de présentation',
+                            'type' => 'video',
+                            'content' => 'https://www.youtube.com/watch?v=exemple',
+                            'duration_minutes' => 10,
+                            'position' => 2,
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Chapitre 1 - Les bases',
+                    'description' => 'Premier chapitre du contenu',
+                    'position' => 2,
+                    'lessons' => [
+                        [
+                            'title' => 'Premiers concepts',
+                            'type' => 'text',
+                            'content' => 'Dans cette leçon nous allons voir les concepts fondamentaux.',
+                            'estimated_read_time' => 15,
+                            'position' => 1,
+                        ],
+                        [
+                            'title' => 'Quiz de validation',
+                            'type' => 'quiz',
+                            'content' => 'Quiz avec 5 questions pour valider vos connaissances',
+                            'position' => 2,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $fileName = 'modele_import_formation_'.now()->format('Y-m-d').'.json';
+
+        return response()->json($template, 200, [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }

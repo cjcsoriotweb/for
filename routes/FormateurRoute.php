@@ -23,6 +23,8 @@ Route::prefix('formateur')
         Route::post('/import', [FormationImportController::class, 'import'])->name('import.zip');
         Route::post('/import/json', [FormateurPageController::class, 'importJson'])->name('import.json');
         Route::post('/import/csv', [FormateurPageController::class, 'importCsv'])->name('import.csv');
+        Route::get('/templates/csv', [FormateurPageController::class, 'downloadCsvTemplate'])->name('templates.csv');
+        Route::get('/templates/json', [FormateurPageController::class, 'downloadJsonTemplate'])->name('templates.json');
 
         // Formation routes
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
