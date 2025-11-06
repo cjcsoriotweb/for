@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\FormationCompletionDocument;
+use App\Models\FormationImportExportLog;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizChoice;
@@ -23,19 +24,31 @@ class FormationImportController extends Controller
 {
     public function showImportForm()
     {
-        return view('out-application.formateur.formateur-import-page');
+        $recentImports = FormationImportExportLog::where('user_id', Auth::id())
+            ->where('type', 'import')
+            ->with('formation')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        
+        return view('out-application.formateur.formateur-import-page', [
+            'recentImports' => $recentImports,
+        ]);
     }
 
     public function import(Request $request)
     {
-        $request->validate([
-            'zip_file' => 'required|file|mimes:zip|max:102400', // 100MB max
-        ]);
-
-        $zipFile = $request->file('zip_file');
-        $tempDir = storage_path('app/temp/import_'.Str::uuid());
-
+        $zipFile = null;
+        $formation = null;
+        
         try {
+            $request->validate([
+                'zip_file' => 'required|file|mimes:zip|max:102400', // 100MB max
+            ]);
+
+            $zipFile = $request->file('zip_file');
+            $tempDir = storage_path('app/temp/import_'.Str::uuid());
+
             // Créer le dossier temporaire
             mkdir($tempDir, 0755, true);
 
@@ -44,7 +57,7 @@ class FormationImportController extends Controller
             $zip = new ZipArchive;
 
             if ($zip->open($zipPath) !== true) {
-                throw new \Exception('Impossible d\'ouvrir le fichier ZIP');
+                throw new \Exception('Impossible d\'ouvrir le fichier ZIP. Le fichier est peut-être corrompu.');
             }
 
             $zip->extractTo($tempDir);
@@ -54,33 +67,73 @@ class FormationImportController extends Controller
             $formationDir = $this->findFormationDirectory($tempDir);
 
             if (! $formationDir) {
-                throw new \Exception('Fichier orchestre.json manquant. Ce ZIP n\'est pas compatible avec l\'import.');
+                throw new \Exception('Fichier orchestre.json manquant. Ce ZIP n\'est pas compatible avec l\'import. Assurez-vous d\'exporter une formation depuis cette plateforme.');
             }
 
             // Vérifier la présence du fichier orchestre.json
             $orchestrePath = $formationDir.'/orchestre.json';
             if (! file_exists($orchestrePath)) {
-                throw new \Exception('Fichier orchestre.json manquant. Ce ZIP n\'est pas compatible avec l\'import.');
+                throw new \Exception('Fichier orchestre.json manquant dans le dossier de formation.');
             }
 
             // Lire le fichier orchestre
-            $orchestre = json_decode(file_get_contents($orchestrePath), true);
+            $orchestreContent = file_get_contents($orchestrePath);
+            $orchestre = json_decode($orchestreContent, true);
+            
             if (! $orchestre) {
-                throw new \Exception('Fichier orchestre.json invalide');
+                throw new \Exception('Fichier orchestre.json invalide : ' . json_last_error_msg());
+            }
+
+            // Valider la structure orchestre
+            if (!isset($orchestre['structure']) || !isset($orchestre['export_info'])) {
+                throw new \Exception('Structure du fichier orchestre.json invalide. Version incompatible.');
             }
 
             // Importer la formation
             $formation = $this->importFormation($formationDir, $orchestre);
 
+            // Calculate stats
+            $stats = [
+                'chapters_count' => $formation->chapters()->count(),
+                'lessons_count' => $formation->chapters()->withCount('lessons')->get()->sum('lessons_count'),
+                'completion_documents_count' => $formation->completionDocuments()->count(),
+            ];
+
             // Nettoyer les fichiers temporaires
             $this->cleanupTempDir($tempDir);
 
+            // Log successful import
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'formation_id' => $formation->id,
+                'type' => 'import',
+                'format' => 'zip',
+                'filename' => $zipFile->getClientOriginalName(),
+                'status' => 'success',
+                'stats' => $stats,
+                'file_size' => $zipFile->getSize(),
+            ]);
+
             return redirect()->route('formateur.formation.show', $formation)
-                ->with('success', 'Formation "'.$formation->title.'" importée avec succès !');
+                ->with('success', 'Formation "'.$formation->title.'" importée avec succès ! La formation a été désactivée par défaut, pensez à l\'activer après vérification.');
 
         } catch (\Exception $e) {
             // Nettoyer en cas d'erreur
-            $this->cleanupTempDir($tempDir);
+            if (isset($tempDir) && is_dir($tempDir)) {
+                $this->cleanupTempDir($tempDir);
+            }
+
+            // Log failed import
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'formation_id' => $formation?->id,
+                'type' => 'import',
+                'format' => 'zip',
+                'filename' => $zipFile?->getClientOriginalName(),
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+                'file_size' => $zipFile ? $zipFile->getSize() : null,
+            ]);
 
             return back()->with('error', 'Erreur lors de l\'import : '.$e->getMessage());
         }
