@@ -14,6 +14,8 @@ use App\Models\QuizQuestion;
 use App\Models\TextContent;
 use App\Models\TextContentAttachment;
 use App\Models\VideoContent;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +24,11 @@ use ZipArchive;
 
 class FormationImportController extends Controller
 {
+    /**
+     * Display the formation import form.
+     *
+     * @return View
+     */
     public function showImportForm()
     {
         $recentImports = FormationImportExportLog::where('user_id', Auth::id())
@@ -36,6 +43,12 @@ class FormationImportController extends Controller
         ]);
     }
 
+    /**
+     * Import a formation from a ZIP file.
+     *
+     * @param Request $request The HTTP request containing the ZIP file
+     * @return RedirectResponse
+     */
     public function import(Request $request)
     {
         $zipFile = null;
@@ -139,6 +152,14 @@ class FormationImportController extends Controller
         }
     }
 
+    /**
+     * Import a formation from the extracted ZIP directory.
+     *
+     * @param string $formationDir The directory containing the formation data
+     * @param array<string, mixed> $orchestre The orchestre.json structure
+     * @return Formation
+     * @throws \Exception
+     */
     private function importFormation(string $formationDir, array $orchestre): Formation
     {
         // Créer la formation
@@ -161,6 +182,12 @@ class FormationImportController extends Controller
         return $formation;
     }
 
+    /**
+     * Get the formation description from metadata file.
+     *
+     * @param string $formationDir The formation directory path
+     * @return string
+     */
     private function getFormationDescription(string $formationDir): string
     {
         $metadataPath = $formationDir.'/formation_metadata.json';
@@ -173,6 +200,12 @@ class FormationImportController extends Controller
         return 'Formation importée';
     }
 
+    /**
+     * Get the formation level from metadata file.
+     *
+     * @param string $formationDir The formation directory path
+     * @return string
+     */
     private function getFormationLevel(string $formationDir): string
     {
         $metadataPath = $formationDir.'/formation_metadata.json';
@@ -185,6 +218,14 @@ class FormationImportController extends Controller
         return 'beginner';
     }
 
+    /**
+     * Import a chapter from the orchestre data.
+     *
+     * @param Formation $formation The parent formation
+     * @param string $formationDir The formation directory path
+     * @param array<string, mixed> $chapterData The chapter data from orchestre.json
+     * @return Chapter
+     */
     private function importChapter(Formation $formation, string $formationDir, array $chapterData): Chapter
     {
         $chapter = Chapter::create([
@@ -206,6 +247,14 @@ class FormationImportController extends Controller
         return $chapter;
     }
 
+    /**
+     * Import a lesson from the chapter data.
+     *
+     * @param Chapter $chapter The parent chapter
+     * @param string $formationDir The formation directory path
+     * @param array<string, mixed> $lessonData The lesson data
+     * @return Lesson
+     */
     private function importLesson(Chapter $chapter, string $formationDir, array $lessonData): Lesson
     {
         $lesson = Lesson::create([
@@ -223,6 +272,13 @@ class FormationImportController extends Controller
         return $lesson;
     }
 
+    /**
+     * Get the lessonable type class name for the given lesson type.
+     *
+     * @param string $type The lesson type (text, video, quiz)
+     * @return string The fully qualified class name
+     * @throws \Exception
+     */
     private function getLessonableType(string $type): string
     {
         return match ($type) {
@@ -233,6 +289,14 @@ class FormationImportController extends Controller
         };
     }
 
+    /**
+     * Create lesson content based on the lesson type.
+     *
+     * @param Lesson $lesson The lesson object
+     * @param string $formationDir The formation directory path
+     * @param array<string, mixed> $lessonData The lesson data
+     * @return VideoContent|TextContent|Quiz
+     */
     private function createLessonContent(Lesson $lesson, string $formationDir, array $lessonData)
     {
         return match ($lessonData['type']) {
@@ -242,6 +306,14 @@ class FormationImportController extends Controller
         };
     }
 
+    /**
+     * Create video content for a lesson.
+     *
+     * @param Lesson $lesson The lesson object
+     * @param string $formationDir The formation directory path
+     * @param array<string, mixed> $lessonData The lesson data
+     * @return VideoContent
+     */
     private function createVideoContent(Lesson $lesson, string $formationDir, array $lessonData): VideoContent
     {
         $metadataPath = $this->resolveFilePath($formationDir, $lessonData['metadata_file']);
@@ -266,6 +338,14 @@ class FormationImportController extends Controller
         ]);
     }
 
+    /**
+     * Create text content for a lesson with attachments.
+     *
+     * @param Lesson $lesson The lesson object
+     * @param string $formationDir The formation directory path
+     * @param array<string, mixed> $lessonData The lesson data
+     * @return TextContent
+     */
     private function createTextContent(Lesson $lesson, string $formationDir, array $lessonData): TextContent
     {
         $metadataPath = $this->resolveFilePath($formationDir, $lessonData['metadata_file']);
@@ -305,6 +385,14 @@ class FormationImportController extends Controller
         return $textContent;
     }
 
+    /**
+     * Create quiz content with questions and choices.
+     *
+     * @param Lesson $lesson The lesson object
+     * @param string $formationDir The formation directory path
+     * @param array<string, mixed> $lessonData The lesson data
+     * @return Quiz
+     */
     private function createQuizContent(Lesson $lesson, string $formationDir, array $lessonData): Quiz
     {
         $quizPath = $this->resolveFilePath($formationDir, $lessonData['quiz_file']);
@@ -341,6 +429,14 @@ class FormationImportController extends Controller
         return $quiz;
     }
 
+    /**
+     * Import completion documents for the formation.
+     *
+     * @param Formation $formation The formation object
+     * @param string $formationDir The formation directory path
+     * @param array<string, mixed> $completionData The completion documents data
+     * @return void
+     */
     private function importCompletionDocuments(Formation $formation, string $formationDir, array $completionData): void
     {
         foreach ($completionData['documents'] as $documentData) {
@@ -362,6 +458,13 @@ class FormationImportController extends Controller
         }
     }
 
+    /**
+     * Resolve the full file path from a relative path.
+     *
+     * @param string $formationDir The formation directory path
+     * @param string $relativePath The relative path from orchestre.json
+     * @return string The resolved absolute path
+     */
     private function resolveFilePath(string $formationDir, string $relativePath): string
     {
         // Essayer d'abord le chemin tel quel depuis orchestre.json
@@ -406,6 +509,12 @@ class FormationImportController extends Controller
         return $directPath;
     }
 
+    /**
+     * Find the directory containing the orchestre.json file.
+     *
+     * @param string $baseDir The base directory to search in
+     * @return string|null The directory path containing orchestre.json, or null if not found
+     */
     private function findFormationDirectory(string $baseDir): ?string
     {
         // Chercher orchestre.json dans ce répertoire
@@ -432,6 +541,12 @@ class FormationImportController extends Controller
         return null;
     }
 
+    /**
+     * Clean up temporary directory and all its contents.
+     *
+     * @param string $tempDir The temporary directory to clean up
+     * @return void
+     */
     private function cleanupTempDir(string $tempDir): void
     {
         if (is_dir($tempDir)) {
@@ -439,31 +554,12 @@ class FormationImportController extends Controller
         }
     }
 
-    private function exploreDirectory(string $dir, string &$output, int $level = 0, int $maxDepth = 3): void
-    {
-        if ($level > $maxDepth) {
-            return;
-        }
-
-        $indent = str_repeat('  ', $level);
-        $items = scandir($dir);
-
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-
-            $path = $dir.'/'.$item;
-            $isDir = is_dir($path);
-
-            $output .= $indent.($isDir ? '[DIR] ' : '[FILE] ').$item."\n";
-
-            if ($isDir && $level < $maxDepth) {
-                $this->exploreDirectory($path, $output, $level + 1, $maxDepth);
-            }
-        }
-    }
-
+    /**
+     * Recursively delete a directory and all its contents.
+     *
+     * @param string $dir The directory to delete
+     * @return void
+     */
     private function deleteDirectory(string $dir): void
     {
         if (! is_dir($dir)) {

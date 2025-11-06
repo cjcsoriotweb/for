@@ -5,14 +5,24 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
 use App\Models\FormationImportExportLog;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
 
 class FormationExportController extends Controller
 {
+    /**
+     * Export a formation in the specified format (ZIP, JSON, or CSV).
+     *
+     * @param Formation $formation The formation to export
+     * @param Request $request The HTTP request containing the format parameter
+     * @return BinaryFileResponse|Response|RedirectResponse
+     */
     public function export(Formation $formation, Request $request)
     {
         $format = $request->query('format', 'zip');
@@ -70,6 +80,13 @@ class FormationExportController extends Controller
         }
     }
 
+    /**
+     * Generate the export filename based on formation title and format.
+     *
+     * @param Formation $formation The formation being exported
+     * @param string $format The export format (zip, json, or csv)
+     * @return string The generated filename
+     */
     private function getExportFilename(Formation $formation, string $format): string
     {
         $extension = match ($format) {
@@ -81,6 +98,13 @@ class FormationExportController extends Controller
         return Str::slug($formation->title).'_export_'.now()->format('Y-m-d_H-i-s').'.'.$extension;
     }
 
+    /**
+     * Export a formation as a ZIP file with all media assets.
+     *
+     * @param Formation $formation The formation to export
+     * @return BinaryFileResponse
+     * @throws \Exception
+     */
     private function exportZip(Formation $formation)
     {
         // Créer un dossier temporaire pour l'export
@@ -115,6 +139,12 @@ class FormationExportController extends Controller
         return response()->download($zipPath, $zipFileName)->deleteFileAfterSend();
     }
 
+    /**
+     * Export a formation as a JSON file (without media assets).
+     *
+     * @param Formation $formation The formation to export
+     * @return Response
+     */
     private function exportJson(Formation $formation)
     {
         $data = [
@@ -149,6 +179,12 @@ class FormationExportController extends Controller
             ->header('Content-Type', 'application/json');
     }
 
+    /**
+     * Export a formation as a CSV file.
+     *
+     * @param Formation $formation The formation to export
+     * @return Response
+     */
     private function exportCsv(Formation $formation)
     {
         $rows = [];
@@ -203,6 +239,12 @@ class FormationExportController extends Controller
             ->header('Content-Transfer-Encoding', 'binary');
     }
 
+    /**
+     * Serialize a lesson to JSON format.
+     *
+     * @param mixed $lesson The lesson to serialize
+     * @return array<string, mixed>
+     */
     private function serializeLessonToJson($lesson)
     {
         $lessonable = $lesson->lessonable;
@@ -250,6 +292,12 @@ class FormationExportController extends Controller
         return $baseData;
     }
 
+    /**
+     * Serialize a lesson to CSV format.
+     *
+     * @param mixed $lesson The lesson to serialize
+     * @return array{type: string, content: string, duration: int}
+     */
     private function serializeLessonToCsv($lesson)
     {
         $lessonable = $lesson->lessonable;
@@ -281,6 +329,12 @@ class FormationExportController extends Controller
         ];
     }
 
+    /**
+     * Create necessary directories for ZIP export.
+     *
+     * @param string $formationDir The root formation directory path
+     * @return void
+     */
     private function createDirectories(string $formationDir): void
     {
         $directories = [
@@ -299,6 +353,13 @@ class FormationExportController extends Controller
         }
     }
 
+    /**
+     * Export formation metadata to a JSON file.
+     *
+     * @param Formation $formation The formation to export
+     * @param string $formationDir The directory where metadata will be saved
+     * @return void
+     */
     private function exportFormationMetadata(Formation $formation, string $formationDir): void
     {
         $metadata = [
@@ -316,6 +377,13 @@ class FormationExportController extends Controller
         );
     }
 
+    /**
+     * Export all chapters and their lessons.
+     *
+     * @param Formation $formation The formation whose chapters to export
+     * @param string $formationDir The directory where chapters will be saved
+     * @return array<int, array<string, mixed>>
+     */
     private function exportChapters(Formation $formation, string $formationDir): array
     {
         $chaptersStructure = [];
@@ -360,6 +428,15 @@ class FormationExportController extends Controller
         return $chaptersStructure;
     }
 
+    /**
+     * Export a single lesson based on its type.
+     *
+     * @param mixed $lesson The lesson to export
+     * @param string $chapterDir The chapter directory path
+     * @param string $chapterSlug The chapter slug identifier
+     * @param int $lessonNumber The lesson number
+     * @return array<string, mixed>|null
+     */
     private function exportLesson($lesson, string $chapterDir, string $chapterSlug, int $lessonNumber): ?array
     {
         $lessonable = $lesson->lessonable;
@@ -375,6 +452,16 @@ class FormationExportController extends Controller
         return null;
     }
 
+    /**
+     * Export a video lesson with its media file.
+     *
+     * @param mixed $lesson The lesson object
+     * @param mixed $videoContent The video content object
+     * @param string $chapterDir The chapter directory path
+     * @param string $chapterSlug The chapter slug identifier
+     * @param int $lessonNumber The lesson number
+     * @return array<string, mixed>
+     */
     private function exportVideoLesson($lesson, $videoContent, string $chapterDir, string $chapterSlug, int $lessonNumber): array
     {
         $lessonSlug = 'lesson_'.$lessonNumber.'_video_'.Str::slug($lesson->title);
@@ -435,6 +522,16 @@ class FormationExportController extends Controller
         ];
     }
 
+    /**
+     * Export a text lesson with its attachments.
+     *
+     * @param mixed $lesson The lesson object
+     * @param mixed $textContent The text content object
+     * @param string $chapterDir The chapter directory path
+     * @param string $chapterSlug The chapter slug identifier
+     * @param int $lessonNumber The lesson number
+     * @return array<string, mixed>
+     */
     private function exportTextLesson($lesson, $textContent, string $chapterDir, string $chapterSlug, int $lessonNumber): array
     {
         $lessonSlug = 'lesson_'.$lessonNumber.'_text_'.Str::slug($lesson->title);
@@ -501,6 +598,16 @@ class FormationExportController extends Controller
         ];
     }
 
+    /**
+     * Export a quiz lesson with its questions and choices.
+     *
+     * @param mixed $lesson The lesson object
+     * @param mixed $quiz The quiz object
+     * @param string $chapterDir The chapter directory path
+     * @param string $chapterSlug The chapter slug identifier
+     * @param int $lessonNumber The lesson number
+     * @return array<string, mixed>
+     */
     private function exportQuizLesson($lesson, $quiz, string $chapterDir, string $chapterSlug, int $lessonNumber): array
     {
         $lessonSlug = 'lesson_'.$lessonNumber.'_quiz_'.Str::slug($lesson->title);
@@ -560,6 +667,13 @@ class FormationExportController extends Controller
         ];
     }
 
+    /**
+     * Export formation completion documents.
+     *
+     * @param Formation $formation The formation object
+     * @param string $formationDir The formation directory path
+     * @return array<string, mixed>
+     */
     private function exportCompletionDocuments(Formation $formation, string $formationDir): array
     {
         $completionDir = $formationDir.'/completion_documents';
@@ -618,6 +732,14 @@ class FormationExportController extends Controller
         ];
     }
 
+    /**
+     * Create a ZIP archive from a directory.
+     *
+     * @param string $sourceDir The source directory to archive
+     * @param string $zipPath The path where the ZIP file will be created
+     * @return void
+     * @throws \Exception
+     */
     private function createZip(string $sourceDir, string $zipPath): void
     {
         $zip = new ZipArchive;
@@ -630,6 +752,14 @@ class FormationExportController extends Controller
         }
     }
 
+    /**
+     * Recursively add a directory and its contents to a ZIP archive.
+     *
+     * @param ZipArchive $zip The ZIP archive object
+     * @param string $dir The directory to add
+     * @param string $relativePath The relative path within the ZIP
+     * @return void
+     */
     private function addDirectoryToZip(ZipArchive $zip, string $dir, string $relativePath = ''): void
     {
         $dirHandle = opendir($dir);
@@ -653,6 +783,12 @@ class FormationExportController extends Controller
         closedir($dirHandle);
     }
 
+    /**
+     * Clean up temporary directory after export.
+     *
+     * @param string $tempDir The temporary directory to clean up
+     * @return void
+     */
     private function cleanupTempDir(string $tempDir): void
     {
         if (is_dir($tempDir)) {
@@ -660,6 +796,15 @@ class FormationExportController extends Controller
         }
     }
 
+    /**
+     * Create the orchestre.json file that describes the export structure.
+     *
+     * @param Formation $formation The formation object
+     * @param string $formationDir The formation directory path
+     * @param array<int, array<string, mixed>> $chaptersStructure The chapters structure
+     * @param array<string, mixed> $completionDocumentsStructure The completion documents structure
+     * @return void
+     */
     private function createOrchestreFile(Formation $formation, string $formationDir, array $chaptersStructure, array $completionDocumentsStructure): void
     {
         // Collecter tous les fichiers exportés
@@ -711,6 +856,12 @@ class FormationExportController extends Controller
         );
     }
 
+    /**
+     * Recursively delete a directory and all its contents.
+     *
+     * @param string $dir The directory to delete
+     * @return void
+     */
     private function deleteDirectory(string $dir): void
     {
         if (! is_dir($dir)) {

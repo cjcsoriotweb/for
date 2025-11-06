@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Log;
 
 class FormateurPageController extends Controller
 {
-    // CSV expected headers
+    /**
+     * CSV expected headers for import.
+     */
     private const CSV_HEADERS = [
         'Formation',
         'Description Formation',
@@ -31,16 +33,32 @@ class FormateurPageController extends Controller
         'Position Leçon',
     ];
 
+    /**
+     * Display the formateur home page.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
     public function home()
     {
         return view('out-application.formateur.formateur-home-page');
     }
 
+    /**
+     * Display the import page.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
     public function import()
     {
         return view('out-application.formateur.formateur-import-page');
     }
 
+    /**
+     * Import a formation from a JSON file.
+     *
+     * @param Request $request The HTTP request containing the JSON file
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function importJson(Request $request)
     {
         try {
@@ -259,6 +277,12 @@ class FormateurPageController extends Controller
         }
     }
 
+    /**
+     * Get the lessonable type class name for the given lesson type.
+     *
+     * @param string $type The lesson type (text, video, quiz)
+     * @return string The fully qualified class name
+     */
     private function getLessonableType(string $type): string
     {
         return match ($type) {
@@ -269,6 +293,13 @@ class FormateurPageController extends Controller
         };
     }
 
+    /**
+     * Create lesson content based on the lesson type.
+     *
+     * @param array<string, mixed> $lessonData The lesson data
+     * @param int $lessonId The lesson ID
+     * @return VideoContent|TextContent|Quiz
+     */
     private function createLessonContent(array $lessonData, int $lessonId)
     {
         \Illuminate\Support\Facades\Log::info('Creating lesson content', [
@@ -291,6 +322,13 @@ class FormateurPageController extends Controller
         }
     }
 
+    /**
+     * Create quiz content with questions and choices.
+     *
+     * @param array<string, mixed> $lessonData The lesson data
+     * @param int $lessonId The lesson ID
+     * @return Quiz
+     */
     private function createQuizContent(array $lessonData, int $lessonId)
     {
         \Illuminate\Support\Facades\Log::info('Creating quiz content', [
@@ -373,6 +411,13 @@ class FormateurPageController extends Controller
         return $quiz;
     }
 
+    /**
+     * Create video content for a lesson.
+     *
+     * @param array<string, mixed> $lessonData The lesson data
+     * @param int $lessonId The lesson ID
+     * @return VideoContent
+     */
     private function createVideoContent(array $lessonData, int $lessonId)
     {
         $videoData = [
@@ -389,6 +434,13 @@ class FormateurPageController extends Controller
         return VideoContent::find($videoId);
     }
 
+    /**
+     * Create text content for a lesson.
+     *
+     * @param array<string, mixed> $lessonData The lesson data
+     * @param int $lessonId The lesson ID
+     * @return TextContent
+     */
     private function createTextContent(array $lessonData, int $lessonId)
     {
         $textData = [
@@ -404,6 +456,12 @@ class FormateurPageController extends Controller
         return TextContent::find($textId);
     }
 
+    /**
+     * Import a formation from a CSV file.
+     *
+     * @param Request $request The HTTP request containing the CSV file
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function importCsv(Request $request)
     {
         try {
@@ -558,6 +616,16 @@ class FormateurPageController extends Controller
         }
     }
 
+    /**
+     * Create lesson content from CSV row data.
+     *
+     * @param int $lessonId The lesson ID
+     * @param string $type The lesson type
+     * @param string $title The lesson title
+     * @param string $content The lesson content
+     * @param int $duration The lesson duration
+     * @return VideoContent|TextContent|Quiz
+     */
     private function createLessonContentFromCsv(int $lessonId, string $type, string $title, string $content, int $duration)
     {
         $data = [
@@ -593,6 +661,12 @@ class FormateurPageController extends Controller
         }
     }
 
+    /**
+     * Import a SCORM package (not yet implemented).
+     *
+     * @param Request $request The HTTP request containing the SCORM file
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function importScorm(Request $request)
     {
         $request->validate([
@@ -603,6 +677,11 @@ class FormateurPageController extends Controller
         return back()->with('success', 'Import SCORM - Fonctionnalité à implémenter');
     }
 
+    /**
+     * Download a CSV template file for formation import.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function downloadCsvTemplate()
     {
         $rows = [];
@@ -691,6 +770,11 @@ class FormateurPageController extends Controller
             ->header('Content-Transfer-Encoding', 'binary');
     }
 
+    /**
+     * Download a JSON template file for formation import.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function downloadJsonTemplate()
     {
         $template = [
