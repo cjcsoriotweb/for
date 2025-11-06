@@ -4,13 +4,36 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use ZipArchive;
 
 class FormationExportController extends Controller
 {
-    public function export(Formation $formation)
+    public function export(Formation $formation, Request $request)
+    {
+        // Charger toutes les données nécessaires
+        $formation->load([
+            'chapters.lessons.lessonable',
+            'chapters.lessons.quizzes.quizQuestions.quizChoices',
+            'completionDocuments',
+        ]);
+
+        $format = $request->query('format', 'zip');
+
+        switch ($format) {
+            case 'json':
+                return $this->exportJson($formation);
+            case 'csv':
+                return $this->exportCsv($formation);
+            case 'zip':
+            default:
+                return $this->exportZip($formation);
+        }
+    }
+
+    private function exportZip(Formation $formation)
     {
         // Créer un dossier temporaire pour l'export
         $tempDir = storage_path('app/temp/'.Str::uuid());
@@ -18,13 +41,6 @@ class FormationExportController extends Controller
 
         // Créer les dossiers nécessaires
         $this->createDirectories($formationDir);
-
-        // Charger toutes les données nécessaires
-        $formation->load([
-            'chapters.lessons.lessonable',
-            'chapters.lessons.quizzes.quizQuestions.quizChoices',
-            'completionDocuments',
-        ]);
 
         // Exporter les métadonnées de la formation
         $this->exportFormationMetadata($formation, $formationDir);
@@ -49,6 +65,172 @@ class FormationExportController extends Controller
 
         // Retourner le téléchargement
         return response()->download($zipPath, $zipFileName)->deleteFileAfterSend();
+    }
+
+    private function exportJson(Formation $formation)
+    {
+        $data = [
+            'title' => $formation->title,
+            'description' => $formation->description,
+            'level' => $formation->level,
+            'exported_at' => now()->toISOString(),
+            'export_version' => '2.0',
+            'chapters' => $formation->chapters->map(function ($chapter) {
+                return [
+                    'title' => $chapter->title,
+                    'position' => $chapter->position,
+                    'lessons' => $chapter->lessons->map(function ($lesson) {
+                        return $this->serializeLessonToJson($lesson);
+                    })->toArray(),
+                ];
+            })->toArray(),
+            'completion_documents' => $formation->completionDocuments->map(function ($doc) {
+                return [
+                    'title' => $doc->title,
+                    'original_name' => $doc->original_name,
+                    'mime_type' => $doc->mime_type,
+                    'size' => $doc->size,
+                ];
+            })->toArray(),
+        ];
+
+        $fileName = Str::slug($formation->title).'_export_'.now()->format('Y-m-d_H-i-s').'.json';
+        
+        return response()->json($data)
+            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"')
+            ->header('Content-Type', 'application/json');
+    }
+
+    private function exportCsv(Formation $formation)
+    {
+        $rows = [];
+        
+        // En-tête CSV
+        $rows[] = [
+            'Formation',
+            'Description Formation',
+            'Niveau',
+            'Chapitre',
+            'Position Chapitre',
+            'Leçon',
+            'Type Leçon',
+            'Contenu',
+            'Durée (minutes)',
+            'Position Leçon',
+        ];
+
+        // Données
+        foreach ($formation->chapters as $chapter) {
+            foreach ($chapter->lessons as $lesson) {
+                $lessonData = $this->serializeLessonToCsv($lesson);
+                $rows[] = [
+                    $formation->title,
+                    $formation->description ?? '',
+                    $formation->level ?? '',
+                    $chapter->title,
+                    $chapter->position ?? 0,
+                    $lesson->title,
+                    $lessonData['type'],
+                    $lessonData['content'],
+                    $lessonData['duration'],
+                    $lesson->position ?? 0,
+                ];
+            }
+        }
+
+        $fileName = Str::slug($formation->title).'_export_'.now()->format('Y-m-d_H-i-s').'.csv';
+        $handle = fopen('php://temp', 'r+');
+        
+        foreach ($rows as $row) {
+            fputcsv($handle, $row, ';');
+        }
+        
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($csv)
+            ->header('Content-Type', 'text/csv; charset=UTF-8')
+            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"')
+            ->header('Content-Transfer-Encoding', 'binary');
+    }
+
+    private function serializeLessonToJson($lesson)
+    {
+        $lessonable = $lesson->lessonable;
+        $baseData = [
+            'title' => $lesson->title,
+            'position' => $lesson->position ?? 0,
+        ];
+
+        if ($lessonable instanceof \App\Models\VideoContent) {
+            return array_merge($baseData, [
+                'type' => 'video',
+                'description' => $lessonable->description,
+                'video_url' => $lessonable->video_url,
+                'duration_minutes' => $lessonable->duration_minutes,
+            ]);
+        } elseif ($lessonable instanceof \App\Models\TextContent) {
+            return array_merge($baseData, [
+                'type' => 'text',
+                'description' => $lessonable->description,
+                'content' => $lessonable->content,
+                'estimated_read_time' => $lessonable->estimated_read_time,
+            ]);
+        } elseif ($lessonable instanceof \App\Models\Quiz) {
+            return array_merge($baseData, [
+                'type' => 'quiz',
+                'description' => $lessonable->description,
+                'passing_score' => $lessonable->passing_score,
+                'max_attempts' => $lessonable->max_attempts,
+                'questions' => $lessonable->quizQuestions->map(function ($question) {
+                    return [
+                        'question' => $question->question,
+                        'type' => $question->type,
+                        'points' => $question->points,
+                        'choices' => $question->quizChoices->map(function ($choice) {
+                            return [
+                                'choice' => $choice->choice,
+                                'is_correct' => $choice->is_correct,
+                            ];
+                        })->toArray(),
+                    ];
+                })->toArray(),
+            ]);
+        }
+
+        return $baseData;
+    }
+
+    private function serializeLessonToCsv($lesson)
+    {
+        $lessonable = $lesson->lessonable;
+
+        if ($lessonable instanceof \App\Models\VideoContent) {
+            return [
+                'type' => 'video',
+                'content' => $lessonable->video_url ?? '',
+                'duration' => $lessonable->duration_minutes ?? 0,
+            ];
+        } elseif ($lessonable instanceof \App\Models\TextContent) {
+            return [
+                'type' => 'text',
+                'content' => strip_tags($lessonable->content ?? ''),
+                'duration' => $lessonable->estimated_read_time ?? 0,
+            ];
+        } elseif ($lessonable instanceof \App\Models\Quiz) {
+            return [
+                'type' => 'quiz',
+                'content' => $lessonable->quizQuestions->count() . ' questions',
+                'duration' => 15,
+            ];
+        }
+
+        return [
+            'type' => 'unknown',
+            'content' => '',
+            'duration' => 0,
+        ];
     }
 
     private function createDirectories(string $formationDir): void

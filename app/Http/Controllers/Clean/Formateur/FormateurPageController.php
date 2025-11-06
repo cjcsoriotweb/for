@@ -199,12 +199,158 @@ class FormateurPageController extends Controller
 
     public function importCsv(Request $request)
     {
-        $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt|max:5120', // 5MB max
-        ]);
+        try {
+            $request->validate([
+                'csv_file' => 'required|file|mimes:csv,txt|max:5120', // 5MB max
+            ]);
 
-        // TODO: Implement CSV import logic
-        return back()->with('success', 'Import CSV - Fonctionnalité à implémenter');
+            $file = $request->file('csv_file');
+            $csvData = array_map('str_getcsv', file($file->getRealPath()));
+            
+            if (empty($csvData)) {
+                return back()->with('error', 'Le fichier CSV est vide.');
+            }
+
+            // Vérifier l'en-tête
+            $header = array_map('trim', $csvData[0]);
+            $expectedHeaders = ['Formation', 'Description Formation', 'Niveau', 'Chapitre', 'Position Chapitre', 'Leçon', 'Type Leçon', 'Contenu', 'Durée (minutes)', 'Position Leçon'];
+            
+            // Support pour séparateur virgule ou point-virgule
+            if (count($header) === 1 && strpos($header[0], ';') !== false) {
+                $csvData = array_map(function($row) {
+                    return str_getcsv($row[0], ';');
+                }, $csvData);
+                $header = array_map('trim', $csvData[0]);
+            }
+
+            Log::info('CSV Import - Headers found', ['headers' => $header]);
+
+            DB::beginTransaction();
+
+            $formations = [];
+            $currentFormation = null;
+            $currentChapter = null;
+            $stats = ['formations' => 0, 'chapters' => 0, 'lessons' => 0];
+
+            // Traiter chaque ligne (skip header)
+            for ($i = 1; $i < count($csvData); $i++) {
+                $row = $csvData[$i];
+                
+                if (count($row) < 7) {
+                    continue; // Ligne incomplète
+                }
+
+                $formationTitle = trim($row[0] ?? '');
+                $formationDesc = trim($row[1] ?? '');
+                $formationLevel = trim($row[2] ?? 'beginner');
+                $chapterTitle = trim($row[3] ?? '');
+                $chapterPosition = (int)($row[4] ?? 0);
+                $lessonTitle = trim($row[5] ?? '');
+                $lessonType = strtolower(trim($row[6] ?? 'text'));
+                $lessonContent = trim($row[7] ?? '');
+                $lessonDuration = (int)($row[8] ?? 5);
+                $lessonPosition = (int)($row[9] ?? 0);
+
+                if (empty($formationTitle) || empty($chapterTitle) || empty($lessonTitle)) {
+                    continue; // Ligne invalide
+                }
+
+                // Créer ou récupérer la formation
+                if (!$currentFormation || $currentFormation->title !== $formationTitle) {
+                    $currentFormation = Formation::firstOrCreate(
+                        [
+                            'title' => $formationTitle,
+                            'user_id' => Auth::id(),
+                        ],
+                        [
+                            'description' => $formationDesc,
+                            'level' => $formationLevel,
+                            'active' => false,
+                        ]
+                    );
+                    
+                    if ($currentFormation->wasRecentlyCreated) {
+                        $stats['formations']++;
+                    }
+                }
+
+                // Créer ou récupérer le chapitre
+                if (!$currentChapter || $currentChapter->title !== $chapterTitle || $currentChapter->formation_id !== $currentFormation->id) {
+                    $currentChapter = Chapter::firstOrCreate(
+                        [
+                            'formation_id' => $currentFormation->id,
+                            'title' => $chapterTitle,
+                        ],
+                        [
+                            'position' => $chapterPosition ?: ($currentFormation->chapters()->count() + 1),
+                        ]
+                    );
+                    
+                    if ($currentChapter->wasRecentlyCreated) {
+                        $stats['chapters']++;
+                    }
+                }
+
+                // Créer la leçon
+                $lesson = Lesson::create([
+                    'chapter_id' => $currentChapter->id,
+                    'title' => $lessonTitle,
+                    'position' => $lessonPosition ?: ($currentChapter->lessons()->count() + 1),
+                    'lessonable_type' => $this->getLessonableType($lessonType),
+                ]);
+
+                // Créer le contenu de la leçon
+                $content = $this->createLessonContentFromCsv($lesson->id, $lessonType, $lessonTitle, $lessonContent, $lessonDuration);
+                $lesson->update(['lessonable_id' => $content->id]);
+                
+                $stats['lessons']++;
+            }
+
+            DB::commit();
+
+            $message = "Import CSV réussi ! {$stats['formations']} formation(s), {$stats['chapters']} chapitre(s), {$stats['lessons']} leçon(s) importées.";
+            return redirect()->route('formateur.home')->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('CSV Import Error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Erreur lors de l\'import CSV : ' . $e->getMessage());
+        }
+    }
+
+    private function createLessonContentFromCsv(int $lessonId, string $type, string $title, string $content, int $duration)
+    {
+        $data = [
+            'lesson_id' => $lessonId,
+            'title' => $title,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        switch ($type) {
+            case 'video':
+                $data['video_url'] = $content;
+                $data['duration_minutes'] = $duration;
+                $data['description'] = 'Vidéo importée depuis CSV';
+                $id = DB::table('video_contents')->insertGetId($data);
+                return VideoContent::find($id);
+
+            case 'quiz':
+                $data['description'] = $content;
+                $data['passing_score'] = 50;
+                $data['max_attempts'] = 3;
+                $data['type'] = Quiz::TYPE_LESSON;
+                $id = DB::table('quizzes')->insertGetId($data);
+                return Quiz::find($id);
+
+            case 'text':
+            default:
+                $data['content'] = $content;
+                $data['estimated_read_time'] = $duration;
+                $data['description'] = 'Contenu importé depuis CSV';
+                $id = DB::table('text_contents')->insertGetId($data);
+                return TextContent::find($id);
+        }
     }
 
     public function importScorm(Request $request)

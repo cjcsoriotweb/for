@@ -65,13 +65,71 @@
                     Gestion parcours
                   </a>
 
-                  <a href="{{ route('formateur.formation.export', $formation) }}"
-                    class="inline-flex items-center rounded-xl bg-emerald-500/20 backdrop-blur-sm border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-emerald-500/30 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
-                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Exporter
-                  </a>
+                  <div class="relative inline-block text-left">
+                    <button type="button" onclick="toggleExportMenu()" 
+                      class="inline-flex items-center rounded-xl bg-emerald-500/20 backdrop-blur-sm border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-emerald-500/30 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
+                      <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Exporter
+                      <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    <div id="exportMenu" class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-50">
+                      <div class="py-1">
+                        <a href="{{ route('formateur.formation.export', ['formation' => $formation, 'format' => 'zip']) }}"
+                          class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                          <svg class="mr-3 h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <div>
+                            <div class="font-medium">Format ZIP</div>
+                            <div class="text-xs text-gray-500">Complet avec fichiers</div>
+                          </div>
+                        </a>
+                        <a href="{{ route('formateur.formation.export', ['formation' => $formation, 'format' => 'json']) }}"
+                          class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700">
+                          <svg class="mr-3 h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <div>
+                            <div class="font-medium">Format JSON</div>
+                            <div class="text-xs text-gray-500">Données structurées</div>
+                          </div>
+                        </a>
+                        <a href="{{ route('formateur.formation.export', ['formation' => $formation, 'format' => 'csv']) }}"
+                          class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                          <svg class="mr-3 h-5 w-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          <div>
+                            <div class="font-medium">Format CSV</div>
+                            <div class="text-xs text-gray-500">Tableur Excel</div>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <script>
+                    function toggleExportMenu() {
+                      const menu = document.getElementById('exportMenu');
+                      menu.classList.toggle('hidden');
+                    }
+                    
+                    // Close menu when clicking outside
+                    document.addEventListener('click', function(event) {
+                      const menu = document.getElementById('exportMenu');
+                      const button = event.target.closest('button');
+                      if (!button || button.getAttribute('onclick') !== 'toggleExportMenu()') {
+                        if (!menu.contains(event.target)) {
+                          menu.classList.add('hidden');
+                        }
+                      }
+                    });
+                  </script>
 
                   @if(Auth::user()->superadmin)
                     <a href="{{ route('formateur.formation.delete.show', $formation) }}"
