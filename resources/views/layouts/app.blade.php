@@ -19,9 +19,7 @@
   </div>
 
 
-  @livewire('chat-and-i-a-menu')
 
-  @stack('assistant-dock')
 
   <!-- Bottom widget from layouts/app.blade -->
   @stack('modals') @livewireScripts @stack('scripts')
