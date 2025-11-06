@@ -84,7 +84,6 @@ class FormationsList extends Component
     public function render()
     {
         $formations = $this->formationsQuery()
-            ->take(3)
             ->get()
             ->map(function ($formation) {
                 return $this->shapeFormationData($formation);

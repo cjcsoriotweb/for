@@ -107,20 +107,52 @@ class FormateurPageController extends Controller
                     if (!isset($lesson['title']) || empty(trim($lesson['title']))) {
                         return back()->with('error', "Chapitre '{$chapter['title']}', leçon #" . ($lessonIndex + 1) . " : le champ 'title' est requis");
                     }
-                    
+
                     if (!isset($lesson['type'])) {
                         return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}' : le champ 'type' est requis");
                     }
-                    
+
                     $validTypes = ['text', 'video', 'quiz'];
                     $lessonType = trim(strtolower($lesson['type']));
-                    
+
                     if (!in_array($lessonType, $validTypes)) {
                         return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}' : type '{$lesson['type']}' invalide. Types acceptés : " . implode(', ', $validTypes));
                     }
-                    
+
                     if (!isset($lesson['content'])) {
                         return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}' : le champ 'content' est requis");
+                    }
+
+                    // Validation spécifique pour les quiz
+                    if ($lessonType === 'quiz' && isset($lesson['questions'])) {
+                        if (!is_array($lesson['questions']) || empty($lesson['questions'])) {
+                            return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}' : un quiz doit contenir au moins une question");
+                        }
+
+                        foreach ($lesson['questions'] as $qIndex => $question) {
+                            if (!isset($question['question']) || empty(trim($question['question']))) {
+                                return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}', question #" . ($qIndex + 1) . " : le texte de la question est requis");
+                            }
+
+                            if (!isset($question['choices']) || !is_array($question['choices']) || count($question['choices']) < 2) {
+                                return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}', question #" . ($qIndex + 1) . " : une question doit avoir au moins 2 choix");
+                            }
+
+                            $correctCount = 0;
+                            foreach ($question['choices'] as $cIndex => $choice) {
+                                if (!isset($choice['choice']) || empty(trim($choice['choice']))) {
+                                    return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}', question #" . ($qIndex + 1) . ", choix #" . ($cIndex + 1) . " : le texte du choix est requis");
+                                }
+
+                                if (isset($choice['is_correct']) && $choice['is_correct']) {
+                                    $correctCount++;
+                                }
+                            }
+
+                            if ($correctCount === 0) {
+                                return back()->with('error', "Chapitre '{$chapter['title']}', leçon '{$lesson['title']}', question #" . ($qIndex + 1) . " : au moins un choix doit être marqué comme correct");
+                            }
+                        }
                     }
                 }
             }
@@ -239,43 +271,137 @@ class FormateurPageController extends Controller
 
     private function createLessonContent(array $lessonData, int $lessonId)
     {
-        // Utiliser DB::insert pour contourner complètement le fillable
-        $data = [
+        \Illuminate\Support\Facades\Log::info('Creating lesson content', [
+            'lesson_id' => $lessonId,
+            'type' => $lessonData['type'],
+            'has_questions' => isset($lessonData['questions']),
+            'lesson_data_keys' => array_keys($lessonData)
+        ]);
+
+        switch ($lessonData['type']) {
+            case 'quiz':
+                return $this->createQuizContent($lessonData, $lessonId);
+
+            case 'video':
+                return $this->createVideoContent($lessonData, $lessonId);
+
+            case 'text':
+            default:
+                return $this->createTextContent($lessonData, $lessonId);
+        }
+    }
+
+    private function createQuizContent(array $lessonData, int $lessonId)
+    {
+        \Illuminate\Support\Facades\Log::info('Creating quiz content', [
+            'lesson_id' => $lessonId,
+            'lesson_title' => $lessonData['title'],
+            'has_questions' => isset($lessonData['questions']),
+            'questions_count' => isset($lessonData['questions']) ? count($lessonData['questions']) : 0,
+        ]);
+
+        // Créer le quiz
+        $quizData = [
             'lesson_id' => $lessonId,
             'title' => $lessonData['title'],
+            'description' => $lessonData['content'] ?? 'Quiz importé',
+            'passing_score' => 50,
+            'max_attempts' => 3,
+            'type' => Quiz::TYPE_LESSON,
             'created_at' => now(),
             'updated_at' => now(),
         ];
 
-        switch ($lessonData['type']) {
-            case 'text':
-                $data['content'] = $lessonData['content'];
-                $data['estimated_read_time'] = $lessonData['estimated_read_time'] ?? 5;
-                break;
+        $quizId = DB::table('quizzes')->insertGetId($quizData);
+        $quiz = Quiz::find($quizId);
 
-            case 'video':
-                // Pour l'instant, créer un contenu texte avec l'URL de la vidéo
-                $data['content'] = "Vidéo : " . ($lessonData['content'] ?? 'URL non spécifiée');
-                $data['estimated_read_time'] = $lessonData['duration_minutes'] ?? 10;
-                break;
+        \Illuminate\Support\Facades\Log::info('Quiz created', ['quiz_id' => $quizId]);
 
-            case 'quiz':
-                // Pour l'instant, créer un contenu texte avec les questions
-                $data['content'] = "Quiz : " . ($lessonData['content'] ?? 'Questions à définir');
-                $data['estimated_read_time'] = 15;
-                break;
+        // Créer les questions et choix si présents
+        if (isset($lessonData['questions']) && is_array($lessonData['questions'])) {
+            \Illuminate\Support\Facades\Log::info('Processing questions', ['count' => count($lessonData['questions'])]);
 
-            default:
-                $data['content'] = $lessonData['content'] ?? 'Contenu non défini';
-                $data['estimated_read_time'] = 5;
-                break;
+            foreach ($lessonData['questions'] as $qIndex => $questionData) {
+                \Illuminate\Support\Facades\Log::info('Processing question', [
+                    'index' => $qIndex,
+                    'question_text' => $questionData['question'] ?? 'MISSING',
+                    'has_choices' => isset($questionData['choices']),
+                    'choices_count' => isset($questionData['choices']) ? count($questionData['choices']) : 0,
+                ]);
+
+                $question = \App\Models\QuizQuestion::create([
+                    'quiz_id' => $quiz->id,
+                    'question' => $questionData['question'],
+                    'type' => $questionData['type'] ?? 'multiple_choice',
+                    'points' => $questionData['points'] ?? 1,
+                ]);
+
+                \Illuminate\Support\Facades\Log::info('Question created', ['question_id' => $question->id]);
+
+                // Créer les choix
+                if (isset($questionData['choices']) && is_array($questionData['choices'])) {
+                    foreach ($questionData['choices'] as $cIndex => $choiceData) {
+                        \Illuminate\Support\Facades\Log::info('Processing choice', [
+                            'question_id' => $question->id,
+                            'choice_index' => $cIndex,
+                            'choice_text' => $choiceData['choice'] ?? 'MISSING',
+                            'is_correct' => $choiceData['is_correct'] ?? false,
+                        ]);
+
+                        // Validation : s'assurer que choice_text n'est pas null ou vide
+                        $choiceText = trim($choiceData['choice'] ?? '');
+                        if (empty($choiceText)) {
+                            throw new \Exception("Leçon '{$lessonData['title']}', question #" . ($qIndex + 1) . ", choix #" . ($cIndex + 1) . " : le texte du choix ne peut pas être vide");
+                        }
+
+                        \App\Models\QuizChoice::create([
+                            'question_id' => $question->id,
+                            'choice_text' => $choiceText,
+                            'is_correct' => $choiceData['is_correct'] ?? false,
+                        ]);
+
+                        \Illuminate\Support\Facades\Log::info('Choice created for question', ['question_id' => $question->id]);
+                    }
+                } else {
+                    \Illuminate\Support\Facades\Log::warning('No choices found for question', ['question_id' => $question->id]);
+                }
+            }
+        } else {
+            \Illuminate\Support\Facades\Log::info('No questions to process for quiz', ['quiz_id' => $quizId]);
         }
 
-        // Insérer directement en base pour éviter le fillable
-        $id = DB::table('text_contents')->insertGetId($data);
+        return $quiz;
+    }
 
-        // Retourner l'instance du modèle
-        return TextContent::find($id);
+    private function createVideoContent(array $lessonData, int $lessonId)
+    {
+        $videoData = [
+            'lesson_id' => $lessonId,
+            'title' => $lessonData['title'],
+            'description' => $lessonData['content'] ?? 'Vidéo importée',
+            'video_url' => $lessonData['content'] ?? null,
+            'duration_minutes' => $lessonData['duration_minutes'] ?? 10,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        $videoId = DB::table('video_contents')->insertGetId($videoData);
+        return VideoContent::find($videoId);
+    }
+
+    private function createTextContent(array $lessonData, int $lessonId)
+    {
+        $textData = [
+            'lesson_id' => $lessonId,
+            'title' => $lessonData['title'],
+            'content' => $lessonData['content'],
+            'estimated_read_time' => $lessonData['estimated_read_time'] ?? 5,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        $textId = DB::table('text_contents')->insertGetId($textData);
+        return TextContent::find($textId);
     }
 
     public function importCsv(Request $request)
@@ -608,8 +734,56 @@ class FormateurPageController extends Controller
                         [
                             'title' => 'Quiz de validation',
                             'type' => 'quiz',
-                            'content' => 'Quiz avec 5 questions pour valider vos connaissances',
+                            'content' => 'Quiz avec questions détaillées',
                             'position' => 2,
+                            'questions' => [
+                                [
+                                    'question' => 'Quelle est la capitale de la France ?',
+                                    'type' => 'multiple_choice',
+                                    'points' => 1,
+                                    'choices' => [
+                                        [
+                                            'choice' => 'Paris',
+                                            'is_correct' => true,
+                                        ],
+                                        [
+                                            'choice' => 'Lyon',
+                                            'is_correct' => false,
+                                        ],
+                                        [
+                                            'choice' => 'Marseille',
+                                            'is_correct' => false,
+                                        ],
+                                        [
+                                            'choice' => 'Toulouse',
+                                            'is_correct' => false,
+                                        ],
+                                    ],
+                                ],
+                                [
+                                    'question' => 'Cochez les langages de programmation :',
+                                    'type' => 'multiple_choice',
+                                    'points' => 2,
+                                    'choices' => [
+                                        [
+                                            'choice' => 'PHP',
+                                            'is_correct' => true,
+                                        ],
+                                        [
+                                            'choice' => 'HTML',
+                                            'is_correct' => false,
+                                        ],
+                                        [
+                                            'choice' => 'JavaScript',
+                                            'is_correct' => true,
+                                        ],
+                                        [
+                                            'choice' => 'CSS',
+                                            'is_correct' => false,
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ],
                     ],
                 ],

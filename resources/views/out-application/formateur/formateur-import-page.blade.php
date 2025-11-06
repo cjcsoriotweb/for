@@ -56,83 +56,51 @@
                 </div>
             @endif
 
-            <!-- Import Options -->
-            <div class="max-w-4xl mx-auto mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- ZIP Import -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                        <div class="text-center mb-4">
-                            <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900">Import ZIP</h3>
-                            <p class="text-gray-600 text-sm mt-1">Formation complète avec fichiers</p>
+            <!-- Import ZIP -->
+            <div class="max-w-2xl mx-auto mb-8">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
                         </div>
-
-                        <form action="{{ route('formateur.import.zip') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
-                            @csrf
-                            <div>
-                                <input type="file" name="zip_file" accept=".zip" required
-                                       class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer">
-                                <p class="text-xs text-gray-500 mt-1">Max: 100 Mo</p>
-                            </div>
-                            <button type="submit"
-                                    class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-2 px-3 text-sm rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
-                                Importer
-                            </button>
-                        </form>
+                        <h3 class="text-2xl font-semibold text-gray-900">Import ZIP</h3>
+                        <p class="text-gray-600 mt-2">Formation complète avec fichiers médias</p>
                     </div>
 
-                    <!-- JSON Import -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                        <div class="text-center mb-4">
-                            <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900">Import JSON</h3>
-                            <p class="text-gray-600 text-sm mt-1">Données structurées uniquement</p>
+                    <!-- Loading State -->
+                    <div id="loading-state" class="hidden text-center py-8">
+                        <div class="inline-flex items-center justify-center">
+                            <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
                         </div>
-
-                        <form action="{{ route('formateur.import.json') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
-                            @csrf
-                            <div>
-                                <input type="file" name="json_file" accept=".json" required
-                                       class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100 file:cursor-pointer">
-                                <p class="text-xs text-gray-500 mt-1">Max: 10 Mo</p>
-                            </div>
-                            <button type="submit"
-                                    class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-medium py-2 px-3 text-sm rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200">
-                                Importer
-                            </button>
-                        </form>
+                        <h4 class="text-lg font-medium text-gray-900 mt-4">Import en cours...</h4>
+                        <p class="text-gray-600 mt-2">Veuillez patienter pendant le traitement de votre fichier</p>
                     </div>
 
-                    <!-- CSV Import -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                        <div class="text-center mb-4">
-                            <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900">Import CSV</h3>
-                            <p class="text-gray-600 text-sm mt-1">Format tableur simplifié</p>
-                        </div>
-
-                        <form action="{{ route('formateur.import.csv') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                    <!-- Import Form -->
+                    <div id="import-form">
+                        <form action="{{ route('formateur.import.zip') }}" method="POST" enctype="multipart/form-data" class="space-y-4" id="zip-import-form">
                             @csrf
                             <div>
-                                <input type="file" name="csv_file" accept=".csv,.txt" required
-                                       class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 file:cursor-pointer">
-                                <p class="text-xs text-gray-500 mt-1">Max: 5 Mo</p>
+                                <label for="zip_file" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Sélectionnez votre fichier ZIP
+                                </label>
+                                <input type="file" name="zip_file" id="zip_file" accept=".zip" required
+                                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <p class="text-xs text-gray-500 mt-2">Taille maximale : 100 Mo</p>
                             </div>
-                            <button type="submit"
-                                    class="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium py-2 px-3 text-sm rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200">
-                                Importer
+                            <button type="submit" id="import-button"
+                                    class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-3 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <span class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                                    </svg>
+                                    Importer la formation
+                                </span>
                             </button>
                         </form>
                     </div>
@@ -229,89 +197,45 @@
                     <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Guide d'import - Formats supportés
+                    Guide d'import ZIP
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-2 flex items-center">
-                            <span class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold mr-2">1</span>
-                            Format ZIP
-                        </h4>
-                        <p class="text-sm text-gray-700 mb-2">
-                            Le format le plus complet, incluant tous les fichiers médias (vidéos, documents, etc.).
-                        </p>
-                        <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
-                            <li>Contient un fichier <code class="bg-white px-1 rounded">orchestre.json</code></li>
-                            <li>Inclut vidéos et documents</li>
-                            <li>Structure complète</li>
+
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-900 mb-3 flex items-center">
+                        <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">ZIP</span>
+                        Format ZIP - Formation complète
+                    </h4>
+                    <p class="text-sm text-gray-700 mb-4">
+                        Le format ZIP permet d'importer une formation complète avec tous ses fichiers médias (vidéos, documents, etc.).
+                        C'est le format recommandé pour les imports complexes.
+                    </p>
+
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <h5 class="font-medium text-gray-900 mb-3">Structure du fichier ZIP :</h5>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li class="flex items-start">
+                                <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span><strong>orchestre.json</strong> - Fichier de configuration principal contenant la structure de la formation</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span><strong>Dossier media/</strong> - Contient toutes les vidéos, images et documents</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span><strong>Structure complète</strong> - Chapitres, leçons, quiz et contenu organisé</span>
+                            </li>
                         </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-2 flex items-center">
-                            <span class="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-bold mr-2">2</span>
-                            Format JSON
-                        </h4>
-                        <p class="text-sm text-gray-700 mb-3">
-                            Structure attendue :
-                        </p>
-                        <pre class="bg-white p-3 rounded-lg text-xs text-gray-800 overflow-x-auto"><code>{
-  "title": "Ma Formation",
-  "description": "Description",
-  "chapters": [
-    {
-      "title": "Chapitre 1",
-      "lessons": [
-        {
-          "title": "Leçon 1",
-          "type": "text",
-          "content": "Contenu..."
-        }
-      ]
-    }
-  ]
-}</code></pre>
-                        <a href="{{ route('formateur.templates.json') }}" 
-                           class="mt-2 inline-flex items-center text-xs text-green-600 hover:text-green-700 font-medium">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Télécharger un exemple JSON
-                        </a>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-2 flex items-center">
-                            <span class="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold mr-2">3</span>
-                            Format CSV
-                        </h4>
-                        <p class="text-sm text-gray-700 mb-3">
-                            Format tableur avec colonnes :
-                        </p>
-                        <ul class="text-xs text-gray-700 space-y-1">
-                            <li><strong>Formation</strong> - Titre</li>
-                            <li><strong>Description Formation</strong></li>
-                            <li><strong>Niveau</strong> (beginner/intermediate/advanced)</li>
-                            <li><strong>Chapitre</strong> - Titre</li>
-                            <li><strong>Position Chapitre</strong></li>
-                            <li><strong>Leçon</strong> - Titre</li>
-                            <li><strong>Type Leçon</strong> (text/video/quiz)</li>
-                            <li><strong>Contenu</strong></li>
-                            <li><strong>Durée (minutes)</strong></li>
-                            <li><strong>Position Leçon</strong></li>
-                        </ul>
-                        <p class="text-xs text-gray-500 mt-2">
-                            💡 Séparateur : point-virgule (;) ou virgule (,)
-                        </p>
-                        <a href="{{ route('formateur.templates.csv') }}" 
-                           class="mt-2 inline-flex items-center text-xs text-purple-600 hover:text-purple-700 font-medium">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Télécharger un exemple CSV
-                        </a>
                     </div>
                 </div>
 
-                <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <div class="flex items-start">
                         <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
@@ -320,7 +244,7 @@
                             <h5 class="font-medium text-yellow-800 mb-1">Important</h5>
                             <p class="text-sm text-yellow-700">
                                 Les formations importées sont <strong>désactivées par défaut</strong>. Pensez à les activer après vérification.
-                                Les types de leçons acceptés sont : <code class="bg-yellow-100 px-1 rounded">text</code>, 
+                                Les types de leçons acceptés sont : <code class="bg-yellow-100 px-1 rounded">text</code>,
                                 <code class="bg-yellow-100 px-1 rounded">video</code>, et <code class="bg-yellow-100 px-1 rounded">quiz</code>.
                             </p>
                         </div>
@@ -329,4 +253,25 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const importForm = document.getElementById('zip-import-form');
+            const importButton = document.getElementById('import-button');
+            const importFormDiv = document.getElementById('import-form');
+            const loadingState = document.getElementById('loading-state');
+
+            importForm.addEventListener('submit', function(e) {
+                // Afficher l'état de chargement
+                importFormDiv.classList.add('hidden');
+                loadingState.classList.remove('hidden');
+
+                // Désactiver le bouton
+                importButton.disabled = true;
+                importButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                // Le formulaire sera soumis normalement
+            });
+        });
+    </script>
 </x-app-layout>

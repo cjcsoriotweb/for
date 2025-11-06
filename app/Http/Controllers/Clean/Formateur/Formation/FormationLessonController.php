@@ -331,11 +331,38 @@ class FormationLessonController
             ]);
 
             // Create the choices
-            foreach ($choices as $choiceData) {
+            foreach ($choices as $choiceIndex => $choiceData) {
+                // Log pour debug
+                \Illuminate\Support\Facades\Log::info('Processing choice', [
+                    'choice_index' => $choiceIndex,
+                    'choice_data' => $choiceData,
+                    'question_id' => $question->id
+                ]);
+
+                // Validate choice data
+                if (!isset($choiceData['text']) || trim($choiceData['text']) === '') {
+                    \Illuminate\Support\Facades\Log::error('Empty choice text', [
+                        'choice_index' => $choiceIndex,
+                        'choice_data' => $choiceData,
+                        'question_id' => $question->id
+                    ]);
+                    throw new \Exception('Le texte du choix ne peut pas être vide (choix #' . ($choiceIndex + 1) . ')');
+                }
+
+                $choiceText = trim($choiceData['text']);
+                if (empty($choiceText)) {
+                    \Illuminate\Support\Facades\Log::error('Choice text is empty after trim', [
+                        'choice_index' => $choiceIndex,
+                        'choice_data' => $choiceData,
+                        'question_id' => $question->id
+                    ]);
+                    throw new \Exception('Le texte du choix ne peut pas être vide après nettoyage (choix #' . ($choiceIndex + 1) . ')');
+                }
+
                 \App\Models\QuizChoice::create([
                     'question_id' => $question->id,
-                    'choice_text' => $choiceData['text'],
-                    'is_correct' => $choiceData['is_correct'],
+                    'choice_text' => $choiceText,
+                    'is_correct' => $choiceData['is_correct'] ?? false,
                 ]);
             }
 
@@ -375,11 +402,38 @@ class FormationLessonController
 
             // Delete existing choices and create new ones
             $question->quizChoices()->delete();
-            foreach ($choices as $choiceData) {
+            foreach ($choices as $choiceIndex => $choiceData) {
+                // Log pour debug
+                \Illuminate\Support\Facades\Log::info('Processing choice (update)', [
+                    'choice_index' => $choiceIndex,
+                    'choice_data' => $choiceData,
+                    'question_id' => $question->id
+                ]);
+
+                // Validate choice data
+                if (!isset($choiceData['text']) || trim($choiceData['text']) === '') {
+                    \Illuminate\Support\Facades\Log::error('Empty choice text (update)', [
+                        'choice_index' => $choiceIndex,
+                        'choice_data' => $choiceData,
+                        'question_id' => $question->id
+                    ]);
+                    throw new \Exception('Le texte du choix ne peut pas être vide (choix #' . ($choiceIndex + 1) . ')');
+                }
+
+                $choiceText = trim($choiceData['text']);
+                if (empty($choiceText)) {
+                    \Illuminate\Support\Facades\Log::error('Choice text is empty after trim (update)', [
+                        'choice_index' => $choiceIndex,
+                        'choice_data' => $choiceData,
+                        'question_id' => $question->id
+                    ]);
+                    throw new \Exception('Le texte du choix ne peut pas être vide après nettoyage (choix #' . ($choiceIndex + 1) . ')');
+                }
+
                 \App\Models\QuizChoice::create([
                     'question_id' => $question->id,
-                    'choice_text' => $choiceData['text'],
-                    'is_correct' => $choiceData['is_correct'],
+                    'choice_text' => $choiceText,
+                    'is_correct' => $choiceData['is_correct'] ?? false,
                 ]);
             }
 

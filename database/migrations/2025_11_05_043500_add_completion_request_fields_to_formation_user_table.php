@@ -12,11 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('formation_user', function (Blueprint $table) {
-            $table->timestamp('completion_request_at')->nullable();
-            $table->enum('completion_request_status', ['pending', 'approved', 'rejected'])->nullable();
-            $table->foreignId('trainer_signature_id')->nullable()->constrained('signatures')->onDelete('set null');
-            $table->timestamp('completion_validated_at')->nullable();
-            $table->foreignId('completion_validated_by')->nullable()->constrained('users')->onDelete('set null');
+            if (!Schema::hasColumn('formation_user', 'completion_request_at')) {
+                $table->timestamp('completion_request_at')->nullable();
+            }
+            if (!Schema::hasColumn('formation_user', 'completion_request_status')) {
+                $table->enum('completion_request_status', ['pending', 'approved', 'rejected'])->nullable();
+            }
+            if (!Schema::hasColumn('formation_user', 'trainer_signature_id')) {
+                $table->foreignId('trainer_signature_id')->nullable()->constrained('signatures')->onDelete('set null');
+            }
+            if (!Schema::hasColumn('formation_user', 'completion_validated_at')) {
+                $table->timestamp('completion_validated_at')->nullable();
+            }
+            if (!Schema::hasColumn('formation_user', 'completion_validated_by')) {
+                $table->foreignId('completion_validated_by')->nullable()->constrained('users')->onDelete('set null');
+            }
         });
     }
 

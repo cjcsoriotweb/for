@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('formation_user', function (Blueprint $table) {
-            $table->json('completion_documents')->nullable()->after('completion_validated_by');
+            if (!Schema::hasColumn('formation_user', 'completion_documents')) {
+                $table->json('completion_documents')->nullable()->after('completion_validated_by');
+            }
         });
     }
 
