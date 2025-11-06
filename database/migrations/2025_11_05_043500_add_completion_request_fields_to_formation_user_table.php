@@ -19,7 +19,7 @@ return new class extends Migration
                 $table->enum('completion_request_status', ['pending', 'approved', 'rejected'])->nullable();
             }
             if (!Schema::hasColumn('formation_user', 'trainer_signature_id')) {
-                $table->foreignId('trainer_signature_id')->nullable()->constrained('signatures')->onDelete('set null');
+                $table->unsignedBigInteger('trainer_signature_id')->nullable();
             }
             if (!Schema::hasColumn('formation_user', 'completion_validated_at')) {
                 $table->timestamp('completion_validated_at')->nullable();
@@ -36,7 +36,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('formation_user', function (Blueprint $table) {
-            $table->dropForeign(['trainer_signature_id']);
             $table->dropForeign(['completion_validated_by']);
             $table->dropColumn([
                 'completion_request_at',
