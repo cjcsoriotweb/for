@@ -1,7 +1,7 @@
 @component('mail::message')
 
 <p align="center" style="margin: 0 0 16px;">
-  <img src="https://evolubat.goodview.fr/logo.png"
+  <img src="{{url('/logo-dark.png')}}"
        alt="EvolubatAcademy logo"
        width="80" height="80"
        style="display:inline-block; width:80px; height:80px;">
