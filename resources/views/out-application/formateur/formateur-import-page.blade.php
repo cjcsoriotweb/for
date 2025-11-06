@@ -149,18 +149,77 @@
                 </h3>
 
                 <div class="space-y-4">
-                    <!-- Empty state for import history -->
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
+                    @if(isset($recentImports) && $recentImports->count() > 0)
+                        @foreach($recentImports as $log)
+                            <div class="flex items-start p-4 rounded-xl border {{ $log->status === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200' }}">
+                                <div class="flex-shrink-0 mr-3">
+                                    @if($log->status === 'success')
+                                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+                                    @else
+                                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-medium {{ $log->status === 'success' ? 'text-green-900' : 'text-red-900' }}">
+                                            {{ $log->filename }}
+                                        </h4>
+                                        <span class="text-xs px-2 py-1 rounded-full {{ $log->format === 'zip' ? 'bg-blue-100 text-blue-700' : ($log->format === 'json' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700') }}">
+                                            {{ strtoupper($log->format) }}
+                                        </span>
+                                    </div>
+                                    @if($log->formation)
+                                        <a href="{{ route('formateur.formation.show', $log->formation) }}" 
+                                           class="text-sm {{ $log->status === 'success' ? 'text-green-700 hover:text-green-800' : 'text-red-700' }} font-medium">
+                                            {{ $log->formation->title }}
+                                        </a>
+                                    @endif
+                                    @if($log->stats)
+                                        <p class="text-xs {{ $log->status === 'success' ? 'text-green-600' : 'text-red-600' }} mt-1">
+                                            @if(isset($log->stats['chapters_count']))
+                                                {{ $log->stats['chapters_count'] }} chapitre(s), 
+                                            @endif
+                                            @if(isset($log->stats['lessons_count']))
+                                                {{ $log->stats['lessons_count'] }} leçon(s)
+                                            @endif
+                                        </p>
+                                    @endif
+                                    @if($log->error_message)
+                                        <p class="text-xs text-red-600 mt-1">
+                                            Erreur : {{ $log->error_message }}
+                                        </p>
+                                    @endif
+                                    <p class="text-xs {{ $log->status === 'success' ? 'text-green-500' : 'text-red-500' }} mt-1">
+                                        {{ $log->created_at->diffForHumans() }}
+                                        @if($log->file_size)
+                                            • {{ number_format($log->file_size / 1024 / 1024, 2) }} Mo
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <!-- Empty state for import history -->
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-medium text-gray-900 mb-2">Aucun import effectué</h4>
+                            <p class="text-gray-600">
+                                Vos imports précédents apparaîtront ici une fois que vous aurez importé du contenu.
+                            </p>
                         </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">Aucun import effectué</h4>
-                        <p class="text-gray-600">
-                            Vos imports précédents apparaîtront ici une fois que vous aurez importé du contenu.
-                        </p>
-                    </div>
+                    @endif
                 </div>
             </div>
 

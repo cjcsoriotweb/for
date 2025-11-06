@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
+use App\Models\FormationImportExportLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use ZipArchive;
@@ -13,24 +15,64 @@ class FormationExportController extends Controller
 {
     public function export(Formation $formation, Request $request)
     {
-        // Charger toutes les données nécessaires
-        $formation->load([
-            'chapters.lessons.lessonable',
-            'chapters.lessons.quizzes.quizQuestions.quizChoices',
-            'completionDocuments',
-        ]);
-
         $format = $request->query('format', 'zip');
+        
+        try {
+            // Charger toutes les données nécessaires
+            $formation->load([
+                'chapters.lessons.lessonable',
+                'chapters.lessons.quizzes.quizQuestions.quizChoices',
+                'completionDocuments',
+            ]);
 
-        switch ($format) {
-            case 'json':
-                return $this->exportJson($formation);
-            case 'csv':
-                return $this->exportCsv($formation);
-            case 'zip':
-            default:
-                return $this->exportZip($formation);
+            $stats = [
+                'chapters_count' => $formation->chapters->count(),
+                'lessons_count' => $formation->chapters->sum(fn ($chapter) => $chapter->lessons->count()),
+                'completion_documents_count' => $formation->completionDocuments->count(),
+            ];
+
+            $response = match ($format) {
+                'json' => $this->exportJson($formation),
+                'csv' => $this->exportCsv($formation),
+                default => $this->exportZip($formation),
+            };
+
+            // Log successful export
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'formation_id' => $formation->id,
+                'type' => 'export',
+                'format' => $format,
+                'filename' => $this->getExportFilename($formation, $format),
+                'status' => 'success',
+                'stats' => $stats,
+            ]);
+
+            return $response;
+        } catch (\Exception $e) {
+            // Log failed export
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'formation_id' => $formation->id,
+                'type' => 'export',
+                'format' => $format,
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Erreur lors de l\'export : ' . $e->getMessage());
         }
+    }
+
+    private function getExportFilename(Formation $formation, string $format): string
+    {
+        $extension = match ($format) {
+            'json' => 'json',
+            'csv' => 'csv',
+            default => 'zip',
+        };
+        
+        return Str::slug($formation->title).'_export_'.now()->format('Y-m-d_H-i-s').'.'.$extension;
     }
 
     private function exportZip(Formation $formation)

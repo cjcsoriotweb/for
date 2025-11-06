@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\FormationCompletionDocument;
+use App\Models\FormationImportExportLog;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizChoice;
@@ -23,11 +24,23 @@ class FormationImportController extends Controller
 {
     public function showImportForm()
     {
-        return view('out-application.formateur.formateur-import-page');
+        $recentImports = FormationImportExportLog::where('user_id', Auth::id())
+            ->where('type', 'import')
+            ->with('formation')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        
+        return view('out-application.formateur.formateur-import-page', [
+            'recentImports' => $recentImports,
+        ]);
     }
 
     public function import(Request $request)
     {
+        $zipFile = null;
+        $formation = null;
+        
         try {
             $request->validate([
                 'zip_file' => 'required|file|mimes:zip|max:102400', // 100MB max
@@ -79,8 +92,27 @@ class FormationImportController extends Controller
             // Importer la formation
             $formation = $this->importFormation($formationDir, $orchestre);
 
+            // Calculate stats
+            $stats = [
+                'chapters_count' => $formation->chapters()->count(),
+                'lessons_count' => $formation->chapters()->withCount('lessons')->get()->sum('lessons_count'),
+                'completion_documents_count' => $formation->completionDocuments()->count(),
+            ];
+
             // Nettoyer les fichiers temporaires
             $this->cleanupTempDir($tempDir);
+
+            // Log successful import
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'formation_id' => $formation->id,
+                'type' => 'import',
+                'format' => 'zip',
+                'filename' => $zipFile->getClientOriginalName(),
+                'status' => 'success',
+                'stats' => $stats,
+                'file_size' => $zipFile->getSize(),
+            ]);
 
             return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', 'Formation "'.$formation->title.'" importée avec succès ! La formation a été désactivée par défaut, pensez à l\'activer après vérification.');
@@ -90,6 +122,18 @@ class FormationImportController extends Controller
             if (isset($tempDir) && is_dir($tempDir)) {
                 $this->cleanupTempDir($tempDir);
             }
+
+            // Log failed import
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'formation_id' => $formation?->id,
+                'type' => 'import',
+                'format' => 'zip',
+                'filename' => $zipFile?->getClientOriginalName(),
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+                'file_size' => $zipFile?->getSize(),
+            ]);
 
             return back()->with('error', 'Erreur lors de l\'import : '.$e->getMessage());
         }

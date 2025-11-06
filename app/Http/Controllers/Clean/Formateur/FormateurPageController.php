@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Clean\Formateur;
 use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Formation;
+use App\Models\FormationImportExportLog;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\TextContent;
@@ -170,11 +171,40 @@ class FormateurPageController extends Controller
                 'total_lessons' => $totalLessons
             ]);
 
+            // Log successful import
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'formation_id' => $formation->id,
+                'type' => 'import',
+                'format' => 'json',
+                'filename' => $request->file('json_file')->getClientOriginalName(),
+                'status' => 'success',
+                'stats' => [
+                    'chapters_count' => count($data['chapters']),
+                    'lessons_count' => $totalLessons,
+                ],
+                'file_size' => $request->file('json_file')->getSize(),
+            ]);
+
             return redirect()->route('formateur.formation.show', $formation)
                 ->with('success', "Formation '{$formation->title}' importée avec succès ! {$totalLessons} leçons créées dans " . count($data['chapters']) . " chapitres.");
 
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            // Log failed import
+            if (isset($request) && $request->hasFile('json_file')) {
+                FormationImportExportLog::create([
+                    'user_id' => Auth::id(),
+                    'type' => 'import',
+                    'format' => 'json',
+                    'filename' => $request->file('json_file')->getClientOriginalName(),
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                    'file_size' => $request->file('json_file')->getSize(),
+                ]);
+            }
+            
             Log::error('JSON Import Error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -345,11 +375,36 @@ class FormateurPageController extends Controller
 
             DB::commit();
 
+            // Log successful import
+            FormationImportExportLog::create([
+                'user_id' => Auth::id(),
+                'type' => 'import',
+                'format' => 'csv',
+                'filename' => $request->file('csv_file')->getClientOriginalName(),
+                'status' => 'success',
+                'stats' => $stats,
+                'file_size' => $request->file('csv_file')->getSize(),
+            ]);
+
             $message = "Import CSV réussi ! {$stats['formations']} formation(s), {$stats['chapters']} chapitre(s), {$stats['lessons']} leçon(s) importées.";
             return redirect()->route('formateur.home')->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            // Log failed import
+            if (isset($request) && $request->hasFile('csv_file')) {
+                FormationImportExportLog::create([
+                    'user_id' => Auth::id(),
+                    'type' => 'import',
+                    'format' => 'csv',
+                    'filename' => $request->file('csv_file')->getClientOriginalName(),
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                    'file_size' => $request->file('csv_file')->getSize(),
+                ]);
+            }
+            
             Log::error('CSV Import Error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return back()->with('error', 'Erreur lors de l\'import CSV : ' . $e->getMessage());
         }
