@@ -17,6 +17,20 @@ use Illuminate\Support\Facades\Log;
 
 class FormateurPageController extends Controller
 {
+    // CSV expected headers
+    private const CSV_HEADERS = [
+        'Formation',
+        'Description Formation',
+        'Niveau',
+        'Chapitre',
+        'Position Chapitre',
+        'Leçon',
+        'Type Leçon',
+        'Contenu',
+        'Durée (minutes)',
+        'Position Leçon',
+    ];
+
     public function home()
     {
         return view('out-application.formateur.formateur-home-page');
@@ -280,7 +294,6 @@ class FormateurPageController extends Controller
 
             // Vérifier l'en-tête
             $header = array_map('trim', $csvData[0]);
-            $expectedHeaders = ['Formation', 'Description Formation', 'Niveau', 'Chapitre', 'Position Chapitre', 'Leçon', 'Type Leçon', 'Contenu', 'Durée (minutes)', 'Position Leçon'];
             
             // Support pour séparateur virgule ou point-virgule
             if (count($header) === 1 && strpos($header[0], ';') !== false) {
@@ -288,6 +301,11 @@ class FormateurPageController extends Controller
                     return str_getcsv($row[0], ';');
                 }, $csvData);
                 $header = array_map('trim', $csvData[0]);
+            }
+
+            // Validation de l'en-tête
+            if (count($header) < count(self::CSV_HEADERS) - 2) { // Allow some flexibility
+                return back()->with('error', 'En-tête CSV invalide. Veuillez utiliser le template fourni ou vérifier les colonnes requises.');
             }
 
             Log::info('CSV Import - Headers found', ['headers' => $header]);
@@ -324,19 +342,23 @@ class FormateurPageController extends Controller
 
                 // Créer ou récupérer la formation
                 if (!$currentFormation || $currentFormation->title !== $formationTitle) {
-                    $currentFormation = Formation::firstOrCreate(
-                        [
+                    // Check if formation exists for this user
+                    $existingFormation = Formation::where('title', $formationTitle)
+                        ->where('user_id', Auth::id())
+                        ->first();
+                    
+                    if ($existingFormation) {
+                        // Use existing formation
+                        $currentFormation = $existingFormation;
+                    } else {
+                        // Create new formation
+                        $currentFormation = Formation::create([
                             'title' => $formationTitle,
-                            'user_id' => Auth::id(),
-                        ],
-                        [
                             'description' => $formationDesc,
                             'level' => $formationLevel,
                             'active' => false,
-                        ]
-                    );
-                    
-                    if ($currentFormation->wasRecentlyCreated) {
+                            'user_id' => Auth::id(),
+                        ]);
                         $stats['formations']++;
                     }
                 }

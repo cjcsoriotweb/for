@@ -132,7 +132,7 @@ class FormationImportController extends Controller
                 'filename' => $zipFile?->getClientOriginalName(),
                 'status' => 'failed',
                 'error_message' => $e->getMessage(),
-                'file_size' => $zipFile?->getSize(),
+                'file_size' => $zipFile ? $zipFile->getSize() : null,
             ]);
 
             return back()->with('error', 'Erreur lors de l\'import : '.$e->getMessage());

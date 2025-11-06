@@ -17,6 +17,12 @@ class FormationExportController extends Controller
     {
         $format = $request->query('format', 'zip');
         
+        // Validate format
+        $allowedFormats = ['zip', 'json', 'csv'];
+        if (!in_array($format, $allowedFormats)) {
+            return back()->with('error', 'Format d\'export invalide. Formats acceptés : ' . implode(', ', $allowedFormats));
+        }
+        
         try {
             // Charger toutes les données nécessaires
             $formation->load([
