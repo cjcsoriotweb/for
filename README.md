@@ -1,93 +1,235 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Evolubat - Plateforme de Formation en Ligne
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## À propos du projet
 
-## About Laravel
+Evolubat est une plateforme complète de gestion et de suivi de formations en ligne construite avec Laravel 12. Elle permet aux formateurs de créer et gérer des formations, aux organisateurs de suivre leurs équipes, et aux élèves d'accéder à du contenu pédagogique interactif avec assistance IA intégrée.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Fonctionnalités principales
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🎓 Système de Formation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Création de formations** : Interface intuitive pour créer des formations structurées
+- **Organisation en chapitres et leçons** : Structure hiérarchique (Formation → Chapitre → Leçon)
+- **Types de contenu variés** :
+  - Vidéos hébergées
+  - Contenu texte/HTML enrichi
+  - Quiz évaluatifs
+  - Documents joints
+- **Quiz d'entrée** : Évaluation préalable des connaissances avant accès à la formation
+- **Quiz intégrés** : Quiz de validation des connaissances après chaque leçon
+- **Suivi de progression** : Tracking automatique de l'avancement des élèves
+- **Certificats de complétion** : Génération automatique de documents PDF d'attestation
+- **Import/Export** : Import de formations complètes via fichiers ZIP
+- **Catégories de formation** : Organisation et classification des formations
 
-## Learning Laravel
+### 👥 Gestion Multi-Rôles
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+#### Administrateur (Admin)
+- Gestion des utilisateurs de l'équipe
+- Vue d'ensemble des formations disponibles
+- Activation/désactivation des formations pour l'équipe
+- Suivi des étudiants et de leur progression
+- Gestion des crédits de l'équipe
+- Personnalisation du profil de l'équipe (logo, informations)
+- Accès aux statistiques détaillées
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+#### Formateur
+- Création et modification de formations
+- Gestion des chapitres et leçons
+- Upload de vidéos et documents
+- Création et édition de quiz
+- Configuration des assistants IA pour les formations
+- Suivi des étudiants inscrits
+- Export de formations
+- Gestion des documents de complétion
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+#### Organisateur
+- Vue catalogue des formations disponibles
+- Gestion des utilisateurs de l'équipe
+- Suivi détaillé des étudiants par formation
+- Rapports de progression en PDF
+- Rapports de connexion en PDF
+- Vue des coûts d'inscription
+- Recharge de crédits via Stripe
 
-## Laravel Sponsors
+#### Élève
+- Accès aux formations assignées
+- Navigation intuitive entre chapitres et leçons
+- Lecture de vidéos avec player intégré
+- Passage de quiz avec feedback immédiat
+- Consultation de la progression
+- Téléchargement des certificats de complétion
+- Rapport de connexion personnalisé
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+#### Superadmin
+- Gestion globale des trainers IA
+- Configuration des catégories de formation
+- Accès à tous les espaces de l'application
+- Gestion des assistants IA
 
-### Premium Partners
+### 🤖 Système d'Assistant IA (Ollama)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Architecture IA moderne avec streaming en temps réel :
 
-## Contributing
+#### Caractéristiques
+- **Client HTTP unique** (`OllamaClient`) pour communiquer avec Ollama
+- **Streaming NDJSON** : Réponses progressives en temps réel
+- **Multi-trainers** : Support de plusieurs assistants spécialisés configurables
+- **Historique de conversation** : Context-aware avec gestion de l'historique
+- **Outils intégrés** : Support de fonctions pour actions avancées (tickets de support)
+- **Composants Livewire dédiés** :
+  - `chat.ai-chat` : Chat avec assistant IA
+  - `chat.user-chat` : Chat utilisateur à utilisateur
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Trainers configurables
+Les trainers sont définis dans la base de données (table `ai_trainers`) :
+- Personnalisation du prompt système
+- Configuration du modèle et température
+- Activation/désactivation des outils
+- Ordre de tri personnalisable
 
-## Code of Conduct
+#### API Streaming
+- **Endpoint** : `POST /api/ai/stream`
+- **Format** : Server-Sent Events (NDJSON)
+- **Authentification** : Sanctum
+- **Sécurité** : 
+  - Validation stricte des entrées
+  - Limitation de la longueur des messages
+  - Filtrage des contenus inappropriés
+  - Timeout configurable
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### Intégration avec les formations
+- Assistant IA dédié par formation
+- Contexte adapté au contenu pédagogique
+- Support instantané pour les élèves
 
-## Security Vulnerabilities
+### 💳 Système de Crédits et Paiements
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Crédits d'équipe** : Système de crédits pour gérer les inscriptions
+- **Coût d'inscription** : Déduction automatique des crédits lors de l'inscription
+- **Historique des transactions** : Traçabilité complète des mouvements de crédits
+- **Recharge via Stripe** : Intégration Stripe pour l'achat de crédits
+- **Gestion administrative** : Les admins peuvent ajouter des crédits manuellement
 
-## Front-end Assets (no build step)
+### 📊 Suivi et Reporting
 
-- Tailwind CSS est désormais servi via le CDN officiel (`cdn.tailwindcss.com`) avec configuration inline dans `resources/views/components/ui/layout/meta-header.blade.php`.
-- Axios et le bundle PowerGrid sont chargés côté navigateur (axios via jsDelivr, `powergrid.js` exposé par Laravel) : aucune étape de build n'est nécessaire.
-- Les commandes `npm run dev` / `npm run build` ont été retirées ; redémarrez simplement vos services PHP/queue et videz le cache navigateur si vous modifiez le style.
+- **Logs d'activité utilisateur** : Traçage détaillé des actions (connexions, inscriptions, complétions)
+- **Statistiques de formation** : Taux de complétion, temps passé, résultats aux quiz
+- **Rapports PDF** :
+  - Certificats de complétion
+  - Rapports de connexion
+  - Rapports de progression des étudiants
+- **Système de notation** : Notes de page pour les élèves avec discussions
 
-## AI Assistant Architecture
+### 🛠️ Système de Gestion des Erreurs
 
-Ce projet intègre un système d'assistant IA simplifié utilisant Ollama avec streaming en temps réel.
+Service complet de logging et monitoring des erreurs :
 
-### 🏗️ Architecture
+#### Fonctionnalités
+- Capture automatique des erreurs HTTP (403, 404, 500, etc.)
+- Stockage en base de données avec détails complets
+- Traçabilité : URL, utilisateur, IP, user agent, données de requête
+- Stack traces pour les erreurs 500
+- Résolution et suivi des erreurs
+- Commande Artisan `verifyerror` pour la gestion CLI
 
-L'architecture IA a été refactorisée pour être simple et maintenable :
+#### Utilisation
+```bash
+# Afficher les statistiques
+php artisan verifyerror --stats
 
-- **Un seul client HTTP** : `App\Services\Ai\OllamaClient` pour communiquer avec Ollama
-- **Un seul endpoint API** : `POST /api/ai/stream` pour le streaming NDJSON
-- **Deux composants Livewire dédiés** : `chat.ai-chat` pour l’assistant IA, `chat.user-chat` pour les conversations utilisateur↔utilisateur
-- **Configuration statique** : Les trainers sont définis dans `config/ai.php` (pas de DB)
+# Lister les erreurs récentes
+php artisan verifyerror --limit=20
 
-### 🎓 Trainers disponibles
+# Lister les erreurs non résolues
+php artisan verifyerror --unresolved
 
-Les trainers sont configurés dans `config/ai.php` :
+# Marquer une erreur comme résolue
+php artisan verifyerror --resolve=123
+```
 
-- **default** : Assistant Evolubat généraliste (français, professionnel)
-- **michel** : Professeur de maçonnerie (expert bâtiment, sécurité stricte)
-- **andreas** : Professeur de musique (pédagogique, motivant)
+### 🎨 Interface et UX
 
-### ⚙️ Configuration
+- **Tailwind CSS** : Design moderne et responsive via CDN
+- **Composants Livewire** : Interactions temps réel sans rechargement de page
+- **Laravel Jetstream** : Authentification et gestion d'équipes intégrée
+- **PowerGrid** : Tables de données interactives pour les listings
+- **Heroicons** : Bibliothèque d'icônes intégrée
+- **Notifications temps réel** : Système de notifications avec badge
 
-Variables d'environnement dans `.env` :
+### 🔐 Sécurité et Authentification
+
+- **Laravel Sanctum** : Authentification API sécurisée
+- **Authentification 2FA** : Support de l'authentification à deux facteurs
+- **Gestion d'équipes** : Isolation des données par équipe (Jetstream)
+- **Middlewares personnalisés** : Protection des routes par rôle
+- **Policies** : Autorisation fine des actions
+- **Validation stricte** : Form Requests pour toutes les entrées utilisateur
+
+### 📱 Support et Communication
+
+- **Système de tickets** : Gestion complète des demandes de support
+- **Chat intégré** : Messagerie entre utilisateurs
+- **Invitations d'équipe** : Système d'invitation par email
+- **Notifications** : Centre de notifications avec cloche interactive
+
+## 📋 Prérequis
+
+- PHP 8.2 ou supérieur
+- Composer
+- Base de données (SQLite, MySQL, PostgreSQL)
+- Ollama (pour l'assistant IA) - optionnel
+- Stripe Account (pour les paiements) - optionnel
+- Node.js et NPM (pour le développement frontend) - optionnel
+
+## 🔧 Installation
+
+### 1. Cloner le repository
 
 ```bash
+git clone <repository-url>
+cd for
+```
+
+### 2. Installation des dépendances
+
+```bash
+composer install
+```
+
+### 3. Configuration de l'environnement
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 4. Configuration de la base de données
+
+Éditez le fichier `.env` et configurez votre connexion à la base de données :
+
+```env
+DB_CONNECTION=sqlite
+# ou pour MySQL/PostgreSQL
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=evolubat
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 5. Exécuter les migrations
+
+```bash
+php artisan migrate
+```
+
+### 6. Configuration d'Ollama (optionnel)
+
+Si vous souhaitez utiliser l'assistant IA, configurez Ollama dans `.env` :
+
+```env
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_DEFAULT_MODEL=llama3
 OLLAMA_TIMEOUT=60
@@ -95,58 +237,274 @@ OLLAMA_TEMPERATURE=0.7
 AI_DEFAULT_TRAINER_SLUG=default
 ```
 
-### 🚀 Utilisation
-
-#### Dans une vue Blade :
-
-```blade
-<livewire:chat.ai-chat 
-    contact-id="ai_{{ $trainerId }}" 
-    title="Assistance Maçonnerie" 
-/>
-```
-
-#### Via l'API (pour du JavaScript custom) :
-
-```javascript
-const response = await fetch('/api/ai/stream', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'text/event-stream',
-    },
-    body: JSON.stringify({
-        message: 'Comment faire un enduit ?',
-        trainer: 'michel',
-        conversation_id: 123, // optionnel
-    }),
-});
-
-// Lire le stream NDJSON
-const reader = response.body.getReader();
-// ... (voir resources/views/livewire/chat/ai-chat.blade.php pour exemple complet)
-```
-
-### 🛡️ Garde-fous
-
-- Messages limités à 2000 caractères
-- Validation stricte des inputs
-- Refus explicite des contenus inappropriés
-- Logs en développement uniquement
-- Timeout configurable (60s par défaut)
-
-### 📦 Migrations
-
-Pour mettre à jour la base de données (suppression des anciennes tables trainers) :
+Assurez-vous qu'Ollama est installé et en cours d'exécution :
 
 ```bash
-php artisan migrate
+# Installation d'Ollama (voir https://ollama.ai)
+# Puis télécharger un modèle
+ollama pull llama3
 ```
 
-## License
+### 7. Configuration de Stripe (optionnel)
+
+Pour les paiements, ajoutez vos clés Stripe dans `.env` :
+
+```env
+STRIPE_PUBLIC_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+### 8. Lancer l'application
+
+```bash
+# Méthode 1 : Serveur de développement Laravel
+php artisan serve
+
+# Méthode 2 : Via Composer
+composer run dev
+```
+
+L'application sera accessible sur `http://localhost:8000`
+
+### 9. Créer votre premier utilisateur
+
+Utilisez la console Laravel pour créer un super administrateur :
+
+```bash
+php artisan tinker
+```
+
+Puis dans la console :
+
+```php
+$user = \App\Models\User::create([
+    'name' => 'Admin',
+    'email' => 'admin@evolubat.com',
+    'password' => bcrypt('password'),
+    'superadmin' => true,
+]);
+```
+
+## 🎯 Utilisation
+
+### Démarrage rapide
+
+1. **Connectez-vous** avec les identifiants créés
+2. **Créez une équipe** (via Jetstream)
+3. **Créez votre première formation** (rôle Formateur)
+4. **Ajoutez des chapitres et leçons**
+5. **Configurez un assistant IA** (optionnel)
+6. **Invitez des élèves** à rejoindre votre équipe
+
+### Workflow typique
+
+#### En tant que Formateur
+1. Accéder à l'espace Formateur
+2. Créer une nouvelle formation
+3. Définir le titre, description et image de couverture
+4. Ajouter des chapitres
+5. Pour chaque chapitre, ajouter des leçons (vidéo, texte, quiz)
+6. Configurer un quiz d'entrée (optionnel)
+7. Publier la formation
+
+#### En tant qu'Administrateur
+1. Accéder à l'espace Administrateur
+2. Activer les formations souhaitées pour votre équipe
+3. Inviter des utilisateurs (élèves, formateurs)
+4. Gérer les crédits de l'équipe
+5. Suivre la progression des élèves
+
+#### En tant qu'Élève
+1. Se connecter à la plateforme
+2. Voir les formations disponibles
+3. S'inscrire à une formation (consomme des crédits de l'équipe)
+4. Passer le quiz d'entrée si requis
+5. Suivre les leçons dans l'ordre
+6. Passer les quiz de validation
+7. Obtenir le certificat de complétion
+
+## 📚 Structure du projet
+
+```
+app/
+├── Actions/           # Actions Jetstream
+├── Console/          # Commandes Artisan
+├── Http/
+│   ├── Controllers/  # Contrôleurs
+│   ├── Middleware/   # Middlewares personnalisés
+│   └── Requests/     # Form Requests
+├── Livewire/         # Composants Livewire
+├── Models/           # Modèles Eloquent
+├── Policies/         # Policies d'autorisation
+├── Services/         # Services métier
+│   ├── Ai/          # Services IA (Ollama)
+│   └── Formation/   # Services formations
+└── View/            # View Composers
+
+config/
+├── ai.php           # Configuration IA
+
+database/
+├── migrations/      # Migrations de la base de données
+└── seeders/        # Seeders
+
+resources/
+├── views/          # Templates Blade
+└── markdown/       # Documents Markdown
+
+routes/
+├── AdminRoute.php       # Routes Admin
+├── FormateurRoute.php   # Routes Formateur
+├── EleveRoute.php       # Routes Élève
+├── OrganisateurRoute.php # Routes Organisateur
+├── SuperadminRoute.php  # Routes Superadmin
+├── UserRoute.php        # Routes Utilisateur
+└── api.php             # Routes API
+```
+
+## 🧪 Tests
+
+```bash
+# Exécuter tous les tests
+php artisan test
+
+# Ou via Composer
+composer test
+```
+
+## 🔍 Analyse de code
+
+Le projet utilise PHPStan et Larastan pour l'analyse statique :
+
+```bash
+# Analyse avec PHPStan
+vendor/bin/phpstan analyse
+```
+
+## 🎨 Style de code
+
+Laravel Pint est configuré pour le formatage du code :
+
+```bash
+# Formater le code
+vendor/bin/pint
+```
+
+## 🚀 Commandes utiles
+
+```bash
+# Nettoyer le cache
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+
+# Lister les routes
+php artisan route:list
+
+# Logs en temps réel
+php artisan pail
+
+# Gestion des erreurs
+php artisan verifyerror --stats
+
+# Queue worker (pour les jobs asynchrones)
+php artisan queue:work
+```
+
+## 📦 Architecture technique
+
+### Stack technologique
+
+- **Backend** : Laravel 12 (PHP 8.2+)
+- **Frontend** : Livewire 3.6 + Tailwind CSS 3.4
+- **Base de données** : Support MySQL, PostgreSQL, SQLite
+- **IA** : Ollama (llama3 ou autres modèles)
+- **Authentification** : Laravel Sanctum + Jetstream
+- **Paiements** : Stripe
+- **PDF** : DomPDF
+- **Tables de données** : PowerGrid
+
+### Patterns et principes
+
+- **Architecture MVC** : Séparation claire des responsabilités
+- **Services Layer** : Logique métier dans des services dédiés
+- **Repository Pattern** : Via les modèles Eloquent
+- **Form Requests** : Validation centralisée
+- **Policies** : Autorisation déclarative
+- **Livewire Components** : Composants réactifs sans JavaScript
+
+### Système d'IA
+
+- **Streaming temps réel** : Via Server-Sent Events (NDJSON)
+- **Client HTTP unique** : `OllamaClient` pour toutes les interactions Ollama
+- **Trainers configurables** : Assistants IA personnalisables en DB
+- **Historique contextualisé** : Gestion automatique du contexte de conversation
+- **Outils extensibles** : Support de fonctions pour actions métier (tickets, etc.)
+
+## 🔒 Sécurité
+
+### Bonnes pratiques implémentées
+
+- ✅ Validation stricte de toutes les entrées utilisateur
+- ✅ Protection CSRF sur tous les formulaires
+- ✅ Autorisation via Policies et Middlewares
+- ✅ Hachage sécurisé des mots de passe (bcrypt)
+- ✅ Support de l'authentification 2FA
+- ✅ Limitation des requêtes API (rate limiting)
+- ✅ Sanitization des sorties pour prévenir XSS
+- ✅ Requêtes préparées (prévention SQL injection)
+- ✅ Logging des erreurs et des activités sensibles
+- ✅ Timeouts configurables pour les requêtes externes
+
+### Système de logging des erreurs
+
+Voir le fichier `README_ERROR_SYSTEM.md` pour plus de détails sur le système de gestion des erreurs.
+
+## 📖 Documentation supplémentaire
+
+- **Architecture IA** : Voir `MIGRATION_AI.md` pour comprendre l'architecture de l'assistant IA
+- **Système d'erreurs** : Voir `README_ERROR_SYSTEM.md` pour le système de logging des erreurs
+
+## 🤝 Contribution
+
+Ce projet est actuellement en développement actif. Pour contribuer :
+
+1. Fork le projet
+2. Créez une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Pushez vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
+
+### Standards de code
+
+- Suivre les conventions PSR-12
+- Utiliser Laravel Pint pour le formatage
+- Ajouter des tests pour les nouvelles fonctionnalités
+- Documenter les nouvelles fonctionnalités importantes
+
+## 📝 License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
+## 🆘 Support
 
-##
-* 	* 	* 	* 	* 	/usr/local/bin/php /home/ * /repositories/for/artisan schedule:run >> /dev/null 2>&1
+Pour toute question ou problème :
+
+1. Consultez cette documentation
+2. Vérifiez les logs : `php artisan pail`
+3. Utilisez la commande `verifyerror` pour analyser les erreurs
+4. Consultez la documentation Laravel : https://laravel.com/docs
+
+## 🎓 Ressources
+
+- [Documentation Laravel](https://laravel.com/docs)
+- [Documentation Livewire](https://livewire.laravel.com)
+- [Documentation Tailwind CSS](https://tailwindcss.com/docs)
+- [Documentation Ollama](https://ollama.ai)
+- [Documentation Stripe](https://stripe.com/docs)
+
+---
+
+Développé avec ❤️ pour faciliter l'apprentissage en ligne.
