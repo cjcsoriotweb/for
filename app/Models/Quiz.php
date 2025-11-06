@@ -22,6 +22,8 @@ class Quiz extends Model
         'type',
         'passing_score',
         'max_attempts',
+        'entry_min_score',
+        'entry_max_score',
     ];
 
     protected function casts(): array
@@ -31,12 +33,20 @@ class Quiz extends Model
             'formation_id' => 'integer',
             'passing_score' => 'integer',
             'max_attempts' => 'integer',
+            'entry_min_score' => 'integer',
+            'entry_max_score' => 'integer',
         ];
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(QuizQuestion::class);
     }
 
     public function quizQuestions()
     {
-        return $this->hasMany(QuizQuestion::class);
+        // Backwards compatible alias; preferred relation is questions()
+        return $this->questions();
     }
 
     /**

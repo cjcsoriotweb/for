@@ -25,20 +25,12 @@ class FormationEntryQuizController
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'passing_score' => [
-                'nullable',
-                'integer',
-                'min:0',
-                'max:100',
-                function ($attribute, $value, $fail) {
-                    if ($value !== null && ($value == 0 || $value == 100)) {
-                        $fail('Le seuil de passage doit être strictement entre 0% et 100%. Les valeurs 0% et 100% ne sont pas autorisées.');
-                    }
-                },
-            ],
+            'entry_min_score' => 'required|integer|min:0|max:100',
+            'entry_max_score' => 'required|integer|min:0|max:100|gt:entry_min_score',
         ]);
 
-        $passingScore = $validated['passing_score'] ?? 80;
+        $minScore = $validated['entry_min_score'];
+        $maxScore = $validated['entry_max_score'];
 
         $quiz = $formation->entryQuiz;
 
@@ -46,7 +38,9 @@ class FormationEntryQuizController
             $quiz->update([
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
-                'passing_score' => $passingScore,
+                'passing_score' => $maxScore,
+                'entry_min_score' => $minScore,
+                'entry_max_score' => $maxScore,
                 'max_attempts' => null,
             ]);
         } else {
@@ -56,7 +50,9 @@ class FormationEntryQuizController
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'type' => Quiz::TYPE_ENTRY,
-                'passing_score' => $passingScore,
+                'passing_score' => $maxScore,
+                'entry_min_score' => $minScore,
+                'entry_max_score' => $maxScore,
                 'max_attempts' => null,
             ]);
         }

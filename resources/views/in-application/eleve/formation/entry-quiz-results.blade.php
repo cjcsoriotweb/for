@@ -19,9 +19,25 @@
             <!-- Résumé des résultats -->
             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 overflow-hidden shadow-lg sm:rounded-xl border border-blue-200 mb-8">
                 <div class="p-8">
+                    @php
+                        $minScore = $entryQuiz->entry_min_score ?? 0;
+                        $maxScore = $entryQuiz->entry_max_score ?? ($entryQuiz->passing_score ?? 100);
+                        if ($minScore > $maxScore) {
+                            [$minScore, $maxScore] = [$maxScore, $minScore];
+                        }
+                        $isTooLow = $attempt->score < $minScore;
+                        $isTooHigh = $attempt->score > $maxScore;
+                        $isWithinRange = ! $isTooLow && ! $isTooHigh;
+                        $circleBorderClasses = $isWithinRange
+                            ? 'border-green-200 bg-green-50'
+                            : ($isTooLow ? 'border-amber-200 bg-amber-50' : 'border-red-200 bg-red-50');
+                        $circleTextClasses = $isWithinRange
+                            ? 'text-green-600'
+                            : ($isTooLow ? 'text-amber-600' : 'text-red-600');
+                    @endphp
                     <div class="text-center mb-8">
                         <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                            @if($attempt->score >= ($entryQuiz->passing_score ?? 80))
+                            @if($isWithinRange)
                                 <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
@@ -34,25 +50,27 @@
 
                         <h3 class="text-3xl font-bold text-gray-900 mb-4">{{ $entryQuiz->title }}</h3>
 
-                        <div class="inline-flex items-center justify-center w-32 h-32 rounded-full border-8
-                            {{ $attempt->score <= ($entryQuiz->passing_score ?? 80) ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50' }}
-                            mb-6">
-                            <span class="text-4xl font-bold
-                                {{ $attempt->score <= ($entryQuiz->passing_score ?? 80) ? 'text-green-600' : 'text-red-600' }}">
+                        <div class="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 {{ $circleBorderClasses }} mb-6">
+                            <span class="text-4xl font-bold {{ $circleTextClasses }}">
                                 {{ round($attempt->score, 1) }}%
                             </span>
-                        </div>
-
-                        <p class="text-xl text-gray-600 mb-2">
-                            Score maximum autorisé: <span class="font-semibold">{{ $entryQuiz->passing_score ?? 80 }}%</span>
+                        </div>                        <p class="text-xl text-gray-600 mb-2">
+                            Zone cible : <span class="font-semibold">{{ $minScore }}% &ndash; {{ $maxScore }}%</span>
                         </p>
 
-                        @if($attempt->score <= ($entryQuiz->passing_score ?? 80))
+                        @if($isWithinRange)
                             <div class="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                                 Niveau adapté - Accès autorisé
+                            </div>
+                        @elseif($isTooLow)
+                            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01"></path>
+                                </svg>
+                                Niveau insuffisant - Accès refusé
                             </div>
                         @else
                             <div class="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm font-semibold">
@@ -64,7 +82,7 @@
                         @endif
                     </div>
 
-                    @if($attempt->score <= ($entryQuiz->passing_score ?? 80))
+                    @if($isWithinRange)
                         <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-6">
                             <div class="flex items-start">
                                 <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4">
@@ -76,6 +94,22 @@
                                     <h4 class="text-green-800 font-semibold mb-2">Félicitations !</h4>
                                     <p class="text-green-700">
                                         Votre niveau correspond parfaitement à cette formation. Vous pouvez maintenant accéder à toutes les ressources.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($isTooLow)
+                        <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6 mb-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-amber-800 font-semibold mb-2">Niveau insuffisant détecté</h4>
+                                    <p class="text-amber-700">
+                                        Votre score est inférieur au seuil minimum requis. Un formateur reviendra vers vous pour vous proposer un parcours plus adapté à votre progression actuelle.
                                     </p>
                                 </div>
                             </div>

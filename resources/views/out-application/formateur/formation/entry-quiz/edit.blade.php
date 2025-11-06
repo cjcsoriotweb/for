@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <header>
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -31,15 +31,27 @@
                                     <x-input-error for="title" class="mt-2" />
                                 </div>
 
-                                <!-- Score de passage -->
+                                <!-- Seuil minimum -->
                                 <div>
-                                    <x-label for="passing_score" :value="__('Score de passage (%)')" />
-                                    <x-input id="passing_score" name="passing_score" type="number" min="0" max="100"
-                                             :value="old('passing_score', $quiz->passing_score ?? 80)"
+                                    <x-label for="entry_min_score" :value="__('Score minimum accepté (%)')" />
+                                    <x-input id="entry_min_score" name="entry_min_score" type="number" min="0" max="100"
+                                             :value="old('entry_min_score', $quiz->entry_min_score ?? 0)"
                                              class="mt-1 block w-full" required />
-                                    <x-input-error for="passing_score" class="mt-2" />
+                                    <x-input-error for="entry_min_score" class="mt-2" />
                                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                        Score minimum requis pour accéder à la formation (défaut: 80%)
+                                        En dessous de ce score, le niveau est considéré comme insuffisant.
+                                    </p>
+                                </div>
+
+                                <!-- Seuil maximum -->
+                                <div>
+                                    <x-label for="entry_max_score" :value="__('Score maximum accepté (%)')" />
+                                    <x-input id="entry_max_score" name="entry_max_score" type="number" min="0" max="100"
+                                             :value="old('entry_max_score', $quiz->entry_max_score ?? ($quiz->passing_score ?? 100))"
+                                             class="mt-1 block w-full" required />
+                                    <x-input-error for="entry_max_score" class="mt-2" />
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                        Au-dessus de ce score, le niveau est jugé trop élevé pour la formation.
                                     </p>
                                 </div>
                             </div>
@@ -71,3 +83,4 @@
         </div>
     </div>
 </x-app-layout>
+

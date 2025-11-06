@@ -100,8 +100,23 @@ class QuizService
         }
 
         $score = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
-        $passingScore = $quiz->passing_score ?? 0;
-        $passed = $passingScore > 0 ? $score >= $passingScore : true;
+
+        if ($quiz->isEntryQuiz()) {
+            $minScore = $quiz->entry_min_score ?? 0;
+            $maxScore = $quiz->entry_max_score ?? ($quiz->passing_score ?? 100);
+
+            $minScore = max(0, min(100, (int) $minScore));
+            $maxScore = max(0, min(100, (int) $maxScore));
+
+            if ($minScore > $maxScore) {
+                [$minScore, $maxScore] = [$maxScore, $minScore];
+            }
+
+            $passed = $score >= $minScore && $score <= $maxScore;
+        } else {
+            $passingScore = $quiz->passing_score ?? 0;
+            $passed = $passingScore > 0 ? $score >= $passingScore : true;
+        }
 
         return [
             'score' => $score,

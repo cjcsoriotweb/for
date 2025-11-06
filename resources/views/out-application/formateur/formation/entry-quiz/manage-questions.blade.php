@@ -49,8 +49,10 @@
                         </div>
                         <dl class="grid grid-cols-2 gap-4 text-sm">
                             <div class="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
-                                <dt class="text-indigo-600 font-medium">Score de reussite</dt>
-                                <dd class="text-slate-900 font-semibold">{{ $quiz->passing_score }} %</dd>
+                                <dt class="text-indigo-600 font-medium">Fourchette cible</dt>
+                                <dd class="text-slate-900 font-semibold">
+                                    {{ $quiz->entry_min_score ?? 0 }} % &ndash; {{ $quiz->entry_max_score ?? ($quiz->passing_score ?? 100) }} %
+                                </dd>
                             </div>
                             <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                 <dt class="text-slate-500">Questions</dt>

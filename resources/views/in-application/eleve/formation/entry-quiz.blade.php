@@ -1,4 +1,4 @@
- <x-app-layout>
+﻿ <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -56,8 +56,10 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-amber-600 font-medium">Score requis</p>
-                                    <p class="text-2xl font-bold text-amber-900">{{ $entryQuiz->passing_score }}%</p>
+                                    <p class="text-sm text-amber-600 font-medium">Fourchette idéale</p>
+                                    <p class="text-2xl font-bold text-amber-900">
+                                        {{ $entryQuiz->entry_min_score ?? 0 }}% &ndash; {{ $entryQuiz->entry_max_score ?? ($entryQuiz->passing_score ?? 100) }}%
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -84,9 +86,10 @@
                             <div>
                                 <h4 class="text-amber-800 font-semibold mb-1">Important</h4>
                                 <p class="text-amber-700 text-sm">
-                                    Ce quiz d'entrée évalue votre niveau actuel. Si vous obtenez un score supérieur à {{ $entryQuiz->passing_score }}%,
-                                    cela signifie que cette formation est trop facile pour vous. Un superadmin vous contactera
-                                    pour vous proposer une formation plus adaptée à votre niveau.
+                                    Ce quiz d'entrée évalue votre positionnement.
+                                    Un score inférieur à {{ $entryQuiz->entry_min_score ?? 0 }}% signifie que la formation est trop avancée pour le moment.
+                                    Un score supérieur à {{ $entryQuiz->entry_max_score ?? ($entryQuiz->passing_score ?? 100) }}% indique que la formation sera trop simple.
+                                    Si votre résultat se situe entre ces deux seuils, vous pourrez démarrer le parcours dans les meilleures conditions.
                                 </p>
                             </div>
                         </div>
@@ -236,3 +239,4 @@
         });
     </script>
 </x-app-layout>
+

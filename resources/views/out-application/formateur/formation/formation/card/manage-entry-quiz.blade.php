@@ -62,8 +62,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
               </svg>
               <div>
-                <p class="text-xs text-amber-600 font-medium">Score requis</p>
-                <p class="text-lg font-bold text-amber-900">{{ $entryQuiz->passing_score }}%</p>
+                <p class="text-xs text-amber-600 font-medium">Niveau cible</p>
+                <p class="text-lg font-bold text-amber-900">
+                  {{ $entryQuiz->entry_min_score ?? 0 }}% &ndash; {{ $entryQuiz->entry_max_score ?? ($entryQuiz->passing_score ?? 100) }}%
+                </p>
               </div>
             </div>
           </div>
