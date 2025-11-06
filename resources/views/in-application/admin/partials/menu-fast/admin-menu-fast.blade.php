@@ -20,8 +20,6 @@
                         </div>
                     </div>
 
-          
-
                 </div>
 
                 <div class="w-full max-w-md rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur lg:max-w-sm">
@@ -88,17 +86,6 @@
         </div>
     </section>
 
-    <section id="bascule" class="space-y-6">
-        <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-            <span class="material-symbols-outlined text-lg">tune</span>
-            <h2 class="text-xs font-semibold uppercase tracking-[0.35em]">
-                {{ __('Actions contextuelles') }}
-            </h2>
-        </div>
-        <div class="rounded-3xl border border-slate-200/70 bg-white/70 p-6 shadow-sm shadow-slate-200/60 backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/70 dark:shadow-none">
-            @include('in-application.admin.partials.configuration')
-        </div>
-    </section>
 
     <section id="fonctionnement" class="space-y-6">
         <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400">
