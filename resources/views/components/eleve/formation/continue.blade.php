@@ -1,14 +1,44 @@
-﻿<section class="space-y-8">
+﻿@props(['availableFormationsCount' => 0])
+
+<section class="space-y-8">
   <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-300/70">Continuez vos formations</p>
-      <h2 class="text-2xl font-semibold text-white sm:text-3xl">Continuer mes formations</h2>
-      <p class="mt-2 max-w-2xl text-sm text-slate-300/75">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="h-1 w-6 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-600/70">Continuez vos formations</p>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
+        Continuer mes formations
+        @if($availableFormationsCount > 0)
+          <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {{ $availableFormationsCount }} formation{{ $availableFormationsCount > 1 ? 's' : '' }} disponible{{ $availableFormationsCount > 1 ? 's' : '' }}
+          </span>
+        @endif
+      </h2>
+      <p class="mt-2 max-w-2xl text-sm text-slate-600/80 leading-relaxed">
         Retrouvez vos formations en cours, suivez votre progression et reprenez chaque module au meilleur moment pour
         vous.
       </p>
     </div>
   </div>
+
+  @if($availableFormationsCount === 0)
+  <div class="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4">
+    <div class="flex items-start gap-3">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-sm font-medium text-amber-800">Pas d'inquiétude, aucune formation disponible pour l'équipe</h3>
+        <p class="mt-1 text-sm text-amber-700">
+          S'il s'agit d'une erreur contactez-vous (<a href="{{ route('user.tickets') }}" class="underline hover:text-amber-800">page ticket</a>).
+        </p>
+      </div>
+    </div>
+  </div>
+  @endif
 
   @if($formationsWithProgress->count() > 0)
   <div class="-mx-4 overflow-hidden sm:-mx-2">
@@ -24,8 +54,8 @@
       @endphp
 
       <article
-        class="group flex min-w-[260px] max-w-xs snap-start flex-col overflow-hidden rounded-2xl border {{ $isCompleted ? 'border-green-600 bg-slate-900/80' : 'border-slate-800 bg-slate-900/70' }} transition-colors duration-200 hover:border-slate-700">
-        <div class="h-36 w-full overflow-hidden border-b border-slate-800 bg-slate-900 sm:h-40">
+        class="group flex min-w-[260px] max-w-xs snap-start flex-col overflow-hidden rounded-2xl border {{ $isCompleted ? 'border-green-600 bg-white' : 'border-slate-200 bg-white' }} transition-colors duration-200 hover:border-slate-300">
+        <div class="h-36 w-full overflow-hidden border-b border-slate-200 bg-slate-50 sm:h-40">
           <img src="{{ $formation->cover_image_url }}" alt="Image de couverture de {{ $fallbackTitle }}"
             class="h-full w-full object-cover" loading="lazy"
             onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';" />
@@ -51,27 +81,27 @@
             @endif
           </div>
           @else
-          <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-300">
-            <span class="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-slate-200">
+          <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-600">
+            <span class="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-slate-700">
               Continuer
             </span>
-            <span class="rounded-full bg-slate-800 px-3 py-1 text-slate-200">
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
               {{ $progressPercent }}&nbsp;%
             </span>
           </div>
           @endif
 
-          <div class="space-y-3 text-slate-200">
-            <h3 class="text-lg font-semibold leading-snug text-white line-clamp-2">
+          <div class="space-y-3 text-slate-700">
+            <h3 class="text-lg font-semibold leading-snug text-slate-900 line-clamp-2">
               {{ $fallbackTitle }}
             </h3>
-            <p class="text-sm text-slate-100/80 line-clamp-3">
+            <p class="text-sm text-slate-600/80 line-clamp-3">
               {{ $fallbackDescription }}
             </p>
           </div>
         </div>
 
-        <div class="space-y-4 border-t border-slate-800 px-6 py-5">
+        <div class="space-y-4 border-t border-slate-200 px-6 py-5">
           @if($isCompleted)
           @if($isPendingValidation)
           <div class="flex items-center justify-center">
@@ -89,7 +119,7 @@
             </div>
 
             <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700">
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
               <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                 <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z" clip-rule="evenodd" />
@@ -118,7 +148,7 @@
             </a>
 
             <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700">
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
               <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                 <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z" clip-rule="evenodd" />
@@ -128,12 +158,12 @@
           </div>
           @endif
           @else
-          <div class="h-2 w-full overflow-hidden rounded-full bg-slate-800">
-            <div class="h-full rounded-full bg-slate-200 transition-all duration-300"
+          <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+            <div class="h-full rounded-full bg-slate-600 transition-all duration-300"
               style="width: {{ $progressPercent }}%;"></div>
           </div>
 
-          <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-300">
+          <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-600">
             <span>Progression</span>
             <span>{{ $progressPercent }}&nbsp;%</span>
           </div>
@@ -157,15 +187,15 @@
     </div>
   </div>
   @else
-  <div class="rounded-2xl border border-dashed border-slate-800 bg-slate-900/60 px-8 py-12 text-center text-slate-300">
-    <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-slate-800/70">
-      <svg class="h-8 w-8 text-slate-200" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+  <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-8 py-12 text-center text-slate-600">
+    <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-slate-200">
+      <svg class="h-8 w-8 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
           d="M12 7v10m0-10c-.421-.505-1.892-1.5-3.764-1.5C6.057 5.5 4.5 6.703 4.5 8.25V17c1.557-1.297 3.114-2.5 3.736-2.5 1.872 0 3.343.995 3.764 1.5m0-8c.421-.505 1.892-1.5 3.764-1.5 2.179 0 3.736 1.203 3.736 2.75V17c-1.557-1.297-3.114-2.5-3.736-2.5-1.872 0-3.343.995-3.764 1.5" />
       </svg>
     </div>
-    <h3 class="text-lg font-semibold text-white">Aucune formation en cours</h3>
-    <p class="mt-3 text-sm text-slate-300/80">
+    <h3 class="text-lg font-semibold text-slate-900">Aucune formation en cours</h3>
+    <p class="mt-3 text-sm text-slate-500">
       Demandez &agrave; votre organisme de vous inscrire &agrave; une formation pour commencer votre parcours.
     </p>
   </div>

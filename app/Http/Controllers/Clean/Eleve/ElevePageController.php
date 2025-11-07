@@ -67,6 +67,9 @@ class ElevePageController extends Controller
         // R├â┬®cup├â┬®rer les formations actuelles de l'├â┬®tudiant
         $formations = $this->studentFormationService->listFormationCurrentByStudent($team, $user);
 
+        // R├â┬®cup├â┬®rer le nombre de formations disponibles pour l'├â┬®quipe
+        $availableFormationsCount = $this->studentFormationService->listAvailableFormationsForTeam($team)->count();
+
         // Ajouter les donn├â┬®es de progression pour chaque formation
         $formationsWithProgress = $formations->map(function ($formation) use ($user, $team) {
             $progress = $this->studentFormationService->getStudentProgress($user, $formation);
@@ -107,7 +110,8 @@ class ElevePageController extends Controller
         return view('in-application.eleve.home', compact(
             'team',
             'formationsWithProgress',
-            'formationsPaginees'
+            'formationsPaginees',
+            'availableFormationsCount'
         ));
     }
 
@@ -1385,6 +1389,7 @@ class ElevePageController extends Controller
         $formationProgress = $formation->learners()->where('user_id', $user->id)->first();
         if ($formationProgress && $formationProgress->pivot->entry_quiz_attempt_id) {
             $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
+            [$minScore, $maxScore] = $this->resolveEntryQuizThresholds($entryQuiz);
 
             if ($entryScore < $minScore) {
                 return redirect()->route('eleve.formation.show', [$team, $formation])

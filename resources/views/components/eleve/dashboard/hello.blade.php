@@ -6,32 +6,42 @@ $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_c
 @endphp
 
 <section
-  class="relative overflow-hidden rounded-3xl border border-white/15 bg-slate-900/45 shadow-[0_50px_140px_-60px_rgba(59,130,246,0.55)]">
+  class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_50px_140px_-60px_rgba(59,130,246,0.15)]">
   <div class="absolute inset-0">
-    <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/70 to-slate-800/40"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-slate-50/80 to-slate-100/60"></div>
     <img src="{{ $team->profile_photo_url }}" alt="{{ $team->name }}"
-      class="h-full w-full object-cover opacity-30 mix-blend-luminosity" />
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.45),transparent_60%)]"></div>
+      class="h-full w-full object-cover opacity-20 mix-blend-normal" />
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.15),transparent_60%)]"></div>
+  </div>
+
+  <!-- Logo dans le coin supérieur droit -->
+  <div class="absolute top-6 right-6 z-20">
+    <div class="h-16 w-16 rounded-2xl border-2 border-white/20 bg-white/10 backdrop-blur-sm shadow-lg overflow-hidden">
+      <img src="{{ asset('logo.png') }}" alt="Logo" class="h-full w-full object-cover" />
+    </div>
   </div>
 
   <div
     class="relative z-10 flex flex-col gap-12 px-6 py-14 sm:px-10 lg:flex-row lg:items-end lg:justify-between lg:px-16">
     <div class="max-w-2xl space-y-6">
-      <p class="text-sm uppercase tracking-[0.35em] text-slate-200/70">Espace apprenant</p>
-      <h1 class="text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
+      <div class="flex items-center gap-3">
+        <div class="h-1 w-8 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full"></div>
+        <p class="text-sm uppercase tracking-[0.35em] text-slate-600/70 font-medium">Espace apprenant</p>
+      </div>
+      <h1 class="text-3xl font-bold text-slate-900 sm:text-4xl md:text-5xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
         Bonjour {{ Auth::user()->name }}&nbsp;!
       </h1>
-      <p class="text-lg text-slate-200/80 sm:text-xl">
+      <p class="text-lg text-slate-700/90 sm:text-xl leading-relaxed">
         Pr&ecirc;t &agrave; reprendre l&agrave; o&ugrave; vous vous &ecirc;tes arr&ecirc;t&eacute; ? Choisissez une
         formation et poursuivez votre parcours au rythme qui vous convient.
       </p>
 
       <div class="flex flex-wrap gap-6 pt-4">
         <div>
-          <div class="text-4xl font-semibold text-white">
+          <div class="text-4xl font-semibold text-slate-900">
             {{ $inProgressCount }}
           </div>
-          <p class="text-sm uppercase tracking-wide text-slate-300/70">Formations en cours</p>
+          <p class="text-sm uppercase tracking-wide text-slate-600/70">Formations en cours</p>
         </div>
       </div>
 
@@ -69,21 +79,21 @@ $inProgressCount = $formations->filter(fn ($formation) => empty($formation->is_c
         </div>
 
         <div class="absolute inset-0 flex flex-col justify-end p-6">
-          <h2 class="text-xl font-semibold text-white">
+          <h2 class="text-xl font-semibold text-slate-900">
             {{ $featuredFormation->title }}
           </h2>
-          <p class="mt-2 line-clamp-3 text-sm text-slate-100/80">
+          <p class="mt-2 line-clamp-3 text-sm text-slate-700/80">
             {{ $featuredFormation->description ?? 'Poursuivez votre formation et d&eacute;bloquez le prochain module.'
             }}
           </p>
-          <div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/20">
-            <div class="h-full rounded-full bg-white/80 transition-all duration-500"
+          <div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-slate-200/50">
+            <div class="h-full rounded-full bg-slate-600 transition-all duration-500"
               style="width: {{ (int) ($featuredFormation->progress_data['progress_percent'] ?? 0) }}%;"></div>
           </div>
-          <p class="mt-2 text-xs font-medium uppercase tracking-wider text-white/70">
+          <p class="mt-2 text-xs font-medium uppercase tracking-wider text-slate-600/70">
             Progression&nbsp;: {{ (int) ($featuredFormation->progress_data['progress_percent'] ?? 0) }}%
           </p>
-  
+
         </div>
 
       </div>
