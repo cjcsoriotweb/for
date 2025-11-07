@@ -108,7 +108,6 @@
             </h2>
         </div>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            @include('in-application.admin.partials.menu-fast.stats.credit-team', ['team' => $team])
             @include('in-application.admin.partials.menu-fast.stats.configuration-team', ['team' => $team])
         </div>
     </section>

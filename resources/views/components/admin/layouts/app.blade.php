@@ -32,13 +32,7 @@
             ['label' => __('Accueil administrateur'), 'url' => $backUrl],
             ['label' => __('Tableau de bord'), 'url' => null],
         ];
-    } elseif ($currentRoute && request()->routeIs('application.admin.configuration.credits')) {
-        $backUrl = route('application.admin.configuration.index', $teamParam);
-        $breadcrumbs = [
-            ['label' => __('Configuration'), 'url' => route('application.admin.configuration.index', $teamParam)],
-            ['label' => __("Cr\u{00E9}dits"), 'url' => null],
-        ];
-    } elseif ($currentRoute && request()->routeIs('application.admin.configuration.*')) {
+    }elseif ($currentRoute && request()->routeIs('application.admin.configuration.*')) {
         $backUrl = route('application.admin.index', $teamParam);
         $breadcrumbs = [
             ['label' => __('Tableau de bord'), 'url' => route('application.admin.index', $teamParam)],

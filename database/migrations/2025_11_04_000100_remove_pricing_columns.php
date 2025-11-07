@@ -25,8 +25,6 @@ return new class extends Migration
         // Drop payments table (no longer used)
         Schema::dropIfExists('payments');
 
-        // NOTE: teams.money and team_credit_transactions table are still in use
-        // and should NOT be dropped
     }
 
     public function down(): void
