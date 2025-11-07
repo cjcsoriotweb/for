@@ -22,6 +22,6 @@ Route::prefix('administrateur')
         Route::delete('{team}/formations/{formation}/students/{student}', [AdminFormationStudentController::class, 'unenroll'])->name('formations.students.unenroll');
         Route::get('{team}/configuration', [AdminPageController::class, 'configuration'])->name('configuration.index');
         Route::put('{team}/photo', [AdminConfigurationController::class, 'updatePhoto'])->name('configuration.photo.update');
-        Route::delete('{team}/photo', [AdminConfigurationController::class, 'destroy'])->name('configuration.photo.destroy');
+
         Route::post('{team}/formations/enable/{formation}', [AdminFormationController::class, 'updateVisibilityByTeam'])->name('formations.editVisibility');
     });

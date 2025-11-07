@@ -17,7 +17,7 @@ class PhotoUpdate extends FormRequest
 
         $team = Team::findOrFail(request()->get('team_id'));
 
-        if (Auth::user()->belongsToTeam($team) && Auth::user()->hasTeamRole($team, 'admin')) {
+        if (Auth::user()->superadmin) {
             return true;
         }
 
