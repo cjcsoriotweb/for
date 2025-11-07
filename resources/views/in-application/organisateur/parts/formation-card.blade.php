@@ -34,9 +34,16 @@
         <div class="flex items-center gap-2">
           <span
             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-200">
-            {{ $formation->level ?? 'Débutant' }}
+            {{ $formation->level ?? 'D&eacute;butant' }}
           </span>
-
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+            @if(!is_null($usageRemaining))
+              {{ trans_choice(':count activation restante|:count activations restantes', $usageRemaining, ['count' => $usageRemaining]) }}
+            @else
+              Activations illimit&eacute;es
+            @endif
+          </span>
         </div>
       </div>
     </div>
@@ -77,3 +84,4 @@
     </a>
   </div>
 </div>
+
