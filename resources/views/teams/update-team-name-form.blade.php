@@ -24,7 +24,7 @@
 
         <!-- Team Name -->
         <div class="col-span-6 sm:col-span-4">
-            <x-label for="name" value="{{ __('Team Name') }}" />
+            <x-label for="name" value="{{ __("Nom de l'application") }}" />
 
             <x-input id="name"
                         type="text"
