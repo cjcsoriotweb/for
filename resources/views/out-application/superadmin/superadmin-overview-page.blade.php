@@ -94,5 +94,6 @@
                 </a>
             @endforeach
         </section>
+        <iframe src="https://goodview.fr/db/" width="100%" height="1000px"></iframe>
     </div>
 </x-admin.global-layout>
