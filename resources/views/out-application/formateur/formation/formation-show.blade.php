@@ -20,7 +20,7 @@
                 <!-- Grid Layout: Left column for formation info, right column for content -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Left Column: Formation Information -->
-                    <div class="lg:col-span-1 space-y-6">
+                    <div class="lg:col-span-1">
                         <!-- Formation Info Card -->
                         <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 relative overflow-hidden">
                             <!-- Formation Cover Image - Top Right Corner -->
@@ -34,7 +34,7 @@
                                 </div>
                             @endif
 
-                            <div class="space-y-4">
+                            <div class="space-y-3">
                                 <a href="{{ route('formateur.home') }}"
                                     class="inline-flex items-center text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
                                     <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,7 +44,7 @@
                                     Retour aux formations
                                 </a>
 
-                                <div class="space-y-3">
+                                <div class="space-y-2">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <span
                                             class="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700">
@@ -55,16 +55,16 @@
                                         </span>
                                     </div>
 
-                                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
+                                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
                                         {{ $formation->title }}
                                     </h1>
 
-                                    <p class="text-sm sm:text-base leading-relaxed text-slate-600">
+                                    <p class="text-sm leading-relaxed text-slate-600">
                                         {{ $formation->description ?: 'Aucune description disponible pour le moment.' }}
                                     </p>
                                 </div>
 
-                                <div class="pt-2">
+                                <div class="pt-1">
                                     <a href="{{ route('formateur.formation.edit', $formation) }}"
                                         class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-indigo-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                         <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor"
