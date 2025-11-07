@@ -1,5 +1,5 @@
 <div>
-    @if (auth()->user()->hasTeamPermission($team, 'addTeamMember'))
+    @if (auth()->user()->hasTeamPermission($team, 'addTeamMember') || Auth::user()->superadmin)
 
         <!-- Add Team Member -->
         <div class="mt-10 sm:mt-0">
