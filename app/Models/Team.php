@@ -72,4 +72,9 @@ class Team extends JetstreamTeam
     {
         return $this->hasMany(Claim::class);
     }
+
+    public function managers()
+    {
+        return $this->users()->wherePivot('role', 'manager');
+    }
 }

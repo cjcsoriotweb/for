@@ -29,51 +29,21 @@ class OrganisateurPageController extends Controller
 
     public function catalogue(Request $request, Team $team)
     {
-        $search = $request->query('search', '');
-        $filter = $request->query('filter', 'all'); // all, visible, hidden
-        $sortBy = $request->query('sort', 'title'); // title, created_at, learners_count, lessons_count, total_duration_minutes
-        $sortDirection = $request->query('direction', 'asc'); // asc, desc
-
         $visibleFormations = $this->organisateurService->listVisibleFormations($team);
 
-        // Build query for all formations with search and filters
-        $formationsQuery = Formation::withCount(['learners', 'lessons'])
+        $allFormations = Formation::withCount(['learners', 'lessons'])
             ->with(['lessons' => function ($query) {
                 $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id')
                     ->with(['lessonable' => function (MorphTo $morphTo) {
                         $morphTo->morphWith([
                             VideoContent::class => [],
                             TextContent::class => [],
-                            Quiz::class => ['quizQuestions:id,quiz_id,is_correct'],
+                            Quiz::class => ['quizQuestions:id,quiz_id'],
                         ]);
                     }]);
-            }]);
-
-        // Apply search filter
-        if (! empty($search)) {
-            $formationsQuery->where(function ($query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('level', 'like', "%{$search}%");
-            });
-        }
-
-        // Apply visibility filter
-        if ($filter === 'visible') {
-            $formationsQuery->whereIn('id', $visibleFormations->pluck('id'));
-        } elseif ($filter === 'hidden') {
-            $formationsQuery->whereNotIn('id', $visibleFormations->pluck('id'));
-        }
-
-        // Apply sorting
-        $validSortFields = ['title', 'created_at', 'learners_count', 'lessons_count', 'total_duration_minutes'];
-        if (in_array($sortBy, $validSortFields)) {
-            $formationsQuery->orderBy($sortBy, $sortDirection);
-        } else {
-            $formationsQuery->orderBy('title', 'asc');
-        }
-
-        $allFormations = $formationsQuery->get();
+            }])
+            ->orderBy('title')
+            ->get();
 
         // Count different content types and calculate duration for each formation
         $allFormations->each(function ($formation) {
@@ -106,11 +76,7 @@ class OrganisateurPageController extends Controller
         return view('in-application.organisateur.catalogue', compact(
             'team',
             'visibleFormations',
-            'allFormations',
-            'search',
-            'filter',
-            'sortBy',
-            'sortDirection'
+            'allFormations'
         ));
     }
 

@@ -58,94 +58,17 @@
     </div>
   </div>
 
-  {{-- Search and Filters Section --}}
+  {{-- Catalogue Intro Section --}}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-      <form method="GET" action="{{ route('organisateur.catalogue', $team) }}" class="space-y-6">
-        {{-- Search Bar --}}
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </div>
-          <input type="text" name="search" value="{{ $search }}"
-            placeholder="Rechercher par titre, description ou niveau..."
-            class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Toutes vos formations</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Parcourez l'int?gralit? du catalogue sans filtre ni recherche.
+          </p>
         </div>
-
-        {{-- Filters and Sort --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {{-- Filter by visibility --}}
-          <div>
-            <label for="filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Filtrer par
-            </label>
-            <select name="filter" id="filter"
-              class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="all" {{ $filter==='all' ? 'selected' : '' }}>Toutes les formations</option>
-              <option value="visible" {{ $filter==='visible' ? 'selected' : '' }}>Activées ({{
-                $visibleFormations->count() }})</option>
-              <option value="hidden" {{ $filter==='hidden' ? 'selected' : '' }}>Non activées ({{ $allFormations->count()
-                - $visibleFormations->count() }})</option>
-            </select>
-          </div>
-
-          {{-- Sort by --}}
-          <div>
-            <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Trier par
-            </label>
-            <select name="sort" id="sort"
-              class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="title" {{ $sortBy==='title' ? 'selected' : '' }}>Titre</option>
-              <option value="total_duration_minutes" {{ $sortBy==='total_duration_minutes' ? 'selected' : '' }}>Durée
-              </option>
-              <option value="created_at" {{ $sortBy==='created_at' ? 'selected' : '' }}>Date de création</option>
-              <option value="learners_count" {{ $sortBy==='learners_count' ? 'selected' : '' }}>Nombre d'apprenants
-              </option>
-              <option value="lessons_count" {{ $sortBy==='lessons_count' ? 'selected' : '' }}>Nombre de leçons</option>
-            </select>
-          </div>
-
-          {{-- Sort direction --}}
-          <div>
-            <label for="direction" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Ordre
-            </label>
-            <select name="direction" id="direction"
-              class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="asc" {{ $sortDirection==='asc' ? 'selected' : '' }}>Croissant</option>
-              <option value="desc" {{ $sortDirection==='desc' ? 'selected' : '' }}>Décroissant</option>
-            </select>
-          </div>
-        </div>
-
-        {{-- Search and Reset buttons --}}
-        <div class="flex items-center gap-3">
-          <button type="submit"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            Rechercher
-          </button>
-
-          @if($search || $filter !== 'all' || $sortBy !== 'title' || $sortDirection !== 'asc')
-          <a href="{{ route('organisateur.catalogue', $team) }}"
-            class="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-              </path>
-            </svg>
-            Réinitialiser
-          </a>
-          @endif
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -155,11 +78,8 @@
       <div>
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Formations disponibles</h2>
         <p class="mt-2 text-gray-600 dark:text-gray-400">
-          {{ $allFormations->count() }} formation{{ $allFormations->count() > 1 ? 's' : '' }} trouvée{{
+          {{ $allFormations->count() }} formation{{ $allFormations->count() > 1 ? 's' : '' }} disponible{{
           $allFormations->count() > 1 ? 's' : '' }}
-          @if($search)
-          pour "{{ $search }}"
-          @endif
         </p>
       </div>
       <div class="hidden md:block">
@@ -191,30 +111,11 @@
         </svg>
       </div>
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-        @if($search)
-        Aucune formation trouvée
-        @else
         Aucune formation disponible
-        @endif
       </h3>
       <p class="text-gray-600 dark:text-gray-400 mb-6">
-        @if($search)
-        Essayez de modifier vos critères de recherche ou réinitialisez les filtres.
-        @else
         Il n'y a actuellement aucune formation dans le catalogue.
-        @endif
       </p>
-      @if($search || $filter !== 'all' || $sortBy !== 'title' || $sortDirection !== 'asc')
-      <a href="{{ route('organisateur.catalogue', $team) }}"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-          </path>
-        </svg>
-        Réinitialiser les filtres
-      </a>
-      @endif
     </div>
     @endif
   </div>

@@ -1,6 +1,13 @@
 {{-- Formation Card Component --}}
 @props(['formation', 'team'])
 
+@php
+  $teamPivot = $formation->pivot ?? $formation->teams->firstWhere('id', $team->id)?->pivot;
+  $usageQuota = $teamPivot->usage_quota ?? null;
+  $usageConsumed = $teamPivot->usage_consumed ?? 0;
+  $usageRemaining = !is_null($usageQuota) ? max($usageQuota - $usageConsumed, 0) : null;
+@endphp
+
 <div
   class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-6 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-blue-300 dark:hover:border-blue-600">
   {{-- Background decoration --}}

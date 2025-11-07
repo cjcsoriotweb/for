@@ -54,8 +54,14 @@ class FormationChoice extends Component
             $canAfford = $formationEnrollmentService->canTeamAffordFormation($team, $formation);
 
             $canJoin = ! $isEnrolled && $canAfford;
-            $usageQuota = $formation->pivot->usage_quota ?? null;
-            $usageConsumed = $formation->pivot->usage_consumed ?? 0;
+
+            $teamPivot = $formation->pivot;
+            if (! $teamPivot && $formation->relationLoaded('teams')) {
+                $teamPivot = optional($formation->teams->firstWhere('id', $team->id))->pivot;
+            }
+
+            $usageQuota = $teamPivot->usage_quota ?? null;
+            $usageConsumed = $teamPivot->usage_consumed ?? 0;
             $remainingSlots = $usageQuota !== null
                 ? max($usageQuota - $usageConsumed, 0)
                 : null;

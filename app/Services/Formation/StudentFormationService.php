@@ -57,31 +57,55 @@ class StudentFormationService extends BaseFormationService
     public function listAvailableFormationsForTeam(Team $team): Collection
     {
         return Formation::withCount(['learners', 'lessons'])
-            ->with(['lessons' => function ($query) {
-                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
-            }])
+            ->with([
+                'lessons' => function ($query) {
+                    $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
+                },
+                'teams' => function ($query) use ($team): void {
+                    $query->where('teams.id', $team->id);
+                },
+            ])
             ->whereHas('teams', function (Builder $query) use ($team): void {
                 $query->where('teams.id', $team->id)
                     ->where('formation_in_teams.visible', true);
             })
-            ->get();
+            ->get()
+            ->map(function (Formation $formation) {
+                if ($formation->relationLoaded('teams') && $formation->teams->isNotEmpty()) {
+                    $formation->setRelation('pivot', $formation->teams->first()->pivot);
+                }
+
+                return $formation;
+            });
     }
 
     public function listAvailableFormationsForTeamExceptCurrentUseByMe(Team $team): Collection
     {
         return Formation::withCount(['learners', 'lessons'])
-            ->with(['lessons' => function ($query) {
-                $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
-            }])
+            ->with([
+                'lessons' => function ($query) {
+                    $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
+                },
+                'teams' => function ($query) use ($team): void {
+                    $query->where('teams.id', $team->id);
+                },
+            ])
             ->whereHas('teams', function (Builder $query) use ($team): void {
                 $query->where('teams.id', $team->id)
                     ->where('formation_in_teams.visible', true);
             })
             ->whereDoesntHave('learners', function (Builder $q) {
                 $q->where('users.id', Auth::user()->id);
-                // Si tu n’as pas team_id sur ce pivot, supprime cette ligne.
+                // Si tu n'as pas team_id sur ce pivot, supprime cette ligne.
             })
-            ->get();
+            ->get()
+            ->map(function (Formation $formation) {
+                if ($formation->relationLoaded('teams') && $formation->teams->isNotEmpty()) {
+                    $formation->setRelation('pivot', $formation->teams->first()->pivot);
+                }
+
+                return $formation;
+            });
     }
 
     /**

@@ -10,6 +10,7 @@ Route::prefix('eleve')
     ->group(function () {
         // Main routes - ordered by specificity (most specific first)
         Route::get('/{team}', [ElevePageController::class, 'home'])->name('index');
+        Route::get('/{team}/managers/{manager}', [ElevePageController::class, 'showManager'])->name('managers.show');
 
         // Formation management routes
         Route::prefix('formation')->name('formation.')->group(function () {

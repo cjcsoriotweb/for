@@ -107,12 +107,42 @@ class ElevePageController extends Controller
         // Paginer les formations pour l'API
         $formationsPaginees = $this->studentFormationService->paginateFormationCurrentByStudent($team, $user, 10);
 
+        $teamManagers = $team->users()
+            ->select('users.*')
+            ->wherePivot('role', 'manager')
+            ->orderBy('users.name')
+            ->get();
+
         return view('in-application.eleve.home', compact(
             'team',
             'formationsWithProgress',
             'formationsPaginees',
-            'availableFormationsCount'
+            'availableFormationsCount',
+            'teamManagers'
         ));
+    }
+
+    public function showManager(Team $team, User $manager)
+    {
+        $user = Auth::user();
+
+        if (! $user || ! $user->belongsToTeam($team)) {
+            abort(403, __("Vous n'avez pas acc\u00e8s \u00e0 cette \u00e9quipe."));
+        }
+
+        if (! $manager->belongsToTeam($team) || ! $manager->hasTeamRole($team, 'manager')) {
+            abort(404, __("Ce manager n'est pas associ\u00e9 \u00e0 cette \u00e9quipe."));
+        }
+
+        $managerTeamPivot = $manager->teams()
+            ->where('team_id', $team->id)
+            ->first()?->pivot;
+
+        return view('in-application.eleve.manager.show', [
+            'team' => $team,
+            'manager' => $manager,
+            'managerTeamPivot' => $managerTeamPivot,
+        ]);
     }
 
     /**

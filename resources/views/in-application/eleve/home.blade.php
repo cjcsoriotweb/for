@@ -4,6 +4,7 @@
       <x-eleve.notification-messages />
 
       <x-eleve.hello :team="$team" :current-formation="$formationsWithProgress" />
+      <x-eleve.team.managers-panel :team="$team" :managers="$teamManagers" />
       <x-eleve.FormationContinue :team="$team" :formations="$formationsWithProgress" :availableFormationsCount="$availableFormationsCount" />
       <x-eleve.FormationChoice :team="$team" />
     </div>
