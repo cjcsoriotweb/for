@@ -1,11 +1,13 @@
 <x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
+    <x-ui::auth.form-page
+        title="Créer un compte"
+        subtitle="Rejoignez notre plateforme"
+        footer-text="Déjà inscrit ?"
+        footer-link-text="Se connecter"
+        footer-link-url="{{ route('login') }}"
+    >
+        <x-slot name="fields">
+            <livewire:auth.register-form />
         </x-slot>
-
-        <x-validation-errors class="mb-4" />
-
-        <x-forms.auth.register />
-    </x-authentication-card>
+    </x-ui::auth.form-page>
 </x-guest-layout>

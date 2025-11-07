@@ -1,16 +1,16 @@
 <x-guest-layout>
     <x-ui::auth.form-page
-        title="{{ __('Welcome back') }}"
-        subtitle="{{ __('Sign in to your account') }}"
+        title="Bienvenue"
+        subtitle="Connectez-vous à votre compte"
         :action="route('login')"
-        submit-label="{{ __('Sign in') }}"
+        submit-label="Se connecter"
         :remember="true"
-        remember-label="{{ __('Remember me') }}"
+        remember-label="Se souvenir de moi"
         :remember-checked="old('remember')"
         :forgot-password-url="Route::has('password.request') ? route('password.request') : null"
-        forgot-password-label="{{ __('Forgot password?') }}"
-        footer-text="{{ __('Vous n\'avez pas encore de compte?') }}"
-        footer-link-text="{{ __('Sign up') }}"
+        forgot-password-label="Mot de passe oublié ?"
+        footer-text="Vous n'avez pas encore de compte ?"
+        footer-link-text="S'inscrire"
         footer-link-url="{{ route('register') }}"
     >
         <x-slot name="status">
@@ -33,46 +33,54 @@
         </x-slot>
 
         <x-slot name="fields">
-            <div>
-                <x-label for="email" value="{{ __('Email address') }}" class="block text-sm font-medium text-gray-700 mb-2" />
-                <div class="relative">
+            <div class="space-y-1">
+                <x-label for="email" value="Adresse email" class="block text-sm font-semibold text-gray-800 mb-2" />
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <x-input id="email"
-                             class="block w-full pl-12 pr-3 py-3 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                             class="relative block w-full pl-14 pr-4 py-4 border-2 border-gray-200 rounded-xl shadow-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 hover:shadow-xl hover:border-indigo-300"
                              type="email"
                              name="email"
                              :value="old('email')"
                              required
                              autofocus
                              autocomplete="username"
-                             placeholder="Enter your email" />
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                        </svg>
+                             placeholder="votre@email.com" />
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md">
+                            <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div>
-                <x-label for="password" value="{{ __('Password') }}" class="block text-sm font-medium text-gray-700 mb-2" />
-                <div class="relative">
+            <div class="space-y-1">
+                <x-label for="password" value="Mot de passe" class="block text-sm font-semibold text-gray-800 mb-2" />
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <x-input id="password"
-                             class="block w-full pl-12 pr-12 py-3 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                             class="relative block w-full pl-14 pr-14 py-4 border-2 border-gray-200 rounded-xl shadow-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 hover:shadow-xl hover:border-indigo-300"
                              type="password"
                              name="password"
                              required
                              autocomplete="current-password"
-                             placeholder="Enter your password" />
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
+                             placeholder="Votre mot de passe" />
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md">
+                            <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
                     </div>
-                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword()">
-                        <svg class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="password-toggle">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
+                    <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center group/toggle" onclick="togglePassword()">
+                        <div class="p-2 bg-gray-100 hover:bg-indigo-100 rounded-lg transition-colors duration-200 group-hover/toggle:bg-indigo-200">
+                            <svg class="h-5 w-5 text-gray-500 group-hover/toggle:text-indigo-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="password-toggle">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </div>
                     </button>
                 </div>
             </div>

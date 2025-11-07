@@ -15,4 +15,11 @@ class PageController
     {
         return view('out-application.guest.policy');
     }
+
+    public function terms()
+    {
+        $terms = 'Vos conditions d\'utilisation ici...'; // Vous pouvez personnaliser ce contenu
+
+        return view('out-application.guest.terms', compact('terms'));
+    }
 }
