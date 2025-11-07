@@ -1,5 +1,5 @@
 <div>
-    @if (auth()->user()->hasTeamPermission($team, 'addTeamMember') || Auth::user()->superadmin)
+    @if (Auth::user()->superadmin )
 
         <!-- Add Team Member -->
         <div class="mt-10 sm:mt-0">
@@ -80,7 +80,7 @@
     @endif
 
     <br>
-    @if ($team->teamInvitations->isNotEmpty() && auth()->user()->hasTeamPermission($team, 'addTeamMember'))
+    @if (Auth::user()->superadmin)
         <x-section-border />
 
         <!-- Team Member Invitations -->
