@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
 
             // Etat global
-            $table->enum('status', ['enrolled', 'in_progress', 'completed', 'paused'])->default('enrolled');
+            $table->enum('status', ['enrolled', 'in_progress', 'wait_validation', 'completed', 'paused'])->default('enrolled');
             $table->unsignedTinyInteger('progress_percent')->default(0); // 0..100
             $table->foreignId('current_lesson_id')->nullable()->constrained('lessons')->nullOnDelete();
 

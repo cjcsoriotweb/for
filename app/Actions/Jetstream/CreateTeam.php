@@ -19,6 +19,10 @@ class CreateTeam implements CreatesTeams
      */
     public function create(User $user, array $input): Team
     {
+        
+        if(!$user->superadmin){
+            return abort(403, "Vous n'êtes pas admin");
+        }
         Gate::forUser($user)->authorize('create', Jetstream::newTeamModel());
 
         Validator::make($input, [

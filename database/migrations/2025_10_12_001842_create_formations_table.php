@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->enum('level', ['debutant', 'intermediaire', 'avancé']);
-            $table->integer('money_amount')->default(0);
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
             $table->timestamps();

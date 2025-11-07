@@ -5,9 +5,13 @@
         </h2>
     </x-slot>
 
+    @if(!Auth::user()->superadmin)
+        <p>Vous n'êtes pas superadmin</p>
+    @else
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             @livewire('teams.create-team-form')
         </div>
     </div>
+    @endif
 </x-app-layout>
