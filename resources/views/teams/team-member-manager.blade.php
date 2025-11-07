@@ -36,7 +36,7 @@
 
                                 @foreach ($this->roles as $index => $role)
                                 
-                                    @if(auth()->user()->ownsTeam($team) || auth()->user()->hasTeamPermission($team, 'addTeamMember'))
+                                    @if(Auth::user()->superadmin)
                                     <button type="button" class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 {{ $index > 0 ? 'border-t border-gray-200 focus:border-none rounded-t-none' : '' }} {{ ! $loop->last ? 'rounded-b-none' : '' }}"
                                                     wire:click="$set('addTeamMemberForm.role', '{{ $role->key }}')">
                                         <div class="{{ isset($addTeamMemberForm['role']) && $addTeamMemberForm['role'] !== $role->key ? 'opacity-50' : '' }}">
