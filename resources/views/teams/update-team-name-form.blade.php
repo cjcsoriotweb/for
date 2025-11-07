@@ -36,7 +36,7 @@
         </div>
     </x-slot>
 
-    @if (Gate::check('update', $team))
+ 
         <x-slot name="actions">
             <x-action-message class="me-3" on="saved">
                 {{ __('Saved.') }}
@@ -46,5 +46,4 @@
                 {{ __('Save') }}
             </x-button>
         </x-slot>
-    @endif
 </x-form-section>
