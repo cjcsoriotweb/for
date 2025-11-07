@@ -68,16 +68,12 @@
           </div>
         </div>
 
-        <!-- Progress bar -->
-        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4 overflow-hidden">
-          <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-1000"
-               style="width: {{ $formation->card_completion_percentage }}%"></div>
-        </div>
+
 
         <!-- Action button -->
         <a href="{{ route('formateur.formation.show', $formation) }}"
            class="w-full inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 text-sm">
-          Gérer la formation
+          {{ __('Gérer cette formation') }}
           <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
