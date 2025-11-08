@@ -77,6 +77,12 @@
         'Ajoutez le numero du chapitre pour situer le quiz dans le parcours.',
         'Mentionnez la competence principale visee par ce quiz.',
     ];
+
+    $estimatedDurationFallback = $quiz->estimated_duration_minutes;
+    if (! $estimatedDurationFallback) {
+        $estimatedDurationFallback = $questionCount > 0 ? max($questionCount * 2, 5) : 5;
+    }
+    $defaultEstimatedDuration = old('quiz_estimated_duration', $estimatedDurationFallback);
   @endphp
 
   <div class="py-12">
@@ -148,6 +154,7 @@
               @method('PUT')
               <textarea name="quiz_description" class="hidden" aria-hidden="true">{{ old('quiz_description', $quiz->description) }}</textarea>
               <input type="hidden" name="max_attempts" value="{{ old('max_attempts', $quiz->max_attempts) }}">
+              <input type="hidden" name="quiz_estimated_duration" value="{{ $defaultEstimatedDuration }}">
 
               <div>
                 <label for="quiz_title" class="block text-sm font-semibold text-gray-900">Nouveau titre *</label>

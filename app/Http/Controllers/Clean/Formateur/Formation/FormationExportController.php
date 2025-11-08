@@ -516,6 +516,7 @@ class FormationExportController extends Controller
             'description' => $quiz->description,
             'passing_score' => $quiz->passing_score,
             'max_attempts' => $quiz->max_attempts,
+            'estimated_duration_minutes' => $quiz->estimated_duration_minutes,
             'questions' => $quiz->quizQuestions->map(function ($question) {
                 return [
                     'question' => $question->question,
@@ -542,6 +543,7 @@ class FormationExportController extends Controller
             'type' => 'quiz',
             'title' => $lesson->title,
             'questions_count' => $quiz->quizQuestions->count(),
+            'estimated_duration_minutes' => $quiz->estimated_duration_minutes,
         ];
 
         $metadataFile = 'chapters/'.$chapterSlug.'/'.$lessonSlug.'/metadata.json';

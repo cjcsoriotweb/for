@@ -69,8 +69,15 @@ class FormationsList extends Component
                     break;
                 case 'App\\Models\\Quiz':
                     if ($lesson->lessonable) {
+                        $estimated = (int) ($lesson->lessonable->estimated_duration_minutes ?? 0);
+
+                        if ($estimated > 0) {
+                            $totalDuration += $estimated;
+                            break;
+                        }
+
                         $questionCount = $lesson->lessonable->quizQuestions()->count();
-                        $totalDuration += max($questionCount * 2, 5);
+                        $totalDuration += $questionCount > 0 ? max($questionCount * 2, 5) : 0;
                     }
                     break;
             }

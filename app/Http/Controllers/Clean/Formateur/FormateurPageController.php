@@ -308,6 +308,11 @@ class FormateurPageController extends Controller
             'passing_score' => 50,
             'max_attempts' => 3,
             'type' => Quiz::TYPE_LESSON,
+            'estimated_duration_minutes' => $lessonData['estimated_duration_minutes']
+                ?? ($lessonData['duration_minutes']
+                    ?? (isset($lessonData['questions']) && is_array($lessonData['questions'])
+                        ? max(count($lessonData['questions']) * 2, 5)
+                        : 5)),
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -580,6 +585,7 @@ class FormateurPageController extends Controller
                 $data['passing_score'] = 50;
                 $data['max_attempts'] = 3;
                 $data['type'] = Quiz::TYPE_LESSON;
+                $data['estimated_duration_minutes'] = $duration;
                 $id = DB::table('quizzes')->insertGetId($data);
                 return Quiz::find($id);
 

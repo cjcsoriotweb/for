@@ -77,6 +77,12 @@
         'Donnez une indication sur la duree ou le niveau de difficulte attendu.',
         'Precisez le seuil de reussite ou la suite du parcours apres le quiz.',
     ];
+
+    $estimatedDurationFallback = $quiz->estimated_duration_minutes;
+    if (! $estimatedDurationFallback) {
+        $estimatedDurationFallback = $questionCount > 0 ? max($questionCount * 2, 5) : 5;
+    }
+    $defaultEstimatedDuration = old('quiz_estimated_duration', $estimatedDurationFallback);
   @endphp
 
   <div class="py-12">
@@ -150,6 +156,7 @@
               @method('PUT')
               <input type="hidden" name="quiz_title" value="{{ old('quiz_title', $quiz->title) }}">
               <input type="hidden" name="max_attempts" value="{{ old('max_attempts', $quiz->max_attempts) }}">
+              <input type="hidden" name="quiz_estimated_duration" value="{{ $defaultEstimatedDuration }}">
 
               <div>
                 <label for="quiz_description" class="block text-sm font-semibold text-gray-900">Nouvelle description</label>

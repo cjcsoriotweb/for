@@ -309,6 +309,21 @@ class FormationImportController extends Controller
     {
         $quizPath = $this->resolveFilePath($formationDir, $lessonData['quiz_file']);
         $quizData = json_decode(file_get_contents($quizPath), true);
+        $metadata = [];
+        if (isset($lessonData['metadata_file'])) {
+            $metadataPath = $this->resolveFilePath($formationDir, $lessonData['metadata_file']);
+            $metadata = json_decode(file_get_contents($metadataPath), true) ?? [];
+        }
+
+        $questionCount = isset($quizData['questions']) && is_array($quizData['questions'])
+            ? count($quizData['questions'])
+            : 0;
+        $estimatedDuration = $quizData['estimated_duration_minutes']
+            ?? ($metadata['estimated_duration_minutes'] ?? null);
+
+        if (! $estimatedDuration) {
+            $estimatedDuration = $questionCount > 0 ? max($questionCount * 2, 5) : 5;
+        }
 
         $quiz = Quiz::create([
             'lesson_id' => $lesson->id,
@@ -317,6 +332,7 @@ class FormationImportController extends Controller
             'type' => Quiz::TYPE_LESSON,
             'passing_score' => $quizData['passing_score'] ?? 50,
             'max_attempts' => $quizData['max_attempts'] ?? 3,
+            'estimated_duration_minutes' => $estimatedDuration,
         ]);
 
         // Importer les questions

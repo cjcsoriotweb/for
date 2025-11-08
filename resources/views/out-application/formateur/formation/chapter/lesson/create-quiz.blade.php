@@ -118,6 +118,34 @@
               @enderror
             </div>
 
+            <!-- Estimated Duration -->
+            <div>
+              <label for="quiz_estimated_duration" class="block text-sm font-medium text-gray-700 mb-2">
+                Temps estimé (minutes) *
+              </label>
+              <div class="flex items-center gap-3">
+                <input
+                  type="number"
+                  id="quiz_estimated_duration"
+                  name="quiz_estimated_duration"
+                  min="1"
+                  max="1440"
+                  value="{{ old('quiz_estimated_duration', 15) }}"
+                  class="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('quiz_estimated_duration') border-red-500 @enderror"
+                  placeholder="Ex: 10"
+                  required
+                />
+                <span class="text-sm text-gray-500">
+                  Indiquez le temps moyen pour compléter ce quiz.
+                </span>
+              </div>
+              @error('quiz_estimated_duration')
+              <p class="mt-1 text-sm text-red-600">
+                {{ $message }}
+              </p>
+              @enderror
+            </div>
+
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-between pt-6 border-t border-gray-200">

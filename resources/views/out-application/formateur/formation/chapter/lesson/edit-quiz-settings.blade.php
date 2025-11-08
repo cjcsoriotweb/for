@@ -77,6 +77,12 @@
         '2 ou 3 tentatives encouragent la revision accompagnee.',
         'Tentatives illimitees pour un mode entrainement et auto-apprentissage.',
     ];
+
+    $estimatedDurationFallback = $quiz->estimated_duration_minutes;
+    if (! $estimatedDurationFallback) {
+        $estimatedDurationFallback = $questionCount > 0 ? max($questionCount * 2, 5) : 5;
+    }
+    $defaultEstimatedDuration = old('quiz_estimated_duration', $estimatedDurationFallback);
   @endphp
 
   <div class="py-12">
@@ -174,6 +180,31 @@
                   </div>
                 </div>
                 @error('max_attempts')
+                  <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+              </div>
+
+              <div>
+                <label for="quiz_estimated_duration" class="block text-sm font-semibold text-gray-900">Temps estimé *</label>
+                <p class="mt-1 text-xs text-gray-500">Durée moyenne nécessaire pour compléter le quiz (1 à 1440 minutes).</p>
+
+                <div class="mt-3 flex items-center gap-4">
+                  <input
+                    type="number"
+                    id="quiz_estimated_duration"
+                    name="quiz_estimated_duration"
+                    min="1"
+                    max="1440"
+                    value="{{ $defaultEstimatedDuration }}"
+                    class="w-32 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 @error('quiz_estimated_duration') border-red-500 focus:border-red-500 focus:ring-red-200 @enderror"
+                    placeholder="Ex: 10"
+                    required
+                  />
+                  <p class="text-xs text-gray-500">
+                    Ce champ alimente le temps total de la formation.
+                  </p>
+                </div>
+                @error('quiz_estimated_duration')
                   <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
               </div>

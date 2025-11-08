@@ -24,6 +24,7 @@ class Quiz extends Model
         'max_attempts',
         'entry_min_score',
         'entry_max_score',
+        'estimated_duration_minutes',
     ];
 
     protected function casts(): array
@@ -35,6 +36,7 @@ class Quiz extends Model
             'max_attempts' => 'integer',
             'entry_min_score' => 'integer',
             'entry_max_score' => 'integer',
+            'estimated_duration_minutes' => 'integer',
         ];
     }
 

@@ -63,9 +63,20 @@ class OrganisateurPageController extends Controller
                         $totalDuration += $lesson->lessonable->estimated_read_time ?? 0;
                         break;
                     case Quiz::class:
-                        // Estimate quiz duration: 2 minutes per question
+                        if (! $lesson->lessonable) {
+                            break;
+                        }
+
+                        $estimated = (int) ($lesson->lessonable->estimated_duration_minutes ?? 0);
+
+                        if ($estimated > 0) {
+                            $totalDuration += $estimated;
+                            break;
+                        }
+
+                        // Fallback estimate: 2 minutes per question, minimum 5 for non-empty quizzes
                         $questionCount = $lesson->lessonable->quizQuestions?->count() ?? 0;
-                        $totalDuration += max($questionCount * 2, 5); // Minimum 5 minutes per quiz
+                        $totalDuration += $questionCount > 0 ? max($questionCount * 2, 5) : 0;
                         break;
                 }
             }

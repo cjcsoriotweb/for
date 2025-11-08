@@ -4,7 +4,13 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 @php
                     $formation->loadMissing([
-                        'chapters.lessons',
+                        'chapters.lessons.lessonable' => function ($morphTo) {
+                            $morphTo->morphWith([
+                                \App\Models\VideoContent::class => [],
+                                \App\Models\TextContent::class => [],
+                                \App\Models\Quiz::class => ['quizQuestions'],
+                            ]);
+                        },
                         'entryQuiz.quizQuestions',
                         'teams:id,name',
                         'completionDocuments',
@@ -15,6 +21,42 @@
                     $teams = $formation->teams;
                     $entryQuiz = $formation->entryQuiz;
                     $documentsCount = $formation->completionDocuments->count();
+
+                    $lessons = $chapters->flatMap(fn($chapter) => $chapter->lessons);
+                    $totalDurationMinutes = $lessons->sum(function ($lesson) {
+                        if (! $lesson->lessonable) {
+                            return 0;
+                        }
+
+                        return match ($lesson->lessonable_type) {
+                            \App\Models\VideoContent::class => (int) ($lesson->lessonable->duration_minutes ?? 0),
+                            \App\Models\TextContent::class => (int) ($lesson->lessonable->estimated_read_time ?? 0),
+                            \App\Models\Quiz::class => (function () use ($lesson) {
+                                $estimated = (int) ($lesson->lessonable->estimated_duration_minutes ?? 0);
+                                if ($estimated > 0) {
+                                    return $estimated;
+                                }
+
+                                $questionCount = $lesson->lessonable->quizQuestions?->count()
+                                    ?? $lesson->lessonable->quizQuestions()->count();
+
+                                return $questionCount > 0 ? max($questionCount * 2, 5) : 0;
+                            })(),
+                            default => 0,
+                        };
+                    });
+
+                    $durationHours = intdiv($totalDurationMinutes, 60);
+                    $durationMinutesRemainder = $totalDurationMinutes % 60;
+                    $formattedEstimatedDuration = $totalDurationMinutes > 0
+                        ? implode(
+                            ' ',
+                            array_filter([
+                                $durationHours > 0 ? $durationHours . ' h' : null,
+                                $durationMinutesRemainder > 0 ? $durationMinutesRemainder . ' min' : null,
+                            ])
+                        )
+                        : null;
                 @endphp
 
                 <!-- Grid Layout: Left column for formation info, right column for content -->
@@ -56,6 +98,35 @@
                                     <p class="text-sm leading-relaxed text-slate-600">
                                         {{ $formation->description ?: 'Aucune description disponible pour le moment.' }}
                                     </p>
+                                </div>
+
+                                <div class="p-4 mt-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4">
+                                    <div class="p-3 rounded-2xl bg-indigo-100 text-indigo-600">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 1M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-500">
+                                            Temps estimé de la formation
+                                        </p>
+                                        @if ($totalDurationMinutes > 0)
+                                            <p class="text-xl font-semibold text-slate-900">
+                                                {{ $formattedEstimatedDuration }}
+                                            </p>
+                                            <p class="text-xs text-slate-500">
+                                                {{ $totalDurationMinutes }} min cumulés
+                                            </p>
+                                        @else
+                                            <p class="text-base font-medium text-slate-600">
+                                                À définir
+                                            </p>
+                                            <p class="text-xs text-slate-500">
+                                                Ajoutez un temps estimé à chaque leçon pour afficher la durée totale.
+                                            </p>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <div class="pt-1">

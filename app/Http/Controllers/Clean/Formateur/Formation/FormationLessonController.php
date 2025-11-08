@@ -86,6 +86,7 @@ class FormationLessonController
             'quiz_title' => 'required|string|max:255',
             'quiz_description' => 'nullable|string',
             'max_attempts' => 'nullable|integer|min:1|max:10',
+            'quiz_estimated_duration' => 'required|integer|min:1|max:1440',
         ]);
 
         try {
@@ -96,6 +97,7 @@ class FormationLessonController
                 'description' => $validated['quiz_description'],
                 'passing_score' => 0,
                 'max_attempts' => $validated['max_attempts'] ?? null,
+                'estimated_duration_minutes' => $validated['quiz_estimated_duration'],
             ]);
 
             // Update lesson with polymorphic relationship
@@ -269,6 +271,7 @@ class FormationLessonController
             'quiz_title' => 'required|string|max:255',
             'quiz_description' => 'nullable|string',
             'max_attempts' => 'nullable|integer|min:1|max:10',
+            'quiz_estimated_duration' => 'required|integer|min:1|max:1440',
         ]);
 
         try {
@@ -278,6 +281,7 @@ class FormationLessonController
                 'description' => $validated['quiz_description'],
                 'passing_score' => 0,
                 'max_attempts' => $validated['max_attempts'] ?? null,
+                'estimated_duration_minutes' => $validated['quiz_estimated_duration'],
             ]);
 
             return redirect()->route('formateur.formation.show', $formation)

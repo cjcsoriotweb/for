@@ -91,6 +91,11 @@
     if (! $hasDescription) {
         $tips[] = 'Une description courte rassure les participants sur les attentes.';
     }
+
+    $quizEstimatedDuration = $quiz->estimated_duration_minutes;
+    if (! $quizEstimatedDuration) {
+        $quizEstimatedDuration = $questionCount > 0 ? max($questionCount * 2, 5) : null;
+    }
   @endphp
 
   <div class="py-12">
@@ -132,6 +137,9 @@
               <span class="rounded-full border border-white/30 px-3 py-1">Formation : {{ $formation->title }}</span>
               <span class="rounded-full border border-white/30 px-3 py-1">Questions : {{ $questionCount }}</span>
               <span class="rounded-full border border-white/30 px-3 py-1">Tentatives max : {{ $quiz->max_attempts ?? 'Illimite' }}</span>
+              @if ($quizEstimatedDuration)
+                <span class="rounded-full border border-white/30 px-3 py-1">Temps estimé : {{ $quizEstimatedDuration }} min</span>
+              @endif
             </div>
           </div>
           <div class="grid w-full max-w-md grid-cols-2 gap-4 rounded-2xl bg-white/15 p-6 text-sm text-white backdrop-blur">

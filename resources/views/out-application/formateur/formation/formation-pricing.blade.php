@@ -144,7 +144,14 @@
                   <h3 class="text-lg font-semibold text-gray-900">{{ $lesson->title }}</h3>
                   <p class="text-sm text-gray-500 mt-1">
                     Chapitre : {{ $lesson->chapter?->title ?? 'Non assigne' }}
+                    @if ($lesson->lessonable && $lesson->lessonable->estimated_duration_minutes)
+                    <span class="mx-2 text-gray-300">|</span>
+                    Temps estime : {{ $lesson->lessonable->estimated_duration_minutes }} min
+                    @endif
                   </p>
+                  @if (! $lesson->lessonable?->estimated_duration_minutes)
+                  <p class="text-xs text-amber-600 mt-1">Ajoutez un temps estimé pour alimenter la durée totale de la formation.</p>
+                  @endif
                 </div>
               </div>
               <div class="flex items-center gap-2">
