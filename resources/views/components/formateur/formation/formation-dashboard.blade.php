@@ -113,10 +113,10 @@
           </div>
           <div class="text-right">
             <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total_lessons']) }}</p>
-            <p class="text-xs text-gray-500">leçons</p>
+            <p class="text-xs text-gray-500">modules</p>
           </div>
         </div>
-        <h3 class="font-semibold text-gray-900 mb-1">Leçons créées</h3>
+        <h3 class="font-semibold text-gray-900 mb-1">Modules crées</h3>
         <p class="text-sm text-gray-600">{{ $stats['recent_formations'] }} formations récentes</p>
         <div class="mt-3 flex items-center space-x-2">
           <div class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>

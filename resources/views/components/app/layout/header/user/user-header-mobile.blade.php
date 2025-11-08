@@ -13,7 +13,7 @@
          </button>
 
          <el-disclosure id="products" hidden class="mt-2 block space-y-2">
-             <a href="{{ route('profile.show') }}"
+             <a href="{{ route('user.profile') }}"
                  class="block rounded-lg py-2 pr-3 pl-6 text-sm/7 font-semibold text-gray-900 hover:bg-gray-50">{{ __('Paramettre') }}</a>
 
              <a href="{{ route('user.tickets') }}"

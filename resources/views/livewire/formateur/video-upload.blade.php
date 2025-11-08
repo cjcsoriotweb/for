@@ -102,6 +102,31 @@
                             @enderror
                         </div>
 
+                        {{-- Durée estimée --}}
+                        <div>
+                            <label for="video_duration" class="block text-sm font-medium text-gray-700 mb-2">
+                                Temps estimé de visionnage (minutes) *
+                            </label>
+                            <div class="flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    id="video_duration"
+                                    min="1"
+                                    max="1440"
+                                    wire:model.defer="video_duration"
+                                    class="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('video_duration') border-red-500 @enderror"
+                                    placeholder="Ex: 15"
+                                    required
+                                />
+                                <span class="text-sm text-gray-500">
+                                    Auto-détection après upload, ajustez si nécessaire.
+                                </span>
+                            </div>
+                            @error('video_duration')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         {{-- Upload fichier --}}
                         <div class="space-y-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">

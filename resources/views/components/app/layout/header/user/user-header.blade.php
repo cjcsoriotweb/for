@@ -28,7 +28,7 @@
                         </svg>
                     </div>
                     <div class="flex-auto">
-                        <a href="{{ route('profile.show') }}" class="block font-semibold text-gray-900">
+                        <a href="{{ route('user.profile') }}" class="block font-semibold text-gray-900">
                             {{ __('Mon compte') }}
                             <span class="absolute inset-0"></span>
                         </a>

@@ -7,7 +7,6 @@ use App\Http\Requests\account\team\SwitchTeamRequest;
 use App\Models\SupportTicket;
 use App\Models\Team;
 use App\Services\Clean\Account\AccountService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -26,6 +25,15 @@ class AccountPageController extends Controller
         return view('out-application.account.dashboard', [
             'organisations' => $organisations,
             'invitations_pending' => $invitationsPending,
+        ]);
+    }
+
+    public function profile(): View
+    {
+        $user = Auth::user();
+
+        return view('out-application.account.profile', [
+            'user' => $user,
         ]);
     }
 
@@ -105,6 +113,4 @@ class AccountPageController extends Controller
     {
         return $this->statusLabels()[$status] ?? ucfirst($status);
     }
-
-
 }

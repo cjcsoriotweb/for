@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AiController;
-use App\Http\Controllers\AssistantStream;
 use App\Http\Controllers\Clean\Account\AccountInvitationController;
 use App\Http\Controllers\Clean\Account\AccountPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function (): void {
+    Route::get('/user/profile', [AccountPageController::class, 'profile'])
+        ->name('user.profile');
+
     Route::get('/mes-tickets', [AccountPageController::class, 'tickets'])
         ->name('user.tickets');
 
@@ -38,7 +40,3 @@ Route::prefix('mon-compte')
         Route::get('/ai/conversations/{conversation}', [AiController::class, 'showConversation'])->name('ai.conversations.show');
         Route::get('/ai/users', [AiController::class, 'listUsers'])->name('ai.users');
     });
-
-
-
-    

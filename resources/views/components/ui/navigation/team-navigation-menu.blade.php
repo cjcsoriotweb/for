@@ -67,7 +67,7 @@
                                     {{ __('Gestion de votre compte') }}
                                 </div>
 
-                                <x-dropdown-link href="{{ route('profile.show') }}">
+                                <x-dropdown-link href="{{ route('user.profile') }}">
                                     {{ __('Profil') }}
                                 </x-dropdown-link>
 
@@ -171,7 +171,7 @@
 
             <div class="mt-3 space-y-1">
                 <!-- Account Management -->
-                <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
+                <x-responsive-nav-link href="{{ route('user.profile') }}" :active="request()->routeIs('user.profile')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
