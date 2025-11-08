@@ -112,5 +112,8 @@ Route::prefix('formateur')
             Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/text/create', [FormationLessonController::class, 'storeText'])->name('formation.chapter.lesson.text.store');
             Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/text/edit', [FormationLessonController::class, 'editText'])->name('formation.chapter.lesson.text.edit');
             Route::put('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/text/edit', [FormationLessonController::class, 'updateText'])->name('formation.chapter.lesson.text.update');
+            Route::get('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/resources', [FormationLessonController::class, 'showResources'])->name('formation.chapter.lesson.resources.index');
+            Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/resources', [FormationLessonController::class, 'storeResources'])->name('formation.chapter.lesson.resources.store');
+            Route::delete('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/resources/{resource}', [FormationLessonController::class, 'deleteResource'])->name('formation.chapter.lesson.resources.delete');
         });
     });

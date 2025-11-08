@@ -21,7 +21,7 @@
         </h2>
       </div>
       <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-        Retrouvez ici tous les documents officiels ainsi que les fichiers ajoutés aux leçons textes.
+        Retrouvez ici tous les documents officiels ainsi que les fichiers ajout�s aux modules.
       </p>
     </div>
 

@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Clean\Formateur\Formation;
 use App\Models\Chapter;
 use App\Models\Formation;
 use App\Models\Lesson;
+use App\Models\LessonResource;
 use App\Models\TextContent;
-use App\Models\TextContentAttachment;
 use App\Services\FormationService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -190,7 +190,7 @@ class FormationLessonController
 
             // Store optional PDF (inline display)
             if (request()->hasFile('inline_document')) {
-                $this->storeAttachmentFile($textContent, request()->file('inline_document'), 'inline');
+                $this->storeLessonResource($lesson, request()->file('inline_document'), 'inline');
             }
 
             // Store additional downloadable files
@@ -202,7 +202,7 @@ class FormationLessonController
             if (is_array($downloadFiles)) {
                 foreach ($downloadFiles as $file) {
                     if ($file instanceof UploadedFile) {
-                        $this->storeAttachmentFile($textContent, $file, 'download');
+                        $this->storeLessonResource($lesson, $file, 'download');
                     }
                 }
             }
@@ -549,6 +549,24 @@ class FormationLessonController
         return view('out-application.formateur.formation.chapter.lesson.edit-text', compact('formation', 'chapter', 'lesson', 'textContent'));
     }
 
+    public function showResources(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $lesson->load(['resources', 'lessonable']);
+
+        $supportsInline = $lesson->lessonable_type === TextContent::class;
+        $inlineAttachment = $supportsInline ? $lesson->resources->firstWhere('display_mode', 'inline') : null;
+        $downloadAttachments = $lesson->resources->when($supportsInline, fn ($collection) => $collection->where('display_mode', 'download'), fn ($collection) => $collection);
+
+        return view('out-application.formateur.formation.chapter.lesson.resources', [
+            'formation' => $formation,
+            'chapter' => $chapter,
+            'lesson' => $lesson,
+            'supportsInline' => $supportsInline,
+            'inlineAttachment' => $inlineAttachment,
+            'downloadAttachments' => $downloadAttachments,
+        ]);
+    }
+
     public function updateText(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
         $textContent = $lesson->lessonable;
@@ -570,7 +588,7 @@ class FormationLessonController
             'attachments.*' => 'file|max:20480',
             'remove_inline_document' => 'nullable|boolean',
             'remove_attachments' => 'nullable|array',
-            'remove_attachments.*' => 'integer|exists:text_content_attachments,id',
+            'remove_attachments.*' => 'integer|exists:lesson_resources,id',
         ]);
 
         try {
@@ -586,22 +604,22 @@ class FormationLessonController
 
             // Remove existing inline document if requested
             if (request()->boolean('remove_inline_document')) {
-                $this->removeInlineDocument($textContent);
+                $this->removeInlineResources($lesson);
             }
 
             // Replace inline document if a new one is provided
             if (request()->hasFile('inline_document')) {
-                $this->removeInlineDocument($textContent);
-                $this->storeAttachmentFile($textContent, request()->file('inline_document'), 'inline');
+                $this->removeInlineResources($lesson);
+                $this->storeLessonResource($lesson, request()->file('inline_document'), 'inline');
             }
 
             // Remove selected downloadable attachments
             $attachmentsToRemove = request()->input('remove_attachments', []);
             if (is_array($attachmentsToRemove) && count($attachmentsToRemove) > 0) {
-                $textContent->attachments()
+                $lesson->resources()
                     ->whereIn('id', $attachmentsToRemove)
                     ->get()
-                    ->each(fn (TextContentAttachment $attachment) => $this->deleteAttachment($attachment));
+                    ->each(fn (LessonResource $resource) => $this->deleteLessonResource($resource));
             }
 
             // Store new downloadable attachments
@@ -613,7 +631,7 @@ class FormationLessonController
             if (is_array($downloadFiles)) {
                 foreach ($downloadFiles as $file) {
                     if ($file instanceof UploadedFile) {
-                        $this->storeAttachmentFile($textContent, $file, 'download');
+                        $this->storeLessonResource($lesson, $file, 'download');
                     }
                 }
             }
@@ -623,6 +641,58 @@ class FormationLessonController
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du contenu: '.$e->getMessage()]);
         }
+    }
+
+    public function storeResources(Formation $formation, Chapter $chapter, Lesson $lesson)
+    {
+        $lesson->load('lessonable');
+        $supportsInline = $lesson->lessonable_type === TextContent::class;
+
+        request()->validate([
+            'inline_document' => $supportsInline ? 'nullable|file|mimes:pdf|max:20480' : 'nullable',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:20480',
+        ]);
+
+        if (! $supportsInline && request()->hasFile('inline_document')) {
+            return back()->withErrors(['inline_document' => 'Seuls les modules texte acceptent un document intégré.']);
+        }
+
+        try {
+            if ($supportsInline && request()->hasFile('inline_document')) {
+                $this->removeInlineResources($lesson);
+                $this->storeLessonResource($lesson, request()->file('inline_document'), 'inline');
+            }
+
+            $downloadFiles = request()->file('attachments', []);
+            if ($downloadFiles instanceof UploadedFile) {
+                $downloadFiles = [$downloadFiles];
+            }
+
+            if (is_array($downloadFiles)) {
+                foreach ($downloadFiles as $file) {
+                    if ($file instanceof UploadedFile) {
+                        $this->storeLessonResource($lesson, $file, 'download');
+                    }
+                }
+            }
+
+            return back()->with('success', 'Ressources mises à jour avec succès.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Erreur lors de la mise à jour des ressources: '.$e->getMessage()]);
+        }
+    }
+
+    public function deleteResource(Formation $formation, Chapter $chapter, Lesson $lesson, LessonResource $resource)
+    {
+        if ($resource->lesson_id !== $lesson->id) {
+            return redirect()->route('formateur.formation.chapters.index', $formation)
+                ->withErrors(['error' => 'Impossible de trouver la ressource demandée pour ce module.']);
+        }
+
+        $this->deleteLessonResource($resource);
+
+        return back()->with('success', 'Ressource supprimée avec succès.');
     }
 
     public function updateLessonTitle(Formation $formation, Chapter $chapter, Lesson $lesson)
@@ -663,13 +733,13 @@ class FormationLessonController
     }
 
     /**
-     * Persist an uploaded file as an attachment for the provided text content.
+     * Persist an uploaded file as a lesson resource.
      */
-    private function storeAttachmentFile(TextContent $textContent, UploadedFile $file, string $displayMode): void
+    private function storeLessonResource(Lesson $lesson, UploadedFile $file, string $displayMode): LessonResource
     {
-        $path = $file->store('text-content/'.$textContent->id, 'public');
+        $path = $file->store('lesson-resources/'.$lesson->id, 'public');
 
-        $textContent->attachments()->create([
+        return $lesson->resources()->create([
             'name' => $file->getClientOriginalName(),
             'file_path' => $path,
             'mime_type' => $file->getClientMimeType(),
@@ -678,25 +748,25 @@ class FormationLessonController
     }
 
     /**
-     * Remove all inline (auto displayed) documents linked to the text content.
+     * Remove all inline (auto displayed) documents linked to the lesson.
      */
-    private function removeInlineDocument(TextContent $textContent): void
+    private function removeInlineResources(Lesson $lesson): void
     {
-        $textContent->attachments()
+        $lesson->resources()
             ->where('display_mode', 'inline')
             ->get()
-            ->each(fn (TextContentAttachment $attachment) => $this->deleteAttachment($attachment));
+            ->each(fn (LessonResource $resource) => $this->deleteLessonResource($resource));
     }
 
     /**
-     * Delete a stored attachment and its file safely.
+     * Delete a stored resource and its file safely.
      */
-    private function deleteAttachment(TextContentAttachment $attachment): void
+    private function deleteLessonResource(LessonResource $resource): void
     {
-        if ($attachment->file_path && Storage::disk('public')->exists($attachment->file_path)) {
-            Storage::disk('public')->delete($attachment->file_path);
+        if ($resource->file_path && Storage::disk('public')->exists($resource->file_path)) {
+            Storage::disk('public')->delete($resource->file_path);
         }
 
-        $attachment->delete();
+        $resource->delete();
     }
 }

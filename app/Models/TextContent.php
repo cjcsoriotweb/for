@@ -43,6 +43,6 @@ class TextContent extends Model
      */
     public function attachments()
     {
-        return $this->hasMany(TextContentAttachment::class);
+        return $this->hasMany(LessonResource::class, 'lesson_id', 'lesson_id');
     }
 }

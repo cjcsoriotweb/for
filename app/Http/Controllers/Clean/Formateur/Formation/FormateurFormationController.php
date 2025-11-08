@@ -12,6 +12,7 @@ use App\Models\Quiz;
 use App\Models\TextContent;
 use App\Models\VideoContent;
 use App\Services\FormationService;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -110,6 +111,18 @@ class FormateurFormationController extends Controller
 
     public function manageChapters(Formation $formation)
     {
+        $formation->load([
+            'chapters.lessons' => fn ($query) => $query->orderBy('position'),
+            'chapters.lessons.resources',
+            'chapters.lessons.lessonable' => function (MorphTo $morphTo) {
+                $morphTo->morphWith([
+                    TextContent::class => ['attachments'],
+                    VideoContent::class => [],
+                    Quiz::class => [],
+                ]);
+            },
+        ]);
+
         return view('out-application.formateur.formation.formation-chapters', compact('formation'));
     }
 

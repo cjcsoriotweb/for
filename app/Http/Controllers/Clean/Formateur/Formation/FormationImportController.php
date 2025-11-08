@@ -12,7 +12,7 @@ use App\Models\Quiz;
 use App\Models\QuizChoice;
 use App\Models\QuizQuestion;
 use App\Models\TextContent;
-use App\Models\TextContentAttachment;
+use App\Models\LessonResource;
 use App\Models\VideoContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -293,10 +293,12 @@ class FormationImportController extends Controller
                     $storagePath = 'formations/attachments/'.Str::uuid().'_'.$fileName;
                     Storage::disk('public')->put($storagePath, file_get_contents($sourcePath));
 
-                    TextContentAttachment::create([
-                        'text_content_id' => $textContent->id,
+                    LessonResource::create([
+                        'lesson_id' => $lesson->id,
+                        'name' => $fileName,
                         'file_path' => $storagePath,
-                        'original_name' => $fileName,
+                        'mime_type' => mime_content_type($sourcePath) ?: null,
+                        'display_mode' => 'download',
                     ]);
                 }
             }

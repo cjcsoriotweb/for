@@ -225,6 +225,21 @@
                     Modifier
                   </a>
                   @endif
+                  @php
+                  $resourceCount = $lesson->resources->count();
+                  @endphp
+                  <a href="{{ route('formateur.formation.chapter.lesson.resources.index', [$formation, $chapter, $lesson]) }}"
+                    class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-purple-700 hover:text-purple-900 hover:bg-purple-50 rounded-md transition-colors duration-200">
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.5 6.5a2 2 0 102.828 2.828l6.5-6.5A4 4 0 1015.172 7z"></path>
+                    </svg>
+                    Ressources
+                    @if($resourceCount)
+                    <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold text-purple-900 bg-white rounded-full border border-purple-200">
+                      {{ $resourceCount }}
+                    </span>
+                    @endif
+                  </a>
                   @else
                   <a href="{{ route('formateur.formation.chapter.lesson.define', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 rounded-md transition-colors duration-200"

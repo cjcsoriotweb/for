@@ -48,6 +48,14 @@ class Lesson extends Model
     }
 
     /**
+     * Files linked to this lesson (visible in resources tab).
+     */
+    public function resources()
+    {
+        return $this->hasMany(LessonResource::class);
+    }
+
+    /**
      * Get the quizzes associated with this lesson
      */
     public function quizzes()
