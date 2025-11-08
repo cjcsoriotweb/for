@@ -58,6 +58,7 @@ class StudentFormationService extends BaseFormationService
     {
         return Formation::withCount(['learners', 'lessons'])
             ->with([
+                'entryQuiz',
                 'lessons' => function ($query) {
                     $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
                 },
@@ -83,6 +84,7 @@ class StudentFormationService extends BaseFormationService
     {
         return Formation::withCount(['learners', 'lessons'])
             ->with([
+                'entryQuiz',
                 'lessons' => function ($query) {
                     $query->select('lessons.id', 'lessons.chapter_id', 'lessons.title', 'lessons.lessonable_type', 'lessons.lessonable_id');
                 },

@@ -65,6 +65,7 @@ class FormationChoice extends Component
             $remainingSlots = $usageQuota !== null
                 ? max($usageQuota - $usageConsumed, 0)
                 : null;
+            $hasEntryQuiz = (bool) $formation->entryQuiz;
 
             return [
                 'id' => $formation->id,
@@ -81,9 +82,15 @@ class FormationChoice extends Component
                     'team' => $team,
                     'formation' => $formation->id,
                 ]),
+                'entry_quiz_route' => $hasEntryQuiz
+                    ? route('eleve.formation.entry-quiz.attempt', [$team, $formation->id])
+                    : null,
                 'can_afford' => $canAfford,
                 'can_join' => $canJoin,
-                'enroll_button_label' => $canJoin ? 'Rejoindre cette formation' : null,
+                'has_entry_quiz' => $hasEntryQuiz,
+                'enroll_button_label' => $canJoin
+                    ? ($hasEntryQuiz ? 'Vérifier que la formation est adaptée à moi' : 'Rejoindre cette formation')
+                    : null,
             ];
         });
     }
