@@ -80,4 +80,7 @@
     </div>
     </main>
     </div>
+    @livewire('assistant')
+
+
 </x-app-layout>
