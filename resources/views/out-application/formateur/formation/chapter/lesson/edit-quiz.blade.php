@@ -130,35 +130,6 @@
         <section class="space-y-6 lg:col-span-2">
           <article class="rounded-2xl border border-gray-200 bg-white shadow-sm">
             <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-              <div>
-                <h2 class="text-xl font-semibold text-gray-900">Configuration rapide</h2>
-                <p class="text-sm text-gray-600">Quatre etapes suffisent pour rendre le quiz publiable.</p>
-              </div>
-              <span class="text-sm font-semibold text-gray-700">{{ $completionRate }}% pret</span>
-            </div>
-            <ul class="divide-y divide-gray-100">
-              @foreach ($checklist as $step)
-                <li class="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div class="flex items-start gap-3">
-                    <span class="mt-1 h-2.5 w-2.5 rounded-full {{ $step['done'] ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
-                    <div>
-                      <p class="font-medium text-gray-900">{{ $step['label'] }}</p>
-                      <p class="text-sm text-gray-600">{{ $step['description'] }}</p>
-                    </div>
-                  </div>
-                  <a href="{{ $step['route'] }}" class="inline-flex items-center gap-2 text-sm font-semibold {{ $step['done'] ? 'text-emerald-600 hover:text-emerald-700' : 'text-indigo-600 hover:text-indigo-700' }}">
-                    {{ $step['done'] ? 'Modifier' : 'Completer' }}
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </li>
-              @endforeach
-            </ul>
-          </article>
-
-          <article class="rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
               <h2 class="text-xl font-semibold text-gray-900">Questions</h2>
               <div class="flex gap-3">
                 <a href="{{ $manageQuestionsRoute }}" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
