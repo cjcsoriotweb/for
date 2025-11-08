@@ -66,9 +66,19 @@
             <div class="flex items-center gap-2">
               <a href="{{ Storage::disk('public')->url($inlineAttachment->file_path) }}" target="_blank"
                 class="inline-flex items-center px-3 py-2 text-xs font-medium text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
-                Prévisualiser
+                Previsualiser
               </a>
+            </div>
+          </div>
+          @else
+          <div class="p-4 text-sm text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded-xl text-center">
+            Aucun PDF n'a encore ete integre dans cette lecon.
+          </div>
           @endif
+        </div>
+
+      </div>
+      @endif
 
       <div class="bg-white shadow-sm border border-gray-200 rounded-2xl {{ $supportsInline ? 'mt-6' : '' }}">
         <div class="px-6 py-4 border-b border-gray-100">

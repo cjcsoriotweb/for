@@ -12,6 +12,13 @@
     </div>
 </div>
 
+@if(isset($lessonResources) && $lessonResources->isNotEmpty())
+    @include('in-application.eleve.lesson.partials.lesson-resources', [
+        'lessonResources' => $lessonResources,
+        'canDownloadLessonResources' => $canDownloadLessonResources ?? false,
+    ])
+@endif
+
 @if(isset($formationDocuments) && $formationDocuments->isNotEmpty())
     @include('in-application.eleve.lesson.partials.formation-documents', [
         'formationDocuments' => $formationDocuments,

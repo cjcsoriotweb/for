@@ -46,5 +46,6 @@ Route::prefix('eleve')
             Route::post('/{team}/{formation}/{chapter}/{lesson}/start', [ElevePageController::class, 'startLesson'])->name('start');
             Route::post('/{team}/{formation}/{chapter}/{lesson}/complete', [ElevePageController::class, 'completeLesson'])->name('complete');
             Route::post('/{team}/{formation}/{chapter}/{lesson}/progress', [ElevePageController::class, 'updateProgress'])->name('progress');
+            Route::get('/{team}/{formation}/{chapter}/{lesson}/resources/{resource}', [ElevePageController::class, 'downloadLessonResource'])->name('resources.download');
         });
     });
