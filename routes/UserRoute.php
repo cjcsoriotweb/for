@@ -9,6 +9,12 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/user/profile', [AccountPageController::class, 'profile'])
         ->name('user.profile');
 
+    Route::get('/user/profile/informations', [AccountPageController::class, 'editProfileInformation'])
+        ->name('user-profile-information.edit');
+
+    Route::get('/user/profile/password', [AccountPageController::class, 'editPassword'])
+        ->name('user-password.edit');
+
     Route::get('/mes-tickets', [AccountPageController::class, 'tickets'])
         ->name('user.tickets');
 

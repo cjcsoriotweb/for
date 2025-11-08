@@ -37,6 +37,24 @@ class AccountPageController extends Controller
         ]);
     }
 
+    public function editProfileInformation(): View
+    {
+        $user = Auth::user();
+
+        return view('out-application.account.profile-information', [
+            'user' => $user,
+        ]);
+    }
+
+    public function editPassword(): View
+    {
+        $user = Auth::user();
+
+        return view('out-application.account.password', [
+            'user' => $user,
+        ]);
+    }
+
     public function switch(SwitchTeamRequest $request)
     {
         $request = $request->validated();

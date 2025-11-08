@@ -43,7 +43,7 @@
                             <p class="mb-6 text-slate-600 dark:text-slate-300">
                                 {{ __('Modifiez votre mot de passe pour renforcer la sécurité de votre compte.') }}
                             </p>
-                            <a href="{{ route('user-password.update') }}"
+                            <a href="{{ route('user-password.edit') }}"
                                class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                                 {{ __('Modifier') }}
                                 <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
@@ -64,7 +64,7 @@
                             <p class="mb-6 text-slate-600 dark:text-slate-300">
                                 {{ __('Mettez à jour vos informations personnelles.') }}
                             </p>
-                            <a href="{{ route('user-profile-information.update') }}"
+                            <a href="{{ route('user-profile-information.edit') }}"
                                class="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                                 {{ __('Modifier') }}
                                 <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
@@ -86,16 +86,29 @@
                                 {{ __('Activez l\'authentification à deux facteurs pour plus de sécurité.') }}
                             </p>
                             @if($user->two_factor_secret)
-                                <span class="inline-flex items-center rounded-lg bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                                    {{ __('Activé') }}
-                                    <span class="material-symbols-outlined ml-1 text-sm">check_circle</span>
-                                </span>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center rounded-lg bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                                        {{ __('Activé') }}
+                                        <span class="material-symbols-outlined ml-1 text-sm">check_circle</span>
+                                    </span>
+                                    <form method="POST" action="{{ route('two-factor.disable') }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="inline-flex items-center rounded-lg border border-transparent bg-red-50 px-4 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 dark:border-red-400/50 dark:bg-red-900/20 dark:text-red-200 dark:hover:bg-red-800">
+                                            {{ __('Désactiver') }}
+                                        </button>
+                                    </form>
+                                </div>
                             @else
-                                <a href="{{ route('two-factor.enable') }}"
-                                   class="inline-flex items-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                                    {{ __('Activer') }}
-                                    <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
-                                </a>
+                                <form method="POST" action="{{ route('two-factor.enable') }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="inline-flex items-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                                        {{ __('Activer') }}
+                                        <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
+                                    </button>
+                                </form>
                             @endif
                         </div>
                     </div>
