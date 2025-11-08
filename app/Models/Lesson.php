@@ -54,4 +54,22 @@ class Lesson extends Model
     {
         return $this->hasMany(Quiz::class);
     }
+
+    /**
+     * Get the display name for the lesson, falling back to the base title.
+     */
+    public function getName(): string
+    {
+        $lessonableTitle = data_get($this->lessonable, 'title');
+
+        if (is_string($lessonableTitle) && $lessonableTitle !== '') {
+            return $lessonableTitle;
+        }
+
+        if (is_string($this->title) && $this->title !== '') {
+            return $this->title;
+        }
+
+        return 'Lesson #' . ($this->id ?? '?');
+    }
 }

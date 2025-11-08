@@ -153,10 +153,10 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center space-x-2">
                       <h4 class="text-sm font-medium text-gray-900 truncate" id="lesson-title-{{ $lesson->id }}">
-                        {{ $lesson->title }}
+                        {{ $lesson->getName() }}
                       </h4>
                       <button type="button"
-                        onclick="openEditLessonModal({{ $lesson->id }}, '{{ addslashes($lesson->title) }}', {{ $formation->id }}, {{ $chapter->id }})"
+                        onclick="openEditLessonModal({{ $lesson->id }}, '{{ addslashes($lesson->getName()) }}', {{ $formation->id }}, {{ $chapter->id }})"
                         class="inline-flex items-center p-1 text-gray-400 hover:text-indigo-600 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100"
                         title="Modifier le nom de la leçon">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
