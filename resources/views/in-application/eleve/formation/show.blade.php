@@ -25,6 +25,8 @@
       <div class="order-1 lg:order-1 space-y-8">
         <x-eleve.formation-header :formation="$formationWithProgress" :progress="$progress" />
 
+        <x-eleve.formation-timeline :formation="$formationWithProgress" />
+
         <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
       </div>
 
