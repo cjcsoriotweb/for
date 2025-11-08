@@ -1,4 +1,5 @@
-<div class="fixed bottom-4 right-4 z-50">
+<div class="fixed bottom-4 right-4 z-50" style="display:none">
+    <!-- IA DESACTIVE !-->
     <div wire:poll.3s="checkServersStatus">
         <!-- Rien ou juste l'affichage du status -->
     </div>
