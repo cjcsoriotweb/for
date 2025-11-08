@@ -16,7 +16,7 @@ return new class extends Migration
 
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('text');
+            $table->longText('text');
             $table->boolean('is_ia')->default(0);
             
             
