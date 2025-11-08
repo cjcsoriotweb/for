@@ -18,6 +18,12 @@ class Assistant extends Component
     public $streamingMessageId = null; // id du message IA en cours
     public $streamingText = '';        // texte streamé en direct
 
+
+    public function clean(){
+        AssistantMessage::where('user_id', Auth::id())
+            ->orderBy('id', 'desc')
+            ->delete();
+    }
     public function mount()
     {
         $this->loadMessages();
