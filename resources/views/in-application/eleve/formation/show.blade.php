@@ -21,16 +21,16 @@
     @else
     <!-- Layout responsive : grid sur PC, stack sur mobile -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Présentation à gauche sur PC -->
-      <div class="order-1 lg:order-1">
+      <!-- Présentation + Contenu à gauche sur PC -->
+      <div class="order-1 lg:order-1 space-y-8">
         <x-eleve.formation-header :formation="$formationWithProgress" :progress="$progress" />
+
+        <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
       </div>
 
       <!-- Contenu principal à droite sur PC -->
       <div class="order-2 lg:order-2 space-y-8">
         <x-eleve.formation-actions :team="$team" :formation="$formationWithProgress" :progress="$progress" />
-
-        <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
 
         <div id="resources-section">
           @include('in-application.eleve.formation.partials.resources', [
