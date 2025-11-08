@@ -27,7 +27,6 @@
 
         <x-eleve.formation-timeline :formation="$formationWithProgress" />
 
-        <x-eleve.formation-chapters :formation="$formationWithProgress" :team="$team" />
       </div>
 
       <!-- Contenu principal à droite sur PC -->

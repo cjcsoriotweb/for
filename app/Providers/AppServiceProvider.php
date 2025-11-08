@@ -72,7 +72,6 @@ class AppServiceProvider extends ServiceProvider
             'eleve.notification-messages' => 'components.eleve.dashboard.notification-messages',
             'eleve.hello' => 'components.eleve.dashboard.hello',
             'eleve.formation-actions' => 'components.eleve.formation.actions',
-            'eleve.formation-chapters' => 'components.eleve.formation.chapters',
             'eleve.formation-timeline' => 'components.eleve.formation.timeline',
             'eleve.formation-choice' => 'components.eleve.formation.choice',
             'eleve.formation-continue' => 'components.eleve.formation.continue',
