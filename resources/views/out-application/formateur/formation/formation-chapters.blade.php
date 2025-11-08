@@ -249,6 +249,7 @@
                   <form method="POST" action="{{ route('formateur.formation.chapter.lesson.delete', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}" class="inline"
                     onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette leçon? Cette action est irréversible.')">
                     @csrf
+                    
                     @method('delete')
                     
                     <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-red-700 hover:text-red-900 hover:bg-red-50 rounded-md transition-colors duration-200">
