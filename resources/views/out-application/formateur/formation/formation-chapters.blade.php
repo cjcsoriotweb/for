@@ -88,7 +88,7 @@
                     <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
-                    {{ $chapter->lessons->count() }} leçon{{ $chapter->lessons->count() > 1 ? 's' : '' }}
+                    {{ $chapter->lessons->count() }} module{{ $chapter->lessons->count() > 1 ? 's' : '' }}
                   </p>
                 </div>
               </div>
@@ -108,7 +108,7 @@
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
-                    Nouvelle leçon
+                    Nouveau module
                   </button>
                 </form>
               </div>
@@ -124,7 +124,7 @@
               </svg>
               <h4 class="text-sm font-medium text-gray-900 mb-2">Chapitre vide</h4>
               <p class="text-gray-500 text-sm mb-6">
-                Ajoutez votre première leçon pour commencer à construire ce chapitre.
+                Ajoutez vootre premier module pour commencer à construire ce chapitre.
               </p>
               <form method="post" action="{{ route('formateur.formation.chapter.lesson.add', ['formation' => $formation, 'chapter' => $chapter]) }}" class="inline">
                 @csrf
@@ -132,7 +132,7 @@
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                   </svg>
-                  Ajouter une leçon
+                  Ajouter un module
                 </button>
               </form>
             </div>
@@ -155,16 +155,7 @@
                       <h4 class="text-sm font-medium text-gray-900 truncate" id="lesson-title-{{ $lesson->id }}">
                         {{ $lesson->getName() }}
                       </h4>
-                      <button type="button"
-                        onclick="openEditLessonModal({{ $lesson->id }}, '{{ addslashes($lesson->getName()) }}', {{ $formation->id }}, {{ $chapter->id }})"
-                        class="inline-flex items-center p-1 text-gray-400 hover:text-indigo-600 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100"
-                        title="Modifier le nom de la leçon">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                          </path>
-                        </svg>
-                      </button>
+          
                     </div>
                   </div>
 
@@ -237,7 +228,7 @@
                   @else
                   <a href="{{ route('formateur.formation.chapter.lesson.define', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 rounded-md transition-colors duration-200"
-                    title="Choisir le type de leçon (Quiz, Vidéo ou Texte)">
+                    title="Choisir le type du module (Quiz, Vidéo ou Texte)">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     </svg>
@@ -247,7 +238,7 @@
 
                   <!-- Delete Lesson Button -->
                   <form method="POST" action="{{ route('formateur.formation.chapter.lesson.delete', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}" class="inline"
-                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette leçon? Cette action est irréversible.')">
+                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce module? Cette action est irréversible.')">
                     @csrf
 
                     @method('delete')
@@ -271,49 +262,7 @@
       @endif
     </div>
 
-    <!-- Edit Lesson Title Modal -->
-    <div id="editLessonModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-      <div class="relative top-20 mx-auto p-5 border w-11/12 sm:w-96 shadow-lg rounded-xl bg-white">
-        <div class="mt-3">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-gray-900">
-              Modifier le nom de la leçon
-            </h3>
-            <button type="button" onclick="closeEditLessonModal()" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
 
-          <form id="editLessonForm" method="POST">
-            @csrf @method('PUT')
-
-            <div class="mb-4">
-              <label for="lesson_title" class="block text-sm font-medium text-gray-700 mb-2">Nouveau nom de la
-                leçon</label>
-              <input type="text" id="lesson_title" name="lesson_title"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Entrez le nouveau nom de la leçon" />
-              @error('lesson_title')
-              <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-              @enderror
-            </div>
-
-            <div class="flex justify-end space-x-3">
-              <button type="button" onclick="closeEditLessonModal()"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
-                Annuler
-              </button>
-              <button type="submit"
-                class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-200">
-                Enregistrer
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
 
     <!-- Display success message -->
     @if(session('success'))
@@ -329,157 +278,4 @@
     </div>
     @endif
 
-    <script>
-      // Global variables to store current lesson data
-      let currentLessonId = null;
-      let currentFormationId = null;
-      let currentChapterId = null;
-
-      function openEditLessonModal(lessonId, currentTitle, formationId, chapterId) {
-        currentLessonId = lessonId;
-        currentFormationId = formationId;
-        currentChapterId = chapterId;
-
-        // Set the current title in the input field
-        document.getElementById("lesson_title").value = currentTitle;
-
-        // Update form action
-        const form = document.getElementById("editLessonForm");
-        form.action = `/formateur/formation/${formationId}/chapitre/${chapterId}/lesson/${lessonId}/title`;
-
-        // Show modal
-        document.getElementById("editLessonModal").classList.remove("hidden");
-        document.body.classList.add("overflow-hidden");
-
-        // Focus on input field
-        document.getElementById("lesson_title").focus();
-      }
-
-      function closeEditLessonModal() {
-        document.getElementById("editLessonModal").classList.add("hidden");
-        document.body.classList.remove("overflow-hidden");
-        currentLessonId = null;
-        currentFormationId = null;
-        currentChapterId = null;
-      }
-
-      // Handle lesson form submission with AJAX
-      document.getElementById("editLessonForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const submitButton = this.querySelector('button[type="submit"]');
-        const originalText = submitButton.textContent;
-
-        // Disable submit button and show loading state
-        submitButton.disabled = true;
-        submitButton.innerHTML =
-          '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Enregistrement...';
-
-        fetch(this.action, {
-          method: "POST",
-          body: formData,
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-            Accept: "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              // Update the lesson title in the DOM
-              const titleElement = document.getElementById(`lesson-title-${currentLessonId}`);
-              if (titleElement) {
-                titleElement.textContent = data.new_title;
-              }
-
-              // Close modal and show success message
-              closeEditLessonModal();
-
-              // Show success message
-              showSuccessMessage(data.message);
-            } else {
-              throw new Error(data.message || "Erreur lors de la modification");
-            }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            // Show error message in the modal
-            const errorDiv = document.createElement("div");
-            errorDiv.className = "mt-2 text-sm text-red-600";
-            errorDiv.textContent = error.message;
-
-            const existingError = this.querySelector(".text-red-600");
-            if (existingError) {
-              existingError.remove();
-            }
-
-            const titleInput = document.getElementById("lesson_title");
-            titleInput.parentNode.appendChild(errorDiv);
-          })
-          .finally(() => {
-            // Re-enable submit button
-            submitButton.disabled = false;
-            submitButton.textContent = originalText;
-          });
-      });
-
-      function showSuccessMessage(message) {
-        // Remove existing success message
-        const existingMessage = document.getElementById("successMessage");
-        if (existingMessage) {
-          existingMessage.remove();
-        }
-
-        // Create new success message
-        const successDiv = document.createElement("div");
-        successDiv.id = "successMessage";
-        successDiv.className =
-          "fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg z-50";
-        successDiv.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    ${message}
-                </div>
-            `;
-
-        document.body.appendChild(successDiv);
-
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-          successDiv.style.opacity = "0";
-          setTimeout(() => {
-            successDiv.remove();
-          }, 300);
-        }, 5000);
-      }
-
-      // Auto-hide success message after 5 seconds (for page load messages)
-      const successMessage = document.getElementById("successMessage");
-      if (successMessage) {
-        setTimeout(() => {
-          successMessage.style.opacity = "0";
-          setTimeout(() => {
-            successMessage.remove();
-          }, 300);
-        }, 5000);
-      }
-
-      // Keyboard shortcuts
-      document.addEventListener("keydown", function (e) {
-        // Escape key closes modals
-        if (e.key === "Escape") {
-          closeEditLessonModal();
-        }
-      });
-
-      // Close modal when clicking outside
-      document.getElementById("editLessonModal").addEventListener("click", function (e) {
-        if (e.target === this) {
-          closeEditLessonModal();
-        }
-      });
-    </script>
 </x-app-layout>
