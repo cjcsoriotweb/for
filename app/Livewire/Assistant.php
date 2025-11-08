@@ -21,8 +21,8 @@ class Assistant extends Component
     public $streamingText = ''; // texte streamé en direct
 
     // État des serveurs (pour affichage éventuel dans la vue)
-    public $serverAURL = "http://ollama.goodview.fr:1234";
-    public $serverBURL = "http://ollama.goodview.fr:12345";
+    public $serverAURL = "http://nas.goodview.fr:1234";
+    public $serverBURL = "http://nas.goodview.fr:12345";
 
     public $serverA = null; // true = OK, false = KO, null = pas encore testé
     public $serverB = null;
