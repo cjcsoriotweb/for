@@ -76,26 +76,6 @@
             </div>
           </div>
 
-          <!-- Action Button -->
-          <div class="ml-3">
-            @if($chapter->is_accessible && $chapter->lessons && $chapter->lessons->count() > 0)
-            <a href="{{ route('eleve.lesson.show', [$team, $formation, $chapter, $chapter->lessons->first()]) }}"
-               class="inline-flex items-center px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-md border border-blue-200 dark:border-blue-800 transition-colors">
-              @if($chapter->is_current)
-              Continuer
-              @else
-              Commencer
-              @endif
-              <svg class="w-3 h-3 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </a>
-            @else
-            <span class="inline-flex items-center px-3 py-1.5 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-medium rounded-md border border-gray-200 dark:border-gray-600 cursor-not-allowed">
-              Verrouillé
-            </span>
-            @endif
-          </div>
         </div>
       </div>
       @endforeach

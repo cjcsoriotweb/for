@@ -21,7 +21,7 @@
                 </div>
                 <div>
                     <h1 class="text-3xl font-bold text-white mb-1">
-                        {{ $lesson->title }}
+                        {{ $lesson->getName() }}
                     </h1>
                     <div class="flex items-center space-x-4 text-white text-sm opacity-90">
                         <span class="flex items-center space-x-1">

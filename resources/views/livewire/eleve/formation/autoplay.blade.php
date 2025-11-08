@@ -1,16 +1,15 @@
 <div class="flex w-full items-center justify-between gap-3">
-  {{-- Bouton Continuer vers la leçon --}}
+  {{-- Bouton vers le module suivant --}}
   @if($currentLesson && $currentLesson->chapter)
   <button type="button" wire:click="proceedToLesson"
-    class="inline-flex items-center px-4 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium text-sm rounded-lg border border-blue-200 dark:border-blue-800 transition-colors">
-    {{-- Icône "Suivant" --}}
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-      class="w-4 h-4 mr-2">
-      <path stroke-linecap="round" stroke-linejoin="round"
-        d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
-    </svg>
-    {{ $currentLesson->title }}
-    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    class="inline-flex items-center justify-between w-full px-4 py-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors">
+    <div class="text-left">
+      <div class="text-sm font-semibold">Module suivant</div>
+      <div class="text-xs text-blue-600/80 dark:text-blue-200/80">
+        {{ method_exists($currentLesson, 'getName') ? $currentLesson->getName() : $currentLesson->title }}
+      </div>
+    </div>
+    <svg class="w-4 h-4 ml-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
     </svg>
   </button>
@@ -46,17 +45,3 @@
   </button>
   @endif
 </div>
-
-@push('scripts')
-<script>
-  // Quand le composant Livewire émet "autoplayRedirect", on clique sur le bouton "continuer".
-  document.addEventListener('livewire:init', () => {
-    if (window.Livewire && typeof Livewire.on === 'function') {
-      Livewire.on('autoplayRedirect', () => {
-        const btn = document.getElementById('continue-button');
-        if (btn) btn.click();
-      });
-    }
-  });
-</script>
-@endpush

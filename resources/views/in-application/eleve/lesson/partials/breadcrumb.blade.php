@@ -78,7 +78,7 @@
                 </svg>
                 <span
                     class="ml-1 text-blue-600 md:ml-2 dark:text-blue-400"
-                    >{{ $lesson->title }}</span
+                    >{{ $lesson->getName() }}</span
                 >
             </div>
         </li>
