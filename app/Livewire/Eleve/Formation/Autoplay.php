@@ -20,6 +20,10 @@ class Autoplay extends Component
 
     public $showCountdown = false;
 
+    public $previousLesson;
+
+    public $nextLesson;
+
     public function autoplayOn()
     {
         session(['autoplay' => true]);
@@ -39,6 +43,7 @@ class Autoplay extends Component
         $this->formation = $formation;
         $this->currentLesson = $currentLesson;
         $this->team = $team ?? auth()->user()?->currentTeam ?? $this->formation->teams()->first();
+        $this->resolveAdjacentLessons();
 
         if (session()->has('autoplay')) {
             $this->autoplay = session()->get('autoplay');
@@ -89,6 +94,38 @@ class Autoplay extends Component
     {
         $this->showCountdown = false;
         $this->countdown = 0;
+    }
+
+    private function resolveAdjacentLessons(): void
+    {
+        $this->previousLesson = null;
+        $this->nextLesson = null;
+
+        if (! $this->currentLesson) {
+            return;
+        }
+
+        $formationWithLessons = $this->formation->load([
+            'chapters' => function ($chapterQuery) {
+                $chapterQuery->orderBy('position')
+                    ->with(['lessons' => function ($lessonQuery) {
+                        $lessonQuery->orderBy('position');
+                    }]);
+            },
+        ]);
+
+        $lessons = $formationWithLessons->chapters
+            ->flatMap(fn ($chapter) => $chapter->lessons)
+            ->values();
+
+        $currentIndex = $lessons->search(fn ($lesson) => $lesson->id === $this->currentLesson->id);
+
+        if ($currentIndex === false) {
+            return;
+        }
+
+        $this->previousLesson = $lessons->get($currentIndex - 1);
+        $this->nextLesson = $lessons->get($currentIndex + 1);
     }
 
     public function render()

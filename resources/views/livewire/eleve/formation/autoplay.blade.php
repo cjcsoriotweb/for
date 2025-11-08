@@ -1,10 +1,22 @@
-<div class="flex w-full items-center justify-between gap-3">
+<div class="flex w-full flex-col gap-3">
+  <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
+    <span class="text-gray-400 dark:text-gray-500 truncate pr-2">
+      {{ $previousLesson ? (method_exists($previousLesson, 'getName') ? $previousLesson->getName() : $previousLesson->title) : '—' }}
+    </span>
+    <span class="text-gray-900 dark:text-white truncate px-2">
+      {{ method_exists($currentLesson, 'getName') ? $currentLesson->getName() : $currentLesson?->title }}
+    </span>
+    <span class="text-gray-400 dark:text-gray-500 truncate pl-2 text-right">
+      {{ $nextLesson ? (method_exists($nextLesson, 'getName') ? $nextLesson->getName() : $nextLesson->title) : 'Fin de formation' }}
+    </span>
+  </div>
+
   {{-- Bouton vers le module suivant --}}
   @if($currentLesson && $currentLesson->chapter)
   <button type="button" wire:click="proceedToLesson"
     class="inline-flex items-center justify-between w-full px-4 py-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors">
     <div class="text-left">
-      <div class="text-sm font-semibold">Module suivant</div>
+      <div class="text-sm font-semibold">Continuer</div>
       <div class="text-xs text-blue-600/80 dark:text-blue-200/80">
         {{ method_exists($currentLesson, 'getName') ? $currentLesson->getName() : $currentLesson->title }}
       </div>
@@ -14,8 +26,8 @@
     </svg>
   </button>
   @else
-  <span class="inline-flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 font-medium text-sm rounded-lg border border-gray-200 dark:border-gray-600 cursor-not-allowed">
-    Aucune leçon disponible
+  <span class="inline-flex items-center justify-center px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium text-sm rounded-lg border border-gray-200 dark:border-gray-600">
+    Fin de formation
   </span>
   @endif
 
