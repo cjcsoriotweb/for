@@ -2,11 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Models\AssistantMessage;
 use Livewire\Component;
 
 class Assistant extends Component
 {
     public bool $isOpen = false;
+    public $messages = [];
 
     public function toggleChat()
     {
