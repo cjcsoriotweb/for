@@ -23,6 +23,64 @@ class FormateurFormationController extends Controller
         return view('out-application.formateur.formation.formation-show', compact('formation'));
     }
 
+    public function previewFormation(Formation $formation)
+    {
+        $formation->loadMissing([
+            'chapters.lessons' => fn ($query) => $query->orderBy('position'),
+            'chapters.lessons.lessonable' => function (MorphTo $morphTo) {
+                $morphTo->morphWith([
+                    VideoContent::class => [],
+                    TextContent::class => [],
+                    Quiz::class => ['quizQuestions'],
+                ]);
+            },
+        ]);
+
+        $chapters = $formation->chapters;
+        $lessonCount = $chapters->sum(fn ($chapter) => $chapter->lessons->count());
+
+        $lessons = $chapters->flatMap(fn ($chapter) => $chapter->lessons);
+        $totalDurationMinutes = $lessons->sum(function ($lesson) {
+            if (! $lesson->lessonable) {
+                return 0;
+            }
+
+            return match ($lesson->lessonable_type) {
+                VideoContent::class => (int) ($lesson->lessonable->duration_minutes ?? 0),
+                TextContent::class => (int) ($lesson->lessonable->estimated_read_time ?? 0),
+                Quiz::class => (function () use ($lesson) {
+                    $estimated = (int) ($lesson->lessonable->estimated_duration_minutes ?? 0);
+                    if ($estimated > 0) {
+                        return $estimated;
+                    }
+
+                    $questionCount = $lesson->lessonable->quizQuestions?->count()
+                        ?? $lesson->lessonable->quizQuestions()->count();
+
+                    return $questionCount > 0 ? max($questionCount * 2, 5) : 0;
+                })(),
+                default => 0,
+            };
+        });
+
+        $durationHours = intdiv($totalDurationMinutes, 60);
+        $durationMinutesRemainder = $totalDurationMinutes % 60;
+
+        $formattedEstimatedDuration = $totalDurationMinutes > 0
+            ? implode(' ', array_filter([
+                $durationHours > 0 ? $durationHours . ' h' : null,
+                $durationMinutesRemainder > 0 ? $durationMinutesRemainder . ' min' : null,
+            ]))
+            : null;
+
+        return view('out-application.formateur.formation.formation-preview', [
+            'formation' => $formation,
+            'lessonCount' => $lessonCount,
+            'totalDurationMinutes' => $totalDurationMinutes,
+            'formattedEstimatedDuration' => $formattedEstimatedDuration,
+        ]);
+    }
+
     public function showFormationTeams(Formation $formation)
     {
         $formation->loadMissing(['teams:id,name']);

@@ -130,9 +130,21 @@
                                 </div>
 
                                 <div class="pt-1">
+                                    <a href="{{ route('formateur.formation.preview', $formation) }}"
+                                        target="_blank" rel="noopener"
+                                        class="mb-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-emerald-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.752 11.168l-5.197-2.6A1 1 0 008 9.47v5.06a1 1 0 001.555.832l5.197-2.6a1 1 0 000-1.664z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Essayer la formation
+                                        <span class="text-xs font-normal text-white/80">(mode preview dédié)</span>
+                                    </a>
                                     <a href="{{ route('formateur.formation.edit.title', $formation) }}"
                                         class="mb-5 inline-block w-full items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-indigo-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                          
+
                                         Modifier le titre
                                     </a>
                                     <a href="{{ route('formateur.formation.edit.description', $formation) }}"

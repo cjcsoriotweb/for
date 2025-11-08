@@ -32,6 +32,7 @@ Route::prefix('formateur')
         // ici middleware admin
         Route::middleware(FormateurOwner::class)->group(function () {
             Route::get('/formation/{formation}/show', [FormateurFormationController::class, 'showFormation'])->name('formation.show');
+            Route::get('/formation/{formation}/preview', [FormateurFormationController::class, 'previewFormation'])->name('formation.preview');
             Route::get('/formation/{formation}/teams', [FormateurFormationController::class, 'showFormationTeams'])->name('formation.teams.index');
             Route::get('/formation/{formation}/edit', [FormateurFormationController::class, 'editFormation'])->name('formation.edit');
             Route::get('/formation/{formation}/edit/title', [FormateurFormationController::class, 'editFormationTitle'])->name('formation.edit.title');
