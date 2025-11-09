@@ -99,8 +99,13 @@ class UserActivityService
             ->with('user')
             ->orderBy('created_at', 'desc');
 
+        // Apply date filters even if only one bound is provided
         if ($startDate && $endDate) {
             $query->dateRange($startDate, $endDate);
+        } elseif ($startDate) {
+            $query->where('created_at', '>=', $startDate);
+        } elseif ($endDate) {
+            $query->where('created_at', '<=', $endDate);
         }
 
         if ($search) {
@@ -112,8 +117,20 @@ class UserActivityService
         }
 
         if ($lessonFilter) {
-            // Filter by lesson-related URLs
-            $query->where('url', 'like', '%'.$lessonFilter.'%');
+            // Filter by lesson-related URLs. If a numeric lesson ID is provided,
+            // try matching common URL patterns (raw and URL-encoded).
+            if (ctype_digit((string) $lessonFilter)) {
+                $id = (string) $lessonFilter;
+                $query->where(function ($q) use ($id) {
+                    $q->where('url', 'like', '%/lessons/'.$id.'%')
+                      ->orWhere('url', 'like', '%/lesson/'.$id.'%')
+                      ->orWhere('url', 'like', '%lessons%2F'.$id.'%')
+                      ->orWhere('url', 'like', '%lesson%2F'.$id.'%')
+                      ->orWhere('url', 'like', '%/'.$id.'%');
+                });
+            } else {
+                $query->where('url', 'like', '%'.$lessonFilter.'%');
+            }
         }
 
         if ($paginate) {
@@ -134,8 +151,13 @@ class UserActivityService
     {
         $query = UserActivityLog::forUser($userId);
 
+        // Apply date filters even if only one bound is provided
         if ($startDate && $endDate) {
             $query->dateRange($startDate, $endDate);
+        } elseif ($startDate) {
+            $query->where('created_at', '>=', $startDate);
+        } elseif ($endDate) {
+            $query->where('created_at', '<=', $endDate);
         }
 
         $logs = $query->get();

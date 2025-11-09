@@ -19,7 +19,6 @@
 
     <x-organisateur.parts.action-buttons :buttons="[
       ['type' => 'back', 'url' => route('organisateur.formations.students', [$team, $formation]), 'text' => 'Retour aux élèves'],
-      ['type' => 'pdf', 'url' => route('organisateur.formations.students.report.pdf', [$team, $formation, $student]), 'text' => 'Voir le PDF'],
       ['type' => 'download', 'url' => route('organisateur.formations.students.report.pdf.download', [$team, $formation, $student]), 'text' => 'Télécharger le PDF']
     ]" />
   </div>
