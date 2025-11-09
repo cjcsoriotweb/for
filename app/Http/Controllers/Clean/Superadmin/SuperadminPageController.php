@@ -11,6 +11,7 @@ use App\Models\SupportTicket;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,11 +42,23 @@ class SuperadminPageController extends Controller
         return view('out-application.superadmin.superadmin-console-page');
     }
 
-    public function comptaDashboard()
+    public function comptaDashboard(Request $request)
     {
-        $currentDate = now();
-        $monthStart = $currentDate->copy()->startOfMonth();
-        $monthEnd = $currentDate->copy()->endOfMonth();
+        $filterMonth = $request->query('filter_month');
+        if (is_string($filterMonth) && preg_match('/^\d{4}-\d{2}$/', $filterMonth)) {
+            $selectedMonth = Carbon::createFromFormat('Y-m', $filterMonth);
+        } else {
+            $selectedMonth = now();
+            $filterMonth = $selectedMonth->format('Y-m');
+        }
+
+        $monthStart = $selectedMonth->copy()->startOfMonth();
+        $monthEnd = $selectedMonth->copy()->endOfMonth();
+
+        $filterTeam = $request->query('filter_team');
+        $filterTeam = is_numeric($filterTeam) ? (int) $filterTeam : null;
+        $filterFormation = $request->query('filter_formation');
+        $filterFormation = is_numeric($filterFormation) ? (int) $filterFormation : null;
 
         $activeFormationsThisMonth = Formation::query()
             ->where('active', true)
@@ -62,12 +75,33 @@ class SuperadminPageController extends Controller
             ->whereColumn('usage_consumed', '<', 'usage_quota')
             ->count();
 
+        $availableTeams = Team::query()
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $availableFormations = Formation::query()
+            ->orderBy('title')
+            ->get(['id', 'title']);
+
         $topFormations = Formation::query()
             ->with(['teams'])
-            ->withCount('learners')
+            ->when($filterTeam, function (Builder $query) use ($filterTeam) {
+                $query->whereHas('teams', function (Builder $query) use ($filterTeam) {
+                    $query->where('teams.id', $filterTeam);
+                });
+            })
+            ->when($filterFormation, function (Builder $query) use ($filterFormation) {
+                $query->where('formations.id', $filterFormation);
+            })
             ->withCount([
-                'learners as completed_learners_count' => function (Builder $query) {
-                    $query->whereNotNull('formation_user.completed_at');
+                'learners as learners_count' => function (Builder $query) use ($monthStart, $monthEnd) {
+                    $query->whereNotNull('formation_user.enrolled_at')
+                        ->whereBetween('formation_user.enrolled_at', [$monthStart, $monthEnd]);
+                },
+                'learners as completed_learners_count' => function (Builder $query) use ($monthStart, $monthEnd) {
+                    $query->whereNotNull('formation_user.enrolled_at')
+                        ->whereBetween('formation_user.enrolled_at', [$monthStart, $monthEnd])
+                        ->whereNotNull('formation_user.completed_at');
                 },
             ])
             ->orderByDesc('learners_count')
@@ -123,6 +157,14 @@ class SuperadminPageController extends Controller
                 'unused_formations' => $unusedFormationSlots,
             ],
             'formations' => $formations,
+            'filters' => [
+                'month' => $filterMonth,
+                'team' => $filterTeam,
+                'formation' => $filterFormation,
+            ],
+            'selectedMonthLabel' => $selectedMonth->translatedFormat('F Y'),
+            'filterTeams' => $availableTeams,
+            'filterFormations' => $availableFormations,
         ]);
     }
 
