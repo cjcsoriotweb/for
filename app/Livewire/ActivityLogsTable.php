@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\UserActivityLog;
 use App\Services\UserActivityService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -29,6 +30,14 @@ class ActivityLogsTable extends Component
     public $lessons = [];
 
     public $formationId;
+
+    public ?int $editingIpId = null;
+
+    public string $editingIpValue = '';
+
+    protected array $rules = [
+        'editingIpValue' => 'required|ip',
+    ];
 
     public function mount($userId, $lessons = null, $formationId = null)
     {
@@ -75,6 +84,7 @@ class ActivityLogsTable extends Component
         $this->startDate = '';
         $this->endDate = '';
         $this->resetPage();
+        $this->cancelEditingIp();
         $this->loadActivityData();
     }
 
@@ -96,6 +106,52 @@ class ActivityLogsTable extends Component
 
         // Load available lessons for the filter dropdown
         $this->loadAvailableLessons();
+    }
+
+    public function startEditingIp(int $activityId): void
+    {
+        $activity = UserActivityLog::find($activityId);
+
+        if (! $activity) {
+            return;
+        }
+
+        $this->editingIpId = $activityId;
+        $this->editingIpValue = $activity->ip_address ?? '';
+    }
+
+    public function saveEditingIp(): void
+    {
+        if (! $this->editingIpId) {
+            return;
+        }
+
+        $this->validate();
+
+        $activity = UserActivityLog::find($this->editingIpId);
+
+        if (! $activity) {
+            $this->resetEditingIpState();
+            return;
+        }
+
+        $activity->update([
+            'ip_address' => $this->editingIpValue,
+        ]);
+
+        $this->loadActivityData();
+        $this->resetEditingIpState();
+    }
+
+    public function cancelEditingIp(): void
+    {
+        $this->resetEditingIpState();
+    }
+
+    private function resetEditingIpState(): void
+    {
+        $this->editingIpId = null;
+        $this->editingIpValue = '';
     }
 
     private function loadAvailableLessons()

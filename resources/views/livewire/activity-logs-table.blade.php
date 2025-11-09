@@ -123,19 +123,7 @@
             </th>
             <th
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Navigateur
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Appareil
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
               Durée
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Action
             </th>
           </tr>
         </thead>
@@ -197,25 +185,24 @@
                   </span>
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
+              wire:dblclick="startEditingIp({{ $activity->id }})">
+              @if($editingIpId === $activity->id)
+              <div class="space-y-1">
+                <input type="text" wire:model.defer="editingIpValue" wire:keydown.enter="saveEditingIp"
+                  wire:keydown.escape="cancelEditingIp" wire:blur="saveEditingIp" autofocus
+                  class="block w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  placeholder="Nouvelle IP">
+                @error('editingIpValue')
+                <p class="text-xs text-red-600">{{ $message }}</p>
+                @enderror
+              </div>
+              @else
               {{ $activity->formatted_ip }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-              {{ $activity->browser_info ?? 'N/A' }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-              {{ $activity->device_type }}
+              @endif
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
               {{ $activity->formatted_duration }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $activity->method === 'GET' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                                   ($activity->method === 'POST' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                                   'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200') }}">
-                {{ $activity->method }}
-              </span>
             </td>
           </tr>
           @endforeach
