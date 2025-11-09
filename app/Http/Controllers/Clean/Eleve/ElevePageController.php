@@ -1482,18 +1482,6 @@ class ElevePageController extends Controller
     {
         $user = Auth::user();
 
-        $isEnrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation, $team);
-        if (! $isEnrolled) {
-            if (! $this->formationEnrollmentService->canTeamAffordFormation($team, $formation)) {
-                abort(403, 'Votre équipe ne dispose pas de crédit pour cette formation.');
-            }
-
-            $enrolled = $this->formationEnrollmentService->enrollUser($formation, $team, $user->id);
-            if (! $enrolled) {
-                abort(403, 'Impossible de vous inscrire pour le moment. Contactez un administrateur.');
-            }
-        }
-
         // Vérifier si la formation a un quiz d'entrée
         $entryQuiz = $formation->entryQuiz;
         if (! $entryQuiz) {
@@ -1536,21 +1524,16 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Soumettre les r├®ponses du quiz d'entr├®e
+     * Soumettre les réponses du quiz d'entrée
      */
     public function submitEntryQuiz(Team $team, Formation $formation, Request $request)
     {
         $user = Auth::user();
 
-        // V├®rifier si l'├®tudiant est inscrit ├á la formation
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return response()->json(['error' => 'Non autoris├®'], 403);
-        }
-
-        // V├®rifier si la formation a un quiz d'entr├®e
+        // Vérifier si la formation a un quiz d'entrée
         $entryQuiz = $formation->entryQuiz;
         if (! $entryQuiz) {
-            return response()->json(['error' => 'Quiz d\'entr├®e non trouv├®'], 404);
+            return response()->json(['error' => 'Quiz d\'entrée non trouvé'], 404);
         }
 
         $answers = $request->input('answers', []);
@@ -1559,7 +1542,32 @@ class ElevePageController extends Controller
         $quizService = app(\App\Services\Quiz\QuizService::class);
         $result = $quizService->submitFormationQuiz($user, $entryQuiz, $answers, \App\Models\QuizAttempt::TYPE_PRE);
 
-        // Mettre ├á jour la progression de l'├®tudiant dans la formation
+        [$minScore, $maxScore] = $this->resolveEntryQuizThresholds($entryQuiz);
+
+        if ($result['score'] < $minScore) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('error', 'Votre niveau actuel est insuffisant pour cette formation (score: '.round($result['score'], 1).'%). Un formateur vous contactera pour vous orienter vers un parcours plus adapté.');
+        }
+
+        if ($result['score'] > $maxScore) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('error', 'Votre niveau est trop élevé pour cette formation (score: '.round($result['score'], 1).'%). Un superadmin vous contactera pour vous proposer une formation plus adaptée.');
+        }
+
+        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
+            if (! $this->formationEnrollmentService->canTeamAffordFormation($team, $formation)) {
+                return redirect()->route('eleve.formation.show', [$team, $formation])
+                    ->with('error', 'Votre équipe ne dispose plus de crédit pour cette formation.');
+            }
+
+            $enrolled = $this->formationEnrollmentService->enrollUser($formation, $team, $user->id);
+            if (! $enrolled) {
+                return redirect()->route('eleve.formation.show', [$team, $formation])
+                    ->with('error', 'Impossible de valider votre inscription. Contactez un administrateur.');
+            }
+        }
+
+        // Mettre à jour la progression de l'étudiant dans la formation
         $formation->learners()->syncWithoutDetaching([
             $user->id => [
                 'entry_quiz_attempt_id' => $result['attempt_id'],
@@ -1569,23 +1577,9 @@ class ElevePageController extends Controller
             ],
         ]);
 
-        // V├®rifier si l'├®tudiant a r├®ussi le quiz
-        [$minScore, $maxScore] = $this->resolveEntryQuizThresholds($entryQuiz);
-
-        if ($result['score'] < $minScore) {
-            return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('error', 'Votre niveau actuel est insuffisant pour cette formation (score: '.round($result['score'], 1).'%). Un formateur vous contactera pour vous orienter vers un parcours plus adapt├®.');
-        }
-
-        if ($result['score'] > $maxScore) {
-            return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('error', 'Votre niveau est trop ├®lev├® pour cette formation (score: '.round($result['score'], 1).'%). Un superadmin vous contactera pour vous proposer une formation plus adapt├®e.');
-        }
-
         return redirect()->route('eleve.formation.show', [$team, $formation])
-            ->with('success', 'F├®licitations ! Votre niveau correspond parfaitement ├á cette formation (score: '.round($result['score'], 1).'%). Vous pouvez maintenant commencer.');
+            ->with('success', 'Félicitations ! Votre niveau correspond parfaitement à cette formation (score: '.round($result['score'], 1).'%). Vous pouvez maintenant commencer.');
     }
-
     /**
      * Afficher les r├®sultats du quiz d'entr├®e
      */
