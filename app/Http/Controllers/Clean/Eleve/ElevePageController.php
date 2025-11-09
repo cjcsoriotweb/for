@@ -1482,16 +1482,23 @@ class ElevePageController extends Controller
     {
         $user = Auth::user();
 
-        // Vérifier si l'étudiant est inscrit à la formation
-        if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n'etes pas inscrit à cette formation');
+        $isEnrolled = $this->studentFormationService->isEnrolledInFormation($user, $formation, $team);
+        if (! $isEnrolled) {
+            if (! $this->formationEnrollmentService->canTeamAffordFormation($team, $formation)) {
+                abort(403, 'Votre équipe ne dispose pas de crédit pour cette formation.');
+            }
+
+            $enrolled = $this->formationEnrollmentService->enrollUser($formation, $team, $user->id);
+            if (! $enrolled) {
+                abort(403, 'Impossible de vous inscrire pour le moment. Contactez un administrateur.');
+            }
         }
 
         // Vérifier si la formation a un quiz d'entrée
         $entryQuiz = $formation->entryQuiz;
         if (! $entryQuiz) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('info', 'Cette formation n'a pas de quiz d'entrée.');
+                ->with('info', 'Cette formation n\'a pas de quiz d\'entrée.');
         }
 
         $formationUser = $this->fetchFormationUser($team, $formation, $user);
