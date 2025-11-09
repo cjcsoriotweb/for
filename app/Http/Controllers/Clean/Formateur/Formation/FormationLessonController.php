@@ -758,6 +758,31 @@ class FormationLessonController
             ->each(fn (LessonResource $resource) => $this->deleteLessonResource($resource));
     }
 
+       public function moveLessonUp(Formation $formation, Chapter $chapter, Lesson $lesson, FormationService $formationService)
+    {
+        try {
+            $formationService->lessons()->moveLessonUp($formation, $chapter, $lesson);
+            return redirect()->route('formateur.formation.chapters.index', $formation)
+                ->with('success', 'Module déplacé vers le haut.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Erreur lors du déplacement: ' . $e->getMessage()]);
+        }
+    }
+
+    public function moveLessonDown(Formation $formation, Chapter $chapter, Lesson $lesson, FormationService $formationService)
+    {
+        try {
+            $formationService->lessons()->moveLessonDown($formation, $chapter, $lesson);
+            return redirect()->route('formateur.formation.chapters.index', $formation)
+                ->with('success', 'Module déplacé vers le bas.');
+
+            return redirect()->route('formateur.formation.chapters.index', $formation)->with('success', 'Module déplacé vers le haut.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Erreur lors du déplacement: ' . $e->getMessage()]);
+        }
+    }
+
+    
     /**
      * Delete a stored resource and its file safely.
      */

@@ -1,5 +1,4 @@
-﻿<?php
-
+<?php
 namespace App\Services\Formation;
 
 use App\Models\Chapter;
@@ -98,5 +97,6 @@ class LessonFormationService extends BaseFormationService
             }
             $i++;
         }
-    }}\r
+    }
+}
 
