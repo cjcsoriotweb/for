@@ -17,35 +17,14 @@
             'route' => route('superadmin.users.index'),
         ],
         [
-            'title' => __('Formations'),
-            'description' => __('Mettez a jour le catalogue global.'),
-            'stat' => number_format($stats->get('formations', 0)) . ' ' . __('formations'),
-            'icon' => 'library_books',
-            'route' => route('superadmin.formations.index'),
-        ],
-        [
-            'title' => __('Validations'),
+            'title' => __('Valider fin de formation'),
             'description' => __('Validez les demandes de fin de formation.'),
             'stat' => '0 ' . __('demandes'), // TODO: Add actual count
             'icon' => 'check_circle',
             'route' => route('superadmin.completion-requests.index'),
         ],
         [
-            'title' => __('Assistants IA'),
-            'description' => __('Creez ou ajustez les formateurs IA.'),
-            'stat' => number_format($trainerCount) . ' ' . __('assistants'),
-            'icon' => 'smart_toy',
-            'route' => route('superadmin.ai.index'),
-        ],
-        [
-            'title' => __('Invitations'),
-            'description' => __('Suivez les acces en attente et relancez.'),
-            'stat' => number_format($stats->get('invitations', 0)) . ' ' . __('invites'),
-            'icon' => 'forward_to_inbox',
-            'route' => route('superadmin.teams.index', ['focus' => 'invitations']),
-        ],
-        [
-            'title' => __('Support & tests'),
+            'title' => __('Support client'),
             'description' => __('Centre support et batterie de tests.'),
             'stat' => number_format($stats->get('tickets', 0)) . ' ' . __('tickets'),
             'icon' => 'support_agent',

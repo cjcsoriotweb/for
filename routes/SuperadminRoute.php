@@ -24,6 +24,7 @@ Route::prefix('superadmin')
         Route::post('/completion-requests/{formationUser}/cancel', [SuperadminPageController::class, 'cancelCompletionRequest'])->name('completion-requests.cancel');
         Route::get('/support', [SuperadminPageController::class, 'supportIndex'])->name('support.index');
         Route::get('/console', [SuperadminPageController::class, 'console'])->name('console');
+        Route::get('/compta', [SuperadminPageController::class, 'comptaDashboard'])->name('compta.index');
         Route::get('/db', function () {
             return view('out-application.superadmin.superadmin-db-page');
         })->name('db');

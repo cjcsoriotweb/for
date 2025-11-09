@@ -7,11 +7,11 @@ use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\FormationInTeams;
 use App\Models\FormationUser;
-
 use App\Models\SupportTicket;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +39,91 @@ class SuperadminPageController extends Controller
     public function console()
     {
         return view('out-application.superadmin.superadmin-console-page');
+    }
+
+    public function comptaDashboard()
+    {
+        $currentDate = now();
+        $monthStart = $currentDate->copy()->startOfMonth();
+        $monthEnd = $currentDate->copy()->endOfMonth();
+
+        $activeFormationsThisMonth = Formation::query()
+            ->where('active', true)
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->count();
+
+        $studentsStartedThisMonth = FormationUser::query()
+            ->whereNotNull('enrolled_at')
+            ->whereBetween('enrolled_at', [$monthStart, $monthEnd])
+            ->count();
+
+        $unusedFormationSlots = FormationInTeams::query()
+            ->whereNotNull('usage_quota')
+            ->whereColumn('usage_consumed', '<', 'usage_quota')
+            ->count();
+
+        $topFormations = Formation::query()
+            ->with(['teams'])
+            ->withCount('learners')
+            ->withCount([
+                'learners as completed_learners_count' => function (Builder $query) {
+                    $query->whereNotNull('formation_user.completed_at');
+                },
+            ])
+            ->orderByDesc('learners_count')
+            ->take(5)
+            ->get();
+
+        $formations = $topFormations->map(function (Formation $formation) {
+            $team = $formation->teams->first();
+            $statusKey = 'not-started';
+
+            if ($formation->learners_count > 0) {
+                $statusKey = $formation->completed_learners_count >= $formation->learners_count
+                    ? 'completed'
+                    : 'in-progress';
+            }
+
+            $statusClasses = match ($statusKey) {
+                'completed' => [
+                    'bg' => 'bg-green-100 dark:bg-green-900/40',
+                    'text' => 'text-green-800 dark:text-green-300',
+                ],
+                'in-progress' => [
+                    'bg' => 'bg-blue-100 dark:bg-blue-900/40',
+                    'text' => 'text-blue-800 dark:text-blue-300',
+                ],
+                default => [
+                    'bg' => 'bg-gray-100 dark:bg-gray-700/40',
+                    'text' => 'text-gray-800 dark:text-gray-300',
+                ],
+            };
+
+            $statusLabel = match ($statusKey) {
+                'completed' => __('Terminée'),
+                'in-progress' => __('En cours'),
+                default => __('Non commencée'),
+            };
+
+            return [
+                'id' => $formation->id,
+                'name' => $formation->title,
+                'team' => $team->name ?? __('Non assignée'),
+                'students' => $formation->learners_count,
+                'status_label' => $statusLabel,
+                'status_classes' => $statusClasses,
+                'route' => route('superadmin.formations.show', $formation),
+            ];
+        });
+
+        return view('out-application.superadmin.compta.index', [
+            'stats' => [
+                'active_formations' => $activeFormationsThisMonth,
+                'students_started' => $studentsStartedThisMonth,
+                'unused_formations' => $unusedFormationSlots,
+            ],
+            'formations' => $formations,
+        ]);
     }
 
     public function teamsIndex(Request $request)
