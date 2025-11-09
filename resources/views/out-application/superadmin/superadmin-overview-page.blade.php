@@ -94,6 +94,36 @@
                 </a>
             @endforeach
         </section>
-        <iframe src="https://goodview.fr/db/" width="100%" height="1000px"></iframe>
+        <section class="rounded-3xl border border-slate-100 bg-gradient-to-r from-indigo-500 to-sky-500 p-8 shadow-lg ring-1 ring-black/5 transition dark:border-slate-800">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-white/90">
+                        {{ __('Utilitaires') }}
+                    </p>
+                    <h2 class="text-2xl font-semibold text-white">
+                        {{ __('Console Superadmin + phpMyAdmin') }}
+                    </h2>
+                    <p class="text-sm text-white/80">
+                        {{ __('Ouvrez la page DB pour retrouver l’iframe habituel et un accès à phpMyAdmin en un seul clic.') }}
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a
+                        href="{{ route('superadmin.console') }}"
+                        class="inline-flex items-center justify-center rounded-2xl border border-white/50 bg-white/90 px-6 py-3 text-sm font-semibold text-indigo-600 transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    >
+                        {{ __('Ouvrir la console DB') }}
+                    </a>
+                    <a
+                        href="{{ route('superadmin.db') }}"
+                        target="_blank"
+                        rel="noreferrer"
+                        class="inline-flex items-center justify-center rounded-2xl border border-white/50 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    >
+                        {{ __('PhpMyAdmin') }}
+                    </a>
+                </div>
+            </div>
+        </section>
     </div>
 </x-admin.global-layout>

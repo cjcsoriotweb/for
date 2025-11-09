@@ -23,6 +23,9 @@ Route::prefix('superadmin')
         Route::post('/completion-requests/{formationUser}/reject', [SuperadminPageController::class, 'rejectCompletionRequest'])->name('completion-requests.reject');
         Route::post('/completion-requests/{formationUser}/cancel', [SuperadminPageController::class, 'cancelCompletionRequest'])->name('completion-requests.cancel');
         Route::get('/support', [SuperadminPageController::class, 'supportIndex'])->name('support.index');
+        Route::get('/db', function () {
+            return view('out-application.superadmin.superadmin-db-page');
+        })->name('db');
         Route::prefix('ai')
             ->name('ai.')
             ->group(function (): void {
