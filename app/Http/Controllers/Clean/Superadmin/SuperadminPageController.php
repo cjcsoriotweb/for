@@ -60,19 +60,29 @@ class SuperadminPageController extends Controller
         $filterFormation = $request->query('filter_formation');
         $filterFormation = is_numeric($filterFormation) ? (int) $filterFormation : null;
 
-        $activeFormationsThisMonth = Formation::query()
-            ->where('active', true)
-            ->whereBetween('created_at', [$monthStart, $monthEnd])
-            ->count();
+        // Formations actives: formations ayant des inscriptions commencées dans la période sélectionnée
+        $activeFormationsThisMonth = FormationUser::query()
+            ->whereNotNull('enrolled_at')
+            ->whereBetween('enrolled_at', [$monthStart, $monthEnd])
+            ->when($filterTeam, fn ($q) => $q->where('team_id', $filterTeam))
+            ->when($filterFormation, fn ($q) => $q->where('formation_id', $filterFormation))
+            ->distinct('formation_id')
+            ->count('formation_id');
 
+        // Elèves ayant commencé pendant la période + filtres
         $studentsStartedThisMonth = FormationUser::query()
             ->whereNotNull('enrolled_at')
             ->whereBetween('enrolled_at', [$monthStart, $monthEnd])
+            ->when($filterTeam, fn ($q) => $q->where('team_id', $filterTeam))
+            ->when($filterFormation, fn ($q) => $q->where('formation_id', $filterFormation))
             ->count();
 
+        // Licences non consommées (quand filtré: par équipe et/ou formation)
         $unusedFormationSlots = FormationInTeams::query()
             ->whereNotNull('usage_quota')
             ->whereColumn('usage_consumed', '<', 'usage_quota')
+            ->when($filterTeam, fn ($q) => $q->where('team_id', $filterTeam))
+            ->when($filterFormation, fn ($q) => $q->where('formation_id', $filterFormation))
             ->count();
 
         $availableTeams = Team::query()
@@ -94,14 +104,20 @@ class SuperadminPageController extends Controller
                 $query->where('formations.id', $filterFormation);
             })
             ->withCount([
-                'learners as learners_count' => function (Builder $query) use ($monthStart, $monthEnd) {
+                'learners as learners_count' => function (Builder $query) use ($monthStart, $monthEnd, $filterTeam) {
                     $query->whereNotNull('formation_user.enrolled_at')
                         ->whereBetween('formation_user.enrolled_at', [$monthStart, $monthEnd]);
+                    if ($filterTeam) {
+                        $query->where('formation_user.team_id', $filterTeam);
+                    }
                 },
-                'learners as completed_learners_count' => function (Builder $query) use ($monthStart, $monthEnd) {
+                'learners as completed_learners_count' => function (Builder $query) use ($monthStart, $monthEnd, $filterTeam) {
                     $query->whereNotNull('formation_user.enrolled_at')
                         ->whereBetween('formation_user.enrolled_at', [$monthStart, $monthEnd])
                         ->whereNotNull('formation_user.completed_at');
+                    if ($filterTeam) {
+                        $query->where('formation_user.team_id', $filterTeam);
+                    }
                 },
             ])
             ->orderByDesc('learners_count')
@@ -150,6 +166,80 @@ class SuperadminPageController extends Controller
             ];
         });
 
+
+
+        // Suivi des élèves inscrits (par période/équipe/formation)
+        $sort = (string) $request->query('sort', 'date_desc');
+        $allowedSorts = ['date_desc', 'date_asc', 'status_desc', 'status_asc'];
+        if (! in_array($sort, $allowedSorts, true)) {
+            $sort = 'date_desc';
+        }
+
+        $enrollments = FormationUser::query()
+            ->with([
+                'formation:id,title',
+                'team:id,name',
+                'user:id,name',
+            ])
+            ->whereNotNull('enrolled_at')
+            ->whereBetween('enrolled_at', [$monthStart, $monthEnd])
+            ->when($filterTeam, fn ($q) => $q->where('team_id', $filterTeam))
+            ->when($filterFormation, fn ($q) => $q->where('formation_id', $filterFormation))
+            ->orderByDesc('enrolled_at')
+            ->limit(100)
+            ->get()
+            ->map(function (FormationUser $fu) {
+                $statusKey = $fu->completed_at ? 'completed' : (($fu->last_seen_at || $fu->enrolled_at) ? 'in-progress' : 'not-started');
+
+                $statusClasses = match ($statusKey) {
+                    'completed' => [
+                        'bg' => 'bg-green-100 dark:bg-green-900/40',
+                        'text' => 'text-green-800 dark:text-green-300',
+                    ],
+                    'in-progress' => [
+                        'bg' => 'bg-blue-100 dark:bg-blue-900/40',
+                        'text' => 'text-blue-800 dark:text-blue-300',
+                    ],
+                    default => [
+                        'bg' => 'bg-gray-100 dark:bg-gray-700/40',
+                        'text' => 'text-gray-800 dark:text-gray-300',
+                    ],
+                };
+
+                $statusLabel = match ($statusKey) {
+                    'completed' => __('Terminée'),
+                    'in-progress' => __('En cours'),
+                    default => __('Non commencée'),
+                };
+
+                return [
+                    'formation_name' => $fu->formation?->title ?? __('Inconnue'),
+                    'team_name' => $fu->team?->name ?? __('Non assignée'),
+                    'student_name' => $fu->user?->name ?? __('Utilisateur supprimé'),
+                    'status_label' => $statusLabel,
+                    'status_classes' => $statusClasses,
+                    'status_key' => $statusKey,
+                    'enrolled_at' => $fu->enrolled_at,
+                    'formation_route' => $fu->formation ? route('superadmin.formations.show', $fu->formation) : '#',
+                    'user_route' => $fu->user ? route('superadmin.users.show', $fu->user) : '#',
+                ];
+            });
+        // Tri c�t� collection si demand�
+        if (in_array($sort, ['status_desc', 'status_asc'], true)) {
+            $rank = [
+                'not-started' => 0,
+                'in-progress' => 1,
+                'completed' => 2,
+            ];
+            $enrollments = $enrollments->sortBy(
+                fn (array $e) => $rank[$e['status_key']] ?? 0,
+                SORT_REGULAR,
+                $sort === 'status_desc'
+            )->values();
+        } elseif ($sort === 'date_asc') {
+            $enrollments = $enrollments->sortBy('enrolled_at')->values();
+        }
+
         return view('out-application.superadmin.compta.index', [
             'stats' => [
                 'active_formations' => $activeFormationsThisMonth,
@@ -157,10 +247,12 @@ class SuperadminPageController extends Controller
                 'unused_formations' => $unusedFormationSlots,
             ],
             'formations' => $formations,
+            'enrollments' => $enrollments,
             'filters' => [
                 'month' => $filterMonth,
                 'team' => $filterTeam,
                 'formation' => $filterFormation,
+                'sort' => $sort,
             ],
             'selectedMonthLabel' => $selectedMonth->translatedFormat('F Y'),
             'filterTeams' => $availableTeams,

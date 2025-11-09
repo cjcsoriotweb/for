@@ -30,6 +30,13 @@
             'icon' => 'support_agent',
             'route' => route('superadmin.support.index'),
         ],
+               [
+            'title' => __('Comptabilité'),
+            'description' => __('....'),
+            'stat' => '',
+            'icon' => 'money',
+            'route' => route('superadmin.compta.index'),
+        ],
     ];
 @endphp
 
