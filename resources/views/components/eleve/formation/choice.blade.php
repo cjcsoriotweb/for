@@ -15,21 +15,21 @@
 
   @if($formations->isNotEmpty())
   <div class="-mx-4 overflow-hidden sm:-mx-2">
-    <div class="flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 sm:px-2">
+    <div class="grid grid-cols-1 gap-5 px-4 pb-4 sm:px-2 sm:grid-cols-2">
       @foreach($formations as $formation)
       @php
       $isEnrolled = data_get($formation, 'is_enrolled', false);
       $canJoin = data_get($formation, 'can_join', true);
       @endphp
       <article
-        class="group flex min-w-[260px] max-w-xs snap-start flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-colors duration-200 hover:border-slate-300">
-        <div class="h-36 w-full overflow-hidden border-b border-slate-200 bg-slate-50 sm:h-40">
+        class="group flex w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors duration-200 hover:border-slate-300">
+        <div class="h-24 w-full overflow-hidden border-b border-slate-200 bg-slate-50 sm:h-28">
           <img src="{{ $formation['cover_image_url'] }}" alt="Image de couverture de {{ $formation['title'] }}"
             class="h-full w-full object-cover" loading="lazy"
             onerror="this.src='{{ asset('images/formation-placeholder.svg') }}';" />
         </div>
 
-        <div class="flex flex-1 flex-col justify-between gap-6 p-6">
+        <div class="flex flex-1 flex-col justify-between gap-4 p-4">
           <div class="space-y-4">
             <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-600">
               <span>{{ $formation['status_label'] }}</span>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="space-y-3 text-slate-700">
-              <h3 class="text-lg font-semibold leading-snug text-slate-900 line-clamp-2">
+              <h3 class="text-base font-semibold leading-snug text-slate-900 line-clamp-2">
                 {{ $formation['title'] }}
               </h3>
               <p class="text-sm text-slate-600/80 line-clamp-3">
@@ -52,7 +52,7 @@
             </div>
           </div>
 
-          <div class="space-y-4 pt-6">
+          <div class="space-y-3 pt-4">
             @if($formation['has_progress'])
             <div>
               <div
@@ -60,7 +60,7 @@
                 <span>Progression</span>
                 <span>{{ $formation['progress_percent'] }}%</span>
               </div>
-              <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+              <div class="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
                 <div class="h-full rounded-full bg-slate-600 transition-all duration-300"
                   style="width: {{ $formation['progress_percent'] }}%;"></div>
               </div>
@@ -69,7 +69,7 @@
 
             @if($isEnrolled)
             <a href="{{ $formation['show_route'] }}"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-white">
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-950 transition hover:bg-white">
               Continuer la formation
               <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"
                 aria-hidden="true">
@@ -86,7 +86,7 @@
             <x-forms.eleve.join-formation :formation="$formation" />
             @else
               <div
-                class="rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-700">
+                class="rounded-xl border border-slate-300 bg-slate-100 px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-700">
                 Plus d'utilisations disponibles
               </div>
             @endif

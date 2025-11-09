@@ -18,8 +18,6 @@ class RegisterForm extends Component
 
     public $password = '';
 
-    public $password_confirmation = '';
-
     public $terms = false;
 
     public $totalSteps = 4;
@@ -71,8 +69,7 @@ class RegisterForm extends Component
                 break;
             case 3:
                 $rules = [
-                    'password' => 'required|string|min:12|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/',
-                    'password_confirmation' => 'required|string|same:password',
+                    'password' => 'required|string|min:6',
                 ];
                 break;
             case 4:
@@ -97,8 +94,7 @@ class RegisterForm extends Component
             $this->validate([
                 'name' => 'required|string|min:2|max:255',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:12|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/',
-                'password_confirmation' => 'required|string|same:password',
+                'password' => 'required|string|min:6',
             ]);
 
             Log::info('Validation passée');
@@ -146,7 +142,7 @@ class RegisterForm extends Component
             $maxStep = 3;
         }
 
-        if (! empty($this->password) && ! empty($this->password_confirmation)) {
+        if (! empty($this->password)) {
             $maxStep = 4;
         }
 
@@ -160,33 +156,23 @@ class RegisterForm extends Component
         return match ($firstField) {
             'name' => 1,
             'email' => 2,
-            'password', 'password_confirmation' => 3,
+            'password' => 3,
             default => 1,
         };
     }
 
     public function getPasswordStrength()
     {
-        $password = $this->password;
-        $strength = 0;
-        $checks = [
-            'length' => strlen($password) >= 12,
-            'lowercase' => preg_match('/[a-z]/', $password),
-            'uppercase' => preg_match('/[A-Z]/', $password),
-            'number' => preg_match('/\d/', $password),
-            'special' => preg_match('/[@$!%*?&]/', $password),
-        ];
+        $length = strlen((string) $this->password);
 
-        $strength = array_sum($checks);
-
-        if ($strength <= 2) {
+        if ($length < 3) {
             return ['level' => 'weak', 'percentage' => 25, 'color' => 'red', 'text' => 'Faible'];
-        } elseif ($strength <= 3) {
+        } elseif ($length < 6) {
             return ['level' => 'medium', 'percentage' => 50, 'color' => 'yellow', 'text' => 'Moyen'];
-        } elseif ($strength <= 4) {
-            return ['level' => 'strong', 'percentage' => 75, 'color' => 'blue', 'text' => 'Fort'];
+        } elseif ($length < 10) {
+            return ['level' => 'strong', 'percentage' => 75, 'color' => 'blue', 'text' => 'Valide'];
         } else {
-            return ['level' => 'very-strong', 'percentage' => 100, 'color' => 'green', 'text' => 'Très fort'];
+            return ['level' => 'very-strong', 'percentage' => 100, 'color' => 'green', 'text' => 'Très bien'];
         }
     }
 

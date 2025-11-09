@@ -11,7 +11,7 @@
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
       <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500/80">Votre &eacute;quipe</p>
-      <h2 class="text-2xl font-bold text-slate-900">Managers &agrave; contacter</h2>
+      <h2 class="text-2xl font-bold text-slate-900">Managers à contacter</h2>
       <p class="mt-1 text-sm text-slate-600">
         Identifiez rapidement les responsables qui accompagnent votre parcours au sein de
         {{ $team->name }}.

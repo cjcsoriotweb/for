@@ -76,26 +76,7 @@
                     @enderror
                 </div>
 
-                <div class="space-y-2">
-                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
-                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Confirmer le mot de passe
-                    </label>
-                    <div class="relative">
-                        <input
-                            wire:model.defer="password_confirmation"
-                            type="password"
-                            id="password_confirmation"
-                            placeholder="Confirmer votre mot de passe"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-                        />
-                    </div>
-                    @error('password_confirmation')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                
 
                 @if($password)
                     <div class="mt-4 p-4 bg-gray-50 rounded-lg">
@@ -109,7 +90,7 @@
                             <div class="h-2 rounded-full transition-all duration-300 {{ $this->getPasswordStrength()['color'] === 'red' ? 'bg-red-500' : ($this->getPasswordStrength()['color'] === 'yellow' ? 'bg-yellow-500' : ($this->getPasswordStrength()['color'] === 'blue' ? 'bg-blue-500' : 'bg-green-500')) }}" style="width: {{ $this->getPasswordStrength()['percentage'] }}%"></div>
                         </div>
                         <div class="mt-2 text-xs text-gray-600">
-                            <p>Le mot de passe doit contenir au moins 12 caractères avec majuscules, minuscules, chiffres et caractères spéciaux.</p>
+                            <p>Le mot de passe doit contenir au moins 6 caractères.</p>
                         </div>
                     </div>
                 @endif
