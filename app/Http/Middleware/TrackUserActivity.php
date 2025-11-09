@@ -87,6 +87,15 @@ class TrackUserActivity
             return true;
         }
 
+        $routeName = $request->route()?->getName();
+        if ($routeName && (
+            str_starts_with($routeName, 'formateur.') ||
+            str_starts_with($routeName, 'application.admin.') ||
+            str_starts_with($routeName, 'organisateur.')
+        )) {
+            return true;
+        }
+
         return false;
     }
 }

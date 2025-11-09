@@ -149,9 +149,52 @@
               </div>
             </td>
             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-              <div class="flex flex-col">
-                <span class="font-medium">{{ $activity->getFormationName() ?? 'N/A' }}</span>
-                <span class="text-xs text-gray-500">{{ $activity->getLessonName() ?? 'Page générale' }}</span>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2 text-sm font-medium">
+                  @php
+                  $iconVariant = match (true) {
+                      $activity->is_quiz => 'quiz',
+                      $activity->lesson_type === 'text' => 'text',
+                      $activity->lesson_type === 'video' => 'video',
+                      $activity->is_lesson => 'lesson',
+                      default => 'page',
+                  };
+                  $iconClasses = match ($iconVariant) {
+                      'quiz' => 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200',
+                      'text' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200',
+                      'video', 'lesson' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200',
+                      default => 'bg-slate-100 text-slate-500 dark:bg-slate-700/40 dark:text-slate-300',
+                  };
+                  @endphp
+                  <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl {{ $iconClasses }}">
+                    @if($iconVariant === 'quiz')
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9Zm0 2c-3.866 0-7 3.134-7 7s3.134 7 7 7 7-3.134 7-7-3.134-7-7-7Zm-.25 3.75a1.25 1.25 0 0 1 2.5 0c0 .69-.56 1.25-1.25 1.25h-.25v1h.25c1.247 0 2.25-1.003 2.25-2.25s-1.003-2.25-2.25-2.25-2.25 1.003-2.25 2.25H8.75c0-2.07 1.68-3.75 3.75-3.75Zm0 7.5c.414 0 .75.336.75.75v.75h-1.5v-.75c0-.414.336-.75.75-.75Z" />
+                    </svg>
+                    @elseif($iconVariant === 'text')
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M7 4.25a.75.75 0 0 0 0 1.5H16.5a.75.75 0 0 0 0-1.5H7Zm0 4a.75.75 0 0 0 0 1.5H13a.75.75 0 0 0 0-1.5H7Zm0 4a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5H7Zm0 4a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H7Z" />
+                    </svg>
+                    @elseif($iconVariant === 'video' || $iconVariant === 'lesson')
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M17 5.25a1 1 0 0 1 1 1v11.5a1 1 0 0 1-1.555.832L10 15.861V8.139l6.444-3.721A1 1 0 0 1 17 5.25Z" />
+                      <path d="M5 6.25C5 5.007 6.007 4 7.25 4h2.5c1.243 0 2.25 1.007 2.25 2.25v11.5C12 18.993 10.993 20 9.75 20h-2.5C5.007 20 4 18.993 4 17.75V6.25Z" />
+                    </svg>
+                    @else
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 5.25C3 4.007 4.007 3 5.25 3h13.5C19.993 3 21 4.007 21 5.25v13.5c0 1.243-1.007 2.25-2.25 2.25H5.25C4.007 21 3 19.993 3 18.75V5.25Z" />
+                      <path d="M7.5 7.5h9v9h-9z" fill="#fff" />
+                    </svg>
+                    @endif
+                  </span>
+                  <span>{{ $activity->formation_label }}</span>
+                </div>
+                  <span class="text-xs text-gray-500">
+                    {{ $activity->getLessonName() ?? $activity->lesson_type_label }}
+                  </span>
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">

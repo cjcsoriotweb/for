@@ -2,13 +2,26 @@
 
 namespace App\Models;
 
+use App\Models\Lesson;
+use App\Models\Quiz;
+use App\Models\TextContent;
+use App\Models\VideoContent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class UserActivityLog extends Model
 {
     /** @use HasFactory<\Database\Factories\UserActivityLogFactory> */
     use HasFactory;
+
+    private ?Lesson $resolvedLesson = null;
+    private static array $formationTitlePlaceholders = [
+        'titre par defaut',
+        'titre par default',
+        'titre par défaut',
+        'nouvelle formation',
+    ];
 
     public $fillable = [
         'user_id',
@@ -142,28 +155,34 @@ class UserActivityLog extends Model
         return 'Desktop';
     }
 
+    public function getIsLessonAttribute(): bool
+    {
+        return (bool) $this->url && str_contains($this->url, '/lesson/');
+    }
+
+    public function getIsQuizAttribute(): bool
+    {
+        return (bool) $this->url && str_contains($this->url, '/quiz/');
+    }
+
     /**
      * Get formation name from URL
      */
     public function getFormationName(): ?string
     {
-        if (! $this->url) {
+        $formationId = $this->extractFormationIdFromUrl();
+
+        if (! $formationId) {
             return null;
         }
 
-        // Extract formation ID from URL pattern: /organisateur/{team}/formations/{formation}/...
-        $pattern = '/\/organisateur\/\d+\/formations\/(\d+)/';
-        if (preg_match($pattern, $this->url, $matches)) {
-            try {
-                $formation = \App\Models\Formation::find($matches[1]);
+        try {
+            $formation = \App\Models\Formation::find($formationId);
 
-                return $formation ? $formation->title : null;
-            } catch (\Exception $e) {
-                return null;
-            }
+            return $formation ? $formation->title : null;
+        } catch (\Exception $e) {
+            return null;
         }
-
-        return null;
     }
 
     /**
@@ -171,20 +190,16 @@ class UserActivityLog extends Model
      */
     public function getLessonName(): ?string
     {
-        if (! $this->url) {
+        try {
+            if ($lesson = $this->resolveLesson()) {
+                return $lesson->getName();
+            }
+        } catch (\Exception $e) {
             return null;
         }
 
-        // Extract lesson ID from URL pattern: /eleve/{team}/formations/{formation}/chapters/{chapter}/lessons/{lesson}
-        $pattern = '/\/eleve\/\d+\/formations\/\d+\/chapters\/\d+\/lessons\/(\d+)/';
-        if (preg_match($pattern, $this->url, $matches)) {
-            try {
-                $lesson = \App\Models\Lesson::find($matches[1]);
-
-                return $lesson ? $lesson->title : null;
-            } catch (\Exception $e) {
-                return null;
-            }
+        if (! $this->url) {
+            return null;
         }
 
         // Check if it's a quiz attempt page
@@ -198,6 +213,72 @@ class UserActivityLog extends Model
         }
 
         return null;
+    }
+
+    public function getFormationLabelAttribute(): string
+    {
+        $title = $this->getFormationName();
+
+        if ($title && ! $this->isFormationTitlePlaceholder($title)) {
+            return $title;
+        }
+
+        return $this->lesson_type_label;
+    }
+
+    private function isFormationTitlePlaceholder(string $title): bool
+    {
+        $normalized = Str::of($title)->ascii()->lower()->trim()->__toString();
+
+        return in_array($normalized, self::$formationTitlePlaceholders, true);
+    }
+
+    public function getLessonTypeAttribute(): string
+    {
+        if ($lesson = $this->resolveLesson()) {
+            return match ($lesson->lessonable_type) {
+                VideoContent::class => 'video',
+                TextContent::class => 'text',
+                Quiz::class => 'quiz',
+                default => 'lesson',
+            };
+        }
+
+        if ($this->is_quiz) {
+            return 'quiz';
+        }
+
+        if ($this->is_lesson) {
+            return 'lesson';
+        }
+
+        return 'unknown';
+    }
+
+    public function getLessonTypeLabelAttribute(): string
+    {
+        return match ($this->lesson_type) {
+            'quiz' => 'Quiz',
+            'video' => 'Vidéo',
+            'text' => 'Texte',
+            'lesson' => 'Leçon',
+            default => 'Page générale',
+        };
+    }
+
+    private function resolveLesson(): ?Lesson
+    {
+        if ($this->resolvedLesson !== null) {
+            return $this->resolvedLesson;
+        }
+
+        if (! $lessonId = $this->extractLessonIdFromUrl()) {
+            return null;
+        }
+
+        $this->resolvedLesson = Lesson::find($lessonId);
+
+        return $this->resolvedLesson;
     }
 
     /**
@@ -222,5 +303,81 @@ class UserActivityLog extends Model
         }
 
         return 'Autre';
+    }
+
+    private function extractLessonIdFromUrl(): ?int
+    {
+        $segments = $this->getUrlSegments();
+
+        if (false !== ($lessonIndex = array_search('lesson', $segments, true))) {
+            $offset = $lessonIndex + 1;
+
+            if (isset($segments[$offset]) && $segments[$offset] === 'quiz') {
+                $offset++;
+            }
+
+            if (isset($segments[$offset + 3]) && ctype_digit($segments[$offset + 3])) {
+                return (int) $segments[$offset + 3];
+            }
+        }
+
+        $path = $this->getUrlPath();
+        $pattern = '/\/eleve\/\d+\/formations\/\d+\/chapters\/\d+\/lessons\/(\d+)/';
+        if (preg_match($pattern, $path, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return null;
+    }
+
+    private function extractFormationIdFromUrl(): ?int
+    {
+        $segments = $this->getUrlSegments();
+
+        if (false !== ($lessonIndex = array_search('lesson', $segments, true))) {
+            $formationIndex = $lessonIndex + 2;
+
+            if (isset($segments[$lessonIndex + 1]) && $segments[$lessonIndex + 1] === 'quiz') {
+                $formationIndex++;
+            }
+
+            if (isset($segments[$formationIndex]) && ctype_digit($segments[$formationIndex])) {
+                return (int) $segments[$formationIndex];
+            }
+        }
+
+        $path = $this->getUrlPath();
+        $patterns = [
+            '/\/organisateur\/\d+\/formations\/(\d+)/',
+            '/\/eleve\/formation\/\d+\/(\d+)/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $path, $matches)) {
+                return (int) $matches[1];
+            }
+        }
+
+        return null;
+    }
+
+    private function getUrlPath(): string
+    {
+        if (! $this->url) {
+            return '';
+        }
+
+        return parse_url($this->url, PHP_URL_PATH) ?? '';
+    }
+
+    private function getUrlSegments(): array
+    {
+        $path = $this->getUrlPath();
+
+        if ($path === '') {
+            return [];
+        }
+
+        return array_values(array_filter(explode('/', $path), static fn ($segment) => $segment !== ''));
     }
 }

@@ -100,6 +100,7 @@ class UserActivityService
         $query = UserActivityLog::forUser($userId)
             ->with('user')
             ->orderBy('created_at', 'desc');
+        $query->where('duration_seconds', '>', 0);
 
         // Apply date filters even if only one bound is provided
         if ($startDate && $endDate) {
@@ -155,7 +156,8 @@ class UserActivityService
      */
     public function getUserActivitySummary(int $userId, ?string $startDate = null, ?string $endDate = null, ?int $formationId = null): array
     {
-        $query = UserActivityLog::forUser($userId);
+        $query = UserActivityLog::forUser($userId)
+            ->where('duration_seconds', '>', 0);
 
         // Apply date filters even if only one bound is provided
         if ($startDate && $endDate) {
@@ -317,6 +319,7 @@ class UserActivityService
             "%/formation/{$id}%",
             "%formations%2F{$id}%",
             "%formation%2F{$id}%",
+            "%/lesson/%/{$id}/%",
         ];
 
         return $query->where(function (Builder $subQuery) use ($patterns) {
