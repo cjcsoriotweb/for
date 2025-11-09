@@ -14,48 +14,7 @@
     </x-slot>
 
     <div class="space-y-8">
-        <section class="rounded-3xl border border-slate-100 bg-white/70 p-8 shadow-lg ring-1 ring-black/5 transition dark:border-slate-800 dark:bg-slate-900/70 dark:ring-white/5">
-            <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">{{ __('Mois en cours') }}</p>
-                    <h1 class="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{{ __('Tableau de bord comptable') }}</h1>
-                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                        {{ __('Un condensé des consommations et des formations actives sur la période en cours.') }}
-                    </p>
-                </div>
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="text-sm font-semibold text-slate-500 dark:text-slate-400">
-                        {{ now()->translatedFormat('F Y') }}
-                    </div>
-                    <button
-                        type="button"
-                        class="flex h-10 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600"
-                    >
-                        <span class="material-symbols-outlined text-base">refresh</span>
-                        {{ __('Actualiser les données') }}
-                    </button>
-                </div>
-            </div>
-
-            <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-                <div class="flex flex-col gap-2 rounded-2xl border border-slate-100 bg-slate-50/70 p-6 shadow-inner dark:border-slate-800 dark:bg-slate-900/60">
-                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">{{ __('Formations actives ce mois-ci') }}</p>
-                    <p class="text-4xl font-bold text-slate-900 dark:text-white">{{ number_format($stats['active_formations'] ?? 0) }}</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">{{ __('Formations publiées et suivies depuis le début du mois.') }}</p>
-                </div>
-                <div class="flex flex-col gap-2 rounded-2xl border border-slate-100 bg-white p-6 shadow-lg dark:border-slate-800 dark:bg-slate-950/60">
-                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">{{ __('Élèves ayant commencé') }}</p>
-                    <p class="text-4xl font-bold text-slate-900 dark:text-white">{{ number_format($stats['students_started'] ?? 0) }}</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">{{ __('Inscriptions dont la date de début est dans la période actuelle.') }}</p>
-                </div>
-                <div class="flex flex-col gap-2 rounded-2xl border border-slate-100 bg-slate-50/70 p-6 shadow-inner dark:border-slate-800 dark:bg-slate-900/60">
-                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">{{ __('Formations restantes non utilisées') }}</p>
-                    <p class="text-4xl font-bold text-slate-900 dark:text-white">{{ number_format($stats['unused_formations'] ?? 0) }}</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">{{ __('Formations avec licences disponibles encore non consommées.') }}</p>
-                </div>
-            </div>
-        </section>
-
+  
         <section class="rounded-3xl border border-slate-100 bg-white/70 p-6 shadow-lg ring-1 ring-black/5 transition dark:border-slate-800 dark:bg-slate-900/70 dark:ring-white/5">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
