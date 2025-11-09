@@ -73,11 +73,9 @@
                     </div>
 
                     @php
-                        use Laravel\Fortify\Fortify;
-
                         $twoFactorEnabled = $user->hasEnabledTwoFactorAuthentication();
                         $isConfirmingTwoFactor = ! empty($user->two_factor_secret) && is_null($user->two_factor_confirmed_at);
-                        $showRecoveryCodes = $twoFactorEnabled || session('status') === Fortify::RECOVERY_CODES_GENERATED || session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_CONFIRMED;
+                        $showRecoveryCodes = $twoFactorEnabled || session('status') === \Laravel\Fortify\Fortify::RECOVERY_CODES_GENERATED || session('status') === \Laravel\Fortify\Fortify::TWO_FACTOR_AUTHENTICATION_CONFIRMED;
                     @endphp
 
                     <!-- Authentification à deux facteurs -->
@@ -94,25 +92,25 @@
                                 {{ __('Activez l\'authentification à deux facteurs pour protéger votre compte avec un second facteur de connexion.') }}
                             </p>
 
-                            @if (session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_ENABLED)
+                            @if (session('status') === \Laravel\Fortify\Fortify::TWO_FACTOR_AUTHENTICATION_ENABLED)
                                 <div class="mb-4 rounded-2xl border border-blue-200 bg-blue-50/80 px-4 py-3 text-sm text-blue-900 dark:border-blue-400/40 dark:bg-blue-900/40 dark:text-blue-200">
                                     {{ __('Un QR code vient d\'être généré : scannez-le avec Google Authenticator puis saisissez le code à 6 chiffres pour valider.') }}
                                 </div>
                             @endif
 
-                            @if (session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_CONFIRMED)
+                            @if (session('status') === \Laravel\Fortify\Fortify::TWO_FACTOR_AUTHENTICATION_CONFIRMED)
                                 <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-900/40 dark:text-emerald-200">
                                     {{ __('Authentification à deux facteurs activée.') }}
                                 </div>
                             @endif
 
-                            @if (session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_DISABLED)
+                            @if (session('status') === \Laravel\Fortify\Fortify::TWO_FACTOR_AUTHENTICATION_DISABLED)
                                 <div class="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-600/40 dark:bg-slate-800/40 dark:text-slate-300">
                                     {{ __('Authentification à deux facteurs désactivée.') }}
                                 </div>
                             @endif
 
-                            @if (session('status') === Fortify::RECOVERY_CODES_GENERATED)
+                            @if (session('status') === \Laravel\Fortify\Fortify::RECOVERY_CODES_GENERATED)
                                 <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-200">
                                     {{ __('De nouveaux codes de récupération ont été générés.') }}
                                 </div>
@@ -132,7 +130,7 @@
                                 <div class="mt-4 max-w-xl text-sm text-slate-600 dark:text-slate-300">
                                     <p class="font-semibold">
                                         {{ __('Clé de configuration') }} :
-                                        {{ Fortify::currentEncrypter()->decrypt($user->two_factor_secret) }}
+                                        {{ \Laravel\Fortify\Fortify::currentEncrypter()->decrypt($user->two_factor_secret) }}
                                     </p>
                                 </div>
 
@@ -171,7 +169,7 @@
                                 </div>
 
                                 <div class="mt-4 grid gap-2 max-w-xl rounded-2xl bg-slate-50 p-4 text-sm font-mono text-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
-                                    @foreach (json_decode(Fortify::currentEncrypter()->decrypt($user->two_factor_recovery_codes), true) as $code)
+                                    @foreach (json_decode(\Laravel\Fortify\Fortify::currentEncrypter()->decrypt($user->two_factor_recovery_codes), true) as $code)
                                         <div class="rounded-xl bg-white/60 px-3 py-2 dark:bg-slate-800/40">{{ $code }}</div>
                                     @endforeach
                                 </div>

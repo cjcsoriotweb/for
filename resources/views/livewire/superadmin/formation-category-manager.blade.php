@@ -1,7 +1,3 @@
-@php
-    use Illuminate\Support\Str;
-@endphp
-
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-1">
         <div class="bg-white shadow-sm ring-1 ring-gray-100/70 sm:rounded-2xl">
@@ -116,7 +112,7 @@
                                     <h3 class="text-sm font-semibold text-gray-900 truncate">{{ $category->name }}</h3>
                                     <div class="mt-1 text-xs text-gray-500 space-y-1">
                                         @if ($category->description)
-                                            <p>{{ Str::limit($category->description, 160) }}</p>
+                                            <p>{{ \Illuminate\Support\Str::limit($category->description, 160) }}</p>
                                         @endif
                                         @if ($category->aiTrainer)
                                             <p>
