@@ -28,10 +28,13 @@ class ActivityLogsTable extends Component
 
     public $lessons = [];
 
-    public function mount($userId, $lessons = null)
+    public $formationId;
+
+    public function mount($userId, $lessons = null, $formationId = null)
     {
         $this->userId = $userId;
         $this->lessons = $lessons ?? collect();
+        $this->formationId = $formationId;
         $this->loadActivityData();
     }
 
@@ -87,7 +90,8 @@ class ActivityLogsTable extends Component
         $this->activitySummary = $activityService->getUserActivitySummary(
             $this->userId,
             $this->startDate ?: null,
-            $this->endDate ?: null
+            $this->endDate ?: null,
+            $this->formationId
         );
 
         // Load available lessons for the filter dropdown
@@ -119,6 +123,7 @@ class ActivityLogsTable extends Component
             $this->endDate ?: null,
             $this->search ?: null,
             $this->lessonFilter ?: null,
+            $this->formationId,
             true
         );
 

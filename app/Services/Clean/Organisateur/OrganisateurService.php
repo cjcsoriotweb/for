@@ -381,13 +381,15 @@ class OrganisateurService
                 $activityFilters['start_date'] ?? null,
                 $activityFilters['end_date'] ?? null,
                 $activityFilters['activity_search'] ?? null,
-                $activityFilters['lesson_filter'] ?? null
+                $activityFilters['lesson_filter'] ?? null,
+                $formation->id
             );
 
             $activitySummary = $this->userActivityService->getUserActivitySummary(
                 $student->id,
                 $activityFilters['start_date'] ?? null,
-                $activityFilters['end_date'] ?? null
+                $activityFilters['end_date'] ?? null,
+                $formation->id
             );
         }
 

@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\UserActivityLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -93,7 +95,7 @@ class UserActivityService
      *
      * @param  bool  $paginate  When true, return a paginator instead of a plain collection.
      */
-    public function getUserActivityLogs(int $userId, ?int $limit = null, ?string $startDate = null, ?string $endDate = null, ?string $search = null, ?string $lessonFilter = null, bool $paginate = false)
+    public function getUserActivityLogs(int $userId, ?int $limit = null, ?string $startDate = null, ?string $endDate = null, ?string $search = null, ?string $lessonFilter = null, ?int $formationId = null, bool $paginate = false)
     {
         $query = UserActivityLog::forUser($userId)
             ->with('user')
@@ -133,6 +135,10 @@ class UserActivityService
             }
         }
 
+        if ($formationId !== null) {
+            $query = $this->applyFormationFilter($query, $formationId);
+        }
+
         if ($paginate) {
             return $query->paginate($limit ?? 20);
         }
@@ -147,7 +153,7 @@ class UserActivityService
     /**
      * Get activity summary for a user
      */
-    public function getUserActivitySummary(int $userId, ?string $startDate = null, ?string $endDate = null): array
+    public function getUserActivitySummary(int $userId, ?string $startDate = null, ?string $endDate = null, ?int $formationId = null): array
     {
         $query = UserActivityLog::forUser($userId);
 
@@ -158,6 +164,10 @@ class UserActivityService
             $query->where('created_at', '>=', $startDate);
         } elseif ($endDate) {
             $query->where('created_at', '<=', $endDate);
+        }
+
+        if ($formationId !== null) {
+            $query = $this->applyFormationFilter($query, $formationId);
         }
 
         $logs = $query->get();
@@ -297,5 +307,22 @@ class UserActivityService
         }
 
         return $query->get();
+    }
+
+    private function applyFormationFilter(Builder $query, int $formationId): Builder
+    {
+        $id = (string) $formationId;
+        $patterns = [
+            "%/formations/{$id}%",
+            "%/formation/{$id}%",
+            "%formations%2F{$id}%",
+            "%formation%2F{$id}%",
+        ];
+
+        return $query->where(function (Builder $subQuery) use ($patterns) {
+            foreach ($patterns as $pattern) {
+                $subQuery->orWhere('url', 'like', $pattern);
+            }
+        });
     }
 }

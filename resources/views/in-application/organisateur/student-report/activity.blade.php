@@ -25,6 +25,10 @@
     </div>
   </div>
   <div class="px-4 py-5 sm:px-6">
-    @livewire('activity-logs-table', ['userId' => $student->id, 'lessons' => $lessons])
+    @livewire('activity-logs-table', [
+        'userId' => $student->id,
+        'lessons' => $lessons,
+        'formationId' => $formation->id,
+    ])
   </div>
 </div>
