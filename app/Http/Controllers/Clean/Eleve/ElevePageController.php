@@ -1545,13 +1545,21 @@ class ElevePageController extends Controller
         [$minScore, $maxScore] = $this->resolveEntryQuizThresholds($entryQuiz);
 
         if ($result['score'] < $minScore) {
-            return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('error', 'Votre niveau actuel est insuffisant pour cette formation (score: '.round($result['score'], 1).'%). Un formateur vous contactera pour vous orienter vers un parcours plus adapté.');
+            return redirect()->route('eleve.formation.not-suitable', [$team, $formation])
+                ->with([
+                    'reason' => 'too_low',
+                    'score' => round($result['score'], 1),
+                    'threshold' => $minScore,
+                ]);
         }
 
         if ($result['score'] > $maxScore) {
-            return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('error', 'Votre niveau est trop élevé pour cette formation (score: '.round($result['score'], 1).'%). Un superadmin vous contactera pour vous proposer une formation plus adaptée.');
+            return redirect()->route('eleve.formation.not-suitable', [$team, $formation])
+                ->with([
+                    'reason' => 'too_high',
+                    'score' => round($result['score'], 1),
+                    'threshold' => $maxScore,
+                ]);
         }
 
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
@@ -1579,6 +1587,30 @@ class ElevePageController extends Controller
 
         return redirect()->route('eleve.formation.show', [$team, $formation])
             ->with('success', 'Félicitations ! Votre niveau correspond parfaitement à cette formation (score: '.round($result['score'], 1).'%). Vous pouvez maintenant commencer.');
+    }
+
+    /**
+     * Afficher la page "formation non adaptée"
+     */
+    public function formationNotSuitable(Team $team, Formation $formation)
+    {
+        $user = Auth::user();
+        $reason = session('reason');
+        $score = session('score');
+        $threshold = session('threshold');
+
+        if (! $reason || $score === null || $threshold === null) {
+            return redirect()->route('eleve.formation.show', [$team, $formation])
+                ->with('warning', 'Les informations du quiz d\'entrée sont manquantes.');
+        }
+
+        return view('in-application.eleve.formation.not-suitable', compact(
+            'team',
+            'formation',
+            'reason',
+            'score',
+            'threshold'
+        ));
     }
     /**
      * Afficher les r├®sultats du quiz d'entr├®e

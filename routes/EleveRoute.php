@@ -24,6 +24,9 @@ Route::prefix('eleve')
             Route::post('/{team}/{formation}/request-completion', [ElevePageController::class, 'requestCompletion'])->name('request-completion');
             Route::post('/{team}/{formation}/feedback', [ElevePageController::class, 'submitFeedback'])->name('feedback');
 
+            Route::get('/{team}/{formation}/not-suitable', [ElevePageController::class, 'formationNotSuitable'])
+                ->name('not-suitable');
+
             // Entry quiz routes
             Route::prefix('entry-quiz')->name('entry-quiz.')->group(function () {
                 Route::get('/{team}/{formation}/attempt', [ElevePageController::class, 'attemptEntryQuiz'])->name('attempt');
