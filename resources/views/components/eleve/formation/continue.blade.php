@@ -66,13 +66,7 @@
               </svg>
               En attente de validation
             </div>
-            @else
-            <div class="flex items-center gap-2 rounded-full bg-green-600/20 border border-green-600 px-4 py-2 text-sm font-medium text-green-400">
-              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-              </svg>
-              Formation terminée
-            </div>
+       
             @endif
           </div>
           @else
@@ -123,14 +117,7 @@
             </a>
           </div>
           @else
-          <div class="flex items-center justify-center">
-            <div class="flex items-center gap-2 text-green-400">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-              </svg>
-              <span class="text-sm font-medium">Formation réussie à 100%</span>
-            </div>
-          </div>
+    
 
           <div class="space-y-3">
             <a href="{{ route('eleve.formation.completed', [$team, $formation->id]) }}"
