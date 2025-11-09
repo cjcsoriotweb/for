@@ -36,6 +36,11 @@ class SuperadminPageController extends Controller
         ]);
     }
 
+    public function console()
+    {
+        return view('out-application.superadmin.superadmin-console-page');
+    }
+
     public function teamsIndex(Request $request)
     {
         $search = trim((string) $request->input('search', ''));
