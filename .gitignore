@@ -38,3 +38,10 @@ Thumbs.db
 
 # --- Laravel Mix (ancien) ---
 /public/mix-manifest.json
+
+# --- Temporary files ---
+tmp_*.txt
+temp_*.html
+*.tmp
+*.bak
+install.me
