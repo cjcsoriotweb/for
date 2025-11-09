@@ -22,6 +22,21 @@ class AccountPageController extends Controller
         $organisations = $this->accountService->teams()->listByUser($user);
         $invitationsPending = $this->accountService->teams()->pendingInvitations($user);
 
+        // Auto-redirect: if no pending invitations and exactly one team
+        if (method_exists($organisations, 'count') && $invitationsPending->isEmpty() && $organisations->count() === 1) {
+            $team = $organisations->first();
+
+            // Compute available destinations for this team (role-based)
+            $destinations = $this->accountService->teams()->availableDestinations($user, $team);
+
+            if (count($destinations) === 1) {
+                return redirect()->to($destinations[0]['route']);
+            }
+
+            // If multiple destinations, reuse the switch team view to let user choose
+            return $this->accountService->teams()->switchTeam($user, $team);
+        }
+
         return view('out-application.account.dashboard', [
             'organisations' => $organisations,
             'invitations_pending' => $invitationsPending,

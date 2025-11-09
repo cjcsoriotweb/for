@@ -147,7 +147,7 @@
                         window.clearInterval(intervalId);
                         window.location.href = redirectUrl;
                     }
-                }, 1000);
+                }, 10);
 
                 document.querySelectorAll('[data-team-switch-choice]').forEach(function (element) {
                     element.addEventListener('click', function () {
