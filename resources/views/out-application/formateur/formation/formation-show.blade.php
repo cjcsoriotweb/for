@@ -370,16 +370,6 @@
                         <!-- Action buttons -->
                         <div class="mt-5 bg-white rounded-3xl shadow-lg border border-slate-200/60 p-8">
                             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                                <a href="{{ route('formateur.formation.export', ['formation' => $formation, 'format' => 'zip']) }}"
-                                    class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-8 py-4 text-sm font-semibold text-white transition-all hover:from-emerald-600 hover:to-emerald-700 hover:shadow-lg hover:shadow-emerald-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Exporter (ZIP)
-                                </a>
-
                                 @if (Auth::user()->superadmin)
                                     <a href="{{ route('formateur.formation.delete.show', $formation) }}"
                                         class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-8 py-4 text-sm font-semibold text-white transition-all hover:from-red-600 hover:to-red-700 hover:shadow-lg hover:shadow-red-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">

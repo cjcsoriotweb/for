@@ -54,26 +54,7 @@
           </div>
         </div>
 
-        <!-- Importer formation -->
-        <div class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm/6 hover:bg-gray-50">
-          <div class="flex size-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-            <!-- Icône import (nuage vers le haut) -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"
-                 class="size-6 text-gray-600 group-hover:text-indigo-600">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M7.5 18.75h9A3.75 3.75 0 0 0 20.25 15 4.5 4.5 0 0 0 16 10.7 5.25 5.25 0 0 0 6.52 9.6 3.75 3.75 0 0 0 3.75 13.25c0 3.03 2.22 5.5 3.75 5.5Z"/>
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 15.75V9.75m0 0 3 3m-3-3-3 3"/>
-            </svg>
-          </div>
-          <div class="flex-auto">
-            <a href="{{ route('formateur.import') }}" class="block font-semibold text-gray-900">
-              Importer formation
-              <span class="absolute inset-0"></span>
-            </a>
-            <p class="mt-1 text-gray-600">Importez un catalogue ou des supports existants.</p>
-          </div>
-        </div>
+        
 
       </div>
 
