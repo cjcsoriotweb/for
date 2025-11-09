@@ -72,6 +72,14 @@
                         </div>
                     </div>
 
+                    @php
+                        use Laravel\Fortify\Fortify;
+
+                        $twoFactorEnabled = $user->hasEnabledTwoFactorAuthentication();
+                        $isConfirmingTwoFactor = ! empty($user->two_factor_secret) && is_null($user->two_factor_confirmed_at);
+                        $showRecoveryCodes = $twoFactorEnabled || session('status') === Fortify::RECOVERY_CODES_GENERATED || session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_CONFIRMED;
+                    @endphp
+
                     <!-- Authentification à deux facteurs -->
                     <div class="group relative overflow-hidden rounded-2xl bg-white p-8 shadow-lg ring-1 ring-slate-200 transition-all duration-300 hover:shadow-xl hover:ring-slate-300 dark:bg-slate-800/50 dark:ring-slate-700 dark:hover:ring-slate-600">
                         <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity group-hover:opacity-100"></div>
@@ -82,34 +90,122 @@
                             <h3 class="mb-2 text-xl font-semibold text-slate-900 dark:text-white">
                                 {{ __('Sécurisation 2FA') }}
                             </h3>
-                            <p class="mb-6 text-slate-600 dark:text-slate-300">
-                                {{ __('Activez l\'authentification à deux facteurs pour plus de sécurité.') }}
+                            <p class="mb-4 text-slate-600 dark:text-slate-300">
+                                {{ __('Activez l\'authentification à deux facteurs pour protéger votre compte avec un second facteur de connexion.') }}
                             </p>
-                            @if($user->two_factor_secret)
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-flex items-center rounded-lg bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                                        {{ __('Activé') }}
-                                        <span class="material-symbols-outlined ml-1 text-sm">check_circle</span>
-                                    </span>
+
+                            @if (session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_ENABLED)
+                                <div class="mb-4 rounded-2xl border border-blue-200 bg-blue-50/80 px-4 py-3 text-sm text-blue-900 dark:border-blue-400/40 dark:bg-blue-900/40 dark:text-blue-200">
+                                    {{ __('Un QR code vient d\'être généré : scannez-le avec Google Authenticator puis saisissez le code à 6 chiffres pour valider.') }}
+                                </div>
+                            @endif
+
+                            @if (session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_CONFIRMED)
+                                <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-900/40 dark:text-emerald-200">
+                                    {{ __('Authentification à deux facteurs activée.') }}
+                                </div>
+                            @endif
+
+                            @if (session('status') === Fortify::TWO_FACTOR_AUTHENTICATION_DISABLED)
+                                <div class="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-600/40 dark:bg-slate-800/40 dark:text-slate-300">
+                                    {{ __('Authentification à deux facteurs désactivée.') }}
+                                </div>
+                            @endif
+
+                            @if (session('status') === Fortify::RECOVERY_CODES_GENERATED)
+                                <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-200">
+                                    {{ __('De nouveaux codes de récupération ont été générés.') }}
+                                </div>
+                            @endif
+
+                            @if ($isConfirmingTwoFactor)
+                                <div class="mt-4 max-w-xl text-sm text-slate-600 dark:text-slate-300">
+                                    <p class="font-semibold">
+                                        {{ __('Scannez ce QR code avec votre application Google Authenticator ou copiez la clé de configuration et saisissez ensuite le code généré.') }}
+                                    </p>
+                                </div>
+
+                                <div class="mt-4 p-2 inline-block bg-white dark:bg-slate-900 rounded-2xl shadow-inner">
+                                    {!! $user->twoFactorQrCodeSvg() !!}
+                                </div>
+
+                                <div class="mt-4 max-w-xl text-sm text-slate-600 dark:text-slate-300">
+                                    <p class="font-semibold">
+                                        {{ __('Clé de configuration') }} :
+                                        {{ Fortify::currentEncrypter()->decrypt($user->two_factor_secret) }}
+                                    </p>
+                                </div>
+
+                                <form method="POST" action="{{ route('two-factor.confirm') }}" class="mt-4 space-y-3">
+                                    @csrf
+                                    <div>
+                                        <label for="code" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                                            {{ __('Code à 6 chiffres') }}
+                                        </label>
+                                        <input
+                                            id="code"
+                                            name="code"
+                                            type="text"
+                                            inputmode="numeric"
+                                            autocomplete="one-time-code"
+                                            value="{{ old('code') }}"
+                                            class="mt-2 block w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-500"
+                                        />
+                                        @error('code', 'confirmTwoFactorAuthentication')
+                                            <p class="mt-1 text-xs font-medium text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <button type="submit"
+                                            class="inline-flex items-center rounded-2xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                                        {{ __('Confirmer') }}
+                                    </button>
+                                </form>
+                            @endif
+
+                            @if ($showRecoveryCodes && $twoFactorEnabled && $user->two_factor_recovery_codes)
+                                <div class="mt-6 max-w-xl text-sm text-slate-600 dark:text-slate-300">
+                                    <p class="font-semibold">
+                                        {{ __('Conservez précieusement ces codes de récupération. Vous pourrez les utiliser si vous perdez votre appareil TOTP.') }}
+                                    </p>
+                                </div>
+
+                                <div class="mt-4 grid gap-2 max-w-xl rounded-2xl bg-slate-50 p-4 text-sm font-mono text-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
+                                    @foreach (json_decode(Fortify::currentEncrypter()->decrypt($user->two_factor_recovery_codes), true) as $code)
+                                        <div class="rounded-xl bg-white/60 px-3 py-2 dark:bg-slate-800/40">{{ $code }}</div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            <div class="mt-5 flex flex-wrap items-center gap-3">
+                                @if (! $twoFactorEnabled)
+                                    <form method="POST" action="{{ route('two-factor.enable') }}">
+                                        @csrf
+                                        <button type="submit"
+                                                class="inline-flex items-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                                            {{ __('Activer') }}
+                                            <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('two-factor.regenerate-recovery-codes') }}">
+                                        @csrf
+                                        <button type="submit"
+                                                class="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:bg-slate-800/40 dark:text-slate-100 dark:hover:bg-slate-700">
+                                            {{ __('Régénérer les codes de récupération') }}
+                                        </button>
+                                    </form>
+
                                     <form method="POST" action="{{ route('two-factor.disable') }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                class="inline-flex items-center rounded-lg border border-transparent bg-red-50 px-4 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 dark:border-red-400/50 dark:bg-red-900/20 dark:text-red-200 dark:hover:bg-red-800">
+                                                class="inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                                             {{ __('Désactiver') }}
                                         </button>
                                     </form>
-                                </div>
-                            @else
-                                <form method="POST" action="{{ route('two-factor.enable') }}">
-                                    @csrf
-                                    <button type="submit"
-                                            class="inline-flex items-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                                        {{ __('Activer') }}
-                                        <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
-                                    </button>
-                                </form>
-                            @endif
+                                @endif
+                            </div>
                         </div>
                     </div>
 
