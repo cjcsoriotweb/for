@@ -199,14 +199,30 @@
                                     {{ __('Inscrit le') }} {{ $enrollmentDate?->translatedFormat('d M Y') ?? __('Date inconnue') }}
                                 </p>
                                     @if($teamForFormation)
-                                        <a href="{{ route('organisateur.formations.students.report.overview', [
-                                            'team' => $teamForFormation->id,
-                                            'formation' => $formation->id,
-                                            'student' => $user->id,
-                                        ]) }}"
-                                           class="mt-2 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800">
-                                            {{ __('Suivis') }}
-                                        </a>
+                                        <div class="mt-2 flex flex-col items-end gap-2">
+                                            <a href="{{ route('organisateur.formations.students.report.overview', [
+                                                'team' => $teamForFormation->id,
+                                                'formation' => $formation->id,
+                                                'student' => $user->id,
+                                            ]) }}"
+                                               class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800">
+                                                {{ __('Suivis') }}
+                                            </a>
+                                            <form
+                                                action="{{ route('superadmin.users.formations.destroy', ['user' => $user->id, 'formation' => $formation->id]) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('{{ __('Confirmer la suppression de cet utilisateur de la formation ?') }}');"
+                                            >
+                                                @csrf
+                                                @method('DELETE')
+                                                <button
+                                                    type="submit"
+                                                    class="inline-flex items-center justify-center rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-800/40 dark:text-rose-300 dark:hover:bg-rose-900/40"
+                                                >
+                                                    {{ __('Supprimer de la formation') }}
+                                                </button>
+                                            </form>
+                                        </div>
                                     @endif
                                     @if($formation->pivot->completed_at)
                                         <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">

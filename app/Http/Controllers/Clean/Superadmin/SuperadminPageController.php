@@ -355,6 +355,32 @@ class SuperadminPageController extends Controller
         ]);
     }
 
+    public function removeUserFormation(Request $request, User $user, Formation $formation)
+    {
+        $formationUser = FormationUser::where('user_id', $user->id)
+            ->where('formation_id', $formation->id)
+            ->first();
+
+        if (!$formationUser) {
+            return redirect()->back()->with('error', 'Cette formation n\'est pas associée à l\'utilisateur.');
+        }
+
+        DB::transaction(function () use ($formation, $user, $formationUser) {
+            $lessonIds = $formation->lessons()->pluck('lessons.id');
+
+            if ($lessonIds->isNotEmpty()) {
+                DB::table('lesson_user')
+                    ->where('user_id', $user->id)
+                    ->whereIn('lesson_id', $lessonIds)
+                    ->delete();
+            }
+
+            $formationUser->delete();
+        });
+
+        return redirect()->back()->with('success', 'L\'utilisateur a été retiré de la formation et son historique a été supprimé.');
+    }
+
     public function formationsIndex(Request $request)
     {
         $search = trim((string) $request->input('search', ''));

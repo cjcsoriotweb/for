@@ -154,7 +154,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier le quiz d'entr├®e si la formation en a un
@@ -269,7 +269,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier si la formation est termin├®e
@@ -370,7 +370,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // Marquer la formation comme termin├®e (forcer le statut completed et progression ├á 100 %)
@@ -489,7 +489,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit ├á la formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier si la formation est termin├®e
@@ -528,7 +528,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier si la formation est termin├®e
@@ -637,7 +637,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier si la formation est termin├®e
@@ -800,7 +800,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit ├á cette formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            return back()->with('error', 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            return back()->with('error', 'Vous n\'etes pas inscrit à cette formation');
         }
 
         try {
@@ -873,7 +873,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit ├á la formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier que la le├ºon appartient bien au chapitre et ├á la formation
@@ -1136,7 +1136,7 @@ class ElevePageController extends Controller
 
         // V├®rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier que la le├ºon est bien un quiz
@@ -1326,7 +1326,7 @@ class ElevePageController extends Controller
 
         // V├®rifier les permissions
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier que la le├ºon est bien un quiz
@@ -1451,7 +1451,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit ├á la formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier si la formation a un quiz d'entr├®e
@@ -1552,7 +1552,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit ├á la formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier que la tentative appartient ├á l'utilisateur connect├®
@@ -1595,7 +1595,7 @@ class ElevePageController extends Controller
 
         // V├®rifier si l'├®tudiant est inscrit ├á la formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'├¬tes pas inscrit ├á cette formation.');
+            abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
         // V├®rifier si la formation est termin├®e
