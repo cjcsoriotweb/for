@@ -21,7 +21,33 @@ FORMATIONS LIST - MAIN CONTAINER
     {{-- ========================================
     FEATURED FORMATIONS SECTION
     ======================================== --}}
-    <x-formateur.formation.formation-featured :formations="$formations" />
+    <x-formateur.formation.formation-featured :formations="$featuredFormations" />
+
+    {{-- ========================================
+    ALL FORMATIONS (PAGINATED)
+    ======================================== --}}
+    <div id="formations-list" class="mt-12">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Toutes les formations</h2>
+      </div>
+
+      @if($formations->count() > 0)
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @foreach($formations as $formation)
+            <x-formateur.formation.formation-card :formation="$formation" />
+          @endforeach
+        </div>
+
+        <div class="mt-8">
+          {{ $formations->links() }}
+        </div>
+      @else
+        <div class="text-center py-12 bg-gradient-to-br from-gray-50 to-blue-50/50 rounded-2xl border border-gray-100">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Aucune formation trouvée</h3>
+          <p class="text-gray-600">Créez votre première formation pour commencer.</p>
+        </div>
+      @endif
+    </div>
   </div>
 
 </div>

@@ -35,27 +35,12 @@
             {{ $formation->title }}
           </h3>
           <div class="flex items-center space-x-2">
-            <span
-              @class([
-                'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border',
-                'bg-emerald-100 text-emerald-800 border-emerald-200' => $formation->card_is_active,
-                'bg-gray-100 text-gray-700 border-gray-200' => ! $formation->card_is_active,
-              ])>
-              <div class="w-2 h-2 rounded-full mr-2 animate-pulse"
-                @class([
-                  'bg-emerald-500' => $formation->card_is_active,
-                  'bg-gray-400' => ! $formation->card_is_active,
-                ])></div>
-              {{ $formation->card_is_active ? 'Active' : 'Inactive' }}
-            </span>
-
-              <span>
+            <span>
               @if($formation->user_id !== Auth::user()->id )
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border bg-red-100 text-red-800 border-red-200">
                   <div class="w-2 h-2 rounded-full mr-2 animate-pulse"></div>
                   {{ App\Models\User::find($formation->user_id)->name }}
                 </span>
-
               @endif
             </span>
           </div>
@@ -78,15 +63,7 @@
           </div>
         </div>
       </div>
-      <div class="flex-shrink-0">
-        <div class="relative">
-          <div class="w-4 h-4 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full animate-pulse shadow-lg">
-          </div>
-          <div
-            class="absolute inset-0 w-4 h-4 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full animate-ping opacity-30">
-          </div>
-        </div>
-      </div>
+      
     </div>
 
     <div class="mb-8">

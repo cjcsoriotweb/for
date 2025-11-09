@@ -9,9 +9,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class FormationsList extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'tailwind';
+
     protected function formationsQuery()
     {
         $query = Formation::withCount(['learners', 'lessons'])
@@ -90,7 +95,16 @@ class FormationsList extends Component
 
     public function render()
     {
-        $formations = $this->formationsQuery()
+        $formations = $this->formationsQuery()->paginate(10);
+
+        $formations->setCollection(
+            $formations->getCollection()->map(function ($formation) {
+                return $this->shapeFormationData($formation);
+            })
+        );
+
+        $featuredFormations = $this->formationsQuery()
+            ->limit(3)
             ->get()
             ->map(function ($formation) {
                 return $this->shapeFormationData($formation);
@@ -101,6 +115,7 @@ class FormationsList extends Component
 
         return view('livewire.formateur.formations.formations-list', [
             'formations' => $formations,
+            'featuredFormations' => $featuredFormations,
             'stats' => $stats,
         ]);
     }

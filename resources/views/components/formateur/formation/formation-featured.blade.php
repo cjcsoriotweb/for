@@ -8,12 +8,7 @@
       </svg>
       Aperçu des formations
     </h2>
-    <a href="#formations-list" class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center">
-      Voir tout
-      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-      </svg>
-    </a>
+    
   </div>
 
   @if($formations->count() > 0)
@@ -31,15 +26,7 @@
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
 
-        <!-- Status indicator -->
-        <div class="absolute top-4 right-4">
-          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-            {{ $formation->card_is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700' }}">
-            <div class="w-1.5 h-1.5 rounded-full mr-1.5 animate-pulse
-              {{ $formation->card_is_active ? 'bg-green-500' : 'bg-gray-400' }}"></div>
-            {{ $formation->card_is_active ? 'Active' : 'Inactive' }}
-          </span>
-        </div>
+        
       </div>
 
       <!-- Content -->

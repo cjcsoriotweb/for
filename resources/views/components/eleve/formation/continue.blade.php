@@ -91,6 +91,13 @@
         </div>
 
         <div class="space-y-3 border-t border-slate-200 px-4 py-3">
+          @php
+            $moduleCount = $formation->lessons_count ?? $formation->lessons()->count();
+          @endphp
+          <div class="flex items-center justify-between text-xs font-medium text-slate-600">
+            <span>Modules</span>
+            <span>{{ $moduleCount }}</span>
+          </div>
           @if($isCompleted)
           @if($isPendingValidation)
           <div class="flex items-center justify-center">
