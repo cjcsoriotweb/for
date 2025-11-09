@@ -768,7 +768,7 @@ class ElevePageController extends Controller
                     ->with('info', 'Bienvenue dans cette formation ! Veuillez d\'abord passer le quiz d\'entr├®e.');
             }
 
-            return back()->with('success', 'Vous avez ├®t├® inscrit ├á la formation avec succ├¿s !');
+            return back()->with('success', 'La formation est disponible dès maintenant sur cette page !');
         } catch (\Throwable $e) {
             report($e);
 
