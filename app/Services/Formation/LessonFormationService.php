@@ -13,7 +13,7 @@ class LessonFormationService extends BaseFormationService
     {
 
         $lesson = $chapter->lessons()->create(array_merge([
-            'title' => 'Nouvelle leÃ§on',
+            'title' => 'Nouvelle leçon',
             'position' => $chapter->lessons()->count() + 1,
         ], $attributes));
 

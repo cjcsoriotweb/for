@@ -45,7 +45,7 @@ Route::prefix('formateur')
             Route::get('/formation/{formation}/chapters', [FormateurFormationController::class, 'manageChapters'])->name('formation.chapters.index');
             Route::get('/formation/{formation}/ai', [FormateurFormationAiController::class, 'edit'])->name('formation.ai.edit');
             Route::put('/formation/{formation}/ai', [FormateurFormationAiController::class, 'update'])->name('formation.ai.update');
-            // Routes IA supprimÃ©es - trainers sont maintenant dans config/ai.php
+            // Routes IA supprimées - trainers sont maintenant dans config/ai.php
             Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
             Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');
             Route::get('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'index'])->name('formation.completion-documents.index');

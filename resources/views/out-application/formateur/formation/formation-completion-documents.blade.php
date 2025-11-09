@@ -22,7 +22,7 @@
                 Documents de fin de formation - {{ $formation->title }}
               </h1>
               <p class="text-gray-700 text-lg leading-relaxed">
-                Gérez les documents remis aux apprenants Ã  la fin de la formation.
+                Gérez les documents remis aux apprenants à la fin de la formation.
               </p>
             </div>
           </div>
@@ -35,7 +35,7 @@
             <div>
               <h2 class="text-2xl font-bold text-gray-900">Ajouter un document</h2>
               <p class="text-sm text-gray-600 mt-1">
-                Ajoutez les documents remis aux apprenants une fois la formation terminÃ©e.
+                Ajoutez les documents remis aux apprenants une fois la formation terminée.
               </p>
             </div>
           </div>
@@ -114,5 +114,4 @@
     </div>
   </div>
 </x-app-layout>
-
 

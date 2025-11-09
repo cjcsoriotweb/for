@@ -27,7 +27,7 @@ class AdminFormationController extends Controller
 
         app(FormationService::class)->createFormation(['title' => $title, 'description' => $description]);
 
-        return redirect()->back()->with('status', __('Formation crÃ©Ã©e avec succÃ¨s!'));
+        return redirect()->back()->with('status', __('Formation créée avec succès!'));
     }
 
     public function updateVisibilityByTeam(FormationUpdateVisibilityByTeam $request, Team $team, FormationService $formationService)
