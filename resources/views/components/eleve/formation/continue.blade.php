@@ -117,17 +117,28 @@
             </a>
           </div>
           @else
-    
-
           <div class="space-y-3">
-            <a href="{{ route('eleve.formation.completed', [$team, $formation->id]) }}"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
-              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
-                <path fill-rule="evenodd" d="M4 13a2 2 0 100 4h12a2 2 0 100-4H4zm11.24 2a.75.75 0 01.75-.75H16a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V15zm-2.25-.75a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 00.75-.75V15a.75.75 0 00-.75-.75h-.01z" clip-rule="evenodd" />
-              </svg>
-              Voir mon certificat
-            </a>
+            @if($isValidated)
+              <a href="{{ route('eleve.formation.completed', [$team, $formation->id]) }}"
+                 class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
+                  <path fill-rule="evenodd" d="M4 13a2 2 0 100 4h12a2 2 0 100-4H4zm11.24 2a.75.75 0 01.75-.75H16a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V15zm-2.25-.75a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 00.75-.75V15a.75.75 0 00-.75-.75h-.01z" clip-rule="evenodd" />
+                </svg>
+                Voir mon certificat
+              </a>
+            @elseif($progressPercent === 100)
+              <form method="POST" action="{{ route('eleve.formation.request-completion', [$team, $formation->id]) }}">
+                @csrf
+                <button type="submit"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-700">
+                  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.075 2.678a.75.75 0 01.85 0l6 4a.75.75 0 01.075 1.2l-6 5a.75.75 0 01-.95 0l-6-5A.75.75 0 013.075 6.68l6-4zM4 8.25v5.5A2.25 2.25 0 006.25 16h7.5A2.25 2.25 0 0016 13.75v-5.5l-5.225 4.354a2.25 2.25 0 01-2.85 0L4 8.25z" clip-rule="evenodd" />
+                  </svg>
+                  Faire valider ma formation
+                </button>
+              </form>
+            @endif
           </div>
           @endif
           @else

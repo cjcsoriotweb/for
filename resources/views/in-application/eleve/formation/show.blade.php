@@ -3,20 +3,10 @@
     <x-eleve.notification-messages />
 
     @php
-        $isCompleted = $studentFormationService->isFormationCompleted(Auth::user(),$formationWithProgress);
-        if ($isCompleted) {
-            // Marquer la formation comme terminée dans la base de données
-            $formationWithProgress->learners()->syncWithoutDetaching([
-                Auth::user()->id => [
-                    'status' => 'completed',
-                    'completed_at' => now(),
-                    'last_seen_at' => now(),
-                ],
-            ]);
-        }
+        $isCompleted = $studentFormationService->isFormationCompleted(Auth::user(), $formationWithProgress);
     @endphp
 
-    @if($isCompleted)
+    @if(isset($isValidated) && $isValidated)
     @include('in-application.eleve.formation.congratulation')
     @else
     <!-- Layout responsive : grid sur PC, stack sur mobile -->
@@ -52,3 +42,4 @@
 @auth
 @endauth
 </x-eleve-layout>
+

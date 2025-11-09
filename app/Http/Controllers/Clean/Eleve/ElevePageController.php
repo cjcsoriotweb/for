@@ -229,6 +229,16 @@ class ElevePageController extends Controller
             ])
             ->values();
 
+        // Récupérer le statut de validation de la formation pour cet élève
+        $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
+            ->where('user_id', $user->id)
+            ->where('team_id', $team->id)
+            ->first();
+
+        $validationStatus = $formationUser?->completion_request_status;
+        $isValidated = $validationStatus === 'approved';
+        $isPendingValidation = $validationStatus === 'pending';
+
         $assistantTrainer = $formationWithProgress->category?->aiTrainer;
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
@@ -244,6 +254,9 @@ class ElevePageController extends Controller
             'assistantTrainerSlug' => $assistantTrainerSlug,
             'assistantTrainerName' => $assistantTrainerName,
             'entryQuizStatus' => $entryQuizStatus,
+            'validationStatus' => $validationStatus,
+            'isValidated' => $isValidated,
+            'isPendingValidation' => $isPendingValidation,
         ]);
     }
 
@@ -499,6 +512,8 @@ class ElevePageController extends Controller
         // Cr├®er la demande de validation
         $formationUser->completion_request_at = now();
         $formationUser->completion_request_status = 'pending';
+        // Flag for manual validation by admin
+        $formationUser->need_verif = true;
         $formationUser->save();
 
         return back()->with('success', 'Votre demande de validation de fin de formation a ├®t├® envoy├®e avec succ├¿s. Un superadmin la traitera dans les plus brefs d├®lais.');

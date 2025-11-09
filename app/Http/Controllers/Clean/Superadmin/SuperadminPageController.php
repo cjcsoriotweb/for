@@ -570,12 +570,15 @@ class SuperadminPageController extends Controller
             }
         }
 
-        // Mettre à jour la demande
+        // Mettre à jour la demande + marquer la formation comme complétée pour l'élève
         $formationUser->update([
             'completion_request_status' => 'approved',
             'completion_validated_at' => now(),
             'completion_validated_by' => $user->id,
             'completion_documents' => !empty($completionDocuments) ? $completionDocuments : null,
+            'need_verif' => false,
+            'status' => 'completed',
+            'completed_at' => now(),
         ]);
 
         return redirect()->back()->with('success', 'La demande de validation a été approuvée avec succès.');
