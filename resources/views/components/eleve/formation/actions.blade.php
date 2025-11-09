@@ -14,17 +14,17 @@
     @endphp
     @if($currentLesson && $currentLesson->chapter)
     <a href="{{ route('eleve.lesson.show', [$team, $formation, $currentLesson->chapter, $currentLesson]) }}"
-       class="flex items-center p-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg transition-all duration-200 border border-blue-200 dark:border-blue-800">
+       class="flex items-center p-3 bg-gradient-to-r from-emerald-400 to-sky-500 text-white rounded-lg shadow-lg border border-transparent transition duration-200 transform hover:-translate-y-0.5 hover:shadow-xl hover:from-emerald-300 hover:to-sky-400 focus-visible:ring-4 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-safe:animate-pulse">
       <div class="flex-shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l.707.707A1 1 0 0012.414 11H15m2 0h1.586a1 1 0 01.707.293l.707.707A1 1 0 0021 12.414V15m-6 6h1.586a1 1 0 01.707.293l.707.707A1 1 0 0019 21.414V15"></path>
         </svg>
       </div>
-      <div class="ml-2">
-        <p class="text-sm font-medium">Continuer l'apprentissage</p>
-        <p class="text-xs text-blue-600 dark:text-blue-400">Reprendre où vous en étiez</p>
-      </div>
-    </a>
+        <div class="ml-2">
+          <p class="text-sm font-medium">Reprendre là où vous en étiez</p>
+          <p class="text-xs text-white/80">Continuez votre parcours</p>
+        </div>
+      </a>
     @endif
 
     <!-- Formation Resources -->
