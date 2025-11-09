@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
   <!-- Chapter Management Page -->
   <div class="min-h-screen bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -51,10 +51,10 @@
           </path>
         </svg>
         <h3 class="text-xl font-medium text-gray-900 mb-2">
-          Aucun chapitre trouvé
+          Aucun chapitre trouvÃ©
         </h3>
         <p class="text-gray-500 mb-8 max-w-sm mx-auto">
-          Commencez par créer votre premier chapitre pour structurer votre formation.
+          Commencez par crÃ©er votre premier chapitre pour structurer votre formation.
         </p>
         <form action="{{ route('formateur.formation.chapter.store', ['formation' => $formation]) }}" method="POST" class="inline">
           @csrf
@@ -64,7 +64,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
               </path>
             </svg>
-            Créer le premier chapitre
+            CrÃ©er le premier chapitre
           </button>
         </form>
       </div>
@@ -124,7 +124,7 @@
               </svg>
               <h4 class="text-sm font-medium text-gray-900 mb-2">Chapitre vide</h4>
               <p class="text-gray-500 text-sm mb-6">
-                Ajoutez vootre premier module pour commencer à construire ce chapitre.
+                Ajoutez vootre premier module pour commencer Ã  construire ce chapitre.
               </p>
               <form method="post" action="{{ route('formateur.formation.chapter.lesson.add', ['formation' => $formation, 'chapter' => $chapter]) }}" class="inline">
                 @csrf
@@ -176,7 +176,7 @@
                       <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                       </svg>
-                      Vidéo
+                      VidÃ©o
                       @elseif($lesson->lessonable_type === 'App\Models\TextContent')
                       <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -191,7 +191,7 @@
                       <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                       </svg>
-                      Non défini
+                      Non dÃ©fini
                     </span>
                     @endif
                   </div>
@@ -243,21 +243,47 @@
                   @else
                   <a href="{{ route('formateur.formation.chapter.lesson.define', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 rounded-md transition-colors duration-200"
-                    title="Choisir le type du module (Quiz, Vidéo ou Texte)">
+                    title="Choisir le type du module (Quiz, VidÃ©o ou Texte)">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     </svg>
-                    Définir
+                    DÃ©finir
                   </a>
                   @endif
 
-                  <!-- Delete Lesson Button -->
-                  <form method="POST" action="{{ route('formateur.formation.chapter.lesson.delete', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}" class="inline"
-                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce module? Cette action est irréversible.')">
-                    @csrf
+                                    @php
+                    $isFirstInChapter = $lesson->position === $chapter->lessons->min('position');
+                    $isLastInChapter = $lesson->position === $chapter->lessons->max('position');
+                    $hasPrevChapter = $formation->chapters->where('position', '<', $chapter->position)->isNotEmpty();
+                    $hasNextChapter = $formation->chapters->where('position', '>', $chapter->position)->isNotEmpty();
+                  @endphp
 
+                  @if(!($isFirstInChapter && !$hasPrevChapter))
+                  <form method="POST" action="{{ route('formateur.formation.chapter.lesson.move-up', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}" class="inline">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors duration-200" title="Monter">
+                      <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                      </svg>
+                      Monter
+                    </button>
+                  </form>
+                  @endif
+
+                  @if(!($isLastInChapter && !$hasNextChapter))
+                  <form method="POST" action="{{ route('formateur.formation.chapter.lesson.move-down', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}" class="inline">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors duration-200" title="Descendre">
+                      <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                      Descendre
+                    </button>
+                  </form>
+                  @endif<!-- Delete Lesson Button -->
+                  <form method="POST" action="{{ route('formateur.formation.chapter.lesson.delete', ['formation' => $formation, 'chapter' => $chapter, 'lesson' => $lesson]) }}" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce module? Cette action est irréversible.')">
+                    @csrf
                     @method('delete')
-                    
                     <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-red-700 hover:text-red-900 hover:bg-red-50 rounded-md transition-colors duration-200">
                       <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -277,18 +303,13 @@
       @endif
     </div>
 
-
-
-    <!-- Display success message -->
     @if(session('success'))
-    <div id="successMessage"
-      class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg z-50">
+    <div id="successMessage" class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg z-50">
       <div class="flex items-center">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        {{ session("success") }}
+        {{ session('success') }}
       </div>
     </div>
     @endif

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Http\Controllers\Clean\Formateur\FormateurPageController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationAiController;
@@ -45,7 +45,7 @@ Route::prefix('formateur')
             Route::get('/formation/{formation}/chapters', [FormateurFormationController::class, 'manageChapters'])->name('formation.chapters.index');
             Route::get('/formation/{formation}/ai', [FormateurFormationAiController::class, 'edit'])->name('formation.ai.edit');
             Route::put('/formation/{formation}/ai', [FormateurFormationAiController::class, 'update'])->name('formation.ai.update');
-            // Routes IA supprimées - trainers sont maintenant dans config/ai.php
+            // Routes IA supprimÃ©es - trainers sont maintenant dans config/ai.php
             Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
             Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');
             Route::get('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'index'])->name('formation.completion-documents.index');
@@ -80,6 +80,9 @@ Route::prefix('formateur')
             Route::delete('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}', [FormationLessonController::class, 'deleteLesson'])->name('formation.chapter.lesson.delete');
             Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/define', [FormationLessonController::class, 'defineLesson'])->name('formation.chapter.lesson.define.store');
             Route::put('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/title', [FormationLessonController::class, 'updateLessonTitle'])->name('formation.chapter.lesson.title.update');
+
+            Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/move-up', [FormationLessonController::class, 'moveLessonUp'])->name('formation.chapter.lesson.move-up');
+            Route::post('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/move-down', [FormationLessonController::class, 'moveLessonDown'])->name('formation.chapter.lesson.move-down');
 
             // Chapter management routes
             Route::put('/formation/{formation}/chapitre/{chapter}', [FormationChapterController::class, 'updateChapter'])->name('formation.chapter.update');
@@ -118,3 +121,4 @@ Route::prefix('formateur')
             Route::delete('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/resources/{resource}', [FormationLessonController::class, 'deleteResource'])->name('formation.chapter.lesson.resources.delete');
         });
     });
+
