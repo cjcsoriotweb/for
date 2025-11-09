@@ -1,25 +1,3 @@
-@php
-    use Illuminate\Support\Carbon;
-    use Illuminate\Support\Str;
-
-    $defaultTeam = Auth::user()?->currentTeam ?? Auth::user()?->allTeams()->first();
-    $sort = $sort ?? request()->get('sort', 'revenue_desc');
-    $sortKey = Str::beforeLast($sort, '_');
-    $sortDirection = Str::endsWith($sort, '_asc') ? 'asc' : 'desc';
-    $nextSort = function (string $column) use ($sortKey, $sortDirection): string {
-        return $sortKey === $column && $sortDirection === 'asc'
-            ? "{$column}_desc"
-            : "{$column}_asc";
-    };
-    $sortIcon = function (string $column) use ($sortKey, $sortDirection): ?string {
-        if ($sortKey !== $column) {
-            return null;
-        }
-
-        return $sortDirection === 'asc' ? 'stat_1' : 'south';
-    };
-@endphp
-
 <x-admin.global-layout
     icon="library_books"
     :title="__('Gestion des formations')"
@@ -115,88 +93,79 @@
             {{ $formations->links() }}
         </div>
 
-        <div class="rounded-3xl border border-slate-200/70 bg-white p-6 shadow-lg dark:border-slate-700/70 dark:bg-slate-900">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+        <section id="suivis" class="rounded-3xl border border-slate-200/70 bg-white p-6 shadow-lg dark:border-slate-700/70 dark:bg-slate-900">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-                        {{ __('Revenus par formation') }}
+                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                        {{ __('Suivis') }}
+                    </p>
+                    <h2 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                        {{ __('Activations & parcours') }}
                     </h2>
                     <p class="text-sm text-slate-500 dark:text-slate-400">
-                        {{ __('Analysez les revenus bruts estimÃ©s sur la base des coÃ»ts dâ€™inscription ou du tarif catalogue.') }}
+                        {{ __('Consultez en un coup d’œil les activations totales et les progrès enregistrés ce mois-ci.') }}
                     </p>
                 </div>
-                <div class="text-xs text-slate-400">
-                    {{ __('Tri actuel : :label', ['label' => match($sortKey) {
-                        'enrollments' => __('inscriptions'),
-                        'title' => __('nom'),
-                        'updated_at' => __('derniÃ¨re activitÃ©'),
-                        default => __('revenu total'),
-                    } . ' ' . ($sortDirection === 'asc' ? __('croissant') : __('dÃ©croissant'))]) }}
-                </div>
+                <a
+                    href="{{ route('superadmin.completion-requests.index') }}"
+                    class="inline-flex items-center justify-center rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-100 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-200"
+                >
+                    {{ __('Voir les suivis') }}
+                </a>
             </div>
 
-            <div class="mt-6 overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200 text-left text-sm dark:divide-slate-700">
-                    <thead class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        <tr>
-                            @foreach ([
-                                'title' => __('Formation'),
-                                'enrollments' => __('Inscriptions'),
-                                'revenue' => __('Revenu estimÃ©'),
-                                'updated_at' => __('DerniÃ¨re inscription'),
-                            ] as $column => $label)
-                                @php($isSortable = in_array($column, ['title', 'enrollments', 'revenue', 'updated_at'], true))
-                                <th scope="col" class="px-4 py-3">
-                                    @if ($isSortable)
-                                        <a
-                                            href="{{ route('superadmin.formations.index', array_merge(request()->only('search'), ['sort' => $nextSort($column)])) }}"
-                                            class="inline-flex items-center gap-1 text-slate-600 transition hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-300"
-                                        >
-                                            <span>{{ $label }}</span>
-                                            @if ($icon = $sortIcon($column))
-                                                <span class="material-symbols-outlined text-sm">{{ $icon }}</span>
-                                            @endif
-                                        </a>
-                                    @else
-                                        {{ $label }}
-                                    @endif
-                                </th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 text-slate-600 dark:divide-slate-700 dark:text-slate-200">
-                        @forelse ($revenueRows as $row)
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                                <td class="px-4 py-3">
-                                    <div class="flex flex-col">
-                                        <span class="font-medium text-slate-900 dark:text-white">{{ $row->title }}</span>
-                                        <span class="text-xs text-slate-400 dark:text-slate-500">
-                                            {{ trans_choice(':count Ã©quipe|:count Ã©quipes', $row->teams_count, ['count' => number_format((int) $row->teams_count)]) }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="font-semibold">{{ number_format((int) $row->enrollments_count) }}</span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="font-semibold text-emerald-600 dark:text-emerald-400">
-                                        {{ number_format((int) $row->revenue_sum, 0, ',', ' ') }} â‚¬
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{ optional(Carbon::make($row->last_enrollment_at))->diffForHumans() ?? __('Jamais') }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                                    {{ __('Aucune donnÃ©e de revenu Ã  afficher pour le moment.') }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            @php
+                $followCards = [
+                    [
+                        'label' => __('Activations totales'),
+                        'value' => $followStats['activation_total'] ?? 0,
+                        'subtext' => __('Formations activées auprès des équipes.'),
+                        'icon' => 'bolt',
+                        'iconColor' => 'text-emerald-500 dark:text-emerald-300',
+                    ],
+                    [
+                        'label' => __('Activations ce mois-ci'),
+                        'value' => $followStats['activated_this_month'] ?? 0,
+                        'subtext' => __('Nouvelles activations depuis le début du mois.'),
+                        'icon' => 'bolt',
+                        'iconColor' => 'text-indigo-500 dark:text-indigo-300',
+                    ],
+                    [
+                        'label' => __('Formations commencées ce mois-ci'),
+                        'value' => $followStats['started_this_month'] ?? 0,
+                        'subtext' => __('Inscriptions ou premiers accès enregistrés.'),
+                        'icon' => 'play_circle',
+                        'iconColor' => 'text-sky-500 dark:text-sky-300',
+                    ],
+                    [
+                        'label' => __('Formations terminées ce mois-ci'),
+                        'value' => $followStats['completed_this_month'] ?? 0,
+                        'subtext' => __('Parcours déclarés comme terminés.'),
+                        'icon' => 'check_circle',
+                        'iconColor' => 'text-fuchsia-500 dark:text-fuchsia-300',
+                    ],
+                ];
+            @endphp
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach ($followCards as $card)
+                    <div class="rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm ring-1 ring-slate-200 dark:border-slate-800 dark:bg-slate-900/60 dark:ring-slate-900/40">
+                        <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500">
+                            <span class="material-symbols-outlined text-base {{ $card['iconColor'] }}">
+                                {{ $card['icon'] }}
+                            </span>
+                            {{ $card['label'] }}
+                        </div>
+                        <p class="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">
+                            {{ number_format($card['value']) }}
+                        </p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            {{ $card['subtext'] }}
+                        </p>
+                    </div>
+                @endforeach
             </div>
-        </div>
+        </section>
     </div>
 </x-admin.global-layout>

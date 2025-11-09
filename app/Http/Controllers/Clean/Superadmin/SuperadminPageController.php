@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Clean\Superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\AiTrainer;
 use App\Models\Formation;
+use App\Models\FormationInTeams;
 use App\Models\FormationUser;
 
 use App\Models\SupportTicket;
@@ -14,7 +15,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class SuperadminPageController extends Controller
 {
@@ -131,10 +131,6 @@ class SuperadminPageController extends Controller
     {
         $search = trim((string) $request->input('search', ''));
 
-        $sort = (string) $request->query('sort', 'revenue_desc');
-        $sortKey = Str::beforeLast($sort, '_');
-        $sortDirection = Str::endsWith($sort, '_asc') ? 'asc' : 'desc';
-
         $aggregatesSub = DB::table('formation_user')
             ->selectRaw('formation_user.formation_id, COUNT(*) as enrollments_count, 0 as revenue_sum, MAX(COALESCE(formation_user.enrolled_at, formation_user.created_at)) as last_enrollment_at')
             ->groupBy('formation_user.formation_id');
@@ -162,24 +158,21 @@ class SuperadminPageController extends Controller
             ->paginate(18)
             ->withQueryString();
 
-        $orderColumn = match ($sortKey) {
-            'enrollments' => 'enrollments_count',
-            'title' => 'formations.title',
-            'updated_at' => 'formations.updated_at',
-            default => 'revenue_sum',
-        };
+        $startOfMonth = now()->startOfMonth();
 
-        $revenueRows = (clone $baseQuery)
-            ->orderBy($orderColumn, $sortDirection)
-            ->orderBy('formations.title')
-            ->limit(50)
-            ->get();
+        $followStats = [
+            'activation_total' => FormationInTeams::visible()->count(),
+            'activated_this_month' => FormationInTeams::visible()
+                ->where('created_at', '>=', $startOfMonth)
+                ->count(),
+            'started_this_month' => FormationUser::where('enrolled_at', '>=', $startOfMonth)->count(),
+            'completed_this_month' => FormationUser::where('completed_at', '>=', $startOfMonth)->count(),
+        ];
 
         return view('out-application.superadmin.superadmin-formations-page', [
             'formations' => $catalog,
             'search' => $search,
-            'revenueRows' => $revenueRows,
-            'sort' => $sort,
+            'followStats' => $followStats,
         ]);
     }
 
