@@ -222,6 +222,13 @@ class SuperadminPageController extends Controller
                     'enrolled_at' => $fu->enrolled_at,
                     'formation_route' => $fu->formation ? route('superadmin.formations.show', $fu->formation) : '#',
                     'user_route' => $fu->user ? route('superadmin.users.show', $fu->user) : '#',
+                    'report_route' => ($fu->team_id && $fu->formation_id && $fu->user_id)
+                        ? route('organisateur.formations.students.report', [
+                            'team' => $fu->team_id,
+                            'formation' => $fu->formation_id,
+                            'student' => $fu->user_id,
+                        ])
+                        : '#',
                 ];
             });
         // Tri c�t� collection si demand�

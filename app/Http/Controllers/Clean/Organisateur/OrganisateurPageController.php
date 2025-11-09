@@ -194,17 +194,57 @@ class OrganisateurPageController extends Controller
             'end_date' => $request->get('end_date'),
         ];
 
+        // Redirect to the default section-based page (overview)
+        return redirect()->route('organisateur.formations.students.report.overview', [$team, $formation, $student]);
+    }
+
+    public function studentReportSection(Request $request, Team $team, Formation $formation, User $student, string $section)
+    {
+        if (! $this->organisateurService->formationIsVisibleToTeam($team, $formation)) {
+            return redirect()->route('organisateur.index', $team)
+                ->with('error', 'Formation non accessible.');
+        }
+
+        if (! $this->organisateurService->studentIsEnrolledInFormation($formation, $student)) {
+            return redirect()->route('organisateur.formations.students', [$team, $formation])
+                ->with('error', 'Eleve non inscrit a cette formation.');
+        }
+
+        $validSections = ['overview', 'progress', 'quizzes', 'activity', 'documents'];
+        if (! in_array($section, $validSections, true)) {
+            return redirect()->route('organisateur.formations.students.report.overview', [$team, $formation, $student]);
+        }
+
+        $activityFilters = [
+            'activity_search' => $request->get('activity_search'),
+            'lesson_filter' => $request->get('lesson_filter'),
+            'start_date' => $request->get('start_date'),
+            'end_date' => $request->get('end_date'),
+        ];
+
+        $includeActivity = ($section === 'activity');
+
         $reportData = $this->organisateurService->getStudentReportData(
             $formation,
             $student,
             $activityFilters,
-            true
+            $includeActivity
         );
 
-        return view('in-application.organisateur.student-report', array_merge([
+        $view = match ($section) {
+            'overview' => 'in-application.organisateur.student-report.pages.overview',
+            'progress' => 'in-application.organisateur.student-report.pages.progress',
+            'quizzes' => 'in-application.organisateur.student-report.pages.quizzes',
+            'activity' => 'in-application.organisateur.student-report.pages.activity',
+            'documents' => 'in-application.organisateur.student-report.pages.documents',
+            default => 'in-application.organisateur.student-report.pages.overview',
+        };
+
+        return view($view, array_merge([
             'team' => $team,
             'formation' => $formation,
             'student' => $student,
+            'activeTab' => $section,
         ], $reportData));
     }
 

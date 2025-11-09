@@ -125,6 +125,11 @@
                                     <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $enrollment['status_classes']['bg'] }} {{ $enrollment['status_classes']['text'] }}">
                                         {{ $enrollment['status_label'] }}
                                     </span>
+                                    @if (!empty($enrollment['report_route']) && $enrollment['report_route'] !== '#')
+                                        <a href="{{ $enrollment['report_route'] }}" class="ml-3 text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                                            {{ __('Voir détails') }}
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
