@@ -106,16 +106,19 @@
         </div>
 
         <!-- Équipes de l'utilisateur -->
+        @php
+            $teams = $user->ownedTeams->merge($user->teams)->unique('id');
+        @endphp
         <div class="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-lg dark:border-slate-700/70 dark:bg-slate-900">
             <div class="border-b border-slate-200/60 bg-slate-50/80 px-6 py-4 dark:border-slate-800/80 dark:bg-slate-800/80">
                 <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-                    {{ __('Équipes') }} ({{ $user->teams->count() }})
+                    {{ __('Équipes') }} ({{ $teams->count() }})
                 </h3>
             </div>
             <div class="p-6">
-                @if($user->teams->isNotEmpty())
+                @if($teams->isNotEmpty())
                     <div class="space-y-4">
-                        @foreach($user->teams as $team)
+                        @foreach($teams as $team)
                             <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-800/30">
                                 <div class="flex items-center gap-3">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
@@ -130,8 +133,21 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-xs text-slate-500 dark:text-slate-400">
-                                        {{ __('Rejoint le') }} {{ $team->pivot->created_at->translatedFormat('d M Y') }}
+                                        @php
+                                            $joinedAt = $team->pivot->created_at ?? $team->created_at ?? null;
+                                        @endphp
+                                        {{ __('Rejoint le') }} {{ $joinedAt?->translatedFormat('d M Y') ?? __('Date inconnue') }}
                                     </p>
+                                    <div class="mt-2 flex flex-wrap justify-end gap-2">
+                                        <a href="{{ route('organisateur.index', ['team' => $team->id]) }}"
+                                           class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800">
+                                            {{ __('Organiser') }}
+                                        </a>
+                                        <a href="{{ route('application.admin.index', ['team' => $team->id]) }}"
+                                           class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800">
+                                            {{ __('Administrateur') }}
+                                        </a>
+                                    </div>
                                     @if($user->current_team_id === $team->id)
                                         <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                             {{ __('Équipe active') }}
@@ -174,9 +190,24 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">
-                                        {{ __('Inscrit le') }} {{ $formation->pivot->enrolled_at?->translatedFormat('d M Y') ?? $formation->pivot->created_at?->translatedFormat('d M Y') }}
-                                    </p>
+                                @php
+                                    $enrollmentDate = $formation->pivot->enrolled_at ?? $formation->pivot->created_at ?? null;
+                                    $enrollmentDate = $enrollmentDate ? \Illuminate\Support\Carbon::make($enrollmentDate) : null;
+                                    $teamForFormation = $formation->teams->where('id', $formation->pivot->team_id)->first();
+                                @endphp
+                                <p class="text-xs text-slate-500 dark:text-slate-400">
+                                    {{ __('Inscrit le') }} {{ $enrollmentDate?->translatedFormat('d M Y') ?? __('Date inconnue') }}
+                                </p>
+                                    @if($teamForFormation)
+                                        <a href="{{ route('organisateur.formations.students.report.overview', [
+                                            'team' => $teamForFormation->id,
+                                            'formation' => $formation->id,
+                                            'student' => $user->id,
+                                        ]) }}"
+                                           class="mt-2 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800">
+                                            {{ __('Suivis') }}
+                                        </a>
+                                    @endif
                                     @if($formation->pivot->completed_at)
                                         <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                             {{ __('Terminée') }}

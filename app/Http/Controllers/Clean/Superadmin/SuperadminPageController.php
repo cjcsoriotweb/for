@@ -325,6 +325,8 @@ class SuperadminPageController extends Controller
         $user->load([
             'teams:id,name,user_id,created_at',
             'teams.owner:id,name,email',
+            'ownedTeams:id,name,user_id,created_at',
+            'ownedTeams.owner:id,name,email',
             'currentTeam:id,name,user_id',
         ]);
 
