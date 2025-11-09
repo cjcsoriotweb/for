@@ -12,6 +12,7 @@ use App\Models\QuizAttempt;
 use App\Models\Team;
 use App\Models\TextContent;
 use App\Models\LessonResource;
+use App\Models\FormationUser;
 use App\Models\User;
 use App\Services\Clean\Account\AccountService;
 use App\Services\Formation\StudentFormationService;
@@ -58,6 +59,26 @@ class ElevePageController extends Controller
         }
 
         return 'passed';
+    }
+
+    private function fetchFormationUser(Team $team, Formation $formation, User $user): ?FormationUser
+    {
+        return FormationUser::with('completionValidatedBy')
+            ->where('formation_id', $formation->id)
+            ->where('user_id', $user->id)
+            ->where('team_id', $team->id)
+            ->first();
+    }
+
+    private function needsPostEntryQuizRetake(?FormationUser $formationUser, bool $hasEntryQuiz, bool $isFormationCompleted): bool
+    {
+        if (! $hasEntryQuiz || ! $formationUser) {
+            return false;
+        }
+
+        return (bool) $formationUser->entry_quiz_attempt_id
+            && ! $formationUser->post_quiz_attempt_id
+            && $isFormationCompleted;
     }
 
     public function home(Team $team)
@@ -157,21 +178,38 @@ class ElevePageController extends Controller
             abort(403, 'Vous n\'etes pas inscrit à cette formation');
         }
 
-        // V├®rifier le quiz d'entr├®e si la formation en a un
+        // Préparer les données et le quiz d'entrée
         $entryQuiz = $formation->entryQuiz;
+        $formationUser = $this->fetchFormationUser($team, $formation, $user);
+        $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
+
         $entryQuizStatus = null;
+        $entryQuizThresholds = null;
+        $entryQuizScore = null;
+        $postQuizScore = $formationUser?->post_quiz_score !== null ? (float) $formationUser->post_quiz_score : null;
+        $quizProgressDelta = $formationUser?->quiz_progress_delta !== null ? (float) $formationUser->quiz_progress_delta : null;
 
         if ($entryQuiz) {
-            $formationProgress = $formation->learners()->where('user_id', $user->id)->first();
-
-            if ($formationProgress && $formationProgress->pivot->entry_quiz_attempt_id) {
-                $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
             [$minScore, $maxScore] = $this->resolveEntryQuizThresholds($entryQuiz);
-                $entryQuizStatus = $this->determineEntryQuizStatus($entryScore, $minScore, $maxScore);
+            $entryQuizThresholds = ['min' => $minScore, 'max' => $maxScore];
+
+            if ($formationUser?->entry_quiz_attempt_id) {
+                $entryQuizScore = (float) ($formationUser->entry_quiz_score ?? 0);
+                $entryQuizStatus = $this->determineEntryQuizStatus($entryQuizScore, $minScore, $maxScore);
             } else {
                 $entryQuizStatus = 'required';
             }
         }
+
+        $needsEntryQuizRetake = $this->needsPostEntryQuizRetake(
+            $formationUser,
+            (bool) $entryQuiz,
+            $isFormationCompleted
+        );
+
+        $validationStatus = $formationUser?->completion_request_status;
+        $isValidated = $validationStatus === 'approved';
+        $isPendingValidation = $validationStatus === 'pending';
 
         $studentFormationService = $this->studentFormationService;
 
@@ -186,7 +224,6 @@ class ElevePageController extends Controller
         $progress = $this->studentFormationService->getStudentProgress($user, $formation);
 
         $formationDocuments = $formation->completionDocuments()->get();
-        $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
 
         $lessonResources = LessonResource::query()
             ->whereHas('lesson.chapter', fn ($chapterQuery) => $chapterQuery->where('formation_id', $formation->id))
@@ -229,16 +266,6 @@ class ElevePageController extends Controller
             ])
             ->values();
 
-        // Récupérer le statut de validation de la formation pour cet élève
-        $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
-            ->where('user_id', $user->id)
-            ->where('team_id', $team->id)
-            ->first();
-
-        $validationStatus = $formationUser?->completion_request_status;
-        $isValidated = $validationStatus === 'approved';
-        $isPendingValidation = $validationStatus === 'pending';
-
         $assistantTrainer = $formationWithProgress->category?->aiTrainer;
         $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
         $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
@@ -253,6 +280,12 @@ class ElevePageController extends Controller
             'isFormationCompleted' => $isFormationCompleted,
             'assistantTrainerSlug' => $assistantTrainerSlug,
             'assistantTrainerName' => $assistantTrainerName,
+            'entryQuiz' => $entryQuiz,
+            'entryQuizThresholds' => $entryQuizThresholds,
+            'entryQuizScore' => $entryQuizScore,
+            'postQuizScore' => $postQuizScore,
+            'quizProgressDelta' => $quizProgressDelta,
+            'needsEntryQuizRetake' => $needsEntryQuizRetake,
             'entryQuizStatus' => $entryQuizStatus,
             'validationStatus' => $validationStatus,
             'isValidated' => $isValidated,
@@ -1443,52 +1476,55 @@ class ElevePageController extends Controller
     }
 
     /**
-     * Afficher le quiz d'entr├®e pour un ├®tudiant
+     * Afficher le quiz d'entrée pour un étudiant
      */
     public function attemptEntryQuiz(Team $team, Formation $formation)
     {
         $user = Auth::user();
 
-        // V├®rifier si l'├®tudiant est inscrit ├á la formation
+        // Vérifier si l'étudiant est inscrit à la formation
         if (! $this->studentFormationService->isEnrolledInFormation($user, $formation, $team)) {
-            abort(403, 'Vous n\'etes pas inscrit à cette formation');
+            abort(403, 'Vous n'etes pas inscrit à cette formation');
         }
 
-        // V├®rifier si la formation a un quiz d'entr├®e
+        // Vérifier si la formation a un quiz d'entrée
         $entryQuiz = $formation->entryQuiz;
         if (! $entryQuiz) {
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('info', 'Cette formation n\'a pas de quiz d\'entr├®e.');
+                ->with('info', 'Cette formation n'a pas de quiz d'entrée.');
         }
 
-        // V├®rifier si l'├®tudiant a d├®j├á pass├® le quiz d'entr├®e
-        $formationProgress = $formation->learners()->where('user_id', $user->id)->first();
-        if ($formationProgress && $formationProgress->pivot->entry_quiz_attempt_id) {
-            $entryScore = $formationProgress->pivot->entry_quiz_score ?? 0;
+        $formationUser = $this->fetchFormationUser($team, $formation, $user);
+        $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
+        $isPostAttempt = $this->needsPostEntryQuizRetake($formationUser, true, $isFormationCompleted);
+
+        if (! $isPostAttempt && $formationUser?->entry_quiz_attempt_id) {
+            $entryScore = (float) ($formationUser->entry_quiz_score ?? 0);
             [$minScore, $maxScore] = $this->resolveEntryQuizThresholds($entryQuiz);
 
             if ($entryScore < $minScore) {
                 return redirect()->route('eleve.formation.show', [$team, $formation])
-                    ->with('error', 'Votre niveau actuel est insuffisant pour cette formation. Un formateur vous contactera pour vous orienter vers un parcours plus adapt├®.');
+                    ->with('error', 'Votre niveau actuel est insuffisant pour cette formation. Un formateur vous contactera pour vous orienter vers un parcours plus adapté.');
             }
 
             if ($entryScore > $maxScore) {
                 return redirect()->route('eleve.formation.show', [$team, $formation])
-                    ->with('error', 'Votre niveau est trop ├®lev├® pour cette formation. Un superadmin vous contactera pour vous proposer une formation plus adapt├®e.');
+                    ->with('error', 'Votre niveau est trop élevé pour cette formation. Un superadmin vous contactera pour vous proposer une formation plus adaptée.');
             }
 
             return redirect()->route('eleve.formation.show', [$team, $formation])
-                ->with('success', 'F├®licitations ! Votre niveau correspond parfaitement ├á cette formation (score: '.round($entryScore, 1).'%). Vous pouvez maintenant commencer.');
+                ->with('success', 'Félicitations ! Votre niveau correspond parfaitement à cette formation (score: '.round($entryScore, 1).'%). Vous pouvez maintenant commencer.');
         }
 
-        // R├®cup├®rer les questions du quiz
+        // Récupérer les questions du quiz
         $questions = $entryQuiz->quizQuestions()->with('quizChoices')->get();
 
         return view('in-application.eleve.formation.entry-quiz', compact(
             'team',
             'formation',
             'entryQuiz',
-            'questions'
+            'questions',
+            'isPostAttempt'
         ));
     }
 
