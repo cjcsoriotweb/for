@@ -4,6 +4,8 @@ namespace App\Livewire\Superadmin;
 
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use Throwable;
 
 class Console extends Component
@@ -20,7 +22,10 @@ class Console extends Component
         'queue:restart' => 'Redémarrer les workers de file d’attente',
         'optimize' => 'Optimiser l’application (cache)',
         'migrate:status' => 'Afficher l’état des migrations',
+        'git pull' => 'Mettre a jour le code depuis Git',
     ];
+
+    private array $shellCommands = ['git pull'];
 
     public function runCommand(): void
     {
@@ -37,8 +42,7 @@ class Console extends Component
         }
 
         try {
-            Artisan::call($command);
-            $output = trim(Artisan::output());
+            $output = $this->executeCommand($command);
 
             $this->appendLog(
                 $command,
@@ -61,6 +65,33 @@ class Console extends Component
 
         $this->command = $command;
         $this->runCommand();
+    }
+
+    private function executeCommand(string $command): string
+    {
+        if ($this->isShellCommand($command)) {
+            return $this->runShellCommand($command);
+        }
+
+        Artisan::call($command);
+        return trim(Artisan::output());
+    }
+
+    private function isShellCommand(string $command): bool
+    {
+        return in_array($command, $this->shellCommands, true);
+    }
+
+    private function runShellCommand(string $command): string
+    {
+        $process = Process::fromShellCommandline($command, base_path());
+        $process->run();
+
+        if (! $process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return trim($process->getOutput() ?: $process->getErrorOutput());
     }
 
     private function appendLog(string $command, string $output, bool $success): void
