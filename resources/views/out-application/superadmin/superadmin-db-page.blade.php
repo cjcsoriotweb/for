@@ -30,6 +30,10 @@
                         >
                             {{ __('Sauvegarde base de donnée') }}
                         </button>
+
+                        <a taget="_blank" href="{{ $iframeUrl }}" 
+                            class="inline-flex items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        >Ouvrir Phpmyadmin</a>
                     </form>
                 </div>
             </div>
@@ -51,15 +55,5 @@
             </section>
         @endif
 
-        <section class="rounded-3xl border border-slate-100 bg-white/70 p-4 shadow-lg ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/70 dark:ring-white/5">
-            <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
-                <iframe
-                    id="db-iframe"
-                    src="{{ $iframeUrl }}"
-                    class="h-[80vh] w-full min-h-[560px] border-0"
-                    loading="lazy"
-                ></iframe>
-            </div>
-        </section>
     </div>
 </x-admin.global-layout>
