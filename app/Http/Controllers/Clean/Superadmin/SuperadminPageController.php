@@ -751,6 +751,19 @@ class SuperadminPageController extends Controller
             ->route('superadmin.db')
             ->with('status', __('Sauvegarde créée : :path', [
                 'path' => $path,
-            ]));
+            ]))
+            ->with('backup_file', $fileName);
+    }
+
+    public function downloadBackup(string $file)
+    {
+        $disk = Storage::disk('local');
+        $path = "db-backups/{$file}";
+
+        if (!$disk->exists($path)) {
+            abort(404);
+        }
+
+        return $disk->download($path, $file);
     }
 }

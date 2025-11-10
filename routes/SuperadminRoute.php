@@ -31,6 +31,7 @@ Route::prefix('superadmin')
             return view('out-application.superadmin.superadmin-db-page');
         })->name('db');
         Route::post('/db/backup', [SuperadminPageController::class, 'backupDatabase'])->name('db.backup');
+        Route::get('/db/backup/{file}', [SuperadminPageController::class, 'downloadBackup'])->name('db.backup.download')->where('file', '[A-Za-z0-9_.-]+');
         Route::prefix('ai')
             ->name('ai.')
             ->group(function (): void {

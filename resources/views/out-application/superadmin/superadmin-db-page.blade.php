@@ -35,6 +35,22 @@
             </div>
         </section>
 
+        @if (session('backup_file'))
+            <section class="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-inner ring-1 ring-emerald-300/30 dark:border-emerald-500/40 dark:bg-emerald-900/70">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <p class="text-sm font-medium text-emerald-700 dark:text-emerald-200">
+                        {{ __('Sauvegarde prête : :file', ['file' => session('backup_file')]) }}
+                    </p>
+                    <a
+                        href="{{ route('superadmin.db.backup.download', session('backup_file')) }}"
+                        class="inline-flex items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+                    >
+                        {{ __('Télécharger') }}
+                    </a>
+                </div>
+            </section>
+        @endif
+
         <section class="rounded-3xl border border-slate-100 bg-white/70 p-4 shadow-lg ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/70 dark:ring-white/5">
             <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
                 <iframe
