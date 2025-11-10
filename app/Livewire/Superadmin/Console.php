@@ -22,6 +22,7 @@ class Console extends Component
         'queue:restart' => 'Redémarrer les workers de file d’attente',
         'optimize' => 'Optimiser l’application (cache)',
         'migrate:status' => 'Afficher l’état des migrations',
+        'migrate' => 'Mise a jour de la database',
         'git pull' => 'Mise a jour le code depuis Git',
     ];
 

@@ -19,7 +19,7 @@
         [
             'title' => __('Valider fin de formation'),
             'description' => __('Validez les demandes de fin de formation.'),
-            'stat' => '0 ' . __('demandes'), // TODO: Add actual count
+            'stat' => number_format($stats->get('completion_requests_pending', 0)) . ' ' . __('demandes'),
             'icon' => 'check_circle',
             'route' => route('superadmin.completion-requests.index'),
         ],

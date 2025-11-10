@@ -28,6 +28,7 @@ class SuperadminPageController extends Controller
             'formations' => Formation::count(),
             'invitations' => TeamInvitation::count(),
             'tickets' => SupportTicket::count(),
+            'completion_requests_pending' => FormationUser::where('completion_request_status', 'pending')->count(),
         ];
 
         $trainerCount = AiTrainer::count();

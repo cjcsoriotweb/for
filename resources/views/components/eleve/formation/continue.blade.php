@@ -39,14 +39,15 @@
   <div class="-mx-4 overflow-hidden sm:-mx-2">
     <div class="grid grid-cols-1 gap-5 px-4 pb-4 sm:px-2 sm:grid-cols-2">
       @foreach($formationsWithProgress as $formation)
-      @php
-      $progressPercent = (int) ($formation->progress_data['progress_percent'] ?? 0);
-      $isCompleted = (bool) ($formation->is_completed ?? false);
-      $isPendingValidation = (bool) ($formation->is_pending_validation ?? false);
-      $isValidated = (bool) ($formation->is_validated ?? false);
-      $fallbackTitle = $formation->title ?: 'Titre par d&eacute;faut';
-      $fallbackDescription = $formation->description ?: 'Description par d&eacute;faut';
-      @endphp
+    @php
+    $progressPercent = (int) ($formation->progress_data['progress_percent'] ?? 0);
+    $isCompleted = (bool) ($formation->is_completed ?? false);
+    $isPendingValidation = (bool) ($formation->is_pending_validation ?? false);
+    $isValidated = (bool) ($formation->is_validated ?? false);
+    $isRejected = ($formation->validation_status ?? '') === 'rejected';
+    $fallbackTitle = $formation->title ?: 'Titre par d&eacute;faut';
+    $fallbackDescription = $formation->description ?: 'Description par d&eacute;faut';
+    @endphp
 
       <article 
         class="group flex w-full flex-col overflow-hidden rounded-xl border {{ $isCompleted ? 'border-green-600 bg-white' : 'border-slate-200 bg-white' }} transition-colors duration-200 hover:border-slate-300">
@@ -57,19 +58,27 @@
         </div>
 
         <div class="space-y-3 p-4">
-          @if($isCompleted)
-          <div class="flex items-center justify-center">
-            @if($isPendingValidation)
-            <div class="flex items-center gap-2 rounded-full bg-amber-600/20 border border-amber-600 px-4 py-2 text-sm font-medium text-amber-400">
-              <svg class="h-4 w-4 animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-              </svg>
-              En attente de validation
-            </div>
-       
-            @endif
-          </div>
-          @else
+    @if($isCompleted)
+      @if($isPendingValidation || $isRejected)
+      <div class="flex items-center justify-center">
+        @if($isPendingValidation)
+        <div class="flex items-center gap-2 rounded-full bg-amber-600/20 border border-amber-600 px-4 py-2 text-sm font-medium text-amber-400">
+          <svg class="h-4 w-4 animate-spin" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+          </svg>
+          En attente de validation
+        </div>
+        @elseif($isRejected)
+        <div class="flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700">
+          <svg class="h-4 w-4 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span>Demande rejetée</span>
+        </div>
+        @endif
+      </div>
+      @endif
+    @else
           <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-600">
             <span class="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-slate-700">
               Continuer
@@ -125,26 +134,53 @@
           </div>
           @else
           <div class="space-y-3">
-            @if($isValidated)
-              <a href="{{ route('eleve.formation.completed', [$team, $formation->id]) }}"
-                 class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
+            @if($isRejected)
+            <div class="rounded-2xl border border-red-200 bg-red-50/80 px-4 py-3 text-sm text-red-700">
+              <p class="font-semibold">Votre demande de validation a été rejetée.</p>
+              <p class="text-xs text-red-600/80">Revoyez la formation ou contactez un administrateur pour soumettre une nouvelle demande.</p>
+            </div>
+            <div class="space-y-2">
+              <a href="{{ route('eleve.formation.show', [$team, $formation->id]) }}"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50/70 px-3 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
-                  <path fill-rule="evenodd" d="M4 13a2 2 0 100 4h12a2 2 0 100-4H4zm11.24 2a.75.75 0 01.75-.75H16a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V15zm-2.25-.75a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 00.75-.75V15a.75.75 0 00-.75-.75h-.01z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd" d="M10.22 4.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L13.94 10 10.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd" d="M4.75 10a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 4.75 10Z" clip-rule="evenodd" />
                 </svg>
-                Voir mon certificat
+                Revoir la formation
               </a>
-            @elseif($progressPercent === 100)
-              <form method="POST" action="{{ route('eleve.formation.request-completion', [$team, $formation->id]) }}">
-                @csrf
-                <button type="submit"
-                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-700">
-                  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10.075 2.678a.75.75 0 01.85 0l6 4a.75.75 0 01.075 1.2l-6 5a.75.75 0 01-.95 0l-6-5A.75.75 0 013.075 6.68l6-4zM4 8.25v5.5A2.25 2.25 0 006.25 16h7.5A2.25 2.25 0 0016 13.75v-5.5l-5.225 4.354a2.25 2.25 0 01-2.85 0L4 8.25z" clip-rule="evenodd" />
+              <a href="{{ route('user.tickets') }}"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-transparent px-3 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-50">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7.414a2 2 0 00-.586-1.414l-3.414-3.414A2 2 0 0011.586 2H5z" />
+                  <path d="M9 7a1 1 0 100 2h2a1 1 0 100-2H9z" />
+                </svg>
+                Contester le refus
+              </a>
+            </div>
+            @endif
+
+            @if(!$isRejected)
+              @if($isValidated)
+                <a href="{{ route('eleve.formation.completed', [$team, $formation->id]) }}"
+                   class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
+                  <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
+                    <path fill-rule="evenodd" d="M4 13a2 2 0 100 4h12a2 2 0 100-4H4zm11.24 2a.75.75 0 01.75-.75H16a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V15zm-2.25-.75a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 00.75-.75V15a.75.75 0 00-.75-.75h-.01z" clip-rule="evenodd" />
                   </svg>
-                  Faire valider ma formation
-                </button>
-              </form>
+                  Voir mon certificat
+                </a>
+              @elseif($progressPercent === 100)
+                <form method="POST" action="{{ route('eleve.formation.request-completion', [$team, $formation->id]) }}">
+                  @csrf
+                  <button type="submit"
+                          class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-700">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10.075 2.678a.75.75 0 01.85 0l6 4a.75.75 0 01.075 1.2l-6 5a.75.75 0 01-.95 0l-6-5A.75.75 0 013.075 6.68l6-4zM4 8.25v5.5A2.25 2.25 0 006.25 16h7.5A2.25 2.25 0 0016 13.75v-5.5l-5.225 4.354a2.25 2.25 0 01-2.85 0L4 8.25z" clip-rule="evenodd" />
+                    </svg>
+                    Faire valider ma formation
+                  </button>
+                </form>
+              @endif
             @endif
           </div>
           @endif
