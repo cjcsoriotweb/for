@@ -22,7 +22,7 @@ class Console extends Component
         'queue:restart' => 'Redémarrer les workers de file d’attente',
         'optimize' => 'Optimiser l’application (cache)',
         'migrate:status' => 'Afficher l’état des migrations',
-        'git pull' => 'Mettre a jour le code depuis Git',
+        'git pull' => 'Mise a jour le code depuis Git',
     ];
 
     private array $shellCommands = ['git pull'];
