@@ -1,5 +1,5 @@
 @php
-    $iframeUrl = 'https://db.goodview.fr/';
+    $iframeUrl = 'https://db.evolubat-academy.fr/';
 @endphp
 
 <x-admin.global-layout
