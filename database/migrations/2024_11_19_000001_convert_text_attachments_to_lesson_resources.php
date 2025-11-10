@@ -16,12 +16,16 @@ return new class extends Migration
         if (! Schema::hasTable('lesson_resources')) {
             Schema::create('lesson_resources', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
+                $table->foreignId('lesson_id');
                 $table->string('name');
                 $table->string('file_path');
                 $table->string('mime_type')->nullable();
                 $table->string('display_mode', 20)->default('download');
                 $table->timestamps();
+
+                if (Schema::hasTable('lessons')) {
+                    $table->foreign('lesson_id')->references('id')->on('lessons')->cascadeOnDelete();
+                }
             });
 
             return;
@@ -62,6 +66,10 @@ return new class extends Migration
             }
 
             if (! Schema::hasColumn('lesson_resources', 'lesson_id')) {
+                return;
+            }
+
+            if (! Schema::hasTable('lessons')) {
                 return;
             }
 
