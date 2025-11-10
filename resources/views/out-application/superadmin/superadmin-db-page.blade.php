@@ -1,5 +1,5 @@
 @php
-    $iframeUrl = 'https://goodview.fr/db';
+    $iframeUrl = 'https://db.goodview.fr/';
 @endphp
 
 <x-admin.global-layout
@@ -20,6 +20,17 @@
                     <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
                         {{ __('Chargez la console Superadmin directement dans cette page ou ouvrez-la dans un nouvel onglet pour les modifications lourdes.') }}
                     </p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <form method="POST" action="{{ route('superadmin.db.backup') }}">
+                        @csrf
+                        <button
+                            type="submit"
+                            class="inline-flex items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        >
+                            {{ __('Sauvegarde base de donnée') }}
+                        </button>
+                    </form>
                 </div>
             </div>
         </section>

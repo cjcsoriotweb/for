@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
 
 class SuperadminPageController extends Controller
 {
@@ -674,5 +675,82 @@ class SuperadminPageController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'La validation de la demande a été annulée avec succès.');
+    }
+
+    public function backupDatabase(Request $request)
+    {
+        $connectionName = config('database.default');
+        $connection = config("database.connections.{$connectionName}", []);
+
+        if (($connection['driver'] ?? '') !== 'mysql') {
+            return redirect()
+                ->route('superadmin.db')
+                ->with('status', __('La sauvegarde n’est pas disponible pour la connexion « :connection ».', [
+                    'connection' => $connectionName,
+                ]));
+        }
+
+        $database = $connection['database'] ?? null;
+        if (!$database) {
+            return redirect()
+                ->route('superadmin.db')
+                ->with('status', __('Impossible de déterminer la base de données à sauvegarder.'));
+        }
+
+        $dumpCommand = env('DB_BACKUP_COMMAND', 'mysqldump');
+
+        $arguments = [
+            $dumpCommand,
+            '--single-transaction',
+            '--quick',
+            '--skip-lock-tables',
+            '--default-character-set=utf8mb4',
+            '--host=' . ($connection['host'] ?? '127.0.0.1'),
+            '--port=' . ($connection['port'] ?? 3306),
+            '--user=' . ($connection['username'] ?? 'root'),
+        ];
+
+        if (!empty($connection['password'])) {
+            $arguments[] = '--password=' . $connection['password'];
+        }
+
+        $arguments[] = $database;
+
+        $process = new Process($arguments);
+        $process->setTimeout(300);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            $errorMessage = trim($process->getErrorOutput() ?: $process->getOutput());
+            $statusMessage = __('La sauvegarde a échoué : :message', [
+                'message' => $errorMessage ?: __('Erreur inconnue'),
+            ]);
+
+            if (str_contains($errorMessage, 'n\'est pas reconnu')) {
+                $statusMessage = __('La commande « :command » est introuvable. Installez l\'outil MySQL CLI ou spécifiez son chemin via l\'env `DB_BACKUP_COMMAND`.', [
+                    'command' => $dumpCommand,
+                ]);
+            }
+
+            return redirect()
+                ->route('superadmin.db')
+                ->with('status', $statusMessage);
+        }
+
+        $disk = Storage::disk('local');
+        $directory = 'db-backups';
+        if (!$disk->exists($directory)) {
+            $disk->makeDirectory($directory);
+        }
+
+        $fileName = 'db-backup-' . now()->format('Y-m-d_H-i-s') . '.sql';
+        $path = "{$directory}/{$fileName}";
+        $disk->put($path, $process->getOutput());
+
+        return redirect()
+            ->route('superadmin.db')
+            ->with('status', __('Sauvegarde créée : :path', [
+                'path' => $path,
+            ]));
     }
 }

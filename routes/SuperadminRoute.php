@@ -30,6 +30,7 @@ Route::prefix('superadmin')
         Route::get('/db', function () {
             return view('out-application.superadmin.superadmin-db-page');
         })->name('db');
+        Route::post('/db/backup', [SuperadminPageController::class, 'backupDatabase'])->name('db.backup');
         Route::prefix('ai')
             ->name('ai.')
             ->group(function (): void {
