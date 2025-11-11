@@ -41,7 +41,7 @@ class VideoPlayer extends Component
         $this->lesson = $lesson;
         $this->lessonContent = $lessonContent;
 
-        // Si LessonUser exist dd(ici)
+    
 
         $this->loadExistingProgress();
     }
@@ -104,8 +104,29 @@ class VideoPlayer extends Component
     public function post(int $data)
     {
 
+        
         $this->currentTimePlayer = $data;
-        $this->dispatch('updated', data: $data);
+
+            // Si LessonUser exist dd(ici)
+        if (Auth::check()) {
+            $lessonUser = $this->lesson->learners()
+                ->where('user_id', Auth::id())
+                ->first();
+
+            if ($lessonUser) {
+
+                if($lessonUser->pivot->watched_seconds < $data){
+
+                     $this->lesson
+                    ->learners()
+                    ->updateExistingPivot(Auth::id(), ['watched_seconds' => $data]);
+                    $this->dispatch('updated', data: $data);
+
+                }
+               
+    
+            }
+        }
         $this->skipRender(); 
     }
 
