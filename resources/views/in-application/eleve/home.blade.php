@@ -15,7 +15,7 @@
                   </div>
                   <div class="flex-1">
                     <h3 class="text-sm font-medium text-red-800">
-                      {{ _("Aucune formation n'est activée pour ") . $team->name . "."}} 
+                      {!! _("Aucune formation n'est activée pour <b>") . $team->name . "</b>."!!} 
                     </h3>
                     <p class="mt-1 text-sm text-red-700">
                       <a href="{{ route('user.tickets') }}" class="underline hover:text-amber-800">{{ _("Si vous pensez qu'il s'agit d'une erreur, cliquez-ici.")}}</a>
