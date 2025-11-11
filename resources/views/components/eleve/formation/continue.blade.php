@@ -209,7 +209,7 @@
     </div>
     <h3 class="text-lg font-semibold text-slate-900">Aucune formation en cours</h3>
     <p class="mt-3 text-sm text-slate-500">
-      Demandez &agrave; votre organisme de vous inscrire &agrave; une formation pour commencer votre parcours.
+      {{ __("Une fois que vous serez inscrit à une formation, elle sera ici.")}}
     </p>
   </div>
   @endif
