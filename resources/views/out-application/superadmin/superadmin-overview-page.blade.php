@@ -42,7 +42,7 @@
 
 <x-admin.global-layout
     icon="dashboard"
-    :title="__('Espace superadmin')"
+    :title="__('Espace Super-Admin')"
     :subtitle="__('')"
 >
     <div class="space-y-12">
