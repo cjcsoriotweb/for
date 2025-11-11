@@ -7,7 +7,6 @@ use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationCompletionDocumentController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationEntryQuizController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationExportController;
-use App\Http\Controllers\Clean\Formateur\Formation\FormationImportController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationLessonController;
 use App\Http\Middleware\FormateurMiddleware;
 use App\Http\Middleware\FormateurOwner;
@@ -19,12 +18,6 @@ Route::prefix('formateur')
     ->scopeBindings()
     ->group(function () {
         Route::get('/', [FormateurPageController::class, 'home'])->name('home');
-        Route::get('/import', [FormationImportController::class, 'showImportForm'])->name('import');
-        Route::post('/import', [FormationImportController::class, 'import'])->name('import.zip');
-        Route::post('/import/json', [FormateurPageController::class, 'importJson'])->name('import.json');
-        Route::post('/import/csv', [FormateurPageController::class, 'importCsv'])->name('import.csv');
-        Route::get('/templates/csv', [FormateurPageController::class, 'downloadCsvTemplate'])->name('templates.csv');
-        Route::get('/templates/json', [FormateurPageController::class, 'downloadJsonTemplate'])->name('templates.json');
 
         // Formation routes
         Route::get('/formation/create', [FormateurFormationController::class, 'createFormation'])->name('formations.create');
@@ -53,7 +46,6 @@ Route::prefix('formateur')
             Route::delete('/formation/{formation}/completion-documents/{document}', [FormationCompletionDocumentController::class, 'destroy'])->name('formation.completion-documents.destroy');
 
             // Export formation
-            Route::get('/formation/{formation}/export', [FormationExportController::class, 'export'])->name('formation.export');
 
             // Delete formation (superadmin only)
             Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->group(function () {
