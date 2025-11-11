@@ -40,8 +40,8 @@ class TeamService
 
         if ($user->hasTeamRole($team, 'manager')) {
             $destinations[] = [
-                'key' => 'manager',
-                'badge' => __('Manager'),
+                'key' => 'organisateur',
+                'badge' => __('organisateur'),
                 'title' => __('Espace organisateur'),
                 'description' => __('Piloter les formations, les membres et les parcours.'),
                 'icon' => 'groups',
@@ -53,9 +53,9 @@ class TeamService
         if ($user->hasTeamRole($team, 'eleve')) {
             $destinations[] = [
                 'key' => 'Apprentisage',
-                'badge' => __('Eleve'),
+                'badge' => __('Apprentisage'),
                 'title' => __("Espace d'apprentissage"),
-                'description' => __('Commencez une formations.'),
+                'description' => __('Commencez ou continuez une formations.'),
                 'icon' => 'school',
                 'gradient' => 'from-emerald-500 via-teal-500 to-cyan-500',
                 'route' => route('eleve.index', ['team' => $team]),
