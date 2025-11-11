@@ -71,17 +71,17 @@
                         </span>
                     </div>
                     <div class="flex justify-center items-center gap-4">
-                        <button type="button" wire:click="seekBy(-10)"
+                        <button type="button" wire:click="seekBy(-10)" wire:loading.remove
                             class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
                             <span class="material-symbols-outlined text-2xl">replay_10</span>
                         </button>
-                        <button type="button" wire:click="togglePlayback"
-                            class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md">
+                        <button type="button" wire:click="togglePlayback" 
+                            class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md" >
                             <span class="material-symbols-outlined text-3xl">
                                 {{ $isPlaying ? 'pause' : 'play_arrow' }}
                             </span>
                         </button>
-                        <button type="button" wire:click="seekBy(10)"
+                        <button type="button" wire:click="seekBy(10)" wire:loading.remove
                             class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
                             <span class="material-symbols-outlined text-2xl">forward_10</span>
                         </button>
@@ -152,7 +152,6 @@
                 if (total) total.textContent = formatTime(duration);
                 if (fill) fill.style.width = `${percentage}%`;
                 if (handle) handle.style.left = `${percentage}%`;
-                console.log(currentTime);
 
 
             };
@@ -226,6 +225,10 @@
                 video.addEventListener('loadedmetadata', () => sendProgress(true));
                 video.addEventListener('play', () => sendProgress(true));
                 video.addEventListener('pause', () => sendProgress(true));
+                video.addEventListener('ended', () => {
+                    $wire.dispatch('ended');
+
+                });
 
                 if (video.readyState >= 1) {
                     sendProgress(true);

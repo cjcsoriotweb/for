@@ -19,8 +19,6 @@ class VideoPlayer extends Component
     public $lesson;
     public $lessonContent;
 
-
-
     // Tracking
     public $resumeTime = 0;
     public $duration = 0;
@@ -33,31 +31,38 @@ class VideoPlayer extends Component
     public $showCompletionNotification = false;
     public $isPlaying = false;
 
+    //Page
+
+    public $currentPage = "vplayer";
+    // vplayer
+    // eplayer
+
+
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, $lessonContent)
     {
+        
+        
         $this->team = $team;
         $this->formation = $formation;
         $this->chapter = $chapter;
         $this->lesson = $lesson;
         $this->lessonContent = $lessonContent;
 
-    
-
         $this->loadExistingProgress();
     }
 
     private function loadExistingProgress(): void
     {
-        if (!Auth::check()) return;
+        if (!Auth::check()) {
+            return;
+        }
 
         $user = Auth::user();
 
-        $lessonUser = $this->lesson->learners()
-            ->where('user_id', $user->id)
-            ->first();
+        $lessonUser = $this->lesson->learners()->where('user_id', $user->id)->first();
 
         if ($lessonUser) {
-            $this->resumeTime     = (int) ($lessonUser->pivot->watched_seconds ?? 0);
+            $this->resumeTime = (int) ($lessonUser->pivot->watched_seconds ?? 0);
             $this->videoCompleted = ($lessonUser->pivot->status ?? null) === 'completed';
         }
     }
@@ -88,7 +93,7 @@ class VideoPlayer extends Component
     public function handleVideoProgress(float $currentTime = 0, float $duration = 0): void
     {
         $this->currentTime = max(0, $currentTime);
-        $this->resumeTime  = (int) $this->currentTime;
+        $this->resumeTime = (int) $this->currentTime;
 
         if ($duration > 0) {
             $this->duration = $duration;
@@ -98,42 +103,58 @@ class VideoPlayer extends Component
             $this->watchedPercentage = min(100, max(0, ($this->currentTime / $this->duration) * 100));
         }
     }
- 
+
+    #[On('ended')]
+    public function ended()
+    {
+        $this->currentPage = "eplayer";
+    }
+
+    public function replay(){
+        $this->js('window.location.reload()');
+
+    }
+    public function completed()
+    {
+        if (Auth::check()) {
+            $lessonUser = $this->lesson->learners()->where('user_id', Auth::id())->first();
+
+            if ($lessonUser) {
+                $this->lesson->learners()->updateExistingPivot(Auth::id(), ['status' => 'completed']);
+            }
+        }
+        $this->js('window.location.reload()');
+
+    }
 
     #[On('post')]
     public function post(int $data)
     {
-
-        
         $this->currentTimePlayer = $data;
 
-            // Si LessonUser exist dd(ici)
+        // Si LessonUser exist dd(ici)
         if (Auth::check()) {
-            $lessonUser = $this->lesson->learners()
-                ->where('user_id', Auth::id())
-                ->first();
+            $lessonUser = $this->lesson->learners()->where('user_id', Auth::id())->first();
 
             if ($lessonUser) {
-
-                if($lessonUser->pivot->watched_seconds < $data){
-
-                     $this->lesson
-                    ->learners()
-                    ->updateExistingPivot(Auth::id(), ['watched_seconds' => $data]);
+                if ($lessonUser->pivot->watched_seconds < $data) {
+                    $this->lesson->learners()->updateExistingPivot(Auth::id(), ['watched_seconds' => $data]);
                     $this->dispatch('updated', data: $data);
-
                 }
-               
-    
             }
         }
-        $this->skipRender(); 
+        $this->skipRender();
     }
-
-
 
     public function render()
     {
-        return view('livewire.eleve.video-player');
+
+        if($this->currentPage === "vplayer"){
+        return view('livewire.eleve.video.video-player');
+
+        } else {
+        return view('livewire.eleve.video.video-end');
+
+        }
     }
 }
