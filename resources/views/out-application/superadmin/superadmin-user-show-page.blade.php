@@ -148,11 +148,6 @@
                                             {{ __('Administrateur') }}
                                         </a>
                                     </div>
-                                    @if($user->current_team_id === $team->id)
-                                        <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                            {{ __('Équipe active') }}
-                                        </span>
-                                    @endif
                                 </div>
                             </div>
                         @endforeach
