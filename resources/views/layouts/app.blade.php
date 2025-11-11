@@ -3,6 +3,7 @@
 
 <head>
   <link rel="icon" href="{{ asset('favicon.ico') }}" />
+  <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
   <x-meta-header />
 </head>
 

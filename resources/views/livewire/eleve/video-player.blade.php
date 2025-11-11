@@ -1,5 +1,5 @@
 <div>
-    <div class="aspect-video mb-4 bg-black rounded-lg overflow-hidden">
+    <div class="aspect-video mb-4 bg-black rounded-lg overflow-hidden" wire:ignore>
         <video
             controls
             autoplay
