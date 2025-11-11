@@ -66,69 +66,53 @@
             </span>
         </div>
     </div>
-    @endif @script
+    @endif
+    @once
+    @script
     <script>
         const video = document.getElementById("lesson-video");
         const currentTimeDisplay = document.getElementById("current-time");
         if (!video || !currentTimeDisplay) return;
 
-        // Function to format time in MM:SS
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
         }
 
+        const UPDATE_INTERVAL = 5000;
         let lastUpdateTime = 0;
-        const UPDATE_INTERVAL = 5000; // 5 seconds in milliseconds
 
-        // Update current time display
         function updateCurrentTime() {
-            const currentTime = formatTime(video.currentTime);
-            const duration = formatTime(video.duration || 0);
-            currentTimeDisplay.textContent = `${currentTime} / ${duration}`;
+            const currentSeconds = video.currentTime || 0;
+            const durationSeconds = video.duration || 0;
+            currentTimeDisplay.textContent = `${formatTime(currentSeconds)} / ${formatTime(durationSeconds)}`;
 
-            // Send time update to Livewire every 5 seconds
             const now = Date.now();
             if (now - lastUpdateTime >= UPDATE_INTERVAL) {
                 lastUpdateTime = now;
-
-                // Dispatch custom event that Livewire can listen to
-                const timeEvent = new CustomEvent("videoTimeUpdate", {
-                    currentTime: video.currentTime,
-                });
-                $wire.dispatch("videoTimeUpdate", { currentTime: currentTime });
+                $wire.dispatch("videoTimeUpdate", { currentTime: currentSeconds });
             }
         }
 
-        $wire.on("leave", (event) => {
-            window.location.reload();
-
-            // ...
-        });
-        // Function to run when video ends
-        function onVideoEnd() {
-            $wire.dispatch("videoEnded", { endEvent: true });
-
-            // Add your custom logic here - could dispatch an event, make an API call, etc.
-            // For example: mark lesson as completed, show next lesson button, etc.
-        }
-
-        // Event listeners
         video.addEventListener("timeupdate", updateCurrentTime);
+
         video.addEventListener("loadedmetadata", function () {
-            updateCurrentTime();
-            // Resume from saved position if available
-            const resumeTime =
-                parseFloat(video.getAttribute("data-resume-time")) || 0;
+            const resumeTime = parseFloat(video.dataset.resumeTime) || 0;
             if (resumeTime > 0 && resumeTime < video.duration) {
                 video.currentTime = resumeTime;
             }
+            updateCurrentTime();
         });
-        video.addEventListener("ended", onVideoEnd);
 
-        // Initialize display
+        video.addEventListener("ended", () => {
+            $wire.dispatch("videoEnded", { endEvent: true });
+        });
+
+        $wire.on("leave", () => window.location.reload());
+
         updateCurrentTime();
     </script>
     @endscript
+    @endonce
 </div>

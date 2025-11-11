@@ -94,6 +94,7 @@ class VideoPlayer extends Component
 
     public function handleVideoTimeUpdate($currentTime)
     {
+        $currentTime = (float) $currentTime;
         $this->currentTime = $currentTime;
 
         // Ensure lesson is started when user begins watching
@@ -103,11 +104,18 @@ class VideoPlayer extends Component
         $this->saveProgress($currentTime, false); // Explicitly set to in_progress
 
         // Show save notification
-        $this->lastSavedTime = $currentTime;
+        $this->lastSavedTime = $this->formatDuration($currentTime);
         $this->showSaveNotification = true;
 
         // Hide notification after 3 seconds
         $this->dispatch('hide-save-notification');
+    }
+
+    private function formatDuration(float $seconds): string
+    {
+        $minutes = floor($seconds / 60);
+        $remainingSeconds = floor($seconds % 60);
+        return sprintf('%d:%02d', $minutes, $remainingSeconds);
     }
 
     public function handleVideoEnded()
