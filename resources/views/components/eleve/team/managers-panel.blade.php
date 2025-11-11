@@ -23,7 +23,7 @@
   </div>
 
   @if($collection->isEmpty())
-    <div class="mt-6 rounded-2xl border border-dashed border-red-200 bg-white/70 px-6 py-5 text-sm text-grey-500">
+    <div class="mt-6 rounded-2xl border border-dashed border-red-200 bg-white/70 px-6 py-5 text-sm text-slate-500">
       Aucun manager n'est actuellement li&eacute; &agrave; cette &eacute;quipe.
     </div>
   @else
