@@ -2,7 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full antialiased">
 
 <head>
-  <link rel="icon" href="{{ asset('favicon.ico') }}" />
   <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
   <x-meta-header />
 </head>
