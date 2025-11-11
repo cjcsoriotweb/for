@@ -105,7 +105,7 @@
                                         <span class="material-symbols-outlined text-base transition duration-300 group-hover:translate-x-1 group-hover:scale-110">
                                             rocket_launch
                                         </span>
-                                        {{ __('Entrer maintenant') }}
+                        
                                     </span>
                                     <span class="material-symbols-outlined text-lg transition duration-300 group-hover:translate-x-1 group-hover:scale-125">
                                         arrow_forward
