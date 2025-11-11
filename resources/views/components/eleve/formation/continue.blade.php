@@ -12,10 +12,7 @@
       <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
         Continuer mes formations
       </h2>
-      <p class="mt-2 max-w-2xl text-sm text-slate-600/80 leading-relaxed">
-        Retrouvez vos formations en cours, suivez votre progression et reprenez chaque module au meilleur moment pour
-        vous.
-      </p>
+
     </div>
   </div>
 

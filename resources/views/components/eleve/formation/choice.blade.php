@@ -6,10 +6,6 @@
         <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-600/70">Explorer de nouvelles formations</p>
       </div>
       <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Formations disponibles</h2>
-      <p class="mt-2 max-w-2xl text-sm text-slate-600/80 leading-relaxed">
-        Inspirez-vous des offres de votre organisme, comparez les programmes et lancez-vous dans de nouveaux modules
-        &agrave; tout moment.
-      </p>
     </div>
   </div>
 
