@@ -55,7 +55,6 @@
                             <span class="absolute inset-0"></span>
                         </a>
 
-                        <p class="mt-1 text-gray-600">{{ __('Modifier vos informations personnelles') }}</p>
                     </div>
                 </div>
 
@@ -77,7 +76,6 @@
                                 Déconnexion
                                 <span class="absolute inset-0"></span>
                             </button>
-                            <p class="mt-1 text-red-600">{{ __('Deconnectez-vous de votre compte.') }}</p>
                         </div>
                     </div>
                 </form>
