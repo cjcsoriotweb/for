@@ -113,7 +113,7 @@
                 <div class="flex justify-center">
                     <a
                         href="{{ route('user.dashboard') }}"
-                        class="inline-flex items-center gap-2 rounded-full  bg-white px-5 py-2 text-sm font-medium text-slate-600 transition hover:border-sky-200 hover:bg-sky-50 hover:text-slate-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/40"
+                        class="inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-slate-600 transition hover:border-sky-200 bg-sky-50 hover:text-slate-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/40"
                     >
                         <span class="material-symbols-outlined text-base">arrow_back</span>
                         {{ __('Retour au choix des equipes') }}
