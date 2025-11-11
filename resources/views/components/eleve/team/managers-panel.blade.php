@@ -10,10 +10,10 @@
 <section class="rounded-3xl border border-green-200 bg-green-50/50 px-6 py-8 shadow-sm sm:px-10">
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-green-500/80">Votre &eacute;quipe</p>
-      <h2 class="text-2xl font-bold text-green-900">Managers à contacter</h2>
+      <h2 class="text-2xl font-bold text-green-900">
+        {{ _('Contacts lié à la formation') }}
+      </h2>
       <p class="mt-1 text-sm text-green-600">
-        Identifiez rapidement les responsables qui accompagnent votre parcours au sein de
         {{ $team->name }}.
       </p>
     </div>
