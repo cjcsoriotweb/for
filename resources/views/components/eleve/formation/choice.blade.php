@@ -107,7 +107,9 @@
     </div>
     <h3 class="text-lg font-semibold text-slate-900">Aucune autre formation disponible</h3>
     <p class="mt-3 text-sm text-slate-500">
-      Revenez bient&ocirc;t pour d&eacute;couvrir les nouvelles formations propos&eacute;es &agrave; votre &eacute;quipe.
+      {{
+        __("Il y aura bientôt une à plusieurs formation.s disponible ici.")
+      }}
     </p>
   </div>
   @endif
