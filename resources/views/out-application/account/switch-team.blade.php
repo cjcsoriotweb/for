@@ -4,7 +4,7 @@
 
         <main class="relative z-10 px-4 py-16 sm:px-8 lg:px-14">
             <div class="mx-auto flex max-w-5xl flex-col gap-12">
-                <div class="relative overflow-hidden rounded-3xl border border-white/70 bg-white/75 p-10 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-12">
+                <div class="relative overflow-hidden rounded-3xl border border-white/70 bg-white/75 p-10  backdrop-blur-xl sm:p-12">
                         <div class="relative mx-auto max-w-3xl text-center">
                         <span class="inline-flex items-center gap-2 rounded-full bg-sky-100/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">
                             <span class="material-symbols-outlined text-sm">swap_horiz</span>
@@ -113,7 +113,7 @@
                 <div class="flex justify-center">
                     <a
                         href="{{ route('user.dashboard') }}"
-                        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 hover:text-slate-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/40"
+                        class="inline-flex items-center gap-2 rounded-full  bg-white px-5 py-2 text-sm font-medium text-slate-600 transition hover:border-sky-200 hover:bg-sky-50 hover:text-slate-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/40"
                     >
                         <span class="material-symbols-outlined text-base">arrow_back</span>
                         {{ __('Retour au choix des equipes') }}
