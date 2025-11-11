@@ -1,21 +1,5 @@
 ﻿@props(['availableFormationsCount' => 0])
 
-<section class="space-y-8">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-      <div class="flex items-center gap-3 mb-2">
-        <div class="h-1 w-6 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"></div>
-        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-600/70">Continuez vos formations</p>
-      </div>
-      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
-        Continuer mes formations
-      </h2>
-      <p class="mt-2 max-w-2xl text-sm text-slate-600/80 leading-relaxed">
-        Retrouvez vos formations en cours, suivez votre progression et reprenez chaque module au meilleur moment pour
-        vous.
-      </p>
-    </div>
-  </div>
 
   @if($availableFormationsCount === 0)
   <div class="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4">
@@ -34,6 +18,25 @@
     </div>
   </div>
   @endif
+  
+<section class="space-y-8">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <div class="h-1 w-6 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"></div>
+        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-600/70">Continuez vos formations</p>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
+        Continuer mes formations
+      </h2>
+      <p class="mt-2 max-w-2xl text-sm text-slate-600/80 leading-relaxed">
+        Retrouvez vos formations en cours, suivez votre progression et reprenez chaque module au meilleur moment pour
+        vous.
+      </p>
+    </div>
+  </div>
+
+
 
   @if($formationsWithProgress->count() > 0)
   <div class="-mx-4 overflow-hidden sm:-mx-2">
