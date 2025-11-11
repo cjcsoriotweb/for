@@ -6,7 +6,7 @@
 
 
               @if($availableFormationsCount === 0)
-              <div class="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4">
+              <div class="rounded-2xl border border-red-200 bg-red-50 px-6 py-4">
                 <div class="flex items-start gap-3">
                   <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
@@ -14,8 +14,8 @@
                     </svg>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-sm font-medium text-amber-800">Pas d'inquiétude, aucune formation disponible pour l'équipe</h3>
-                    <p class="mt-1 text-sm text-amber-700">
+                    <h3 class="text-sm font-medium text-red-800">Pas d'inquiétude, aucune formation disponible pour l'équipe</h3>
+                    <p class="mt-1 text-sm text-red-700">
                       S'il s'agit d'une erreur contactez-vous (<a href="{{ route('user.tickets') }}" class="underline hover:text-amber-800">page ticket</a>).
                     </p>
                   </div>
