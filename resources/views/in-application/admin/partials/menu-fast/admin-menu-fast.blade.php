@@ -1,8 +1,6 @@
 <div class="space-y-14">
     <section class="relative overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950 text-white shadow-2xl">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,255,0.25),_transparent_55%)]"></div>
-        <div class="absolute -top-24 -right-28 h-80 w-80 rounded-full bg-indigo-500/30 blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl"></div>
+
 
         <div class="relative px-8 py-10 lg:px-12 lg:py-12">
             <div class="flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
