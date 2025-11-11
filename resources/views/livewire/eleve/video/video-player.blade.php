@@ -33,9 +33,7 @@
                     <div class="absolute inset-0 pointer-events-none p-4 md:p-6">
                         <div class="flex justify-between">
                             @if (!$isPlaying)
-                                <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Introduction to
-                                    Frontend
-                                    Design</h1>
+                                <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">{{$lesson->getname()}}</h1>
                             @endif
 
                             <p id="toast"
