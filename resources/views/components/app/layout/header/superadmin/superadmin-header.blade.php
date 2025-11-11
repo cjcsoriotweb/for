@@ -2,7 +2,7 @@
     <div class="relative">
         <button popovertarget="admin-menu-product"
             class="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
-            {{__("Webmaster")}}
+            {{__("Espace gérant")}}
             <!-- Chevron -->
             <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
                 class="size-5 flex-none text-gray-400">
