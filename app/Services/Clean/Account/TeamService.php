@@ -42,7 +42,7 @@ class TeamService
             $destinations[] = [
                 'key' => 'organisateur',
                 'badge' => __('DRH'),
-                'title' => __('Suivi.'),
+                'title' => __('Suivi DRH.'),
                 'description' => __('Suivi des formations, les membres et les parcours.'),
                 'icon' => 'groups',
                 'gradient' => 'from-purple-500 via-fuchsia-500 to-rose-500',
