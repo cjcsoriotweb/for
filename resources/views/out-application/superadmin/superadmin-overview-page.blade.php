@@ -5,14 +5,14 @@
         [
             'title' => __('Equipes'),
             'description' => __('Pilotez toutes les organisations et leurs acces.'),
-            'stat' => number_format($stats->get('teams', 0)) . ' ' . __('equipes'),
+            'stat' =>'',
             'icon' => 'groups_2',
             'route' => route('superadmin.teams.index'),
         ],
         [
             'title' => __('Utilisateurs'),
             'description' => __('Consultez les comptes et leurs droits.'),
-            'stat' => number_format($stats->get('users', 0)) . ' ' . __('comptes'),
+            'stat' => '',
             'icon' => 'badge',
             'route' => route('superadmin.users.index'),
         ],
