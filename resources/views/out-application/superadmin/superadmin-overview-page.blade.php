@@ -31,10 +31,10 @@
             'route' => route('superadmin.support.index'),
         ],
                [
-            'title' => __('Comptabilité'),
-            'description' => __('....'),
+            'title' => __('Suivis des formations'),
+            'description' => __('Recherche avancé sur les formations'),
             'stat' => '',
-            'icon' => 'money',
+            'icon' => 'book',
             'route' => route('superadmin.compta.index'),
         ],
     ];
