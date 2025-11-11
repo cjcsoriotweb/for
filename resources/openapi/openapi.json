@@ -1,0 +1,27 @@
+"/users": {
+  "get": {
+    "summary": "Lister les utilisateurs",
+    "operationId": "listUsers",
+    "responses": {
+      "200": {
+        "description": "Liste d'utilisateurs",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" }
+                },
+                "required": ["id", "name", "email"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
