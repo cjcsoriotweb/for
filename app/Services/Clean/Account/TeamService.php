@@ -42,8 +42,8 @@ class TeamService
             $destinations[] = [
                 'key' => 'organisateur',
                 'badge' => __('DRH'),
-                'title' => __('Suvis.'),
-                'description' => __('Suivis des formations, les membres et les parcours.'),
+                'title' => __('Suivi.'),
+                'description' => __('Suivi des formations, les membres et les parcours.'),
                 'icon' => 'groups',
                 'gradient' => 'from-purple-500 via-fuchsia-500 to-rose-500',
                 'route' => route('organisateur.index', ['team' => $team]),
