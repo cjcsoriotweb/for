@@ -98,7 +98,7 @@
                         href="{{ route('superadmin.console') }}"
                         class="inline-flex items-center justify-center rounded-2xl border border-white/50 bg-white/90 px-6 py-3 text-sm font-semibold text-indigo-600 transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     >
-                        {{ __('Ouvrir la console DB') }}
+                        {{ __('Developpeur') }}
                     </a>
                     <a
                         href="{{ route('superadmin.db') }}"
@@ -106,7 +106,7 @@
                         rel="noreferrer"
                         class="inline-flex items-center justify-center rounded-2xl border border-white/50 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     >
-                        {{ __('Base de donnée & Backup') }}
+                        {{ __('Base de donnée') }}
                     </a>
                 </div>
             </div>

@@ -42,10 +42,19 @@
                     {!! $this->user->twoFactorQrCodeSvg() !!}
                 </div>
 
-                <div class="mt-4 max-w-xl text-sm text-gray-600">
+                @php
+                    $setupKey = decrypt($this->user->two_factor_secret);
+                @endphp
+
+                <div x-data="{ showingSetupKey: false, setupKey: {{ json_encode($setupKey) }} }" class="mt-4 max-w-xl text-sm text-gray-600">
                     <p class="font-semibold">
-                        {{ __('Setup Key') }}: {{ decrypt($this->user->two_factor_secret) }}
+                        {{ __('Setup Key') }}:
+                        <span class="font-mono" x-text="showingSetupKey ? setupKey : setupKey.replace(/./g, '*')"></span>
                     </p>
+
+                    <x-secondary-button type="button" class="mt-2" x-on:click="showingSetupKey = ! showingSetupKey">
+                        <span x-text="showingSetupKey ? '{{ __('Hide setup key') }}' : '{{ __('Show setup key') }}'"></span>
+                    </x-secondary-button>
                 </div>
 
                 @if ($showingConfirmation)
@@ -62,16 +71,26 @@
             @endif
 
             @if ($showingRecoveryCodes)
-                <div class="mt-4 max-w-xl text-sm text-gray-600">
+                @php
+                    $recoveryCodes = json_decode(decrypt($this->user->two_factor_recovery_codes), true);
+                @endphp
+
+                <div x-data="{ showingCodes: false, recoveryCodes: {{ json_encode($recoveryCodes) }} }" class="mt-4 max-w-xl text-sm text-gray-600 space-y-2">
                     <p class="font-semibold">
                         {{ __('Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost.') }}
                     </p>
-                </div>
 
-                <div class="grid gap-1 max-w-xl mt-4 px-4 py-4 font-mono text-sm bg-gray-100 rounded-lg">
-                    @foreach (json_decode(decrypt($this->user->two_factor_recovery_codes), true) as $code)
-                        <div>{{ $code }}</div>
-                    @endforeach
+                    <div class="flex justify-end">
+                        <x-secondary-button type="button" class="mt-2" x-on:click="showingCodes = ! showingCodes">
+                            <span x-text="showingCodes ? '{{ __('Hide recovery codes') }}' : '{{ __('Show recovery codes') }}'"></span>
+                        </x-secondary-button>
+                    </div>
+
+                    <div class="grid gap-1 max-w-xl mt-4 px-4 py-4 font-mono text-sm bg-gray-100 rounded-lg">
+                        <template x-for="code in recoveryCodes" :key="code">
+                            <div x-text="showingCodes ? code : code.replace(/./g, '*')"></div>
+                        </template>
+                    </div>
                 </div>
             @endif
         @endif

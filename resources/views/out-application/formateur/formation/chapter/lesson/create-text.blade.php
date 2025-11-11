@@ -158,45 +158,6 @@
 
             </div>
 
-            <!-- Attachments -->
-            <div class="space-y-6">
-              <div>
-                <label for="inline_document" class="block text-sm font-medium text-gray-700 mb-2">
-                  Document PDF affich&eacute; automatiquement
-                </label>
-                <input type="file" id="inline_document" name="inline_document" accept="application/pdf"
-                  class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('inline_document') border-red-500 @enderror">
-                @error('inline_document')
-                <p class="mt-1 text-sm text-red-600">
-                  {{ $message }}
-                </p>
-                @enderror
-                <p class="text-xs text-gray-500 mt-1">
-                  Ce fichier PDF sera affich&eacute; directement dans la le&ccedil;on pour vos apprenants.
-                </p>
-              </div>
-
-              <div>
-                <label for="attachments" class="block text-sm font-medium text-gray-700 mb-2">
-                  Autres fichiers &agrave; t&eacute;l&eacute;charger
-                </label>
-                <input type="file" id="attachments" name="attachments[]" multiple
-                  class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('attachments') border-red-500 @enderror @error('attachments.*') border-red-500 @enderror">
-                @error('attachments')
-                <p class="mt-1 text-sm text-red-600">
-                  {{ $message }}
-                </p>
-                @enderror
-                @error('attachments.*')
-                <p class="mt-1 text-sm text-red-600">
-                  {{ $message }}
-                </p>
-                @enderror
-                <p class="text-xs text-gray-500 mt-1">
-                  Ajoutez des documents compl&eacute;mentaires (20&nbsp;Mo max par fichier). Ils seront propos&eacute;s en t&eacute;l&eacute;chargement.
-                </p>
-              </div>
-            </div>
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-between pt-6 border-t border-gray-200">
