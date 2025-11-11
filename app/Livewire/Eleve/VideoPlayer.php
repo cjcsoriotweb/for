@@ -26,7 +26,7 @@ class VideoPlayer extends Component
 
     // UI
     public $showCompletionNotification = false;
-    public $isPlaying = true;
+    public $isPlaying = false;
 
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, $lessonContent)
     {
@@ -70,6 +70,12 @@ class VideoPlayer extends Component
     public function togglePlayback(): void
     {
         $this->isPlaying ? $this->pauseVideo() : $this->playVideo();
+    }
+
+    public function seekBy(int $seconds): void
+    {
+        $seconds = max(-3600, min(3600, $seconds));
+        $this->dispatch('video-seek', $seconds);
     }
 
     public function handleVideoProgress(float $currentTime = 0, float $duration = 0): void

@@ -71,7 +71,7 @@
                         </span>
                     </div>
                     <div class="flex justify-center items-center gap-4">
-                        <button type="button"
+                        <button type="button" wire:click="seekBy(-10)"
                             class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
                             <span class="material-symbols-outlined text-2xl">replay_10</span>
                         </button>
@@ -81,7 +81,7 @@
                                 {{ $isPlaying ? 'pause' : 'play_arrow' }}
                             </span>
                         </button>
-                        <button type="button"
+                        <button type="button" wire:click="seekBy(10)"
                             class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
                             <span class="material-symbols-outlined text-2xl">forward_10</span>
                         </button>
@@ -197,6 +197,20 @@
       if (video) {
         video.pause();
       }
+    });
+
+    Livewire.on('video-seek', (seconds = 0) => {
+      const video = getVideo();
+      if (!video) return;
+
+      const offset = Number(seconds) || 0;
+      const current = Number(video.currentTime || 0);
+      const hasDuration = Number.isFinite(video.duration) && video.duration > 0;
+      const duration = hasDuration ? video.duration : null;
+      const targetTime = Math.max(0, current + offset);
+
+      video.currentTime = duration !== null ? Math.min(duration, targetTime) : targetTime;
+      dispatchProgress(video, true);
     });
 
     bindProgressListeners();
