@@ -4,11 +4,7 @@
         <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {{ $lesson->getName() }}
         </h2>
-        @if(! empty($lessonContent?->description))
-            <p class="mt-2 text-gray-600 dark:text-gray-300">
-                {{ $lessonContent->description }}
-            </p>
-        @endif
+
     </div>
 
     {{-- Composant Livewire pour la gestion video --}}
@@ -19,4 +15,10 @@
         'lesson' => $lesson,
         'lessonContent' => $lessonContent,
     ])
+
+    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ __('A propos de cette vidéo') }}</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ $lessonContent->description }}</p>
+    </div>
+
 </div>

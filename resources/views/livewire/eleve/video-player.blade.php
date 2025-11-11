@@ -1,166 +1,213 @@
 <div>
-    <div class="aspect-video mb-4 bg-black rounded-lg overflow-hidden" wire:ignore>
-        <video
-            controls
-            autoplay
-            class="w-full h-full"
-            id="lesson-video"
-            preload="auto"
-            poster="{{ asset('images/video-poster.jpg') }}"
-            oncontextmenu="return false;"
-            data-resume-time="{{ $resumeTime }}"
-            data-lesson-id="{{ $lesson->id ?? '' }}"
-            data-lesson-content-id="{{ $lessonContent->id ?? '' }}"
-        >
-            <source
-                src="{{ Storage::disk('public')->url($lessonContent->video_path) }}"
-                type="video/mp4"
-            />
-            Votre navigateur ne supporte pas la lecture de vidéos.
-        </video>
-    </div>
 
-    <!-- Current time display -->
-    <div class="mb-4">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
-            Temps actuel:
-            <span id="current-time" class="font-mono">0:00 / 0:00</span>
+    <main class="flex flex-1 justify-center py-8 px-4 sm:px-6 lg:px-8">
+        <div class="layout-content-container flex flex-col w-full max-w-5xl flex-1">
+            <div class="flex flex-col gap-6">
+                <div class="relative group">
+
+                    <div class="relative flex items-center justify-center bg-black bg-cover bg-center aspect-video rounded-xl overflow-hidden shadow-lg"
+                        data-alt="Abstract gradient background for video placeholder"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8uTSDep5uWpkw20gfP_oegiJ9Sz_XPzoDXWLXm5VgUB4rOfJV32Vw3rYBIR3IxKonTtVGIp1QRrdxf2BIDXgHfhhr4kDfX7evvAPSTW_jIbGBKlqkAACVXHNEnhs4WDuil3uNEiP4zVpGjoyaO3FtaTbCHu0mg5IAlfnRuGvZnzcjjUV1NGLu-PQcivjrp2H88e5L1BhWkaOLDaN63UV_piT4lDTNKF4LZbpKl9FevxmaS7OLf9UjyJAGK8XEjTH076805Qn4tmk");'>
+
+
+                        <video id="video" wire:ignore class="w-full h-full" controls  muted playsinline
+                            preload="metadata" poster="{{ asset('images/video-poster.jpg') }}"
+                            oncontextmenu="return false;" data-initialized="false"
+                            data-resume-time="{{ $resumeTime ?? 0 }}" data-lesson-id="{{ $lesson->id ?? '' }}"
+                            data-lesson-content-id="{{ $lessonContent->id ?? '' }}"
+                            style="display: absolute;width:100%;height:100%;">
+                            <source src="{{ Storage::disk('public')->url($lessonContent->video_path) }}"
+                                type="video/mp4" />
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
+                        @if(!$isPlaying)
+                        <button type="button" wire:click="togglePlayback" style="position: absolute"
+                            class="flex shrink-0 items-center justify-center rounded-full size-16 bg-black/50 text-white backdrop-blur-sm transition-transform group-hover:scale-110">
+                            <span class="material-symbols-outlined text-4xl">
+                                {{ $isPlaying ? 'pause' : 'play_arrow' }}
+                            </span>
+                        </button>
+                        @endif
+                    </div>
+
+                    <div class="absolute inset-0 pointer-events-none p-4 md:p-6">
+                        <div class="flex justify-between">
+                        @if(!$isPlaying)
+
+                            <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Introduction to Frontend
+                                Design</h1>
+                    @endif
+
+                            <p
+                                class="text-white text-sm font-normal leading-normal py-1 px-3 bg-black/40 rounded-md backdrop-blur-sm">
+                                Lecture enregistrée</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-4">
+
+                    @php
+                        $formatTime = function ($seconds) {
+                            $seconds = max(0, (int) $seconds);
+                            return $seconds >= 3600 ? gmdate('H:i:s', $seconds) : gmdate('i:s', $seconds);
+                        };
+                        $progressWidth = $duration > 0 ? number_format($watchedPercentage, 2, '.', '') : 0;
+                    @endphp
+                    <div class="flex items-center gap-4">
+                        <span data-progress-current class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            {{ $formatTime($currentTime) }}
+                        </span>
+                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full group cursor-pointer">
+                            <div class="relative h-full">
+                                <div data-progress-fill class="absolute h-full bg-primary rounded-full"
+                                    style="width: {{ $progressWidth }}%;"></div>
+                                <div data-progress-handle
+                                    class="absolute size-4 bg-white dark:bg-gray-300 rounded-full -translate-y-1/2 top-1/2 -translate-x-1/2 shadow-md transition-transform group-hover:scale-110"
+                                    style="left: {{ $progressWidth }}%;"></div>
+                            </div>
+                        </div>
+                        <span data-progress-total class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            {{ $formatTime($duration) }}
+                        </span>
+                    </div>
+                    <div class="flex justify-center items-center gap-4">
+                        <button type="button"
+                            class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-2xl">replay_10</span>
+                        </button>
+                        <button type="button" wire:click="togglePlayback"
+                            class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md">
+                            <span class="material-symbols-outlined text-3xl">
+                                {{ $isPlaying ? 'pause' : 'play_arrow' }}
+                            </span>
+                        </button>
+                        <button type="button"
+                            class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-2xl">forward_10</span>
+                        </button>
+                    </div>
+                </div>
+           
+            </div>
         </div>
-    </div>
-
-    <div
-        id="save-notification"
-        class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg animate-pulse hidden"
-        role="status"
-        aria-live="polite"
-    >
-        <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                    fill-rule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clip-rule="evenodd"
-                ></path>
-            </svg>
-            <span class="font-medium">
-                Durée sauvegardée : <span id="saved-duration"></span>
-            </span>
-        </div>
-    </div>
-    <!-- Completion notification -->
-    @if($showCompletionNotification)
-    <div
-        class="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg animate-bounce"
-    >
-        <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                    fill-rule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clip-rule="evenodd"
-                ></path>
-            </svg>
-            <span class="font-medium">
-                Vidéo terminée ! Leçon marquée comme complétée.
-            </span>
-        </div>
-    </div>
-    @endif
-    @once
-    @script
-    <script>
-        const video = document.getElementById("lesson-video");
-        const currentTimeDisplay = document.getElementById("current-time");
-        if (!video || !currentTimeDisplay) return;
-
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-        }
-
-        const UPDATE_INTERVAL = 5000;
-        let lastUpdateTime = 0;
-        const lessonId = video.dataset.lessonId || null;
-        const storageKey = lessonId ? `lesson-progress-${lessonId}` : null;
-        const serverResumeTime = Number.parseFloat(@json($resumeTime ?? 0)) || 0;
-
-        const readStoredProgress = () => {
-            if (!storageKey || typeof localStorage === "undefined") {
-                return 0;
-            }
-            const storedValue = localStorage.getItem(storageKey);
-            const parsedValue = Number.parseFloat(storedValue);
-            return Number.isFinite(parsedValue) ? parsedValue : 0;
-        };
-
-        const writeStoredProgress = (value) => {
-            if (!storageKey || typeof localStorage === "undefined") {
-                return;
-            }
-            if (!Number.isFinite(value)) {
-                return;
-            }
-            localStorage.setItem(storageKey, value.toString());
-        };
-
-        let resumeHint = Math.max(serverResumeTime, readStoredProgress());
-
-        function updateCurrentTime() {
-            const currentSeconds = video.currentTime || 0;
-            const durationSeconds = video.duration || 0;
-            currentTimeDisplay.textContent = `${formatTime(currentSeconds)} / ${formatTime(durationSeconds)}`;
-
-            const now = Date.now();
-            if (now - lastUpdateTime >= UPDATE_INTERVAL) {
-                lastUpdateTime = now;
-                $wire.dispatch("videoTimeUpdate", { currentTime: currentSeconds });
-            }
-        }
-
-        video.addEventListener("timeupdate", updateCurrentTime);
-
-        video.addEventListener("loadedmetadata", function () {
-            const datasetResume = parseFloat(video.dataset.resumeTime) || 0;
-            resumeHint = Math.max(resumeHint, datasetResume);
-            if (resumeHint > 0 && resumeHint < video.duration) {
-                video.currentTime = resumeHint;
-            }
-            updateCurrentTime();
-        });
-
-        video.addEventListener("ended", () => {
-            $wire.dispatch("videoEnded", { endEvent: true });
-        });
-
-        $wire.on("leave", () => window.location.reload());
-
-        const saveNotification = document.getElementById("save-notification");
-        const savedDuration = document.getElementById("saved-duration");
-        let hideNotificationTimeout;
-
-        const showSaveNotification = (timeText) => {
-            if (!saveNotification || !savedDuration) return;
-            savedDuration.textContent = timeText || "";
-            saveNotification.classList.remove("hidden");
-            clearTimeout(hideNotificationTimeout);
-            hideNotificationTimeout = setTimeout(() => {
-                saveNotification.classList.add("hidden");
-            }, 3000);
-        };
-
-        $wire.on("progressSaved", (payload) => {
-            const seconds = Number.parseFloat(payload?.seconds);
-            if (Number.isFinite(seconds)) {
-                resumeHint = Math.max(resumeHint, seconds);
-                writeStoredProgress(seconds);
-            }
-            const timeText = payload?.time ?? "";
-            showSaveNotification(timeText);
-        });
-
-        updateCurrentTime();
-    </script>
-    @endscript
-    @endonce
+    </main>
 </div>
+
+@script
+<script>
+  document.addEventListener('livewire:init', () => {
+    const getVideo = () => document.getElementById('video');
+    const getProgressElements = () => ({
+      current: document.querySelector('[data-progress-current]'),
+      total: document.querySelector('[data-progress-total]'),
+      fill: document.querySelector('[data-progress-fill]'),
+      handle: document.querySelector('[data-progress-handle]'),
+    });
+    const formatTime = (seconds) => {
+      const value = Math.max(0, Math.floor(seconds || 0));
+      const hrs = Math.floor(value / 3600);
+      const mins = Math.floor((value % 3600) / 60);
+      const secs = value % 60;
+      if (hrs > 0) {
+        return [hrs, mins, secs].map((n) => n.toString().padStart(2, '0')).join(':');
+      }
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+    const updateProgressUI = (video) => {
+      if (!video) return;
+      const { current, total, fill, handle } = getProgressElements();
+      const duration = Math.floor(video.duration || 0);
+      const currentTime = Math.floor(video.currentTime || 0);
+      const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+      if (current) current.textContent = formatTime(currentTime);
+      if (total) total.textContent = formatTime(duration);
+      if (fill) fill.style.width = `${percentage}%`;
+      if (handle) handle.style.left = `${percentage}%`;
+    };
+    const getComponent = () => {
+      const video = getVideo();
+      if (!video || !window.Livewire) return null;
+      const root = video.closest('[wire\\:id]');
+      if (!root) return null;
+      return window.Livewire.find(root.getAttribute('wire:id'));
+    };
+
+    const dispatchProgress = (() => {
+      let lastSent = 0;
+      let pending = false;
+      return (video, force = false) => {
+        if (!video) return;
+        updateProgressUI(video);
+        const component = getComponent();
+        if (!component) return;
+
+        const now = Date.now();
+        if (!force && now - lastSent < 1000) return; // throttle to ~1s
+        if (pending) return;
+
+        pending = true;
+        lastSent = now;
+
+        component.call(
+          'handleVideoProgress',
+          Math.floor(video.currentTime || 0),
+          Math.floor(video.duration || 0)
+        ).finally(() => {
+          pending = false;
+        });
+      };
+    })();
+
+    const bindProgressListeners = () => {
+      const video = getVideo();
+      if (!video || video.dataset.progressBound === 'true') return;
+
+      const sendProgress = (force = false) => dispatchProgress(video, force);
+
+      video.addEventListener('timeupdate', () => sendProgress());
+      video.addEventListener('seeking', () => sendProgress(true));
+      video.addEventListener('seeked', () => sendProgress(true));
+      video.addEventListener('loadedmetadata', () => sendProgress(true));
+      video.addEventListener('play', () => sendProgress(true));
+      video.addEventListener('pause', () => sendProgress(true));
+
+      if (video.readyState >= 1) {
+        sendProgress(true);
+      }
+
+      video.dataset.progressBound = 'true';
+      updateProgressUI(video);
+    };
+
+    Livewire.on('video-play', () => {
+      const video = getVideo();
+      if (!video) return;
+
+      const playPromise = video.play();
+      if (playPromise?.catch) {
+        playPromise.catch(() => {
+          /* autoplay blocked or other issue; ignore */
+        });
+      }
+    });
+
+    Livewire.on('video-pause', () => {
+      const video = getVideo();
+      if (video) {
+        video.pause();
+      }
+    });
+
+    bindProgressListeners();
+    document.addEventListener('livewire:navigated', () => {
+      bindProgressListeners();
+      updateProgressUI(getVideo());
+    });
+    Livewire.hook('message.processed', () => {
+      bindProgressListeners();
+      updateProgressUI(getVideo());
+    });
+  });
+</script>
+@endscript
