@@ -22,7 +22,7 @@ class VideoPlayer extends Component
     public $lessonContent;
 
     // Video tracking properties
-    public $currentTime = 0;
+    public $resumeTime = 0;
 
     public $duration = 0;
 
@@ -31,10 +31,6 @@ class VideoPlayer extends Component
     public $videoCompleted = false;
 
     // Notification properties
-    public $lastSavedTime = null;
-
-    public $showSaveNotification = false;
-
     public $showCompletionNotification = false;
 
     public function mount(Team $team, Formation $formation, Chapter $chapter, Lesson $lesson, $lessonContent)
@@ -63,7 +59,7 @@ class VideoPlayer extends Component
             ->first();
 
         if ($lessonUser) {
-            $this->currentTime = $lessonUser->pivot->watched_seconds;
+            $this->resumeTime = $lessonUser->pivot->watched_seconds;
             $this->videoCompleted = $lessonUser->pivot->status === 'completed';
         }
     }
@@ -95,20 +91,16 @@ class VideoPlayer extends Component
     public function handleVideoTimeUpdate($currentTime)
     {
         $currentTime = (float) $currentTime;
-        $this->currentTime = $currentTime;
 
         // Ensure lesson is started when user begins watching
         $this->ensureLessonStarted();
 
         // Update watched_seconds in database (sent every 5 seconds from JavaScript)
         $this->saveProgress($currentTime, false); // Explicitly set to in_progress
-
-        // Show save notification
-        $this->lastSavedTime = $this->formatDuration($currentTime);
-        $this->showSaveNotification = true;
-
-        // Hide notification after 3 seconds
-        $this->dispatch('hide-save-notification');
+        $this->dispatch('progressSaved', [
+            'time' => $this->formatDuration($currentTime),
+            'seconds' => $currentTime,
+        ]);
     }
 
     private function formatDuration(float $seconds): string
@@ -284,13 +276,7 @@ class VideoPlayer extends Component
     protected $listeners = [
         'videoTimeUpdate' => 'handleVideoTimeUpdate',
         'videoEnded' => 'handleVideoEnded',
-        'hide-save-notification' => 'hideSaveNotification',
     ];
-
-    public function hideSaveNotification()
-    {
-        $this->showSaveNotification = false;
-    }
 
     public function render()
     {
