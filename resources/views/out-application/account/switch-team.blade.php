@@ -101,12 +101,6 @@
                                 </div>
 
                                 <div class="flex items-center justify-between pt-2 text-sm font-medium text-slate-600 transition duration-300 group-hover:text-white">
-                                    <span class="inline-flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base transition duration-300 group-hover:translate-x-1 group-hover:scale-110">
-                                            rocket_launch
-                                        </span>
-                        
-                                    </span>
                                     <span class="material-symbols-outlined text-lg transition duration-300 group-hover:translate-x-1 group-hover:scale-125">
                                         arrow_forward
                                     </span>
