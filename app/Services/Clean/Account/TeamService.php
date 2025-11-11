@@ -52,10 +52,10 @@ class TeamService
 
         if ($user->hasTeamRole($team, 'eleve')) {
             $destinations[] = [
-                'key' => 'eleve',
+                'key' => 'Apprentisage',
                 'badge' => __('Eleve'),
-                'title' => __('Espace apprenant'),
-                'description' => __('Reprendre vos cours et suivre votre progression.'),
+                'title' => __("Espace d'apprentissage"),
+                'description' => __('Commencez une formations.'),
                 'icon' => 'school',
                 'gradient' => 'from-emerald-500 via-teal-500 to-cyan-500',
                 'route' => route('eleve.index', ['team' => $team]),
