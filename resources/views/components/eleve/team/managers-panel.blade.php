@@ -11,7 +11,7 @@
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
       <h2 class="text-2xl font-bold text-green-900">
-        {{ _('Contacts lié à la formation') }}
+        {{ _('Contacts lié à votre équipe') }}
       </h2>
       <p class="mt-1 text-sm text-green-600">
         {{ $team->name }}.
@@ -24,7 +24,7 @@
 
   @if($collection->isEmpty())
     <div class="mt-6 rounded-2xl border border-dashed border-red-200 bg-white/70 px-6 py-5 text-sm text-slate-500">
-      Aucun manager n'est actuellement li&eacute; &agrave; cette &eacute;quipe.
+      {{ _("Personne n'est lié à cette équipe.") }}
     </div>
   @else
     <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
