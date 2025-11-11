@@ -17,9 +17,6 @@
         {{ $team->name }}.
       </p>
     </div>
-    <div class="text-sm text-green-500">
-      {{ $collection->count() }} manager{{ $collection->count() > 1 ? 's' : '' }}
-    </div>
   </div>
 
   @if($collection->isEmpty())
