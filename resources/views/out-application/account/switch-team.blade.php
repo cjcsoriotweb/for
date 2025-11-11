@@ -20,7 +20,7 @@
                         </h1>
 
                         <p class="mt-4 text-base text-slate-600 sm:text-lg">
-                            {{ __("Chaque role donne acces a un univers et a des outils adaptes. Choisissez celui qui correspond a ce que vous souhaitez faire maintenant.") }}
+                            {{ __("Vous devez choisir le rôle que vous souhaitez jouer.") }}
                         </p>
 
                         @if ($shouldAutoRedirect)
