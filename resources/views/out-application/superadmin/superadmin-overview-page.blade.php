@@ -87,11 +87,8 @@
                         {{ __('Utilitaires') }}
                     </p>
                     <h2 class="text-2xl font-semibold text-white">
-                        {{ __('Console Superadmin + phpMyAdmin') }}
+                        {{ __('Console debug') }}
                     </h2>
-                    <p class="text-sm text-white/80">
-                        {{ __('Ouvrez la page DB pour retrouver l’iframe habituel et un accès à phpMyAdmin en un seul clic.') }}
-                    </p>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     <a
