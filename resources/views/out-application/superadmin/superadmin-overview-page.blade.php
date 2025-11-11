@@ -43,7 +43,7 @@
 <x-admin.global-layout
     icon="dashboard"
     :title="__('Super-admin')"
-    :subtitle=""
+    :subtitle=" "
 >
     <div class="space-y-12">
         <section class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
