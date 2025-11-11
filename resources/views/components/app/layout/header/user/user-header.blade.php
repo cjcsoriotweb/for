@@ -33,7 +33,6 @@
                             <span class="absolute inset-0"></span>
                         </a>
 
-                        <p class="mt-1 text-gray-600">{{ __('Modifier vos informations personnelles') }}</p>
                     </div>
                 </div>
 
