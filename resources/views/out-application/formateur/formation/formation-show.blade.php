@@ -24,7 +24,7 @@
 
                     $lessons = $chapters->flatMap(fn($chapter) => $chapter->lessons);
                     $totalDurationMinutes = $lessons->sum(function ($lesson) {
-                        if (! $lesson->lessonable) {
+                        if (!$lesson->lessonable) {
                             return 0;
                         }
 
@@ -37,8 +37,9 @@
                                     return $estimated;
                                 }
 
-                                $questionCount = $lesson->lessonable->quizQuestions?->count()
-                                    ?? $lesson->lessonable->quizQuestions()->count();
+                                $questionCount =
+                                    $lesson->lessonable->quizQuestions?->count() ??
+                                    $lesson->lessonable->quizQuestions()->count();
 
                                 return $questionCount > 0 ? max($questionCount * 2, 5) : 0;
                             })(),
@@ -48,15 +49,16 @@
 
                     $durationHours = intdiv($totalDurationMinutes, 60);
                     $durationMinutesRemainder = $totalDurationMinutes % 60;
-                    $formattedEstimatedDuration = $totalDurationMinutes > 0
-                        ? implode(
-                            ' ',
-                            array_filter([
-                                $durationHours > 0 ? $durationHours . ' h' : null,
-                                $durationMinutesRemainder > 0 ? $durationMinutesRemainder . ' min' : null,
-                            ])
-                        )
-                        : null;
+                    $formattedEstimatedDuration =
+                        $totalDurationMinutes > 0
+                            ? implode(
+                                ' ',
+                                array_filter([
+                                    $durationHours > 0 ? $durationHours . ' h' : null,
+                                    $durationMinutesRemainder > 0 ? $durationMinutesRemainder . ' min' : null,
+                                ]),
+                            )
+                            : null;
                 @endphp
 
                 <!-- Grid Layout: Left column for formation info, right column for content -->
@@ -100,7 +102,8 @@
                                     </p>
                                 </div>
 
-                                <div class="p-4 mt-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4">
+                                <div
+                                    class="p-4 mt-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4">
                                     <div class="p-3 rounded-2xl bg-indigo-100 text-indigo-600">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -130,8 +133,8 @@
                                 </div>
 
                                 <div class="pt-1">
-                                    <a href="{{ route('formateur.formation.preview', $formation) }}"
-                                        target="_blank" rel="noopener"
+                                    <a href="{{ route('formateur.formation.preview', $formation) }}" target="_blank"
+                                        rel="noopener"
                                         class="mb-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-emerald-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -148,12 +151,12 @@
                                     </a>
                                     <a href="{{ route('formateur.formation.edit.description', $formation) }}"
                                         class="mb-5 inline-block w-full items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-indigo-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                           
+
                                         Modifier la description
                                     </a>
                                     <a href="{{ route('formateur.formation.edit.cover', $formation) }}"
                                         class="mb-5 inline-block w-full items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-indigo-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                          
+
                                         Modifier le logo
                                     </a>
 
@@ -184,7 +187,7 @@
                             </div>
 
                             <div class="p-8">
-                                <div class="grid ">
+                                <div class="grid gap-5">
                                     <!-- Parcours -->
                                     <a href="{{ route('formateur.formation.chapters.index', $formation) }}"
                                         class="group relative overflow-hidden  border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-100 p-8 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10 hover:-translate-y-1 block">
@@ -213,11 +216,41 @@
                                             </p>
                                         </div>
                                     </a>
+
+
+                                    <!-- Gestion des équipes -->
+                                    <a href="{{ route('formateur.formation.teams.index', $formation) }}"
+                                        class="group relative overflow-hidden  border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-100 p-8 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10 hover:-translate-y-1 block">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-br from-teal-400/5 to-teal-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        </div>
+                                        <div class="relative">
+                                            <div class="flex items-start justify-between mb-4">
+                                                <div class="p-3 rounded-xl bg-teal-500 text-white shadow-lg">
+                                                    <svg class="h-6 w-6" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                    </svg>
+                                                </div>
+                                                <svg class="h-5 w-5 text-teal-400 group-hover:translate-x-1 transition-transform duration-300"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                            <h3 class="text-lg font-bold text-slate-900 mb-2">Équipes rattachées</h3>
+                                            <p class="text-sm text-slate-600 leading-relaxed">
+                                                Gérez l'accès des équipes à cette formation
+                                            </p>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </section>
 
-                
+
                     </div>
                 </div>
 
@@ -273,35 +306,7 @@
                                     </div>
                                 </a>
 
-                                <!-- Catégorie IA -->
-                                <a href="{{ route('formateur.formation.ai.edit', $formation) }}"
-                                    class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1">
-                                    <div
-                                        class="absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-cyan-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    </div>
-                                    <div class="relative">
-                                        <div class="flex items-start justify-between mb-4">
-                                            <div class="p-3 rounded-xl bg-cyan-500 text-white shadow-lg">
-                                                <svg class="h-6 w-6" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                                </svg>
-                                            </div>
-                                            <svg class="h-5 w-5 text-cyan-400 group-hover:translate-x-1 transition-transform duration-300"
-                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </div>
-                                        <h3 class="text-lg font-bold text-slate-900 mb-2">Intelligence Artificielle
-                                        </h3>
-                                        <p class="text-sm text-slate-600 leading-relaxed">
-                                            Configurez l'assistant IA pour accompagner vos apprenants
-                                        </p>
-                                    </div>
-                                </a>
+
 
                                 <!-- Quiz d'entrée -->
                                 <a href="{{ route('formateur.formation.entry-quiz.questions', $formation) }}"
@@ -332,57 +337,95 @@
                                     </div>
                                 </a>
 
-                                <!-- Gestion des équipes -->
-                                <a href="{{ route('formateur.formation.teams.index', $formation) }}"
-                                    class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-teal-50 to-teal-100 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-teal-500/10 hover:-translate-y-1">
+
+                            </div>
+                        </div>
+
+                    </section>
+
+
+                </div>
+
+                <!-- A venir -->
+                <div class="mt-8">
+                    <!-- Ressources et extensions -->
+                    <section class="bg-white rounded-3xl shadow-lg border border-slate-200/60 overflow-hidden">
+                        <div class="bg-gradient-to-r from-slate-50 to-rose-50 px-8 py-6 border-b border-slate-200/60">
+                            <div class="flex items-center gap-4">
+                                <div class="p-3 rounded-xl bg-rose-100 text-rose-600">
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-slate-900">
+                                        {{ __('A venir') }}
+                                    </h2>
+                                    <p class="text-slate-600 mt-1">
+                                        {{ __('Ces modules sont en experimentation') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-8">
+                            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+
+
+                                <!-- Catégorie IA -->
+                                <a href="{{ route('formateur.formation.ai.edit', $formation) }}"
+                                    class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1">
                                     <div
-                                        class="absolute inset-0 bg-gradient-to-br from-teal-400/5 to-teal-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        class="absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-cyan-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     </div>
                                     <div class="relative">
                                         <div class="flex items-start justify-between mb-4">
-                                            <div class="p-3 rounded-xl bg-teal-500 text-white shadow-lg">
+                                            <div class="p-3 rounded-xl bg-cyan-500 text-white shadow-lg">
                                                 <svg class="h-6 w-6" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
-                                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                                 </svg>
                                             </div>
-                                            <svg class="h-5 w-5 text-teal-400 group-hover:translate-x-1 transition-transform duration-300"
+                                            <svg class="h-5 w-5 text-cyan-400 group-hover:translate-x-1 transition-transform duration-300"
                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M9 5l7 7-7 7" />
                                             </svg>
                                         </div>
-                                        <h3 class="text-lg font-bold text-slate-900 mb-2">Équipes rattachées</h3>
+                                        <h3 class="text-lg font-bold text-slate-900 mb-2">Intelligence Artificielle
+                                        </h3>
                                         <p class="text-sm text-slate-600 leading-relaxed">
-                                            Gérez l'accès des équipes à cette formation
+                                            Configurez l'assistant IA pour accompagner vos apprenants
                                         </p>
                                     </div>
                                 </a>
+
+
                             </div>
                         </div>
-                        
+
                     </section>
 
-                    
+
                 </div>
-                        <!-- Action buttons -->
-                        <div class="mt-5 bg-white rounded-3xl shadow-lg border border-slate-200/60 p-8">
-                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                                @if (Auth::user()->superadmin)
-                                    <a href="{{ route('formateur.formation.delete.show', $formation) }}"
-                                        class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-8 py-4 text-sm font-semibold text-white transition-all hover:from-red-600 hover:to-red-700 hover:shadow-lg hover:shadow-red-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                                        <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Supprimer
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
+                <!-- Action buttons -->
+                <div class="mt-5 bg-white rounded-3xl p-8">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        @if (Auth::user()->superadmin)
+                            <a href="{{ route('formateur.formation.delete.show', $formation) }}"
+                                class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-8 py-4 text-sm font-semibold text-white transition-all hover:from-red-600 hover:to-red-700 hover:shadow-lg hover:shadow-red-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                {{ __('Détruire cette formation') }}
+                            </a>
+                        @endif
+                    </div>
+                </div>
 
 
 </x-app-layout>
