@@ -64,9 +64,7 @@
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Toutes vos formations</h3>
-          <p class="text-gray-600 dark:text-gray-400">
-            Parcourez l'int?gralit? du catalogue sans filtre ni recherche.
-          </p>
+       
         </div>
       </div>
     </div>
