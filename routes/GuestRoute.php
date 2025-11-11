@@ -36,7 +36,7 @@ Route::get('/legal/terms', [PageController::class, 'terms'])
 
 
 Route::get('/test', function () {
-    $base   = 'http://nas.goodview.fr:3000';
+    $base   = 'http://nas.goodview.fr';
     $token  = 'sk-caf6eaff4e514f47bf7dae014a37375d'; // remplace ensuite
     $model  = 'llama3:latest'; // pris tel quel depuis /api/models
 
