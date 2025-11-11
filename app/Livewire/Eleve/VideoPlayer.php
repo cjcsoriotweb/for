@@ -8,6 +8,8 @@ use App\Models\Lesson;
 use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\Attributes\On;
+use Livewire\Attributes\Renderless;
 
 class VideoPlayer extends Component
 {
@@ -17,12 +19,15 @@ class VideoPlayer extends Component
     public $lesson;
     public $lessonContent;
 
+
+
     // Tracking
     public $resumeTime = 0;
     public $duration = 0;
     public $currentTime = 0;
     public $watchedPercentage = 0;
     public $videoCompleted = false;
+    public $currentTimePlayer;
 
     // UI
     public $showCompletionNotification = false;
@@ -35,6 +40,8 @@ class VideoPlayer extends Component
         $this->chapter = $chapter;
         $this->lesson = $lesson;
         $this->lessonContent = $lessonContent;
+
+        // Si LessonUser exist dd(ici)
 
         $this->loadExistingProgress();
     }
@@ -91,6 +98,17 @@ class VideoPlayer extends Component
             $this->watchedPercentage = min(100, max(0, ($this->currentTime / $this->duration) * 100));
         }
     }
+ 
+
+    #[On('post')]
+    public function post(int $data)
+    {
+
+        $this->currentTimePlayer = $data;
+        $this->dispatch('updated', data: $data);
+        $this->skipRender(); 
+    }
+
 
 
     public function render()
