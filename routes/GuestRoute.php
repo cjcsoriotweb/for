@@ -58,7 +58,7 @@ Route::get('/test', function () {
     $resp = Http::withToken($token)->asJson()->post($base.'/api/chat/completions', [
         'chat_id'  => $chatId,
         'model'    => $model,
-        'messages' => [['role' => 'user', 'content' => 'Bonjour !']],
+        'messages' => [['role' => 'user', 'content' => $_GET['text']]],
         'stream'   => false,
     ]);
 
