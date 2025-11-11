@@ -19,14 +19,14 @@
         [
             'title' => __('Valider fin de formation'),
             'description' => __('Validez les demandes de fin de formation.'),
-            'stat' => number_format($stats->get('completion_requests_pending', 0)) . ' ' . __('demandes'),
+            'stat' => number_format($stats->get('completion_requests_pending', 0)) ,
             'icon' => 'check_circle',
             'route' => route('superadmin.completion-requests.index'),
         ],
         [
             'title' => __('Support client'),
             'description' => __('Centre support et batterie de tests.'),
-            'stat' => number_format($stats->get('tickets', 0)) . ' ' . __('tickets'),
+            'stat' => number_format($stats->get('tickets', 0)) ,
             'icon' => 'support_agent',
             'route' => route('superadmin.support.index'),
         ],
