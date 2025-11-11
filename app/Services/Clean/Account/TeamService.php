@@ -28,7 +28,7 @@ class TeamService
         if ($user->superadmin) {
             $destinations[] = [
                 'key' => 'superadmin',
-                'badge' => __("Administrer l'equipe"),
+                'badge' => __("Administrer l'equipe."),
                 'title' => __('Espace administration'),
                 'description' => __('Gerer la plateforme et les parametres globaux de l equipe.'),
                 'icon' => 'workspace_premium',
@@ -41,8 +41,8 @@ class TeamService
         if ($user->hasTeamRole($team, 'manager')) {
             $destinations[] = [
                 'key' => 'organisateur',
-                'badge' => __('organisateur'),
-                'title' => __('Espace organisateur'),
+                'badge' => __('DRH'),
+                'title' => __('Suivis simple des formations et apprentisage.'),
                 'description' => __('Piloter les formations, les membres et les parcours.'),
                 'icon' => 'groups',
                 'gradient' => 'from-purple-500 via-fuchsia-500 to-rose-500',
