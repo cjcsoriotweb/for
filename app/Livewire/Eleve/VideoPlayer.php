@@ -136,8 +136,14 @@ class VideoPlayer extends Component
             return;
         }
 
-        [$minutes, $seconds] = explode(':', $watchedSeconds);
-        $totalSeconds = ((int) $minutes * 60) + (int) $seconds;
+        if (is_numeric($watchedSeconds)) {
+            $totalSeconds = (int) round($watchedSeconds);
+        } elseif (str_contains($watchedSeconds, ':')) {
+            [$minutes, $seconds] = explode(':', $watchedSeconds);
+            $totalSeconds = ((int) $minutes * 60) + (int) $seconds;
+        } else {
+            $totalSeconds = (int) $watchedSeconds;
+        }
 
         $user = Auth::user();
 
