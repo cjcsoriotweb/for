@@ -14,9 +14,11 @@
                     </svg>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-sm font-medium text-red-800">Pas d'inquiétude, aucune formation disponible pour l'équipe</h3>
+                    <h3 class="text-sm font-medium text-red-800">
+                      {{ _("Aucune formation activée pour cette équipe.")}}
+                    </h3>
                     <p class="mt-1 text-sm text-red-700">
-                      S'il s'agit d'une erreur contactez-vous (<a href="{{ route('user.tickets') }}" class="underline hover:text-amber-800">page ticket</a>).
+                      <a href="{{ route('user.tickets') }}" class="underline hover:text-amber-800">{{ _("Si vous pensez qu'il s'agit d'une erreur, cliquez-ici.")}}</a>
                     </p>
                   </div>
                 </div>
