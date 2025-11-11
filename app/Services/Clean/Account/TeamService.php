@@ -28,7 +28,7 @@ class TeamService
         if ($user->superadmin) {
             $destinations[] = [
                 'key' => 'superadmin',
-                'badge' => __('Super administrateur'),
+                'badge' => __("Administrer l'equipe"),
                 'title' => __('Espace administration'),
                 'description' => __('Gerer la plateforme et les parametres globaux de l equipe.'),
                 'icon' => 'workspace_premium',
