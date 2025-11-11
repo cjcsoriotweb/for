@@ -89,14 +89,10 @@ $isMulti = $q ? in_array(strtolower($q->type), ['multiple_choice','multiple_choi
         </button>
 
         @if($this->hasNextQuestion())
-        @if(count($this->reponse) > 0)
-
         <button wire:click="nextQuestion"
           class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-primary text-white font-bold hover:bg-primary/90">
           Suivant
         </button>
-        @endif
-
         @else
         <button wire:click="validateQuiz"
           class="inline-flex items-center justify-center rounded-lg h-12 px-5 bg-primary text-white font-bold hover:bg-primary/90">
