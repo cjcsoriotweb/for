@@ -3,7 +3,7 @@
 use App\Http\Controllers\Clean\Eleve\ElevePageController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('eleve')
+Route::prefix('apprentisage')
     ->name('eleve.')
     ->middleware(['auth', 'eleve'])
     ->scopeBindings()
