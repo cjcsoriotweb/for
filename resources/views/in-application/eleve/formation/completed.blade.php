@@ -246,35 +246,6 @@
           </div>
         </div>
 
-        <!-- Assistant IA -->
-        @if($assistantTrainer)
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex-shrink-0">
-              <div class="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 9a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                </svg>
-              </div>
-            </div>
-            <div>
-              <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $assistantTrainerName }}</h4>
-              <p class="text-xs text-gray-600 dark:text-gray-400">Votre assistant formation</p>
-            </div>
-          </div>
-
-          <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">
-            Besoin d'aide ou de conseils supplémentaires ? Je suis là pour vous accompagner dans votre apprentissage.
-          </p>
-
-          <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors">
-            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
-            </svg>
-            Discuter avec l'assistant
-          </button>
-        </div>
-        @endif
       </div>
     </div>
 

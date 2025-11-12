@@ -14,14 +14,8 @@ class FormationCategory extends Model
     protected $fillable = [
         'name',
         'description',
-        'ai_trainer_id',
         'created_by',
     ];
-
-    public function aiTrainer(): BelongsTo
-    {
-        return $this->belongsTo(AiTrainer::class, 'ai_trainer_id');
-    }
 
     public function formations(): HasMany
     {

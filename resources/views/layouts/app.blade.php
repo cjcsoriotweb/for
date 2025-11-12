@@ -19,7 +19,6 @@
 
 
 
-
   <!-- Bottom widget from layouts/app.blade -->
   @stack('modals') @livewireScripts @stack('scripts')
 </body>

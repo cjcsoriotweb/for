@@ -2,7 +2,7 @@
 
 ## À propos du projet
 
-Evolubat est une plateforme complète de gestion et de suivi de formations en ligne construite avec Laravel 12. Elle permet aux formateurs de créer et gérer des formations, aux organisateurs de suivre leurs équipes, et aux élèves d'accéder à du contenu pédagogique interactif avec assistance IA intégrée.
+Evolubat est une plateforme complète de gestion et de suivi de formations en ligne construite avec Laravel 12. Elle permet aux formateurs de créer et gérer des formations, aux organisateurs de suivre leurs équipes, et aux élèves d'accéder à du contenu pédagogique interactif.
 
 ## 🚀 Fonctionnalités principales
 
@@ -38,7 +38,6 @@ Evolubat est une plateforme complète de gestion et de suivi de formations en li
 - Gestion des chapitres et leçons
 - Upload de vidéos et documents
 - Création et édition de quiz
-- Configuration des assistants IA pour les formations
 - Suivi des étudiants inscrits
 - Export de formations
 - Gestion des documents de complétion
@@ -62,44 +61,10 @@ Evolubat est une plateforme complète de gestion et de suivi de formations en li
 - Rapport de connexion personnalisé
 
 #### Superadmin
-- Gestion globale des trainers IA
 - Configuration des catégories de formation
 - Accès à tous les espaces de l'application
-- Gestion des assistants IA
-
-### 🤖 Système d'Assistant IA (Ollama)
-
-Architecture IA moderne avec streaming en temps réel :
-
-#### Caractéristiques
-- **Client HTTP unique** (`OllamaClient`) pour communiquer avec Ollama
-- **Streaming NDJSON** : Réponses progressives en temps réel
-- **Multi-trainers** : Support de plusieurs assistants spécialisés configurables
-- **Historique de conversation** : Context-aware avec gestion de l'historique
-- **Outils intégrés** : Support de fonctions pour actions avancées (tickets de support)
-- **Composants Livewire dédiés** :
-  - `chat.ai-chat` : Chat avec assistant IA
-  - `chat.user-chat` : Chat utilisateur à utilisateur
-
-#### Trainers configurables
-Les trainers sont définis dans la base de données (table `ai_trainers`) :
-- Personnalisation du prompt système
-- Configuration du modèle et température
-- Activation/désactivation des outils
-- Ordre de tri personnalisable
-
-#### API Streaming
-- **Endpoint** : `POST /api/ai/stream`
-- **Format** : Server-Sent Events (NDJSON)
-- **Authentification** : Sanctum
-- **Sécurité** : 
-  - Validation stricte des entrées
-  - Limitation de la longueur des messages
-  - Filtrage des contenus inappropriés
-  - Timeout configurable
 
 #### Intégration avec les formations
-- Assistant IA dédié par formation
 - Contexte adapté au contenu pédagogique
 - Support instantané pour les élèves
 
@@ -178,7 +143,6 @@ php artisan verifyerror --resolve=123
 - PHP 8.2 ou supérieur
 - Composer
 - Base de données (SQLite, MySQL, PostgreSQL)
-- Ollama (pour l'assistant IA) - optionnel
 - Stripe Account (pour les paiements) - optionnel
 - Node.js et NPM (pour le développement frontend) - optionnel
 
@@ -225,27 +189,7 @@ DB_PASSWORD=
 php artisan migrate
 ```
 
-### 6. Configuration d'Ollama (optionnel)
-
-Si vous souhaitez utiliser l'assistant IA, configurez Ollama dans `.env` :
-
-```env
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_DEFAULT_MODEL=llama3
-OLLAMA_TIMEOUT=60
-OLLAMA_TEMPERATURE=0.7
-AI_DEFAULT_TRAINER_SLUG=default
-```
-
-Assurez-vous qu'Ollama est installé et en cours d'exécution :
-
-```bash
-# Installation d'Ollama (voir https://ollama.ai)
-# Puis télécharger un modèle
-ollama pull llama3
-```
-
-### 7. Configuration de Stripe (optionnel)
+### 6. Configuration de Stripe (optionnel)
 
 Pour les paiements, ajoutez vos clés Stripe dans `.env` :
 
@@ -294,8 +238,7 @@ $user = \App\Models\User::create([
 2. **Créez une équipe** (via Jetstream)
 3. **Créez votre première formation** (rôle Formateur)
 4. **Ajoutez des chapitres et leçons**
-5. **Configurez un assistant IA** (optionnel)
-6. **Invitez des élèves** à rejoindre votre équipe
+5. **Invitez des élèves** à rejoindre votre équipe
 
 ### Workflow typique
 
@@ -338,12 +281,10 @@ app/
 ├── Models/           # Modèles Eloquent
 ├── Policies/         # Policies d'autorisation
 ├── Services/         # Services métier
-│   ├── Ai/          # Services IA (Ollama)
 │   └── Formation/   # Services formations
 └── View/            # View Composers
 
 config/
-├── ai.php           # Configuration IA
 
 database/
 ├── migrations/      # Migrations de la base de données
@@ -420,7 +361,6 @@ php artisan queue:work
 - **Backend** : Laravel 12 (PHP 8.2+)
 - **Frontend** : Livewire 3.6 + Tailwind CSS 3.4
 - **Base de données** : Support MySQL, PostgreSQL, SQLite
-- **IA** : Ollama (llama3 ou autres modèles)
 - **Authentification** : Laravel Sanctum + Jetstream
 - **Paiements** : Stripe
 - **PDF** : DomPDF
@@ -434,14 +374,6 @@ php artisan queue:work
 - **Form Requests** : Validation centralisée
 - **Policies** : Autorisation déclarative
 - **Livewire Components** : Composants réactifs sans JavaScript
-
-### Système d'IA
-
-- **Streaming temps réel** : Via Server-Sent Events (NDJSON)
-- **Client HTTP unique** : `OllamaClient` pour toutes les interactions Ollama
-- **Trainers configurables** : Assistants IA personnalisables en DB
-- **Historique contextualisé** : Gestion automatique du contexte de conversation
-- **Outils extensibles** : Support de fonctions pour actions métier (tickets, etc.)
 
 ## 🔒 Sécurité
 
@@ -464,7 +396,6 @@ Voir le fichier `README_ERROR_SYSTEM.md` pour plus de détails sur le système d
 
 ## 📖 Documentation supplémentaire
 
-- **Architecture IA** : Voir `MIGRATION_AI.md` pour comprendre l'architecture de l'assistant IA
 - **Système d'erreurs** : Voir `README_ERROR_SYSTEM.md` pour le système de logging des erreurs
 
 ## 🤝 Contribution

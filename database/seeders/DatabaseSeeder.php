@@ -24,8 +24,6 @@ class DatabaseSeeder extends Seeder
             $this->call(FormationSeeder::class);
         }
 
-        $this->call(AiTrainerSeeder::class);
-
         // Lier les formations à l'équipe créée
         $user = User::where('email', 'test@example.com')->first();
         $team = $user->currentTeam;

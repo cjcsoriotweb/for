@@ -12,8 +12,6 @@ class Chat extends Model
 
     protected $fillable = [
         'sender_user_id',
-        'sender_ia_id',
-        'receiver_ia_id',
         'receiver_user_id',
         'content',
         'is_read',
@@ -33,30 +31,12 @@ class Chat extends Model
         return $this->belongsTo(User::class, 'sender_user_id');
     }
 
-    public function receiverIa(): BelongsTo
-    {
-        return $this->belongsTo(AiTrainer::class, 'receiver_ia_id');
-    }
-
-    public function senderIa(): BelongsTo
-    {
-        return $this->belongsTo(AiTrainer::class, 'sender_ia_id');
-    }
-
     public function receiverUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'receiver_user_id');
     }
 
     // Scopes
-    public function scopeWithIa($query, $aiId)
-    {
-        return $query->where(function ($q) use ($aiId) {
-            $q->where('receiver_ia_id', $aiId)
-                ->orWhere('sender_ia_id', $aiId);
-        });
-    }
-
     public function scopeWithUser($query, $userId)
     {
         return $query->where('receiver_user_id', $userId);
@@ -72,32 +52,13 @@ class Chat extends Model
         return $query->where('is_read', false);
     }
 
-    public function scopeConversation($query, $userId, $receiverId, $isIa = false)
+    public function scopeConversation($query, $userId, $receiverId)
     {
-        if ($isIa) {
-            return $query->where(function ($q) use ($userId, $receiverId) {
-                $q->where('sender_user_id', $userId)->where('receiver_ia_id', $receiverId);
-            })->orWhere(function ($q) use ($userId, $receiverId) {
-                $q->where('sender_ia_id', $receiverId)->where('receiver_user_id', $userId);
-            });
-        } else {
-            return $query->where(function ($q) use ($userId, $receiverId) {
-                $q->where('sender_user_id', $userId)->where('receiver_user_id', $receiverId);
-            })->orWhere(function ($q) use ($userId, $receiverId) {
-                $q->where('sender_user_id', $receiverId)->where('receiver_user_id', $userId);
-            });
-        }
-    }
-
-    // Helper methods
-    public function isFromIa(): bool
-    {
-        return $this->sender_ia_id !== null;
-    }
-
-    public function isToIa(): bool
-    {
-        return $this->receiver_ia_id !== null;
+        return $query->where(function ($q) use ($userId, $receiverId) {
+            $q->where('sender_user_id', $userId)->where('receiver_user_id', $receiverId);
+        })->orWhere(function ($q) use ($userId, $receiverId) {
+            $q->where('sender_user_id', $receiverId)->where('receiver_user_id', $userId);
+        });
     }
 
     public function markAsRead(): void

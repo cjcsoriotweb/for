@@ -7,18 +7,11 @@
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <a href="{{ route('superadmin.ai.index') }}"
-                       class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        {{ __('Retour a la console IA') }}
-                    </a>
-                    <h1 class="mt-4 text-3xl font-bold text-gray-900">
+                    <h1 class="text-3xl font-bold text-gray-900">
                         {{ __('Categories de formations') }}
                     </h1>
                     <p class="mt-2 text-sm text-gray-600 max-w-2xl">
-                        {{ __('Creez des categories pour organiser les formations. Chaque categorie peut etre associee a un assistant IA specifique. Les formateurs peuvent ensuite selectionner la categorie appropriee pour leurs formations.') }}
+                        {{ __('Creez des categories pour organiser les formations et proposer une navigation plus claire aux formateurs.') }}
                     </p>
                 </div>
                 <div class="hidden sm:block">
@@ -52,7 +45,7 @@
                                 {{ __('Nouvelle categorie') }}
                             </h2>
                             <p class="mt-1 text-sm text-gray-500">
-                                {{ __('Definissez une categorie et, si besoin, associez-lui un assistant IA actif.') }}
+                                {{ __('Definissez un libelle et une description pour faciliter la gestion du catalogue.') }}
                             </p>
                         </div>
                         <form method="POST" action="{{ route('superadmin.formation-categories.store') }}" class="px-6 py-6 space-y-5">
@@ -84,27 +77,6 @@
                                 >{{ old('description') }}</textarea>
                             </div>
 
-                            <div>
-                                <label for="ai_trainer_id" class="block text-sm font-medium text-gray-700">
-                                    {{ __('Assistant IA associe (optionnel)') }}
-                                </label>
-                                <select
-                                    name="ai_trainer_id"
-                                    id="ai_trainer_id"
-                                    class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                >
-                                    <option value="">{{ __('Aucun assistant specifique') }}</option>
-                                    @foreach ($trainers as $trainer)
-                                        <option value="{{ $trainer->id }}" @selected(old('ai_trainer_id') == $trainer->id)>
-                                            {{ $trainer->name }} @if($trainer->model) - {{ $trainer->model }} @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <p class="mt-1 text-xs text-gray-500">
-                                    {{ __('Seuls les assistants actifs peuvent etre choisis.') }}
-                                </p>
-                            </div>
-
                             <div class="flex items-center justify-end">
                                 <button
                                     type="submit"
@@ -125,7 +97,7 @@
                                     {{ __('Categories existantes') }}
                                 </h2>
                                 <p class="mt-1 text-sm text-gray-500">
-                                    {{ __('Modifiez le nom, la description ou lassistant IA associe. Supprimez une categorie uniquement si elle nest plus utilisee.') }}
+                                    {{ __('Modifiez facilement le nom ou la description. Supprimez une categorie uniquement si elle nest plus utilisee.') }}
                                 </p>
                             </div>
                             <span class="text-sm text-gray-400">{{ trans_choice(':count categorie|:count categories', $categories->count(), ['count' => $categories->count()]) }}</span>
@@ -138,35 +110,17 @@
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="category_id" value="{{ $category->id }}">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">
-                                                    {{ __('Nom') }}
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    value="{{ old('category_id') == $category->id ? old('name') : $category->name }}"
-                                                    class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                    maxlength="120"
-                                                >
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">
-                                                    {{ __('Assistant IA associe') }}
-                                                </label>
-                                                <select
-                                                    name="ai_trainer_id"
-                                                    class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                >
-                                                    <option value="">{{ __('Aucun assistant specifique') }}</option>
-                                                    @foreach ($trainers as $trainer)
-                                                        <option value="{{ $trainer->id }}" @selected((old('category_id') == $category->id ? old('ai_trainer_id') : $category->ai_trainer_id) == $trainer->id)>
-                                                            {{ $trainer->name }} @if($trainer->model) - {{ $trainer->model }} @endif
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">
+                                                {{ __('Nom') }}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value="{{ old('category_id') == $category->id ? old('name') : $category->name }}"
+                                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                maxlength="120"
+                                            >
                                         </div>
 
                                         <div>

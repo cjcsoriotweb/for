@@ -266,10 +266,6 @@ class ElevePageController extends Controller
             ])
             ->values();
 
-        $assistantTrainer = $formationWithProgress->category?->aiTrainer;
-        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
-        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
-
         return view('in-application.eleve.formation.show', [
             'team' => $team,
             'studentFormationService' => $studentFormationService,
@@ -278,8 +274,6 @@ class ElevePageController extends Controller
             'formationDocuments' => $formationDocuments,
             'lessonResources' => $lessonResources,
             'isFormationCompleted' => $isFormationCompleted,
-            'assistantTrainerSlug' => $assistantTrainerSlug,
-            'assistantTrainerName' => $assistantTrainerName,
             'entryQuiz' => $entryQuiz,
             'entryQuizThresholds' => $entryQuizThresholds,
             'entryQuizScore' => $entryQuizScore,
@@ -369,10 +363,6 @@ class ElevePageController extends Controller
             ];
         });
 
-        $assistantTrainer = $formationWithProgress->category?->aiTrainer;
-        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
-        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
-
         // R├®cup├®rer les donn├®es de compl├®tion de la formation
         $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
             ->where('user_id', $user->id)
@@ -387,9 +377,6 @@ class ElevePageController extends Controller
             'formationDocuments' => $formationDocuments,
             'chaptersWithLessons' => $chaptersWithLessons,
             'lessonResources' => $lessonResources,
-            'assistantTrainer' => $assistantTrainer,
-            'assistantTrainerSlug' => $assistantTrainerSlug,
-            'assistantTrainerName' => $assistantTrainerName,
             'formationUser' => $formationUser,
         ]);
     }
@@ -621,10 +608,6 @@ class ElevePageController extends Controller
             ];
         });
 
-        $assistantTrainer = $formationWithProgress->category?->aiTrainer;
-        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
-        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
-
         // R├®cup├®rer les donn├®es de compl├®tion de la formation
         $formationUser = \App\Models\FormationUser::where('formation_id', $formation->id)
             ->where('user_id', $user->id)
@@ -640,9 +623,6 @@ class ElevePageController extends Controller
             'formationDocuments' => $formationDocuments,
             'chaptersWithLessons' => $chaptersWithLessons,
             'lessonResources' => $lessonResources,
-            'assistantTrainer' => $assistantTrainer,
-            'assistantTrainerSlug' => $assistantTrainerSlug,
-            'assistantTrainerName' => $assistantTrainerName,
             'formationUser' => $formationUser,
             'user' => $user,
         ]);
@@ -1007,10 +987,7 @@ class ElevePageController extends Controller
         $formationDocuments = $formation->completionDocuments()->get();
         $isFormationCompleted = $this->studentFormationService->isFormationCompleted($user, $formation);
 
-        $formation->loadMissing('category.aiTrainer');
-        $assistantTrainer = $formation->category?->aiTrainer;
-        $assistantTrainerSlug = $assistantTrainer?->slug ?: config('ai.default_trainer_slug', 'default');
-        $assistantTrainerName = $assistantTrainer?->name ?: __('Assistant Formation');
+        $formation->loadMissing('category');
 
         return view('in-application.eleve.lesson.show', [
             'team' => $team,
@@ -1027,8 +1004,6 @@ class ElevePageController extends Controller
             'isFormationCompleted' => $isFormationCompleted,
             'lessonResources' => $lessonResources,
             'canDownloadLessonResources' => $canDownloadLessonResources,
-            'assistantTrainerSlug' => $assistantTrainerSlug,
-            'assistantTrainerName' => $assistantTrainerName,
         ]);
     }
 

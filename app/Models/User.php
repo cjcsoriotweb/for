@@ -113,11 +113,6 @@ class User extends Authenticatable
         return $this->hasMany(FormationCategory::class, 'created_by');
     }
 
-    public function aiConversations()
-    {
-        return $this->hasMany(AiConversation::class, 'user_id');
-    }
-
     public function sentChats()
     {
         return $this->hasMany(Chat::class, 'sender_user_id');

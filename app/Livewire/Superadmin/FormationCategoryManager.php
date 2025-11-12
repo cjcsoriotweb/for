@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Superadmin;
 
-use App\Models\AiTrainer;
 use App\Models\FormationCategory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +17,6 @@ class FormationCategoryManager extends Component
     public array $form = [
         'name' => '',
         'description' => '',
-        'ai_trainer_id' => null,
     ];
 
     public bool $showForm = false;
@@ -32,13 +30,7 @@ class FormationCategoryManager extends Component
     {
         return view('livewire.superadmin.formation-category-manager', [
             'categories' => FormationCategory::query()
-                ->with(['aiTrainer'])
                 ->withCount('formations')
-                ->orderBy('name')
-                ->get(),
-            'trainers' => AiTrainer::query()
-                ->active()
-                ->orderBy('sort_order')
                 ->orderBy('name')
                 ->get(),
         ]);
@@ -58,7 +50,6 @@ class FormationCategoryManager extends Component
         $this->form = [
             'name' => $category->name,
             'description' => $category->description,
-            'ai_trainer_id' => $category->ai_trainer_id,
         ];
 
         $this->showForm = true;
@@ -71,7 +62,6 @@ class FormationCategoryManager extends Component
         $attributes = [
             'name' => trim($data['name']),
             'description' => $data['description'] !== null ? trim($data['description']) : null,
-            'ai_trainer_id' => $data['ai_trainer_id'] ?? null,
         ];
 
         if ($this->categoryId) {
@@ -114,11 +104,6 @@ class FormationCategoryManager extends Component
                 Rule::unique('formation_categories', 'name')->ignore($this->categoryId),
             ],
             'form.description' => ['nullable', 'string'],
-            'form.ai_trainer_id' => [
-                'nullable',
-                'integer',
-                Rule::exists('ai_trainers', 'id')->where(fn ($query) => $query->where('is_active', true)),
-            ],
         ];
     }
 
@@ -128,7 +113,6 @@ class FormationCategoryManager extends Component
         $this->form = [
             'name' => '',
             'description' => '',
-            'ai_trainer_id' => null,
         ];
     }
 }

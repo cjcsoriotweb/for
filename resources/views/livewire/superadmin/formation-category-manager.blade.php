@@ -11,7 +11,7 @@
                         {{ $categoryId ? __('Modifier la categorie') : __('Nouvelle categorie') }}
                     </h2>
                     <p class="mt-1 text-sm text-gray-500">
-                        {{ __('Associez une categorie a un assistant IA actif pour les formations correspondantes.') }}
+                        {{ __('Creez vos categories pour structurer les catalogues de formations.') }}
                     </p>
                 </div>
                 <button wire:click="{{ $showForm ? 'cancel' : 'create' }}"
@@ -52,24 +52,6 @@
                         </label>
                         <textarea wire:model.defer="form.description" rows="4"
                             class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">
-                            {{ __('Assistant IA associe (optionnel)') }}
-                        </label>
-                        <select wire:model.defer="form.ai_trainer_id"
-                            class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="">{{ __('Aucun assistant specifique') }}</option>
-                            @foreach ($trainers as $trainer)
-                                <option value="{{ $trainer->id }}">
-                                    {{ $trainer->name }} @if($trainer->model) - {{ $trainer->model }} @endif
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="mt-1 text-xs text-gray-500">
-                            {{ __('Seuls les assistants actifs sont proposes.') }}
-                        </p>
                     </div>
 
                     <div class="flex items-center justify-end gap-3">
@@ -118,17 +100,9 @@
                                         @if ($category->description)
                                             <p>{{ Str::limit($category->description, 160) }}</p>
                                         @endif
-                                        @if ($category->aiTrainer)
-                                            <p>
-                                                <span class="font-medium text-gray-700">{{ __('Assistant IA :') }}</span>
-                                                {{ $category->aiTrainer->name }}
-                                                @if ($category->aiTrainer->model)
-                                                    <span class="text-gray-400">({{ $category->aiTrainer->model }})</span>
-                                                @endif
-                                            </p>
-                                        @else
-                                            <p class="text-gray-400">{{ __('Aucun assistant associe') }}</p>
-                                        @endif
+                                        @unless ($category->description)
+                                            <p class="text-gray-400">{{ __('Aucune description fournie.') }}</p>
+                                        @endunless
                                     </div>
                                 </div>
                                 <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-600">

@@ -120,11 +120,6 @@ class Formation extends Model
         return $this->belongsTo(FormationCategory::class, 'formation_category_id');
     }
 
-    public function aiTrainer(): ?AiTrainer
-    {
-        return $this->category?->aiTrainer;
-    }
-
     /**
      * Alias for completionDocuments to support scoped route bindings (documents/{document}).
      */

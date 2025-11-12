@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Clean\Superadmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AiTrainer;
 use App\Models\Formation;
 use App\Models\FormationInTeams;
 use App\Models\FormationUser;
@@ -31,11 +30,8 @@ class SuperadminPageController extends Controller
             'completion_requests_pending' => FormationUser::where('completion_request_status', 'pending')->count(),
         ];
 
-        $trainerCount = AiTrainer::count();
-
         return view('out-application.superadmin.superadmin-overview-page', [
             'stats' => $stats,
-            'trainerCount' => $trainerCount,
         ]);
     }
 

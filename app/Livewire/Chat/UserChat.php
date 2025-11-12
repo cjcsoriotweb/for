@@ -91,7 +91,7 @@ class UserChat extends Component
 
         try {
             $query = Chat::query()
-                ->with(['sender', 'senderIa'])
+                ->with(['sender'])
                 ->orderBy('created_at', 'desc');
 
             $this->applyContactFilter($query, $user);
@@ -99,15 +99,13 @@ class UserChat extends Component
             $chats = $query->get();
 
             $this->messages = $chats->map(function ($chat) use ($user) {
-                $sender = $chat->senderIa ?: $chat->sender;
-
                 return [
-                    'sender' => $sender,
-                    'sender_name' => $sender?->name,
+                    'sender' => $chat->sender,
+                    'sender_name' => $chat->sender?->name,
                     'content' => $chat->content,
                     'created_at' => $chat->created_at,
-                    'is_mine' => $chat->sender_user_id === $user->id && $chat->sender_ia_id === null,
-                    'is_ai' => $chat->sender_ia_id !== null,
+                    'is_mine' => $chat->sender_user_id === $user->id,
+                    'is_ai' => false,
                 ];
             })->toArray();
 

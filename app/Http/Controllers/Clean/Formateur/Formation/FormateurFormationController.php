@@ -184,7 +184,6 @@ class FormateurFormationController extends Controller
         return view('out-application.formateur.formation.formation-chapters', compact('formation'));
     }
 
-    // editAi and updateAi methods removed - trainers are now managed in config/ai.php
 
     public function updateFormation(UpdateFormationRequest $request, Formation $formation)
     {

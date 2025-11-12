@@ -32,21 +32,6 @@ Route::prefix('superadmin')
         })->name('db');
         Route::post('/db/backup', [SuperadminPageController::class, 'backupDatabase'])->name('db.backup');
         Route::get('/db/backup/{file}', [SuperadminPageController::class, 'downloadBackup'])->name('db.backup.download')->where('file', '[A-Za-z0-9_.-]+');
-        Route::prefix('ai')
-            ->name('ai.')
-            ->group(function (): void {
-                Route::get('/', function () {
-                    return view('out-application.superadmin.ai.index');
-                })->name('index');
-
-                Route::get('/trainers', function () {
-                    return view('out-application.superadmin.ai.trainers');
-                })->name('trainers');
-
-                Route::get('/categories', function () {
-                    return view('out-application.superadmin.ai.categories');
-                })->name('categories');
-            });
         Route::get('/formation-categories', [FormationCategoryController::class, 'index'])->name('formation-categories.index');
         Route::post('/formation-categories', [FormationCategoryController::class, 'store'])->name('formation-categories.store');
         Route::put('/formation-categories/{formationCategory}', [FormationCategoryController::class, 'update'])->name('formation-categories.update');

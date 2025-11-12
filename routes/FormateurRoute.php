@@ -1,7 +1,6 @@
 ﻿<?php
 
 use App\Http\Controllers\Clean\Formateur\FormateurPageController;
-use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationAiController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormateurFormationController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationChapterController;
 use App\Http\Controllers\Clean\Formateur\Formation\FormationCompletionDocumentController;
@@ -36,9 +35,6 @@ Route::prefix('formateur')
             Route::put('/formation/{formation}/edit/cover', [FormateurFormationController::class, 'updateFormationCoverImage'])->name('formation.update.cover');
             Route::get('/formation/{formation}/contenu', [FormateurFormationController::class, 'editPricing'])->name('formation.pricing.edit');
             Route::get('/formation/{formation}/chapters', [FormateurFormationController::class, 'manageChapters'])->name('formation.chapters.index');
-            Route::get('/formation/{formation}/ai', [FormateurFormationAiController::class, 'edit'])->name('formation.ai.edit');
-            Route::put('/formation/{formation}/ai', [FormateurFormationAiController::class, 'update'])->name('formation.ai.update');
-            // Routes IA supprimées - trainers sont maintenant dans config/ai.php
             Route::put('/formation/{formation}/update', [FormateurFormationController::class, 'updateFormation'])->name('formation.update');
             Route::post('/formation/{formation}/toggle-status', [FormateurFormationController::class, 'toggleStatus'])->name('formation.toggle-status');
             Route::get('/formation/{formation}/completion-documents', [FormationCompletionDocumentController::class, 'index'])->name('formation.completion-documents.index');
@@ -112,4 +108,3 @@ Route::prefix('formateur')
             Route::delete('/formation/{formation}/chapitre/{chapter}/lesson/{lesson}/resources/{resource}', [FormationLessonController::class, 'deleteResource'])->name('formation.chapter.lesson.resources.delete');
         });
     });
-
