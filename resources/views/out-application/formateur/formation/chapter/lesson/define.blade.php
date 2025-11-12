@@ -52,7 +52,7 @@
                                         type="radio"
                                         name="lesson_type"
                                         value="quiz"
-                                        class="sr-only peer"
+                                        
                                         required
                                     />
                                     <span class="flex flex-1">
@@ -106,7 +106,7 @@
                                         type="radio"
                                         name="lesson_type"
                                         value="video"
-                                        class="sr-only peer"
+                         
                                         required
                                     />
                                     <span class="flex flex-1">
@@ -160,7 +160,7 @@
                                         type="radio"
                                         name="lesson_type"
                                         value="text"
-                                        class="sr-only peer"
+                               
                                         required
                                     />
                                     <span class="flex flex-1">
