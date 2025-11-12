@@ -44,7 +44,7 @@
     </button>
 
     <iframe
-      src="{{config('goodview_genie_url')}}/?models=maconnerie-"
+      src="{{config('service.goodview_genie_url')}}/?models=maconn  erie-"
       title="Assistant IA"
       class="h-full w-full border-0"
       loading="lazy"></iframe>
