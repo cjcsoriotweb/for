@@ -14,6 +14,9 @@ return [
     |
     */
 
+    'goodview_genie_url' => env('GOODVIEW_GENIE_URL', 'https://genie.goodview.fr/'),
+    'phpmyadmin' => env('PHPMYADMIN', '#####'),
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

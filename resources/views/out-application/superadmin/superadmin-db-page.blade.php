@@ -1,5 +1,5 @@
 @php
-    $iframeUrl = 'https://db.evolubat-academy.fr/';
+    $iframeUrl =  config('services.phpmyadmin');
 @endphp
 
 <x-admin.global-layout

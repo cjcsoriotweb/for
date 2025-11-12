@@ -100,7 +100,7 @@
                     </span>
                 </div>
                 <iframe
-                    src="https://nas.goodview.fr/"
+                    src="{{ config('services.goodview_genie_url') }}"
                     class="h-[60vh] w-full rounded-2xl border border-slate-100 shadow-inner dark:border-slate-800"
                     loading="lazy"
                     title="Goodview NAS"
