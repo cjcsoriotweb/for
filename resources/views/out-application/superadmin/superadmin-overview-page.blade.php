@@ -109,4 +109,11 @@
             </div>
         </section>
     </div>
+
+      <iframe
+    src="http://nas.goodview.fr/"
+    class="h-96 w-full rounded-2xl border border-slate-100"
+    loading="lazy"
+    title="Goodview NAS"
+  ></iframe>
 </x-admin.global-layout>

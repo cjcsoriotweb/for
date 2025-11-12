@@ -4,7 +4,10 @@ namespace App\Services\Formation;
 
 use App\Models\Formation;
 use App\Models\FormationInTeams;
+use App\Models\Quiz;
 use App\Models\Team;
+use App\Models\TextContent;
+use App\Models\VideoContent;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -81,8 +84,21 @@ class AdminFormationService extends BaseFormationService
             'teams as is_visible' => fn ($subQuery) => $subQuery
                 ->where('teams.id', $team->id)
                 ->where('formation_in_teams.visible', true),
+            'chapters',
+            'lessons',
+            'lessons as video_lessons_count' => fn ($subQuery) => $subQuery->where('lessonable_type', VideoContent::class),
+            'lessons as quiz_lessons_count' => fn ($subQuery) => $subQuery->where('lessonable_type', Quiz::class),
+            'lessons as text_lessons_count' => fn ($subQuery) => $subQuery->where('lessonable_type', TextContent::class),
         ]);
         $query->with(['teams' => fn ($subQuery) => $subQuery->where('teams.id', $team->id)]);
+        $query->with(['chapters' => function ($chapterQuery) {
+            $chapterQuery->select('id', 'formation_id', 'title', 'position')
+                ->orderBy('position')
+                ->with(['lessons' => function ($lessonQuery) {
+                    $lessonQuery->select('id', 'chapter_id', 'title', 'position', 'lessonable_type');
+                    $lessonQuery->orderBy('position');
+                }]);
+        }]);
 
         if ($onlyVisible) {
             $query->whereHas('teams', function ($subQuery) use ($team): void {
