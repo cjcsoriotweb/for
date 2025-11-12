@@ -6,7 +6,7 @@
     "description": "Jeu d'API publiques destinées aux intégrations Open WebUI / OpenIA pour explorer les formations Evolubat."
   },
   "servers": [
-    { "url": "http://localhost:8000/api" }
+    { "url": "https://evolubat-academy.fr/api" }
   ],
   "paths": {
     "/users": {
