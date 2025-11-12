@@ -107,20 +107,80 @@
               </div>
             @endif
           </div>
-          <div class="grid w-full gap-4 text-center text-sm text-gray-600 sm:grid-cols-3 md:w-auto">
-            <div class="rounded-xl border border-gray-100 px-5 py-3">
+          <form
+            method="POST"
+            action="{{ route('formateur.formation.chapter.lesson.quiz.update', [$formation, $chapter, $lesson]) }}"
+            class="grid w-full gap-4 text-sm text-gray-600 sm:grid-cols-3 md:w-auto"
+          >
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="quiz_title" value="{{ old('quiz_title', $quiz->title) }}">
+
+            <div class="rounded-xl border border-gray-100 px-5 py-3 text-center">
               <p class="text-2xl font-semibold text-gray-900">{{ $questionCount }}</p>
               <p class="mt-1">Questions</p>
             </div>
-            <div class="rounded-xl border border-gray-100 px-5 py-3">
-              <p class="text-2xl font-semibold text-gray-900">{{ $quiz->max_attempts ?? 'Illimite' }}</p>
-              <p class="mt-1">Tentatives</p>
+
+            <div class="rounded-xl border border-gray-100 px-5 py-4 sm:py-5">
+              <label for="max_attempts" class="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Tentatives
+                <span class="text-[11px] font-normal capitalize text-gray-400">optionnel</span>
+              </label>
+              <div class="mt-3 flex items-center gap-3">
+                <input
+                  type="number"
+                  id="max_attempts"
+                  name="max_attempts"
+                  min="1"
+                  max="10"
+                  value="{{ old('max_attempts', $quiz->max_attempts) }}"
+                  placeholder="Illimite"
+                  class="w-28 rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 @error('max_attempts') border-red-500 focus:border-red-500 focus:ring-red-200 @enderror"
+                />
+                <p class="text-xs text-gray-500">
+                  Laissez vide pour un nombre illimite.
+                </p>
+              </div>
+              @error('max_attempts')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+              @enderror
             </div>
-            <div class="rounded-xl border border-gray-100 px-5 py-3">
-              <p class="text-2xl font-semibold text-gray-900">{{ $quizEstimatedDuration ? $quizEstimatedDuration.' min' : '--' }}</p>
-              <p class="mt-1">Duree estimee</p>
+
+            <div class="rounded-xl border border-gray-100 px-5 py-4 sm:py-5">
+              <label for="quiz_estimated_duration" class="text-xs font-semibold uppercase tracking-wide text-gray-500">Duree estimee</label>
+              <div class="mt-3 flex items-center gap-3">
+                <input
+                  type="number"
+                  id="quiz_estimated_duration"
+                  name="quiz_estimated_duration"
+                  min="1"
+                  max="1440"
+                  value="{{ old('quiz_estimated_duration', $quizEstimatedDuration) }}"
+                  class="w-28 rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 @error('quiz_estimated_duration') border-red-500 focus:border-red-500 focus:ring-red-200 @enderror"
+                  placeholder="Ex: 10"
+                  required
+                />
+                <p class="text-xs text-gray-500">
+                  Minutes necessaires pour terminer.
+                </p>
+              </div>
+              @error('quiz_estimated_duration')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+              @enderror
             </div>
-          </div>
+
+            <div class="sm:col-span-3 flex justify-end">
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Mettre a jour
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </form>
         </div>
       </header>
 
