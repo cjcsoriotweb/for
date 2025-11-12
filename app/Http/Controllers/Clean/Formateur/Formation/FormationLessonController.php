@@ -84,7 +84,6 @@ class FormationLessonController
         // Validate the quiz data
         $validated = request()->validate([
             'quiz_title' => 'required|string|max:255',
-            'quiz_description' => 'nullable|string',
             'max_attempts' => 'nullable|integer|min:1|max:10',
             'quiz_estimated_duration' => 'required|integer|min:1|max:1440',
         ]);
@@ -94,7 +93,6 @@ class FormationLessonController
             $quiz = \App\Models\Quiz::create([
                 'lesson_id' => $lesson->id,
                 'title' => $validated['quiz_title'],
-                'description' => $validated['quiz_description'],
                 'passing_score' => 0,
                 'max_attempts' => $validated['max_attempts'] ?? null,
                 'estimated_duration_minutes' => $validated['quiz_estimated_duration'],
@@ -236,16 +234,6 @@ class FormationLessonController
         return view('out-application.formateur.formation.chapter.lesson.edit-quiz-title', compact('formation', 'chapter', 'lesson', 'quiz'));
     }
 
-    public function editQuizDescription(Formation $formation, Chapter $chapter, Lesson $lesson)
-    {
-        $quiz = $lesson->lessonable;
-        if (! $quiz || ! ($quiz instanceof \App\Models\Quiz)) {
-            return redirect()->route('formateur.formation.chapter.lesson.define', [$formation, $chapter, $lesson])
-                ->withErrors(['error' => 'Quiz non trouvé pour cette leçon.']);
-        }
-
-        return view('out-application.formateur.formation.chapter.lesson.edit-quiz-description', compact('formation', 'chapter', 'lesson', 'quiz'));
-    }
 
     public function editQuizSettings(Formation $formation, Chapter $chapter, Lesson $lesson)
     {
@@ -269,7 +257,6 @@ class FormationLessonController
         // Validate the quiz data
         $validated = request()->validate([
             'quiz_title' => 'required|string|max:255',
-            'quiz_description' => 'nullable|string',
             'max_attempts' => 'nullable|integer|min:1|max:10',
             'quiz_estimated_duration' => 'required|integer|min:1|max:1440',
         ]);
@@ -278,7 +265,6 @@ class FormationLessonController
             // Update the quiz
             $quiz->update([
                 'title' => $validated['quiz_title'],
-                'description' => $validated['quiz_description'],
                 'passing_score' => 0,
                 'max_attempts' => $validated['max_attempts'] ?? null,
                 'estimated_duration_minutes' => $validated['quiz_estimated_duration'],

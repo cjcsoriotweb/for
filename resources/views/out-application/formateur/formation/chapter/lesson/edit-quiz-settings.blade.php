@@ -153,7 +153,6 @@
               @csrf
               @method('PUT')
               <input type="hidden" name="quiz_title" value="{{ old('quiz_title', $quiz->title) }}">
-              <textarea name="quiz_description" class="hidden" aria-hidden="true">{{ old('quiz_description', $quiz->description) }}</textarea>
 
               <div>
                 <label for="max_attempts" class="block text-sm font-semibold text-gray-900">Tentatives maximum</label>

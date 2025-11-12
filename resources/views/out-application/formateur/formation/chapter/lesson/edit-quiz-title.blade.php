@@ -152,7 +152,6 @@
             <form method="POST" action="{{ route('formateur.formation.chapter.lesson.quiz.update', [$formation, $chapter, $lesson]) }}" class="space-y-6">
               @csrf
               @method('PUT')
-              <textarea name="quiz_description" class="hidden" aria-hidden="true">{{ old('quiz_description', $quiz->description) }}</textarea>
               <input type="hidden" name="max_attempts" value="{{ old('max_attempts', $quiz->max_attempts) }}">
               <input type="hidden" name="quiz_estimated_duration" value="{{ $defaultEstimatedDuration }}">
 
