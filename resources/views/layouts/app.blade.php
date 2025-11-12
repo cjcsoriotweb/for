@@ -8,6 +8,8 @@
 
 <body>
 
+  @include('ia.button')
+  
   <div class="min-h-screen flex flex-col">
     <!-- Layouts Parts Header from layouts/app.blade -->
     @include('components.app.layout.header.this')
