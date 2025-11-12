@@ -32,7 +32,7 @@
         ],
         [
             'title' => __('Suivis des formations'),
-            'description' => __('Recherche avancǸ sur les formations'),
+            'description' => __('Recherche avancé sur les formations'),
             'stat' => '',
             'icon' => 'book',
             'route' => route('superadmin.compta.index'),
