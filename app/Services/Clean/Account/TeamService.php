@@ -41,8 +41,8 @@ class TeamService
         if ($user->hasTeamRole($team, 'manager')) {
             $destinations[] = [
                 'key' => 'organisateur',
-                'badge' => __('DRH'),
-                'title' => __('Suivi DRH.'),
+                'badge' => __('Manager'),
+                'title' => __('Suivi apprentis.'),
                 'description' => __('Suivi des formations, les membres et les parcours.'),
                 'icon' => 'groups',
                 'gradient' => 'from-purple-500 via-fuchsia-500 to-rose-500',
