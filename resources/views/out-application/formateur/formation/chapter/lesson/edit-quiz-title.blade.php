@@ -15,7 +15,6 @@
     $currentAction = 'title';
     $editQuizOverviewRoute = route('formateur.formation.chapter.lesson.quiz.edit', [$formation, $chapter, $lesson]);
     $editQuizTitleRoute = route('formateur.formation.chapter.lesson.quiz.edit.title', [$formation, $chapter, $lesson]);
-    $editQuizDescriptionRoute = route('formateur.formation.chapter.lesson.quiz.edit.description', [$formation, $chapter, $lesson]);
     $editQuizSettingsRoute = route('formateur.formation.chapter.lesson.quiz.edit.settings', [$formation, $chapter, $lesson]);
     $manageQuestionsRoute = route('formateur.formation.chapter.lesson.quiz.questions', [$formation, $chapter, $lesson, $quiz]);
 
@@ -48,13 +47,6 @@
             'action' => 'title',
             'route' => $editQuizTitleRoute,
             'done' => $hasTitle,
-        ],
-        [
-            'label' => 'Description',
-            'description' => 'Informer vos apprenants et donner le contexte.',
-            'action' => 'description',
-            'route' => $editQuizDescriptionRoute,
-            'done' => $hasDescription,
         ],
         [
             'label' => 'Parametres',
@@ -152,8 +144,6 @@
             <form method="POST" action="{{ route('formateur.formation.chapter.lesson.quiz.update', [$formation, $chapter, $lesson]) }}" class="space-y-6">
               @csrf
               @method('PUT')
-              <input type="hidden" name="max_attempts" value="{{ old('max_attempts', $quiz->max_attempts) }}">
-              <input type="hidden" name="quiz_estimated_duration" value="{{ $defaultEstimatedDuration }}">
 
               <div>
                 <label for="quiz_title" class="block text-sm font-semibold text-gray-900">Nouveau titre *</label>
@@ -171,6 +161,49 @@
                 @error('quiz_title')
                   <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+              </div>
+
+              <div class="grid gap-5 rounded-xl border border-gray-100 bg-gray-50/80 p-4 sm:grid-cols-2">
+                <div>
+                  <label for="max_attempts" class="block text-sm font-semibold text-gray-900">Tentatives</label>
+                  <p class="mt-1 text-xs text-gray-500">
+                    Laissez vide pour un mode illimité. Sinon indiquez une valeur entre 1 et 10.
+                  </p>
+                  <input
+                    type="number"
+                    id="max_attempts"
+                    name="max_attempts"
+                    min="1"
+                    max="10"
+                    value="{{ old('max_attempts', $quiz->max_attempts) }}"
+                    class="mt-3 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 @error('max_attempts') border-red-500 focus:border-red-500 focus:ring-red-200 @enderror"
+                    placeholder="Illimité"
+                  />
+                  @error('max_attempts')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                  @enderror
+                </div>
+
+                <div>
+                  <label for="quiz_estimated_duration" class="block text-sm font-semibold text-gray-900">Durée estimée *</label>
+                  <p class="mt-1 text-xs text-gray-500">
+                    Temps moyen en minutes (entre 1 et 1440) affiché aux apprenants.
+                  </p>
+                  <input
+                    type="number"
+                    id="quiz_estimated_duration"
+                    name="quiz_estimated_duration"
+                    min="1"
+                    max="1440"
+                    value="{{ old('quiz_estimated_duration', $defaultEstimatedDuration) }}"
+                    class="mt-3 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 @error('quiz_estimated_duration') border-red-500 focus:border-red-500 focus:ring-red-200 @enderror"
+                    placeholder="Ex : 10"
+                    required
+                  />
+                  @error('quiz_estimated_duration')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                  @enderror
+                </div>
               </div>
 
               <div class="flex flex-wrap items-center justify-between gap-4">

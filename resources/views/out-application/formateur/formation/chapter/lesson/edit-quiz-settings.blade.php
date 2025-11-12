@@ -15,7 +15,6 @@
     $currentAction = 'settings';
     $editQuizOverviewRoute = route('formateur.formation.chapter.lesson.quiz.edit', [$formation, $chapter, $lesson]);
     $editQuizTitleRoute = route('formateur.formation.chapter.lesson.quiz.edit.title', [$formation, $chapter, $lesson]);
-    $editQuizDescriptionRoute = route('formateur.formation.chapter.lesson.quiz.edit.description', [$formation, $chapter, $lesson]);
     $editQuizSettingsRoute = route('formateur.formation.chapter.lesson.quiz.edit.settings', [$formation, $chapter, $lesson]);
     $manageQuestionsRoute = route('formateur.formation.chapter.lesson.quiz.questions', [$formation, $chapter, $lesson, $quiz]);
 
@@ -49,13 +48,7 @@
             'route' => $editQuizTitleRoute,
             'done' => $hasTitle,
         ],
-        [
-            'label' => 'Description',
-            'description' => 'Clarifier le contexte et les attentes.',
-            'action' => 'description',
-            'route' => $editQuizDescriptionRoute,
-            'done' => $hasDescription,
-        ],
+
         [
             'label' => 'Parametres',
             'description' => 'Determiner les tentatives et les regles.',

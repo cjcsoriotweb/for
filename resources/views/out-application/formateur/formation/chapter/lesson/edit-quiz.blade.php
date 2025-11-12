@@ -15,7 +15,6 @@
     $currentAction = $currentAction ?? 'overview';
     $editQuizOverviewRoute = route('formateur.formation.chapter.lesson.quiz.edit', [$formation, $chapter, $lesson]);
     $editQuizTitleRoute = route('formateur.formation.chapter.lesson.quiz.edit.title', [$formation, $chapter, $lesson]);
-    $editQuizDescriptionRoute = route('formateur.formation.chapter.lesson.quiz.edit.description', [$formation, $chapter, $lesson]);
     $editQuizSettingsRoute = route('formateur.formation.chapter.lesson.quiz.edit.settings', [$formation, $chapter, $lesson]);
     $manageQuestionsRoute = route('formateur.formation.chapter.lesson.quiz.questions', [$formation, $chapter, $lesson, $quiz]);
 
@@ -45,7 +44,6 @@
             'label' => 'Description',
             'description' => 'Expliquez en quelques lignes ce qui est attendu.',
             'done' => $hasDescription,
-            'route' => $editQuizDescriptionRoute,
         ],
         [
             'label' => 'Parametres',
@@ -217,12 +215,6 @@
                 <a href="{{ $editQuizTitleRoute }}" class="inline-flex items-center gap-2 {{ $currentAction === 'title' ? 'text-indigo-600 font-semibold' : 'hover:text-indigo-600' }}">
                   <span class="h-2 w-2 rounded-full {{ $currentAction === 'title' ? 'bg-indigo-500' : 'bg-gray-300' }}"></span>
                   Changer le titre
-                </a>
-              </li>
-              <li>
-                <a href="{{ $editQuizDescriptionRoute }}" class="inline-flex items-center gap-2 {{ $currentAction === 'description' ? 'text-indigo-600 font-semibold' : 'hover:text-indigo-600' }}">
-                  <span class="h-2 w-2 rounded-full {{ $currentAction === 'description' ? 'bg-indigo-500' : 'bg-gray-300' }}"></span>
-                  Changer la description
                 </a>
               </li>
               <li>

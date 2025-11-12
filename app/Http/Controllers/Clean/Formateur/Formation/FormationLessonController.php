@@ -270,8 +270,7 @@ class FormationLessonController
                 'estimated_duration_minutes' => $validated['quiz_estimated_duration'],
             ]);
 
-            return redirect()->route('formateur.formation.show', $formation)
-                ->with('success', 'Quiz modifié avec succès!');
+            return back()->with('success', 'Quiz modifié avec succès!');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Erreur lors de la modification du quiz: '.$e->getMessage()]);
         }
