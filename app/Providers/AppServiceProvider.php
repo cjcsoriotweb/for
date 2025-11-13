@@ -78,7 +78,6 @@ class AppServiceProvider extends ServiceProvider
             'eleve.formation-header' => 'components.eleve.formation.header',
 
             'header' => 'components.app.layout.header',
-            'meta-header' => 'components.ui.layout.meta-header',
 
             'layout.header' => 'components.app.layout.header',
             'organisateur.layout' => 'components.organisateur.layouts.app',

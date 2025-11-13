@@ -2,36 +2,15 @@
 <!DOCTYPE html>
 <html lang="fr">
     <head>
-        <meta charset="utf-8" />
-        <title>403 — Accès interdit</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <x-meta-header />
-        <style>
-            @keyframes float {
-                0%,
-                100% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-            }
-            @keyframes pulse {
-                0%,
-                100% {
-                    opacity: 1;
-                }
-                50% {
-                    opacity: 0.7;
-                }
-            }
-            .float-animation {
-                animation: float 3s ease-in-out infinite;
-            }
-            .pulse-animation {
-                animation: pulse 2s ease-in-out infinite;
-            }
-        </style>
+  <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ config('app.name') }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @livewireStyles
+  @stack('head')
     </head>
     <body
         class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-red-900/20 dark:to-orange-900/20 text-gray-900 dark:text-gray-100"

@@ -2,15 +2,15 @@
 <!DOCTYPE html>
 <html lang="fr" class="h-full">
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>
-            404 — {{ $siteName ?? config("app.name", "Application") }}
-        </title>
-
-        <x-meta-header />
-
-        <meta name="robots" content="noindex,follow" />
+  <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ config('app.name') }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @livewireStyles
+  @stack('head')
     </head>
     <body class="h-full bg-white text-gray-900">
         <main class="flex min-h-full flex-col items-center justify-center p-6">
