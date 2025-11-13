@@ -146,6 +146,8 @@ class VideoPlayer extends Component
                 }
             }
         }
+        $this->loadExistingProgress();
+
         $this->skipRender();
     }
 

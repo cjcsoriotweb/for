@@ -127,6 +127,19 @@
             const numberValue = Number(value);
             return Number.isFinite(numberValue) ? numberValue : 0;
         };
+        const parseSecondsPayload = (value, depth = 0) => {
+            if (Number.isFinite(value)) return value;
+            if (typeof value === 'string' && value.trim() !== '') {
+                const parsed = Number(value);
+                return Number.isFinite(parsed) ? parsed : 0;
+            }
+            if (value && typeof value === 'object' && depth < 3) {
+                if ('seconds' in value) return parseSecondsPayload(value.seconds, depth + 1);
+                if ('data' in value) return parseSecondsPayload(value.data, depth + 1);
+                if ('value' in value) return parseSecondsPayload(value.value, depth + 1);
+            }
+            return 0;
+        };
         let maxWatchedSeconds = (() => {
             const container = getProgressContainer();
             return container ? parseToNumber(container.dataset.maxWatched) : 0;
@@ -363,7 +376,8 @@
             startPeriodicSave();
         };
 
-        Livewire.on('updated', (data) => {
+        Livewire.on('updated', (payload) => {
+            const seconds = Math.max(0, Math.floor(parseSecondsPayload(payload) || 0));
             const toast = document.getElementById('toast');
             if (toast) {
                 toast.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
@@ -377,11 +391,11 @@
 
             const timeElement = document.getElementById('time');
             if (timeElement) {
-                timeElement.textContent = formatTime(data);
+                timeElement.textContent = formatTime(seconds);
             }
 
             const previousMax = getMaxWatchedSeconds();
-            const newMax = setMaxWatchedSeconds(data);
+            const newMax = setMaxWatchedSeconds(seconds);
             if (newMax !== previousMax) {
                 updateAllowedTrack(getVideo());
             }
