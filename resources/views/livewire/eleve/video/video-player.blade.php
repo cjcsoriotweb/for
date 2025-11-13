@@ -96,23 +96,23 @@
                             {{ $formatTime($duration) }}
                         </span>
                     </div>
-                        <div class="flex justify-center items-center gap-4">
-                            <button type="button" wire:click="seekBy(-10)" wire:loading.remove
-                                class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
-                                <span class="material-symbols-outlined text-2xl">replay_10</span>
-                            </button>
-                            <button type="button" wire:click="togglePlayback" 
-                                class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md" >
-                                <span class="material-symbols-outlined text-3xl">
-                                    {{ $isPlaying ? 'pause' : 'play_arrow' }}
-                                </span>
-                            </button>
-                            <button type="button" wire:click="seekBy(10)" wire:loading.remove data-forward-button
-                                class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
-                                <span class="material-symbols-outlined text-2xl">forward_10</span>
-                            </button>
-                        </div>
+                    <div class="flex justify-center items-center gap-4">
+                        <button type="button" wire:click="seekBy(-10)" wire:loading.remove
+                            class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-2xl">replay_10</span>
+                        </button>
+                        <button type="button" wire:click="togglePlayback" 
+                            class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md" >
+                            <span class="material-symbols-outlined text-3xl">
+                                {{ $isPlaying ? 'pause' : 'play_arrow' }}
+                            </span>
+                        </button>
+                        <button type="button" wire:click="seekBy(10)" wire:loading.remove
+                            class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-2xl">forward_10</span>
+                        </button>
                     </div>
+                </div>
 
             </div>
         </div>
@@ -153,9 +153,6 @@
             allowed: document.querySelector('[data-progress-allowed]'),
             bar: document.querySelector('[data-progress-bar]'),
         });
-        const getControlElements = () => ({
-            forward: document.querySelector('[data-forward-button]'),
-        });
         const formatTime = (seconds) => {
             const value = Math.max(0, Math.floor(seconds || 0));
             const hrs = Math.floor(value / 3600);
@@ -178,19 +175,6 @@
             const percentage = duration > 0 ? (allowedSeconds / duration) * 100 : 0;
 
             allowed.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
-        };
-        const updateSeekControls = (video = null) => {
-            const targetVideo = video || getVideo();
-            const { forward } = getControlElements();
-            if (!forward || !targetVideo) return;
-
-            const allowedLimit = getAllowedSeekTime(targetVideo);
-            const currentTime = parseToNumber(targetVideo.currentTime);
-            const canForward = currentTime + 10 <= allowedLimit + 0.001;
-
-            forward.classList.toggle('hidden', !canForward);
-            forward.classList.toggle('pointer-events-none', !canForward);
-            forward.toggleAttribute('disabled', !canForward);
         };
         const getComponent = () => {
             const video = getVideo();
@@ -236,7 +220,6 @@
             if (handle) handle.style.left = `${percentage}%`;
 
             updateAllowedTrack(video);
-            updateSeekControls(video);
         };
 
         const startPeriodicSave = (() => {
@@ -401,7 +384,6 @@
             const newMax = setMaxWatchedSeconds(data);
             if (newMax !== previousMax) {
                 updateAllowedTrack(getVideo());
-                updateSeekControls(getVideo());
             }
         });
 
@@ -443,7 +425,6 @@
         bindProgressListeners();
         bindProgressBarInteractions();
         updateAllowedTrack(getVideo());
-        updateSeekControls(getVideo());
         document.addEventListener('livewire:navigated', () => {
             bindProgressListeners();
             bindProgressBarInteractions();
