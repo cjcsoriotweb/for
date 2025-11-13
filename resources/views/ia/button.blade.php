@@ -1,7 +1,7 @@
 ﻿<!-- Bouton flottant modernise pour l'assistant IA -->
 <div class="pointer-events-none fixed inset-0 z-[9999] flex items-end justify-end p-5 sm:p-6">
-  <button
-    type="button"
+  <a
+    href="{{url('/test')}}"
     aria-label="Discuter avec l'assistant IA"
     class="assistant-launcher pointer-events-auto group relative flex items-center gap-4 overflow-hidden rounded-full border border-white/15
            bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 px-5 py-2.5 text-white shadow-2xl shadow-indigo-600/40
@@ -23,33 +23,9 @@
 
     <!-- Pulse decorative -->
     <span aria-hidden="true" class="assistant-launcher__pulse"></span>
-
-  </button>
+  </a>
 </div>
 
-<!-- Modal iframe -->
-<div
-  id="assistant-modal"
-  class="assistant-modal hidden fixed inset-0 z-[10000] items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 sm:p-8"
-  role="dialog"
-  aria-modal="true"
-  aria-hidden="true">
-  <div class="relative w-full max-w-5xl h-[80vh] rounded-3xl bg-white shadow-2xl shadow-slate-900/50 overflow-hidden">
-    <button
-      type="button"
-      class="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-      aria-label="Fermer le chat IA"
-      data-assistant-close>
-      ✕
-    </button>
-
-    <iframe
-      src="{{config('services.goodview_genie_url')}}?models= "
-      title="Assistant IA"
-      class="h-full w-full border-0"
-      loading="lazy"></iframe>
-  </div>
-</div>
 
 <style>
   .assistant-launcher {
