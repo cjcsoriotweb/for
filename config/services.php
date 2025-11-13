@@ -14,8 +14,9 @@ return [
     |
     */
 
-    'chatbot.endpoint' => env('GOODVIEW_GENIE_URL_CHAT_ENDPOINT', 'https://genie.goodview.fr/api/chat/completions'),
-    'services.chatbot.token' => env('GOODVIEW_GENIE_URL_CHAT_ENDPOINT_TOKEN','######'),
+
+    'chatbot.endpoint' => env('CHATBOT_ENDPOINT', 'https://genie.goodview.fr/api/chat/completions'),
+    'services.chatbot.token' => env('CHATBOT_TOKEN','######'),
 
     'goodview_genie_url' => env('GOODVIEW_GENIE_URL', 'https://genie.goodview.fr/'),
     'goodview_genie_api' => env('GOODVIEW_TOKENAPI', '#####'),
