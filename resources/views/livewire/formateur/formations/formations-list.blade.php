@@ -13,11 +13,6 @@ FORMATIONS LIST - MAIN CONTAINER
     ======================================== --}}
     <x-formateur.formation.formation-header />
 
-    {{-- ========================================
-    DASHBOARD SECTION
-    ======================================== --}}
-    <x-formateur.formation.formation-dashboard :stats="$stats" />
-
 
     {{-- ========================================
     ALL FORMATIONS (PAGINATED)
