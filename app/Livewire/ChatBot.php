@@ -374,7 +374,7 @@ class ChatBot extends Component
     private function requestReplyStream(string $prompt, callable $onChunk): void
     {
         $endpoint = config('services.chatbot.endpoint', 'http://192.168.1.62:8000/api/chat/completions');
-        $token = config('services.chatbot.token', 'sk-caf6eaff4e514f47bf7dae014a37375d');
+        $token = config('services.chatbot.token', '#####');
         $model = $this->resolveModelKey();
 
         $payload = [

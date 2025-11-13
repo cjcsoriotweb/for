@@ -14,9 +14,12 @@ return [
     |
     */
 
+    'chatbot.endpoint' => env('GOODVIEW_GENIE_URL_CHAT_ENDPOINT', 'https://genie.goodview.fr/api/chat/completions'),
+    'services.chatbot.token' => env('GOODVIEW_GENIE_URL_CHAT_ENDPOINT_TOKEN','######'),
+
     'goodview_genie_url' => env('GOODVIEW_GENIE_URL', 'https://genie.goodview.fr/'),
-    'phpmyadmin' => env('PHPMYADMIN', '#####'),
     'goodview_genie_api' => env('GOODVIEW_TOKENAPI', '#####'),
+    'phpmyadmin' => env('PHPMYADMIN', '#####'),
 
     
 
