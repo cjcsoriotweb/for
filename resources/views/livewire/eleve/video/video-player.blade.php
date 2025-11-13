@@ -72,13 +72,24 @@
                         <span data-progress-current class="text-sm font-medium text-gray-600 dark:text-gray-400">
                             {{ $formatTime($currentTime) }}
                         </span>
-                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full group cursor-pointer">
-                            <div class="relative h-full">
-                                <div data-progress-fill class="absolute h-full bg-primary rounded-full"
-                                    style="width: {{ $progressWidth }}%;"></div>
-                                <div data-progress-handle
-                                    class="absolute size-4 bg-white dark:bg-gray-300 rounded-full -translate-y-1/2 top-1/2 -translate-x-1/2 shadow-md transition-transform group-hover:scale-110"
-                                    style="left: {{ $progressWidth }}%;"></div>
+                        @php
+                            $maxAccessibleSeconds = max(0, (int) ($maxWatchedSeconds ?? 0));
+                            $allowedWidth = $duration > 0 ? number_format(min(100, ($maxAccessibleSeconds / $duration) * 100), 2, '.', '') : 0;
+                        @endphp
+                        <div class="flex-1 group cursor-pointer select-none" data-progress-container
+                            data-max-watched="{{ $maxAccessibleSeconds }}">
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full group cursor-pointer" data-progress-bar>
+                                <div class="relative h-full">
+                                    <div data-progress-fill class="absolute h-full bg-primary rounded-full"
+                                        style="width: {{ $progressWidth }}%;"></div>
+                                    <div data-progress-handle
+                                        class="absolute size-4 bg-white dark:bg-gray-300 rounded-full -translate-y-1/2 top-1/2 -translate-x-1/2 shadow-md transition-transform group-hover:scale-110"
+                                        style="left: {{ $progressWidth }}%;"></div>
+                                </div>
+                            </div>
+                            <div class="mt-1 h-1 w-full bg-gray-200/80 dark:bg-gray-700/80 rounded-full pointer-events-none">
+                                <div data-progress-allowed class="h-full bg-green-500 rounded-full transition-all duration-200"
+                                    style="width: {{ $allowedWidth }}%;"></div>
                             </div>
                         </div>
                         <span data-progress-total class="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -110,200 +121,317 @@
 
 @script
     <script>
+        const getVideo = () => document.getElementById('video');
+        const getProgressContainer = () => document.querySelector('[data-progress-container]');
+        const parseToNumber = (value) => {
+            const numberValue = Number(value);
+            return Number.isFinite(numberValue) ? numberValue : 0;
+        };
+        let maxWatchedSeconds = (() => {
+            const container = getProgressContainer();
+            return container ? parseToNumber(container.dataset.maxWatched) : 0;
+        })();
+        const getMaxWatchedSeconds = () => maxWatchedSeconds;
+        const setMaxWatchedSeconds = (value = 0) => {
+            const sanitized = Math.max(0, parseToNumber(value));
+            if (sanitized <= maxWatchedSeconds) {
+                return maxWatchedSeconds;
+            }
+            maxWatchedSeconds = sanitized;
+            const container = getProgressContainer();
+            if (container) {
+                container.dataset.maxWatched = sanitized;
+            }
+            return maxWatchedSeconds;
+        };
+        const getProgressElements = () => ({
+            container: getProgressContainer(),
+            current: document.querySelector('[data-progress-current]'),
+            total: document.querySelector('[data-progress-total]'),
+            fill: document.querySelector('[data-progress-fill]'),
+            handle: document.querySelector('[data-progress-handle]'),
+            allowed: document.querySelector('[data-progress-allowed]'),
+            bar: document.querySelector('[data-progress-bar]'),
+        });
+        const formatTime = (seconds) => {
+            const value = Math.max(0, Math.floor(seconds || 0));
+            const hrs = Math.floor(value / 3600);
+            const mins = Math.floor((value % 3600) / 60);
+            const secs = value % 60;
+            if (hrs > 0) {
+                return [hrs, mins, secs].map((n) => n.toString().padStart(2, '0')).join(':');
+            }
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+        const updateAllowedTrack = (video = null) => {
+            const targetVideo = video || getVideo();
+            const { allowed } = getProgressElements();
+            if (!allowed || !targetVideo) return;
+
+            const duration = parseToNumber(targetVideo.duration);
+            if (!duration) return;
+
+            const allowedSeconds = Math.min(getMaxWatchedSeconds(), duration);
+            const percentage = duration > 0 ? (allowedSeconds / duration) * 100 : 0;
+
+            allowed.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+        };
+        const getComponent = () => {
+            const video = getVideo();
+            if (!video || !window.Livewire) return null;
+            const root = video.closest('[wire\\:id]');
+            if (!root) return null;
+            return window.Livewire.find(root.getAttribute('wire:id'));
+        };
+        const emitProgressUpdate = (value = 0) => {
+            const component = getComponent();
+            if (!component || !Number.isFinite(value)) {
+                return;
+            }
+
+            const seconds = Math.max(0, Math.floor(value));
+            component.call('post', seconds);
+        };
+
+        setInterval(() => {
+            const videoElement = getVideo();
+            if (!videoElement) {
+                return;
+            }
+
+            emitProgressUpdate(videoElement.currentTime || 0);
+        }, 5000);
+
+        const updateProgressUI = (video) => {
+            if (!video) return;
+            const {
+                current,
+                total,
+                fill,
+                handle
+            } = getProgressElements();
+            const duration = Math.floor(video.duration || 0);
+            const currentTime = Math.floor(video.currentTime || 0);
+            const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+            if (current) current.textContent = formatTime(currentTime);
+            if (total) total.textContent = formatTime(duration);
+            if (fill) fill.style.width = `${percentage}%`;
+            if (handle) handle.style.left = `${percentage}%`;
+
+            updateAllowedTrack(video);
+        };
+
+        const startPeriodicSave = (() => {
+            let intervalId = null;
+            return () => {
+                const video = getVideo();
+                const component = getComponent();
+                if (!video || !component) return;
+                if (intervalId) return;
+
+                intervalId = setInterval(() => {
+                    const currentVideo = getVideo();
+                    const currentComponent = getComponent();
+
+                    if (!currentVideo || !currentComponent) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        return;
+                    }
+
+                    emitProgressUpdate(currentVideo.currentTime || 0);
+                }, 5000);
+            };
+        })();
+
+        const dispatchProgress = (() => {
+            let lastSent = 0;
+            let pending = false;
+            return (video, force = false) => {
+                if (!video) return;
+                updateProgressUI(video);
+                const component = getComponent();
+                if (!component) return;
+
+                const now = Date.now();
+                if (!force && now - lastSent < 1000) return; // throttle to ~1s
+                if (pending) return;
+
+                pending = true;
+                lastSent = now;
+
+                component.call(
+                    'handleVideoProgress',
+                    Math.floor(video.currentTime || 0),
+                    Math.floor(video.duration || 0)
+                ).finally(() => {
+                    pending = false;
+                });
+            };
+        })();
+
+        const getAllowedSeekTime = (video) => {
+            if (!video) return 0;
+            const duration = parseToNumber(video.duration);
+            if (!duration) return 0;
+
+            return Math.min(duration, Math.max(0, getMaxWatchedSeconds()));
+        };
+
+        const bindProgressBarInteractions = () => {
+            const { bar } = getProgressElements();
+            if (!bar || bar.dataset.seekBound === 'true') return;
+
+            let isDragging = false;
+
+            const seekFromEvent = (event) => {
+                const video = getVideo();
+                if (!video) return;
+
+                const duration = parseToNumber(video.duration);
+                if (!duration) return;
+
+                const rect = bar.getBoundingClientRect();
+                if (!rect.width) return;
+
+                const ratio = (event.clientX - rect.left) / rect.width;
+                const clampedRatio = Math.min(1, Math.max(0, ratio));
+                const desiredTime = clampedRatio * duration;
+                const allowedLimit = getAllowedSeekTime(video);
+                const targetTime = Math.min(desiredTime, allowedLimit);
+
+                video.currentTime = targetTime;
+                dispatchProgress(video, true);
+            };
+
+            const stopDragging = (event) => {
+                if (!isDragging) return;
+                isDragging = false;
+                if (event) {
+                    bar.releasePointerCapture?.(event.pointerId);
+                }
+            };
+
+            bar.addEventListener('pointerdown', (event) => {
+                if (event.pointerType === 'mouse' && event.button !== 0) return;
+                event.preventDefault();
+                isDragging = true;
+                bar.setPointerCapture?.(event.pointerId);
+                seekFromEvent(event);
+            });
+
+            bar.addEventListener('pointermove', (event) => {
+                if (!isDragging) return;
+                seekFromEvent(event);
+            });
+
+            ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => {
+                bar.addEventListener(type, (event) => {
+                    if (!isDragging) return;
+                    stopDragging(event);
+                });
+            });
+
+            bar.dataset.seekBound = 'true';
+            bar.style.touchAction = 'none';
+        };
+
+        const bindProgressListeners = () => {
+            const video = getVideo();
+            if (!video || video.dataset.progressBound === 'true') return;
+
+            const sendProgress = (force = false) => dispatchProgress(video, force);
+
+            video.addEventListener('timeupdate', () => sendProgress());
+            video.addEventListener('seeking', () => sendProgress(true));
+            video.addEventListener('seeked', () => sendProgress(true));
+            video.addEventListener('loadedmetadata', () => sendProgress(true));
+            video.addEventListener('play', () => sendProgress(true));
+            video.addEventListener('pause', () => sendProgress(true));
+            video.addEventListener('ended', () => {
+                const component = getComponent();
+                component?.call('ended');
+            });
+
+            if (video.readyState >= 1) {
+                sendProgress(true);
+            }
+
+            video.dataset.progressBound = 'true';
+            updateProgressUI(video);
+            startPeriodicSave();
+        };
+
         Livewire.on('updated', (data) => {
-            console.log('updated', data)
-            const el = document.getElementById('toast');
-            el.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-            el.classList.add('opacity-100', 'scale-100');
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                toast.classList.add('opacity-100', 'scale-100');
 
-            setTimeout(() => {
-                el.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-                el.classList.remove('opacity-100', 'scale-100');
-            }, 1000);
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                    toast.classList.remove('opacity-100', 'scale-100');
+                }, 1000);
+            }
 
+            const timeElement = document.getElementById('time');
+            if (timeElement) {
+                timeElement.textContent = formatTime(data);
+            }
+
+            const previousMax = getMaxWatchedSeconds();
+            const newMax = setMaxWatchedSeconds(data);
+            if (newMax !== previousMax) {
+                updateAllowedTrack(getVideo());
+            }
         });
 
-            const getVideo = () => document.getElementById('video');
-            console.log(getVideo)
-        
-            const getProgressElements = () => ({
-                current: document.querySelector('[data-progress-current]'),
-                total: document.querySelector('[data-progress-total]'),
-                fill: document.querySelector('[data-progress-fill]'),
-                handle: document.querySelector('[data-progress-handle]'),
-            });
-            const getComponent = () => {
-                const video = getVideo();
-                if (!video || !window.Livewire) return null;
-                const root = video.closest('[wire\\:id]');
-                if (!root) return null;
-                return window.Livewire.find(root.getAttribute('wire:id'));
-            };
-            const formatTime = (seconds) => {
-                const value = Math.max(0, Math.floor(seconds || 0));
-                const hrs = Math.floor(value / 3600);
-                const mins = Math.floor((value % 3600) / 60);
-                const secs = value % 60;
-                if (hrs > 0) {
-                    return [hrs, mins, secs].map((n) => n.toString().padStart(2, '0')).join(':');
-                }
-                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            };
-            const emitProgressUpdate = (value = 0) => {
-                const component = getComponent();
-                if (!component || !Number.isFinite(value)) {
-                    return;
-                }
+        Livewire.on('video-play', () => {
+            const video = getVideo();
+            if (!video) return;
 
-                const seconds = Math.max(0, Math.floor(value));
-                component.call('post', seconds);
-            };
-
-            setInterval(() => {
-                const videoElement = getVideo();
-                if (!videoElement) {
-                    return;
-                }
-
-                emitProgressUpdate(videoElement.currentTime || 0);
-            }, 5000);
-
-            const updateProgressUI = (video) => {
-                if (!video) return;
-                const {
-                    current,
-                    total,
-                    fill,
-                    handle
-                } = getProgressElements();
-                const duration = Math.floor(video.duration || 0);
-                const currentTime = Math.floor(video.currentTime || 0);
-                const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-                if (current) current.textContent = formatTime(currentTime);
-                if (total) total.textContent = formatTime(duration);
-                if (fill) fill.style.width = `${percentage}%`;
-                if (handle) handle.style.left = `${percentage}%`;
-
-
-            };
-
-            const startPeriodicSave = (() => {
-                let intervalId = null;
-                return () => {
-                    const video = getVideo();
-                    const component = getComponent();
-                    if (!video || !component) return;
-                    if (intervalId) return;
-
-                    intervalId = setInterval(() => {
-                        const currentVideo = getVideo();
-                        const currentComponent = getComponent();
-
-                        if (!currentVideo || !currentComponent) {
-                            clearInterval(intervalId);
-                            intervalId = null;
-                            return;
-                        }
-
-                        emitProgressUpdate(currentVideo.currentTime || 0);
-                    }, 5000);
-                };
-            })();
-
-            const dispatchProgress = (() => {
-                let lastSent = 0;
-                let pending = false;
-                return (video, force = false) => {
-                    if (!video) return;
-                    updateProgressUI(video);
-                    const component = getComponent();
-                    if (!component) return;
-
-                    const now = Date.now();
-                    if (!force && now - lastSent < 1000) return; // throttle to ~1s
-                    if (pending) return;
-
-                    pending = true;
-                    lastSent = now;
-
-                    component.call(
-                        'handleVideoProgress',
-                        Math.floor(video.currentTime || 0),
-                        Math.floor(video.duration || 0)
-                    ).finally(() => {
-                        pending = false;
-                    });
-                };
-            })();
-
-            const bindProgressListeners = () => {
-                const video = getVideo();
-                if (!video || video.dataset.progressBound === 'true') return;
-
-                const sendProgress = (force = false) => dispatchProgress(video, force);
-
-                video.addEventListener('timeupdate', () => sendProgress());
-                video.addEventListener('seeking', () => sendProgress(true));
-                video.addEventListener('seeked', () => sendProgress(true));
-                video.addEventListener('loadedmetadata', () => sendProgress(true));
-                video.addEventListener('play', () => sendProgress(true));
-                video.addEventListener('pause', () => sendProgress(true));
-                video.addEventListener('ended', () => {
-                    const component = getComponent();
-                    component?.call('ended');
+            const playPromise = video.play();
+            if (playPromise?.catch) {
+                playPromise.catch(() => {
+                    /* autoplay blocked or other issue; ignore */
                 });
+            }
+        });
 
-                if (video.readyState >= 1) {
-                    sendProgress(true);
-                }
+        Livewire.on('video-pause', () => {
+            const video = getVideo();
+            if (video) {
+                video.pause();
+            }
+        });
 
-                video.dataset.progressBound = 'true';
-                updateProgressUI(video);
-                startPeriodicSave();
-            };
+        Livewire.on('video-seek', (seconds = 0) => {
+            const video = getVideo();
+            if (!video) return;
 
-            Livewire.on('video-play', () => {
-                const video = getVideo();
-                if (!video) return;
+            const offset = Number(seconds) || 0;
+            const current = Number(video.currentTime || 0);
+            const hasDuration = Number.isFinite(video.duration) && video.duration > 0;
+            const duration = hasDuration ? video.duration : null;
+            const targetTime = Math.max(0, current + offset);
 
-                const playPromise = video.play();
-                if (playPromise?.catch) {
-                    playPromise.catch(() => {
-                        /* autoplay blocked or other issue; ignore */
-                    });
-                }
-            });
+            video.currentTime = duration !== null ? Math.min(duration, targetTime) : targetTime;
+            dispatchProgress(video, true);
+        });
 
-            Livewire.on('video-pause', () => {
-                const video = getVideo();
-                if (video) {
-                    video.pause();
-                }
-            });
-
-            Livewire.on('video-seek', (seconds = 0) => {
-                const video = getVideo();
-                if (!video) return;
-
-                const offset = Number(seconds) || 0;
-                const current = Number(video.currentTime || 0);
-                const hasDuration = Number.isFinite(video.duration) && video.duration > 0;
-                const duration = hasDuration ? video.duration : null;
-                const targetTime = Math.max(0, current + offset);
-
-                video.currentTime = duration !== null ? Math.min(duration, targetTime) : targetTime;
-                dispatchProgress(video, true);
-            });
-
+        bindProgressListeners();
+        bindProgressBarInteractions();
+        updateAllowedTrack(getVideo());
+        document.addEventListener('livewire:navigated', () => {
             bindProgressListeners();
-            document.addEventListener('livewire:navigated', () => {
-                bindProgressListeners();
-                updateProgressUI(getVideo());
-            });
-            Livewire.hook('message.processed', () => {
-                bindProgressListeners();
-                updateProgressUI(getVideo());
-            });
+            bindProgressBarInteractions();
+            updateProgressUI(getVideo());
+        });
+        Livewire.hook('message.processed', () => {
+            bindProgressListeners();
+            bindProgressBarInteractions();
+            updateProgressUI(getVideo());
+        });
     </script>
 @endscript

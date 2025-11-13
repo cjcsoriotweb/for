@@ -26,6 +26,7 @@ class VideoPlayer extends Component
     public $watchedPercentage = 0;
     public $videoCompleted = false;
     public $currentTimePlayer;
+    public $maxWatchedSeconds = 0;
 
     // UI
     public $showCompletionNotification = false;
@@ -63,6 +64,7 @@ class VideoPlayer extends Component
 
         if ($lessonUser) {
             $this->resumeTime = (int) ($lessonUser->pivot->watched_seconds ?? 0);
+            $this->maxWatchedSeconds = $this->resumeTime;
             $this->videoCompleted = ($lessonUser->pivot->status ?? null) === 'completed';
         }
     }
@@ -139,6 +141,7 @@ class VideoPlayer extends Component
             if ($lessonUser) {
                 if ($lessonUser->pivot->watched_seconds < $data) {
                     $this->lesson->learners()->updateExistingPivot(Auth::id(), ['watched_seconds' => $data]);
+                    $this->maxWatchedSeconds = max((int) $this->maxWatchedSeconds, $data);
                     $this->dispatch('updated', data: $data);
                 }
             }
