@@ -95,18 +95,9 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             @include('in-application.admin.partials.menu-fast.stats.users-stats', ['team' => $team])
             @include('in-application.admin.partials.menu-fast.stats.formations-stats', ['team' => $team])
+            @include('in-application.admin.partials.menu-fast.stats.configuration-team', ['team' => $team])
+
         </div>
     </section>
 
-    <section id="configuration" class="space-y-6">
-        <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-            <span class="material-symbols-outlined text-lg">settings</span>
-            <h2 class="text-xs font-semibold uppercase tracking-[0.35em]">
-                {{ __('Important') }}
-            </h2>
-        </div>
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            @include('in-application.admin.partials.menu-fast.stats.configuration-team', ['team' => $team])
-        </div>
-    </section>
 </div>
