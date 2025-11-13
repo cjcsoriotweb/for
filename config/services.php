@@ -47,4 +47,10 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'chatbot' => [
+        'endpoint' => env('CHATBOT_ENDPOINT', 'http://192.168.1.62:8000/api/chat/completions'),
+        'token' => env('CHATBOT_TOKEN', 'sk-caf6eaff4e514f47bf7dae014a37375d'),
+        'model' => env('CHATBOT_MODEL', 'llama3:latest'),
+    ],
+
 ];

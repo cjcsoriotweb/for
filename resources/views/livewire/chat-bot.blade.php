@@ -8,7 +8,7 @@
                     class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-xl font-semibold text-emerald-300">
                     EB
                 </div>
-                <div>
+                <div class="flex-1">
                     <p class="text-lg font-semibold text-white">
                         EvoBot Assistant
                     </p>
@@ -16,13 +16,23 @@
                         Disponible 7j/7 pour repondre a vos questions instantanement.
                     </p>
                 </div>
+                <button type="button" wire:click="clearConversation"
+                    class="inline-flex items-center gap-2 rounded-2xl border border-white/10 px-4 py-2 text-sm font-medium text-white transition hover:border-rose-400 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-400/40">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6 7h12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7h12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m10 11 .01 6M14 11l-.01 6" />
+                    </svg>
+                    Effacer
+                </button>
             </header>
 
             <div class="flex-1 overflow-hidden">
                 <div id="chatMessages" class="flex h-full flex-col gap-4 overflow-y-auto px-6 py-6">
                     @forelse ($messages as $index => $message)
                         <div class="flex {{ $message['sender'] === 'user' ? 'justify-end' : 'justify-start' }}"
-                            wire:key="message-{{ $index }}">
+                            wire:key="message-{{ $message->id ?? $index }}">
                             <div
                                 class="max-w-[80%] rounded-3xl px-5 py-4 text-sm leading-relaxed shadow-lg shadow-slate-900/40 {{ $message['sender'] === 'user' ? 'bg-emerald-500 text-slate-900' : 'bg-white/10 text-white' }}">
                                 <div
@@ -35,22 +45,24 @@
                                     {{ $message['text'] }}
                                 </p>
 
-                                @if (!$message->reply)
-                                    <div x-intersect.once="$wire.look('{{ $message->id }}')">
-                                   
-                                            <svg class="w-4 h-4 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10"
-                                                    stroke="currentColor" stroke-width="4"></circle>
+                                <div wire:stream="reply-{{ $message->id }}"
+                                    class="mt-3 text-base font-semibold leading-relaxed text-white">
+                                    @if ($message->reply)
+                                        {!! nl2br(e($message->reply)) !!}
+                                    @else
+                                        <div class="flex items-center gap-2 text-sm text-white/70"
+                                            x-intersect.once="$wire.look({{ $message->id }})">
+                                            <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                    stroke-width="4"></circle>
                                                 <path class="opacity-75" fill="currentColor"
                                                     d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
                                             </svg>
-                                    </div>
-                                @else
-                                    <p class="mt-2 text-base text-white">
-                                        <b>{{ $message['reply'] }} </b>
-                                    </p>
-                                @endif
+                                            EvoBot est en train d'ecrire...
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     @empty
