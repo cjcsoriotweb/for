@@ -92,6 +92,7 @@ class VideoPlayer extends Component
         $this->dispatch('video-seek', $seconds);
     }
 
+    #[Renderless]
     public function handleVideoProgress(float $currentTime = 0, float $duration = 0): void
     {
         $this->currentTime = max(0, $currentTime);

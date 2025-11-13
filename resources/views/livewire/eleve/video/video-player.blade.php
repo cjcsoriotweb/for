@@ -80,16 +80,18 @@
                             data-max-watched="{{ $maxAccessibleSeconds }}">
                             <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full group cursor-pointer" data-progress-bar>
                                 <div class="relative h-full">
-                                    <div data-progress-fill class="absolute h-full bg-primary rounded-full"
-                                        style="width: {{ $progressWidth }}%;"></div>
+                                    <div class="absolute inset-0 rounded-full pointer-events-none">
+                                        <div data-progress-allowed
+                                            class="absolute inset-y-0 left-0 bg-green-500/70 rounded-full transition-[width] duration-200"
+                                            style="width: {{ $allowedWidth }}%;"></div>
+                                        <div data-progress-fill
+                                            class="absolute inset-y-0 left-0 bg-primary rounded-full transition-none z-10"
+                                            style="width: {{ $progressWidth }}%;"></div>
+                                    </div>
                                     <div data-progress-handle
-                                        class="absolute size-4 bg-white dark:bg-gray-300 rounded-full -translate-y-1/2 top-1/2 -translate-x-1/2 shadow-md transition-transform group-hover:scale-110"
+                                        class="absolute size-4 bg-white dark:bg-gray-300 rounded-full -translate-y-1/2 top-1/2 -translate-x-1/2 shadow-md transition-transform group-hover:scale-110 z-20"
                                         style="left: {{ $progressWidth }}%;"></div>
                                 </div>
-                            </div>
-                            <div class="mt-1 h-1 w-full bg-gray-200/80 dark:bg-gray-700/80 rounded-full pointer-events-none">
-                                <div data-progress-allowed class="h-full bg-green-500 rounded-full transition-all duration-200"
-                                    style="width: {{ $allowedWidth }}%;"></div>
                             </div>
                         </div>
                         <span data-progress-total class="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -98,17 +100,17 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-4 justify-between">
                         <div class="flex justify-center items-center gap-4">
-                            <button type="button" wire:click="seekBy(-10)" wire:loading.remove
+                            <button type="button" wire:click="seekBy(-10)" wire:loading.class="opacity-50"
                                 class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
                                 <span class="material-symbols-outlined text-2xl">replay_10</span>
                             </button>
                             <button type="button" wire:click="togglePlayback"
-                                class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md">
-                                <span class="material-symbols-outlined text-3xl">
+                                class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md" >
+                                <span class="material-symbols-outlined text-3xl" wire:loading.class="opacity-50">
                                     {{ $isPlaying ? 'pause' : 'play_arrow' }}
                                 </span>
                             </button>
-                            <button type="button" wire:click="seekBy(10)" wire:loading.remove
+                            <button type="button" wire:click="seekBy(10)" wire:loading.class="opacity-50"
                                 class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
                                 <span class="material-symbols-outlined text-2xl">forward_10</span>
                             </button>
