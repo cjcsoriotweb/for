@@ -40,6 +40,5 @@
     </main>
   </div>
 
-  @livewireScripts
   @stack('scripts')
 </x-app-layout>

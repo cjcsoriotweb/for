@@ -21,5 +21,4 @@
     </main>
   </div>
   
-  @livewireScripts
 </x-app-layout>
