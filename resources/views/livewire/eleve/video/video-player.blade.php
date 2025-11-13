@@ -68,67 +68,78 @@
                         };
                         $progressWidth = $duration > 0 ? number_format($watchedPercentage, 2, '.', '') : 0;
                     @endphp
-                    <div class="flex items-center gap-4">
-                        <span data-progress-current class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ $formatTime($currentTime) }}
-                        </span>
-                        @php
-                            $maxAccessibleSeconds = max(0, (int) ($maxWatchedSeconds ?? 0));
-                            $allowedWidth = $duration > 0 ? number_format(min(100, ($maxAccessibleSeconds / $duration) * 100), 2, '.', '') : 0;
-                        @endphp
-                        <div class="flex-1 group cursor-pointer select-none" data-progress-container
-                            data-max-watched="{{ $maxAccessibleSeconds }}">
-                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full group cursor-pointer" data-progress-bar>
-                                <div class="relative h-full">
-                                    <div class="absolute inset-0 rounded-full pointer-events-none">
+                    @php
+                        $maxAccessibleSeconds = max(0, (int) ($maxWatchedSeconds ?? 0));
+                        $allowedWidth = $duration > 0 ? number_format(min(100, ($maxAccessibleSeconds / $duration) * 100), 2, '.', '') : 0;
+                        $primaryControl =
+                            'relative flex items-center justify-center size-12 rounded-full border border-primary/30 bg-gradient-to-br from-primary to-primary/80 text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
+                        $secondaryControl =
+                            'relative flex items-center justify-center size-11 rounded-full border border-gray-200/70 dark:border-gray-700/70 bg-white/80 dark:bg-gray-900/70 text-gray-700 dark:text-gray-200 transition-colors hover:text-primary dark:hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30';
+                    @endphp
+                    <div
+                        class="rounded-2xl border border-gray-100/70 dark:border-gray-800 bg-white/80 dark:bg-gray-900/70 p-5 backdrop-blur">
+                        <div class="flex items-center gap-4">
+                            <span data-progress-current
+                                class="text-sm font-semibold text-gray-700 dark:text-gray-300 tabular-nums min-w-[3.5rem] text-right">
+                                {{ $formatTime($currentTime) }}
+                            </span>
+                            <div class="flex-1 group cursor-pointer select-none" data-progress-container
+                                data-max-watched="{{ $maxAccessibleSeconds }}">
+                                <div class="h-2.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 transition-colors duration-200 relative overflow-hidden"
+                                    data-progress-bar>
+                                    <div class="absolute inset-0 pointer-events-none">
                                         <div data-progress-allowed
-                                            class="absolute inset-y-0 left-0 bg-green-500/70 rounded-full transition-[width] duration-200"
+                                            class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-400/60 to-emerald-500/80 transition-[width] duration-300"
                                             style="width: {{ $allowedWidth }}%;"></div>
                                         <div data-progress-fill
-                                            class="absolute inset-y-0 left-0 bg-primary rounded-full transition-none z-10"
+                                            class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary to-primary/70 transition-none z-10"
                                             style="width: {{ $progressWidth }}%;"></div>
                                     </div>
                                     <div data-progress-handle
-                                        class="absolute size-4 bg-white dark:bg-gray-300 rounded-full -translate-y-1/2 top-1/2 -translate-x-1/2 shadow-md transition-transform group-hover:scale-110 z-20"
+                                        class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-5 rounded-full bg-white ring-4 ring-white/70 dark:ring-gray-900/80 dark:bg-gray-100 transition-transform duration-200 group-hover:scale-110 z-20"
                                         style="left: {{ $progressWidth }}%;"></div>
                                 </div>
                             </div>
+                            <span data-progress-total
+                                class="text-sm font-semibold text-gray-700 dark:text-gray-300 tabular-nums min-w-[3.5rem]">
+                                {{ $formatTime($duration) }}
+                            </span>
                         </div>
-                        <span data-progress-total class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ $formatTime($duration) }}
-                        </span>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-4 justify-between">
-                        <div class="flex justify-center items-center gap-4">
-                            <button type="button" wire:click="seekBy(-10)" wire:loading.class="opacity-50"
-                                class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
-                                <span class="material-symbols-outlined text-2xl">replay_10</span>
-                            </button>
-                            <button type="button" wire:click="togglePlayback"
-                                class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md" >
-                                <span class="material-symbols-outlined text-3xl" wire:loading.class="opacity-50">
-                                    {{ $isPlaying ? 'pause' : 'play_arrow' }}
-                                </span>
-                            </button>
-                            <button type="button" wire:click="seekBy(10)" wire:loading.class="opacity-50"
-                                class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
-                                <span class="material-symbols-outlined text-2xl">forward_10</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center gap-3 ml-auto">
-                            <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-1">
-                                <button type="button" data-volume-toggle
-                                    class="p-1 text-gray-700 dark:text-gray-200 hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-2xl" data-volume-icon>volume_up</span>
+                        <div class="mt-5 flex flex-wrap items-center gap-4 justify-between">
+                            <div class="flex items-center gap-3">
+                                <button type="button" aria-label="Reculer de 10 secondes" wire:click="seekBy(-10)"
+                                    wire:loading.class="opacity-50"
+                                    class="{{ $secondaryControl }}">
+                                    <span class="material-symbols-outlined text-2xl">replay_10</span>
                                 </button>
-                                <input type="range" data-volume-slider min="0" max="1" step="0.05" value="1"
-                                    aria-label="Volume"
-                                    class="w-32 h-1.5 accent-primary bg-transparent cursor-pointer">
+                                <button type="button" aria-label="{{ $isPlaying ? 'Mettre en pause' : 'Lire la vidéo' }}"
+                                    wire:click="togglePlayback" class="{{ $primaryControl }}">
+                                    <span class="material-symbols-outlined text-3xl" wire:loading.class="opacity-50">
+                                        {{ $isPlaying ? 'pause' : 'play_arrow' }}
+                                    </span>
+                                </button>
+                                <button type="button" aria-label="Avancer de 10 secondes" wire:click="seekBy(10)"
+                                    wire:loading.class="opacity-50"
+                                    class="{{ $secondaryControl }}">
+                                    <span class="material-symbols-outlined text-2xl">forward_10</span>
+                                </button>
                             </div>
-                            <button type="button" data-fullscreen-toggle
-                                class="p-3 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center">
-                                <span class="material-symbols-outlined text-2xl" data-fullscreen-icon>fullscreen</span>
-                            </button>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex items-center gap-3 rounded-full border border-gray-100/60 dark:border-gray-800/80 bg-gray-50/80 dark:bg-gray-800/60 px-4 py-1.5">
+                                    <button type="button" aria-label="Activer ou couper le son" data-volume-toggle
+                                        class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors">
+                                        <span class="material-symbols-outlined text-2xl" data-volume-icon>volume_up</span>
+                                    </button>
+                                    <input type="range" data-volume-slider min="0" max="1" step="0.05" value="1"
+                                        aria-label="Volume"
+                                        class="w-32 h-1.5 cursor-pointer accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-full bg-transparent">
+                                </div>
+                                <button type="button" aria-label="Basculer en plein écran" data-fullscreen-toggle
+                                    class="{{ $secondaryControl }}">
+                                    <span class="material-symbols-outlined text-2xl" data-fullscreen-icon>fullscreen</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
