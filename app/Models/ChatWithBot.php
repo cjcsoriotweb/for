@@ -12,5 +12,7 @@ class ChatWithBot extends Model
         'reply',
         'see',
         'conversation',
+        'chatbot_conversation_id',
+        'chatbot_model_id',
     ];
 }
