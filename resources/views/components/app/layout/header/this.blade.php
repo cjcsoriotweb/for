@@ -34,11 +34,9 @@
                 <el-dialog-panel
                     class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div class="flex items-center justify-between">
-                        <a href="#" class="-m-1.5 p-1.5">
                             <span class="sr-only">{{ config('app.name')}}</span>
                                             <x-application-logo size="2xl" />
 
-                        </a>
                         <button type="button" command="close" commandfor="mobile-menu"
                             class="-m-2.5 rounded-md p-2.5 text-gray-700">
                             <span class="sr-only">Close menu</span>
