@@ -8,7 +8,16 @@
                     <div class="relative flex items-center justify-center bg-black bg-cover bg-center aspect-video rounded-xl overflow-hidden shadow-lg"
                         data-alt="Abstract gradient background for video placeholder"
                         style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8uTSDep5uWpkw20gfP_oegiJ9Sz_XPzoDXWLXm5VgUB4rOfJV32Vw3rYBIR3IxKonTtVGIp1QRrdxf2BIDXgHfhhr4kDfX7evvAPSTW_jIbGBKlqkAACVXHNEnhs4WDuil3uNEiP4zVpGjoyaO3FtaTbCHu0mg5IAlfnRuGvZnzcjjUV1NGLu-PQcivjrp2H88e5L1BhWkaOLDaN63UV_piT4lDTNKF4LZbpKl9FevxmaS7OLf9UjyJAGK8XEjTH076805Qn4tmk");'>
+                        @php
+                            $videoSource = null;
 
+                            if (! empty($lessonContent->video_path)) {
+                                $videoSource = Storage::disk('public')->url($lessonContent->video_path);
+                            } elseif (! empty($lessonContent->video_url)) {
+                                $videoSource = $lessonContent->video_url;
+                            }
+                        @endphp
+                        @if ($videoSource)
 
                         <video id="video" wire:ignore class="w-full h-full" playsinline preload="metadata"
                             poster="{{ asset('images/video-poster.jpg') }}" oncontextmenu="return false;"
@@ -16,7 +25,7 @@
                             data-lesson-id="{{ $lesson->id ?? '' }}"
                             data-lesson-content-id="{{ $lessonContent->id ?? '' }}"
                             style="display: absolute;width:100%;height:100%;">
-                            <source src="{{ Storage::disk('public')->url($lessonContent->video_path) }}"
+                            <source src="{{ $videoSource }}"
                                 type="video/mp4" />
                             Votre navigateur ne supporte pas la lecture de vidéos.
                         </video>
@@ -27,6 +36,14 @@
                                     {{ $isPlaying ? 'pause' : 'play_arrow' }}
                                 </span>
                             </button>
+                        @endif
+                        @else
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center gap-2 bg-black/60 text-white p-6">
+                                <span class="text-lg font-semibold">{{ __("Impossible de charger la vidéo") }}</span>
+                                <p class="text-sm text-white/80 max-w-md">
+                                    {{ __("Aucun fichier ou lien vidéo n'est associé à cette leçon pour le moment.") }}
+                                </p>
+                            </div>
                         @endif
                     </div>
 
@@ -93,7 +110,7 @@
 
 @script
     <script>
-        $wire.on('updated', (data) => {
+        Livewire.on('updated', (data) => {
             console.log('updated', data)
             const el = document.getElementById('toast');
             el.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
@@ -106,15 +123,22 @@
 
         });
 
-        document.addEventListener('livewire:init', () => {
-
             const getVideo = () => document.getElementById('video');
+            console.log(getVideo)
+        
             const getProgressElements = () => ({
                 current: document.querySelector('[data-progress-current]'),
                 total: document.querySelector('[data-progress-total]'),
                 fill: document.querySelector('[data-progress-fill]'),
                 handle: document.querySelector('[data-progress-handle]'),
             });
+            const getComponent = () => {
+                const video = getVideo();
+                if (!video || !window.Livewire) return null;
+                const root = video.closest('[wire\\:id]');
+                if (!root) return null;
+                return window.Livewire.find(root.getAttribute('wire:id'));
+            };
             const formatTime = (seconds) => {
                 const value = Math.max(0, Math.floor(seconds || 0));
                 const hrs = Math.floor(value / 3600);
@@ -125,13 +149,23 @@
                 }
                 return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             };
+            const emitProgressUpdate = (value = 0) => {
+                const component = getComponent();
+                if (!component || !Number.isFinite(value)) {
+                    return;
+                }
+
+                const seconds = Math.max(0, Math.floor(value));
+                component.call('post', seconds);
+            };
 
             setInterval(() => {
-                const currentTime = Math.floor(video.currentTime || 0);
+                const videoElement = getVideo();
+                if (!videoElement) {
+                    return;
+                }
 
-                $wire.dispatch('post', {
-                    data: currentTime
-                });
+                emitProgressUpdate(videoElement.currentTime || 0);
             }, 5000);
 
             const updateProgressUI = (video) => {
@@ -153,13 +187,6 @@
 
 
             };
-            const getComponent = () => {
-                const video = getVideo();
-                if (!video || !window.Livewire) return null;
-                const root = video.closest('[wire\\:id]');
-                if (!root) return null;
-                return window.Livewire.find(root.getAttribute('wire:id'));
-            };
 
             const startPeriodicSave = (() => {
                 let intervalId = null;
@@ -179,8 +206,7 @@
                             return;
                         }
 
-                        const seconds = Math.floor(currentVideo.currentTime || 0);
-                        currentComponent.call('saveme', seconds);
+                        emitProgressUpdate(currentVideo.currentTime || 0);
                     }, 5000);
                 };
             })();
@@ -224,8 +250,8 @@
                 video.addEventListener('play', () => sendProgress(true));
                 video.addEventListener('pause', () => sendProgress(true));
                 video.addEventListener('ended', () => {
-                    $wire.dispatch('ended');
-
+                    const component = getComponent();
+                    component?.call('ended');
                 });
 
                 if (video.readyState >= 1) {
@@ -279,6 +305,5 @@
                 bindProgressListeners();
                 updateProgressUI(getVideo());
             });
-        });
     </script>
 @endscript
