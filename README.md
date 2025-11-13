@@ -118,7 +118,6 @@ php artisan verifyerror --resolve=123
 - **Tailwind CSS** : Design moderne et responsive via CDN
 - **Composants Livewire** : Interactions temps réel sans rechargement de page
 - **Laravel Jetstream** : Authentification et gestion d'équipes intégrée
-- **PowerGrid** : Tables de données interactives pour les listings
 - **Heroicons** : Bibliothèque d'icônes intégrée
 - **Notifications temps réel** : Système de notifications avec badge
 
@@ -364,7 +363,6 @@ php artisan queue:work
 - **Authentification** : Laravel Sanctum + Jetstream
 - **Paiements** : Stripe
 - **PDF** : DomPDF
-- **Tables de données** : PowerGrid
 
 ### Patterns et principes
 
