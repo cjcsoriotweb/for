@@ -3,11 +3,13 @@
     @include('in-application.eleve.lesson.partials.notifications')
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {{-- Navigation fil d'Ariane --}}
-        @include('in-application.eleve.lesson.partials.breadcrumb')
+        @if($lessonType !== 'video')
+            {{-- Navigation fil d'Ariane --}}
+            @include('in-application.eleve.lesson.partials.breadcrumb')
 
-        {{-- En-tête de la leçon --}}
-        @include('in-application.eleve.lesson.partials.header')
+            {{-- En-tête de la leçon --}}
+            @include('in-application.eleve.lesson.partials.header')
+        @endif
 
         {{-- Contenu principal --}}
         @include('in-application.eleve.lesson.partials.main-content')
