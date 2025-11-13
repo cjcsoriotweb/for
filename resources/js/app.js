@@ -3,8 +3,10 @@ import '../css/app.css';
 
 // ✅ Alpine local
 import Alpine from 'alpinejs';
+import intersect from '@alpinejs/intersect';
 
 window.Alpine = Alpine;
+Alpine.plugin(intersect);
 Alpine.start();
 
 // ✅ Intro.js local (JS + CSS)

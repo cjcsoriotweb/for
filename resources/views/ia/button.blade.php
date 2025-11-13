@@ -1,6 +1,6 @@
 ﻿<!-- Bouton flottant modernise pour l'assistant IA -->
 <div class="pointer-events-none fixed inset-0 z-[9999] flex items-end justify-end p-5 sm:p-6">
-  <button
+  <a href="{{url('test')}}"
     type="button"
     aria-label="Discuter avec l'assistant IA"
     class="assistant-launcher pointer-events-auto group relative flex items-center gap-4 overflow-hidden rounded-full border border-white/15
@@ -24,7 +24,7 @@
     <!-- Pulse decorative -->
     <span aria-hidden="true" class="assistant-launcher__pulse"></span>
 
-  </button>
+  </a>
 </div>
 
 <!-- Modal iframe -->
