@@ -1,4 +1,4 @@
-<article class="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/70 p-6 shadow-md ring-1 ring-white/70">
+<article x-data="{ open: false }" class="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/70 p-6 shadow-md ring-1 ring-white/70">
   @php
     $usageQuota = $usagePivot->usage_quota ?? null;
     $usageConsumed = $usagePivot->usage_consumed ?? 0;
@@ -27,34 +27,53 @@
         ->values()
         ->take(4);
   @endphp
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+  <div class="rounded-2xl border border-slate-100 bg-white/90 p-5 shadow-sm">
+    <button type="button" class="flex w-full flex-col gap-6 text-left md:flex-row md:items-center" @click="open = !open">
+      <figure class="w-full max-w-xs shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-inner">
+        <img
+          src="{{ $formation->cover_image_url }}"
+          alt="{{ __('Illustration de la formation : :title', ['title' => $formation->title]) }}"
+          class="aspect-[4/3] w-full object-cover"
+          loading="lazy"
+        >
+      </figure>
+      <div class="flex flex-1 flex-wrap items-start justify-between gap-4">
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex size-9 items-center justify-center rounded-full bg-indigo-50 text-sm font-semibold text-indigo-600 shadow-inner">
+              {{ $loop->iteration }}
+            </span>
+            <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Formation</p>
+          </div>
+          <h3 class="text-2xl font-semibold text-slate-900">{{ $formation->title }}</h3>
+        </div>
+        <div class="flex flex-col items-end gap-2 text-right">
+          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+            <span class="size-2 rounded-full {{ $formation->is_visible ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
+            {{ $formation->is_visible ? 'Visible' : 'Masquee' }}
+          </span>
+          <span class="text-xs text-slate-500">ID #{{ $formation->id }}</span>
+          <span class="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600">
+            <span x-text="open ? 'Masquer les details' : 'Afficher les details'"></span>
+            <svg class="size-4 transition-transform duration-200" :class="{ 'rotate-180': open }" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.25a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z" clip-rule="evenodd" />
+            </svg>
+          </span>
+        </div>
+      </div>
+    </button>
+  </div>
+
+  <div x-show="open" x-transition.opacity.duration.200ms class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]" x-cloak>
     <section class="space-y-6">
       <div class="rounded-2xl border border-slate-100 bg-white/90 p-5 shadow-sm">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-          <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <span class="inline-flex size-9 items-center justify-center rounded-full bg-indigo-50 text-sm font-semibold text-indigo-600 shadow-inner">
-                {{ $loop->iteration }}
-              </span>
-              <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Formation</p>
-            </div>
-            <h3 class="text-2xl font-semibold text-slate-900">{{ $formation->title }}</h3>
-            @if ($formation->description)
-              <p class="text-sm leading-relaxed text-slate-600">
-                {{ $formation->description }}
-              </p>
-            @else
-              <p class="text-sm italic text-slate-500">Aucune description renseignee pour le moment.</p>
-            @endif
-          </div>
-          <div class="flex flex-col items-end gap-2 text-right">
-            <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-              <span class="size-2 rounded-full {{ $formation->is_visible ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
-              {{ $formation->is_visible ? 'Visible' : 'Masquee' }}
-            </span>
-            <span class="text-xs text-slate-500">ID #{{ $formation->id }}</span>
-          </div>
-        </div>
+        @if ($formation->description)
+          <p class="text-sm leading-relaxed text-slate-600">
+            {{ $formation->description }}
+          </p>
+        @else
+          <p class="text-sm italic text-slate-500">Aucune description renseignee pour le moment.</p>
+        @endif
       </div>
 
       <div class="grid gap-4 md:grid-cols-3">
@@ -170,4 +189,3 @@
     </aside>
   </div>
 </article>
-
