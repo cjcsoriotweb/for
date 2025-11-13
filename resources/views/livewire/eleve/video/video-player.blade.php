@@ -7,7 +7,7 @@
 
                     <div class="relative flex items-center justify-center bg-black bg-cover bg-center aspect-video rounded-xl overflow-hidden shadow-lg"
                         data-alt="Abstract gradient background for video placeholder"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8uTSDep5uWpkw20gfP_oegiJ9Sz_XPzoDXWLXm5VgUB4rOfJV32Vw3rYBIR3IxKonTtVGIp1QRrdxf2BIDXgHfhhr4kDfX7evvAPSTW_jIbGBKlqkAACVXHNEnhs4WDuil3uNEiP4zVpGjoyaO3FtaTbCHu0mg5IAlfnRuGvZnzcjjUV1NGLu-PQcivjrp2H88e5L1BhWkaOLDaN63UV_piT4lDTNKF4LZbpKl9FevxmaS7OLf9UjyJAGK8XEjTH076805Qn4tmk");'>
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8uTSDep5uWpkw20gfP_oegiJ9Sz_XPzoDXWLXm5VgUB4rOfJV32Vw3rYBIR3IxKonTtVGIp1QRrdxf2BIDXgHfhhr4kDfX7evvAPSTW_jIbGBKlqkAACVXHNEnhs4WDuil3uNEiP4zVpGjoyaO3FtaTbCHu0mg5IAlfnRuGvZnzcjjUV1NGLu-PQcivjrp2H88e5L1BhWkaOLDaN63UV_piT4lDTNKF4LZbpKl9FevxmaS7OLf9UjyJAGK8XEjTH076805Qn4tmk");' data-fullscreen-root>
                         @php
                             $videoSource = null;
 
@@ -96,21 +96,38 @@
                             {{ $formatTime($duration) }}
                         </span>
                     </div>
-                    <div class="flex justify-center items-center gap-4">
-                        <button type="button" wire:click="seekBy(-10)" wire:loading.remove
-                            class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
-                            <span class="material-symbols-outlined text-2xl">replay_10</span>
-                        </button>
-                        <button type="button" wire:click="togglePlayback" 
-                            class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md" >
-                            <span class="material-symbols-outlined text-3xl">
-                                {{ $isPlaying ? 'pause' : 'play_arrow' }}
-                            </span>
-                        </button>
-                        <button type="button" wire:click="seekBy(10)" wire:loading.remove
-                            class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
-                            <span class="material-symbols-outlined text-2xl">forward_10</span>
-                        </button>
+                    <div class="flex flex-wrap items-center gap-4 justify-between">
+                        <div class="flex justify-center items-center gap-4">
+                            <button type="button" wire:click="seekBy(-10)" wire:loading.remove
+                                class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-2xl">replay_10</span>
+                            </button>
+                            <button type="button" wire:click="togglePlayback"
+                                class="p-4 text-white bg-primary rounded-full hover:bg-primary/90 transition-colors shadow-md">
+                                <span class="material-symbols-outlined text-3xl">
+                                    {{ $isPlaying ? 'pause' : 'play_arrow' }}
+                                </span>
+                            </button>
+                            <button type="button" wire:click="seekBy(10)" wire:loading.remove
+                                class="p-3 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-2xl">forward_10</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-3 ml-auto">
+                            <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-1">
+                                <button type="button" data-volume-toggle
+                                    class="p-1 text-gray-700 dark:text-gray-200 hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-2xl" data-volume-icon>volume_up</span>
+                                </button>
+                                <input type="range" data-volume-slider min="0" max="1" step="0.05" value="1"
+                                    aria-label="Volume"
+                                    class="w-32 h-1.5 accent-primary bg-transparent cursor-pointer">
+                            </div>
+                            <button type="button" data-fullscreen-toggle
+                                class="p-3 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center">
+                                <span class="material-symbols-outlined text-2xl" data-fullscreen-icon>fullscreen</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -166,6 +183,25 @@
             allowed: document.querySelector('[data-progress-allowed]'),
             bar: document.querySelector('[data-progress-bar]'),
         });
+        const getVolumeElements = () => ({
+            slider: document.querySelector('[data-volume-slider]'),
+            toggle: document.querySelector('[data-volume-toggle]'),
+            icon: document.querySelector('[data-volume-icon]'),
+        });
+        const getFullscreenElements = () => ({
+            button: document.querySelector('[data-fullscreen-toggle]'),
+            icon: document.querySelector('[data-fullscreen-icon]'),
+        });
+        const getFullscreenTarget = () => {
+            const explicitTarget = document.querySelector('[data-fullscreen-root]');
+            if (explicitTarget) {
+                return explicitTarget;
+            }
+            const video = getVideo();
+            return video ? video.parentElement : null;
+        };
+        let lastKnownVolume = 1;
+        let fullscreenChangeBound = false;
         const formatTime = (seconds) => {
             const value = Math.max(0, Math.floor(seconds || 0));
             const hrs = Math.floor(value / 3600);
@@ -175,6 +211,45 @@
                 return [hrs, mins, secs].map((n) => n.toString().padStart(2, '0')).join(':');
             }
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+        const updateVolumeIcon = (volume = 1, muted = false) => {
+            const { icon } = getVolumeElements();
+            if (!icon) return;
+
+            if (muted || volume <= 0.01) {
+                icon.textContent = 'volume_off';
+            } else if (volume < 0.5) {
+                icon.textContent = 'volume_down';
+            } else {
+                icon.textContent = 'volume_up';
+            }
+        };
+        const syncVolumeControls = (video = null) => {
+            const targetVideo = video || getVideo();
+            const { slider } = getVolumeElements();
+            if (!targetVideo) return;
+
+            const volume = targetVideo.muted ? 0 : Number(targetVideo.volume ?? 1);
+            if (slider) {
+                slider.value = volume;
+            }
+            updateVolumeIcon(volume, targetVideo.muted);
+        };
+        const requestBrowserFullscreen = (element) => {
+            if (!element) return Promise.resolve();
+            if (element.requestFullscreen) return element.requestFullscreen();
+            if (element.webkitRequestFullscreen) return element.webkitRequestFullscreen();
+            return Promise.resolve();
+        };
+        const exitBrowserFullscreen = () => {
+            if (document.exitFullscreen) return document.exitFullscreen();
+            if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+            return Promise.resolve();
+        };
+        const updateFullscreenIcon = () => {
+            const { icon } = getFullscreenElements();
+            if (!icon) return;
+            icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
         };
         const updateAllowedTrack = (video = null) => {
             const targetVideo = video || getVideo();
@@ -233,6 +308,83 @@
             if (handle) handle.style.left = `${percentage}%`;
 
             updateAllowedTrack(video);
+        };
+        const bindVolumeControls = () => {
+            const video = getVideo();
+            const { slider, toggle } = getVolumeElements();
+            if (!video) return;
+
+            if (slider && slider.dataset.bound !== 'true') {
+                slider.value = video.muted ? 0 : Number(video.volume ?? 1);
+                slider.addEventListener('input', (event) => {
+                    const value = Number(event.target.value);
+                    const sanitized = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 1;
+                    if (sanitized > 0) {
+                        lastKnownVolume = sanitized;
+                        video.muted = false;
+                    } else {
+                        video.muted = true;
+                    }
+                    video.volume = sanitized;
+                    updateVolumeIcon(video.volume, video.muted);
+                });
+                slider.dataset.bound = 'true';
+            }
+
+            if (toggle && toggle.dataset.bound !== 'true') {
+                toggle.addEventListener('click', () => {
+                    if (video.muted || video.volume <= 0.01) {
+                        video.muted = false;
+                        video.volume = lastKnownVolume > 0 ? lastKnownVolume : 1;
+                    } else {
+                        lastKnownVolume = video.volume > 0 ? video.volume : lastKnownVolume;
+                        video.muted = true;
+                    }
+                    syncVolumeControls(video);
+                });
+                toggle.dataset.bound = 'true';
+            }
+
+            if (video.dataset.volumeBound !== 'true') {
+                video.addEventListener('volumechange', () => {
+                    if (!video.muted && video.volume > 0) {
+                        lastKnownVolume = video.volume;
+                    }
+                    syncVolumeControls(video);
+                });
+                video.dataset.volumeBound = 'true';
+            }
+
+            syncVolumeControls(video);
+        };
+        const bindFullscreenControl = () => {
+            const { button } = getFullscreenElements();
+            const target = getFullscreenTarget();
+            if (!button || !target) return;
+
+            if (button.dataset.bound !== 'true') {
+                button.addEventListener('click', async () => {
+                    if (document.fullscreenElement === target) {
+                        await exitBrowserFullscreen();
+                    } else {
+                        try {
+                            await requestBrowserFullscreen(target);
+                        } catch (error) {
+                            console.warn('Unable to enter fullscreen', error);
+                        }
+                    }
+                });
+                button.dataset.bound = 'true';
+            }
+
+            if (!fullscreenChangeBound) {
+                ['fullscreenchange', 'webkitfullscreenchange'].forEach((eventName) => {
+                    document.addEventListener(eventName, updateFullscreenIcon);
+                });
+                fullscreenChangeBound = true;
+            }
+
+            updateFullscreenIcon();
         };
 
         const startPeriodicSave = (() => {
@@ -438,15 +590,21 @@
 
         bindProgressListeners();
         bindProgressBarInteractions();
+        bindVolumeControls();
+        bindFullscreenControl();
         updateAllowedTrack(getVideo());
         document.addEventListener('livewire:navigated', () => {
             bindProgressListeners();
             bindProgressBarInteractions();
+            bindVolumeControls();
+            bindFullscreenControl();
             updateProgressUI(getVideo());
         });
         Livewire.hook('message.processed', () => {
             bindProgressListeners();
             bindProgressBarInteractions();
+            bindVolumeControls();
+            bindFullscreenControl();
             updateProgressUI(getVideo());
         });
     </script>
