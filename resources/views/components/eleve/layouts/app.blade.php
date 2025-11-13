@@ -7,7 +7,7 @@
 @endphp
 
 @push('head')
-    <title>{{ config('app.name', 'Laravel') }} - Espace &Eacute;l&egrave;ve</title>
+    <title>{{ config('app.name', 'Laravel') }} - Espace apprentisage</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net" />
