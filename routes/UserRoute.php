@@ -37,3 +37,8 @@ Route::prefix('mon-compte')
             ->name('invitation.accept');
 
     });
+
+
+Route::get('test', function(){
+    return view('test.chat');
+});

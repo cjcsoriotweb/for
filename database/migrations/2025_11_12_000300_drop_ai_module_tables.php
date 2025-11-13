@@ -46,13 +46,21 @@ return new class extends Migration
             DB::statement('ALTER TABLE chats MODIFY receiver_user_id BIGINT UNSIGNED NOT NULL');
         }
 
-        foreach (['assistant_messages', 'ai_conversation_messages', 'ai_conversations', 'ai_trainers', 'ia_chat_messages'] as $table) {
+        $tablesToDrop = [
+            'ia_chat_messages',
+            'assistant_messages',
+            'ai_conversation_messages',
+            'ai_conversations',
+            'ai_trainers',
+        ];
+
+        foreach ($tablesToDrop as $table) {
             Schema::dropIfExists($table);
         }
     }
 
     public function down(): void
     {
-        // Le module IA a été définitivement retiré.
+        // Le module IA a ï¿½tï¿½ dï¿½finitivement retirï¿½.
     }
 };
