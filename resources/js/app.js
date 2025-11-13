@@ -1,19 +1,6 @@
 import './bootstrap';
 import '../css/app.css';
 
-// ✅ Alpine local
-import Alpine from 'alpinejs';
-import intersect from '@alpinejs/intersect';
-
-window.Alpine = Alpine;
-Alpine.plugin(intersect);
-Alpine.start();
-
-// ✅ Intro.js local (JS + CSS)
-import introJs from 'intro.js';
-import 'intro.js/minified/introjs.min.css';
-
-window.introJs = introJs;
 
 // ✅ Axios local
 import axios from 'axios';
