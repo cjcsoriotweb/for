@@ -18,10 +18,6 @@ FORMATIONS LIST - MAIN CONTAINER
     ======================================== --}}
     <x-formateur.formation.formation-dashboard :stats="$stats" />
 
-    {{-- ========================================
-    FEATURED FORMATIONS SECTION
-    ======================================== --}}
-    <x-formateur.formation.formation-featured :formations="$featuredFormations" />
 
     {{-- ========================================
     ALL FORMATIONS (PAGINATED)

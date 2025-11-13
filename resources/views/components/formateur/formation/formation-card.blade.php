@@ -66,46 +66,16 @@
       
     </div>
 
-    <div class="mb-8">
-      <p class="text-gray-700 text-lg leading-relaxed line-clamp-2 mb-4">
-        {{ $formation->card_description }}
-      </p>
-      <div class="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
-        <div
-          class="bg-gradient-to-r from-blue-500 to-indigo-500 h-1 rounded-full transition-all duration-1000 progress-bar"
-          data-width="{{ $formation->card_completion_percentage }}"></div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between">
-      <div class="flex items-center space-x-4">
-        <a href="{{ route('formateur.formation.show', $formation) }}"
-          class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+    <div>
+       <a href="{{ route('formateur.formation.show', $formation) }}"
+          class="inline-flex items-center px-6 py-3 bg-blue-600 mb-5 text-white font-semibold rounded-xl hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
           Voir les details
         </a>
+    </div>
 
-        <div
-          class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-          <button
-            class="p-2 bg-white/80 hover:bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/60">
-            <svg class="w-4 h-4 text-gray-600 hover:text-blue-600 transition-colors duration-200" fill="none"
-              stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z">
-              </path>
-            </svg>
-          </button>
-          <button
-            class="p-2 bg-white/80 hover:bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/60">
-            <svg class="w-4 h-4 text-gray-600 hover:text-green-600 transition-colors duration-200" fill="none"
-              stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
-              </path>
-            </svg>
-          </button>
-        </div>
-      </div>
+
+    <div class="flex items-center justify-between">
+      
 
       <div class="flex items-center space-x-6 text-sm">
         @if($formation->card_lessons_count > 0)
