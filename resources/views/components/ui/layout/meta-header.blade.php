@@ -298,7 +298,6 @@
   window.axios = axios;
   window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 </script>
-<script src="{{ asset('vendor/livewire-powergrid/powergrid.js') }}" defer></script>
 
 @livewireStyles
 @stack('head')
