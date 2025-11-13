@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Models\ChatWithBot;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class ChatBot extends Component
@@ -9,7 +11,7 @@ class ChatBot extends Component
     /**
      * @var array<int, array<string, string>>
      */
-    public array $messages = [];
+    public $messages;
 
     public string $body = '';
 
@@ -17,28 +19,30 @@ class ChatBot extends Component
         'body' => 'required|string|min:1|max:500',
     ];
 
+    public function fetchMessage(){
+        $this->messages = ChatWithBot::get();
+    }
+    
     public function mount(): void
     {
-        $this->messages = [
-            [
-                'sender' => 'bot',
-                'text' => "Bonjour ! Je suis EvoBot. Decrivez-moi votre besoin et je vous reponds immediatement.",
-                'time' => now()->format('H:i'),
-            ],
-        ];
+       $this->fetchMessage();
     }
 
     public function sendMessage(): void
     {
-        $this->validate();
 
-        $content = trim($this->body);
 
-        $this->pushMessage('user', $content);
+        ChatWithBot::create([
+            'text'=>$this->body,
+            'user_id'=>Auth::user()->id,
+            'see'=>false,
+        ]);
+
         $this->body = '';
 
-        $this->pushMessage('bot', $this->generateReply($content));
 
+   
+        
         $this->dispatch('chat-scrolled');
     }
 
@@ -47,33 +51,52 @@ class ChatBot extends Component
         return view('livewire.chat-bot');
     }
 
-    private function pushMessage(string $sender, string $text): void
-    {
-        $this->messages[] = [
-            'sender' => $sender,
-            'text' => $text,
-            'time' => now()->format('H:i'),
-        ];
-    }
 
+    public function look($id){
+        $message = ChatWithBot::find($id);
+        $message->reply = $this->generateReply($message->text);
+        $message->save();
+        $this->fetchMessage();
+    }
     private function generateReply(string $message): string
     {
-        $normalized = mb_strtolower($message);
+        $ch = curl_init('http://192.168.1.62:8000/api/chat/completions');
 
-        $faq = [
-            'bonjour' => "Bonjour ! Souhaitez-vous parler d un produit, d un service ou d un devis ?",
-            'prix' => "Nos tarifs varient selon la complexite du projet. Partagez quelques details et je vous oriente.",
-            'contact' => "Vous pouvez nous joindre par telephone ou via le formulaire de contact. Souhaitez-vous les coordonnees ?",
-            'rdv' => "Tres bien, indiquez un creneau et nous vous confirmons rapidement.",
-            'merci' => "Avec plaisir ! Puis-je faire autre chose pour vous ?",
+        $data = [
+            'model' => 'llama3:latest',
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $message, // on utilise ton $message ici
+                ],
+            ],
+            'stream' => false,
         ];
 
-        foreach ($faq as $keyword => $reply) {
-            if (str_contains($normalized, $keyword)) {
-                return $reply;
-            }
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Authorization: Bearer sk-caf6eaff4e514f47bf7dae014a37375d', 'Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode($data),
+        ]);
+
+        $response = curl_exec($ch);
+
+        if ($response === false) {
+            curl_close($ch);
+            dd('Erreur cURL : ' . curl_error($ch));
         }
 
-        return "Merci pour votre message. Je transmets a l equipe et je reviens vers vous tres vite.";
+        curl_close($ch);
+
+        // Décoder le JSON
+        $decoded = json_decode($response, true);
+
+   
+
+        $reply = $decoded['choices'][0]['message']['content'] ?? null;
+
+    
+        return $reply ?? 'Erreur : aucune réponse trouvée';
     }
 }
