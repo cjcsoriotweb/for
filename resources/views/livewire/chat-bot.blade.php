@@ -207,7 +207,7 @@
     <div class="mx-auto flex h-screen max-w-4xl flex-col px-4 py-6 sm:px-6 lg:px-0">
         @if ($selectingModel)
             <div
-                class="flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-slate-900/40 backdrop-blur">
+                class="flex h-full flex-col overflow-hidden rounded-3xl  shadow-2xl backdrop-blur">
                 <div
                     class="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 bg-slate-900/80 px-6 py-5">
                     <div>
@@ -244,10 +244,7 @@
                                 @if (! empty($model['description']))
                                     <p class="mt-2 text-sm text-white/70">{{ $model['description'] }}</p>
                                 @endif
-                                <p class="mt-4 text-xs text-white/50">
-                                    Code :
-                                    <span class="font-mono text-white/80">{{ $model['key'] }}</span>
-                                </p>
+                    
                             </button>
                         @empty
                             <div
@@ -261,7 +258,7 @@
             </div>
         @elseif (is_null($conversationId))
             <div
-                class="flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 p-8 text-white shadow-2xl shadow-slate-900/40 backdrop-blur">
+                class="flex h-full flex-col overflow-hidden rounded-3xl  p-8 text-white shadow-2xl  backdrop-blur">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-6">
                     <div>
                         <p class="text-3xl font-semibold">Bienvenue sur EvoBot</p>
@@ -340,19 +337,12 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
-                        @if (! empty($activeModel['key'] ?? null))
-                            <span
-                                class="inline-flex items-center rounded-2xl border border-white/10 px-3 py-1 text-xs font-medium text-white/70">
-                                Modele {{ $activeModel['key'] }}
-                            </span>
-                        @endif
                         <button type="button" wire:click="backToConversations"
                             class="inline-flex items-center gap-2 rounded-2xl border border-white/10 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-400 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-400/40">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                             </svg>
-                            Conversations
                         </button>
                         <button type="button" wire:click="startConversation"
                             class="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300">
@@ -360,7 +350,6 @@
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                             </svg>
-                            Nouvelle
                         </button>
                         <button type="button" wire:click="clearConversation"
                             class="inline-flex items-center gap-2 rounded-2xl border border-white/10 px-4 py-2 text-sm font-medium text-white transition hover:border-rose-400 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-400/40">
@@ -370,7 +359,6 @@
                                     d="M6 7h12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7h12" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m10 11 .01 6M14 11l-.01 6" />
                             </svg>
-                            Effacer
                         </button>
                     </div>
                 </header>
@@ -405,6 +393,33 @@
                                             @if ($message->reply)
                                                 {!! $message->formatted_reply !!}
                                             @else
+
+                                            <!-- Overlay réflexion IA (à rendre seulement pendant le stream) -->
+<div
+  class="fixed inset-0 z-40 flex items-center justify-center
+         pointer-events-none
+         bg-black/10 backdrop-blur-[1px]"
+>
+  <!-- Petit pill propre au centre -->
+  <div
+    class="flex items-center gap-3
+           rounded-full border border-white/10
+           bg-slate-900/80 px-4 py-2
+           shadow-lg shadow-black/40"
+  >
+    <!-- 3 petits points animés -->
+    <div class="flex items-center gap-1.5">
+      <span class="h-2 w-2 rounded-full bg-slate-300 animate-bounce"></span>
+      <span class="h-2 w-2 rounded-full bg-slate-400 animate-bounce [animation-delay:120ms]"></span>
+      <span class="h-2 w-2 rounded-full bg-slate-500 animate-bounce [animation-delay:240ms]"></span>
+    </div>
+
+    <span class="text-[11px] font-medium tracking-wide text-slate-100/80 uppercase">
+      L’IA réfléchit…
+    </span>
+  </div>
+</div>
+
                                                 <div class="flex items-center gap-2 text-sm text-white/70"
                                                     x-intersect.once="$wire.look({{ $message->id }})">
                                                     <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -433,7 +448,7 @@
                     <form wire:submit.prevent="sendMessage" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
                         <div class="w-full">
                             <label for="chat-message" class="sr-only">Votre message</label>
-                            <textarea id="chat-message" wire:model.defer="body" rows="2"
+                            <input id="chat-message" wire:model.defer="body" rows="2"
                                 placeholder="Decrivez votre besoin, posez une question, demandez un devis..."
                                 class="w-full resize-none rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"></textarea>
                             @error('body')

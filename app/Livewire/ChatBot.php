@@ -391,6 +391,7 @@ class ChatBot extends Component
         $rawResponse = '';
         $buffer = '';
         $receivedStream = false;
+        $component = $this;
 
         $ch = curl_init($endpoint);
 
@@ -403,7 +404,7 @@ class ChatBot extends Component
             ],
             CURLOPT_POSTFIELDS => json_encode($payload),
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use (&$rawResponse, &$buffer, &$receivedStream, $onChunk) {
+            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use (&$rawResponse, &$buffer, &$receivedStream, $onChunk, $component) {
                 $rawResponse .= $chunk;
                 $buffer .= str_replace("\r", '', $chunk);
 
@@ -411,22 +412,8 @@ class ChatBot extends Component
                     $packet = substr($buffer, 0, $position);
                     $buffer = substr($buffer, $position + 2);
 
-                    foreach (explode("\n", $packet) as $line) {
-                        $line = trim($line);
-
-                        if ($line === '' || $line === 'data: [DONE]') {
-                            continue;
-                        }
-
-                        if (str_starts_with($line, 'data: ')) {
-                            $payload = json_decode(substr($line, 6), true);
-                            $delta = data_get($payload, 'choices.0.delta.content');
-
-                            if ($delta) {
-                                $receivedStream = true;
-                                $onChunk($delta);
-                            }
-                        }
+                    if ($component->emitStreamPacket($packet, $onChunk)) {
+                        $receivedStream = true;
                     }
                 }
 
@@ -435,6 +422,10 @@ class ChatBot extends Component
         ]);
 
         $result = curl_exec($ch);
+
+        if ($buffer !== '' && $this->emitStreamPacket($buffer, $onChunk)) {
+            $receivedStream = true;
+        }
 
         if ($result === false) {
             $error = curl_error($ch);
@@ -447,8 +438,7 @@ class ChatBot extends Component
         curl_close($ch);
 
         if (! $receivedStream && $rawResponse !== '') {
-            $decoded = json_decode($rawResponse, true);
-            $content = data_get($decoded, 'choices.0.message.content');
+            $content = $this->extractContentFromRawResponse($rawResponse);
 
             if ($content) {
                 $onChunk($content);
@@ -464,6 +454,126 @@ class ChatBot extends Component
     private function streamChunk(int $messageId, string $chunk, bool $replace = false): void
     {
         $this->stream('reply-'.$messageId, $this->formatReply($chunk), $replace);
+    }
+
+    private function emitStreamPacket(string $packet, callable $onChunk): bool
+    {
+        $emitted = false;
+
+        foreach (explode("\n", $packet) as $line) {
+            $line = trim($line);
+
+            if ($line === '' || $line === 'data: [DONE]' || $line === '[DONE]') {
+                continue;
+            }
+
+            if (str_starts_with($line, 'data:')) {
+                $line = ltrim(substr($line, 5));
+            }
+
+            if ($line === '' || $line === '[DONE]') {
+                continue;
+            }
+
+            $payload = json_decode($line, true);
+
+            if (! is_array($payload)) {
+                continue;
+            }
+
+            $chunk = $this->extractChunkContent($payload);
+
+            if ($chunk === null || $chunk === '') {
+                continue;
+            }
+
+            $onChunk($chunk);
+            $emitted = true;
+        }
+
+        return $emitted;
+    }
+
+    private function extractContentFromRawResponse(string $rawResponse): ?string
+    {
+        $lines = preg_split("/\r?\n/", trim($rawResponse));
+
+        if (! $lines) {
+            return null;
+        }
+
+        for ($index = count($lines) - 1; $index >= 0; $index--) {
+            $line = trim($lines[$index]);
+
+            if ($line === '') {
+                continue;
+            }
+
+            if (str_starts_with($line, 'data:')) {
+                $line = ltrim(substr($line, 5));
+            }
+
+            if ($line === '' || $line === '[DONE]') {
+                continue;
+            }
+
+            $decoded = json_decode($line, true);
+
+            if (! is_array($decoded)) {
+                continue;
+            }
+
+            $content = $this->extractChunkContent($decoded);
+
+            if ($content) {
+                return $content;
+            }
+        }
+
+        return null;
+    }
+
+    private function extractChunkContent(array $payload): ?string
+    {
+        $candidates = [
+            data_get($payload, 'choices.0.delta.content'),
+            data_get($payload, 'choices.0.text'),
+            data_get($payload, 'choices.0.message.content'),
+            data_get($payload, 'message.content'),
+            data_get($payload, 'response'),
+            data_get($payload, 'content'),
+        ];
+
+        foreach ($candidates as $candidate) {
+            $chunk = $this->stringifyChunk($candidate);
+
+            if ($chunk !== null && $chunk !== '') {
+                return $chunk;
+            }
+        }
+
+        return null;
+    }
+
+    private function stringifyChunk(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            $result = '';
+
+            array_walk_recursive($value, function ($piece) use (&$result) {
+                if (is_string($piece)) {
+                    $result .= $piece;
+                }
+            });
+
+            return $result;
+        }
+
+        return null;
     }
 
     private function formatReply(?string $content): string
