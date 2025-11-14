@@ -67,44 +67,6 @@
     :title="__('Espace Super-Admin')"
     :subtitle="__('')"
 >
-    <div class="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <aside class="space-y-6 rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-lg ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
-                    {{ __('Menu principal') }}
-                </p>
-                <h2 class="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
-                    {{ __('Modules clefs') }}
-                </h2>
-            </div>
-            <nav>
-                <ul class="space-y-3">
-                    @foreach ($modules as $module)
-                        <li>
-                            <a
-                                href="{{ $module['route'] }}"
-                                class="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white/70 p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-white dark:border-slate-800 dark:bg-slate-900/80 dark:hover:border-indigo-500/40"
-                            >
-                                <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-200">
-                                    <span class="material-symbols-outlined text-2xl">{{ $module['icon'] }}</span>
-                                </span>
-                                <div class="flex-1">
-                                    <p class="text-sm font-semibold text-slate-900 transition group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-200">
-                                        {{ $module['title'] }}
-                                    </p>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">
-                                        {{ $module['description'] }}
-                                    </p>
-                                </div>
-                                <span class="material-symbols-outlined text-base text-slate-400 transition group-hover:text-indigo-500 dark:text-slate-500">
-                                    chevron_right
-                                </span>
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </nav>
-        </aside>
 
         <section class="space-y-8">
             <div class="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-lg ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80">
@@ -117,5 +79,4 @@
             </div>
         </section>
 
-    </div>
 </x-admin.global-layout>
