@@ -3,11 +3,7 @@
         <div class="mx-auto max-w-6xl space-y-14 px-4 py-12 sm:px-6 lg:px-8">
             <x-eleve.notification-messages />
 
-            <x-eleve.home.identity-panel :team="$team" />
-
-
-
-              @if($availableFormationsCount === 0)
+            @if($availableFormationsCount === 0)
               <div class="rounded-2xl border border-red-200 bg-red-50 px-6 py-4">
                 <div class="flex items-start gap-3">
                   <div class="flex-shrink-0">

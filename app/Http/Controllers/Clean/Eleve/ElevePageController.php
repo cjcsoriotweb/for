@@ -83,6 +83,14 @@ class ElevePageController extends Controller
 
     public function home(Team $team)
     {
+        $sessionKey = sprintf('eleve_intro_shown_team_%d', $team->id);
+
+        if (! session()->has($sessionKey)) {
+            session([$sessionKey => true]);
+
+            return view('in-application.eleve.intro', compact('team'));
+        }
+
         $user = Auth::user();
 
         // R├®cup├®rer les formations actuelles de l'├®tudiant
