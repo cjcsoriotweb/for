@@ -10,10 +10,13 @@ use App\Models\SupportTicket;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
+use App\Models\UserActivityLog;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
@@ -355,6 +358,76 @@ class SuperadminPageController extends Controller
             'users' => $users,
             'search' => $search,
         ]);
+    }
+
+    public function impersonateUser(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'ip_address' => ['required', 'ip'],
+        ]);
+
+        if ($request->session()->has('superadmin_impersonation')) {
+            return redirect()->back()->with('warning', __('Veuillez revenir à votre session Super-Admin avant d\'impersonner un autre utilisateur.'));
+        }
+
+        $originalUser = $request->user();
+        if (! $originalUser || $originalUser->id === $user->id) {
+            return redirect()->back()->with('warning', __('Impossible d\'impersonner ce compte.'));
+        }
+
+        $impersonationPayload = [
+            'original_user_id' => $originalUser->id,
+            'original_user_name' => $originalUser->name,
+            'target_user_id' => $user->id,
+            'target_user_name' => $user->name,
+            'ip_address' => $validated['ip_address'],
+            'started_at' => now()->toIso8601String(),
+            'target_url' => url('/'),
+        ];
+
+        UserActivityLog::create([
+            'user_id' => $user->id,
+            'session_id' => Session::getId(),
+            'ip_address' => $validated['ip_address'],
+            'user_agent' => $request->userAgent(),
+            'url' => url('/'),
+            'method' => 'IMPERSONATE',
+            'referrer' => route('superadmin.users.index'),
+            'started_at' => now(),
+            'ended_at' => now(),
+            'duration_seconds' => 0,
+            'request_data' => [
+                'impersonated_by' => $originalUser->id,
+                'impersonated_by_email' => $originalUser->email,
+            ],
+        ]);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $request->session()->put('superadmin_impersonation', $impersonationPayload);
+
+        return redirect()->to(url('/'));
+    }
+
+    public function stopImpersonation(Request $request)
+    {
+        $impersonation = $request->session()->pull('superadmin_impersonation');
+
+        if (! is_array($impersonation) || empty($impersonation['original_user_id'])) {
+            return redirect()->route('superadmin.overview')->with('warning', __('Aucune session d\'impersonation en cours.'));
+        }
+
+        $originalUser = User::find($impersonation['original_user_id']);
+
+        if (! $originalUser || ! $originalUser->superadmin) {
+            Auth::logout();
+            return redirect()->route('login')->with('warning', __('Le compte Super-Admin d\'origine est introuvable.'));
+        }
+
+        Auth::login($originalUser);
+        $request->session()->regenerate();
+
+        return redirect()->route('superadmin.overview')->with('status', __('Vous êtes revenu à votre session Super-Admin.'));
     }
 
     public function userShow(User $user)

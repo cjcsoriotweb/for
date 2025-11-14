@@ -58,13 +58,33 @@
                                 {{ __('Inscrit le') }} : {{ optional($user->created_at)->translatedFormat('d M Y') }}
                             </span>
                         </div>
-                        <a
-                            href="{{ route('superadmin.users.show', $user) }}"
-                            class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                        >
-                            <span class="material-symbols-outlined text-sm">visibility</span>
-                            {{ __('Voir profil') }}
-                        </a>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <form
+                                method="POST"
+                                action="{{ route('superadmin.users.impersonate', $user) }}"
+                            >
+                                @csrf
+                                <input type="hidden" name="ip_address" value="" />
+                                <button
+                                    type="button"
+                                    data-impersonate-trigger="1"
+                                    data-impersonate-user-name="{{ $user->name }}"
+                                    class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:bg-slate-700"
+                                >
+                                    <span class="material-symbols-outlined text-sm">switch_account</span>
+                                    <span class="sr-only">
+                                        {{ __('Se connecter en tant que :name', ['name' => $user->name]) }}
+                                    </span>
+                                </button>
+                            </form>
+                            <a
+                                href="{{ route('superadmin.users.show', $user) }}"
+                                class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                            >
+                                <span class="material-symbols-outlined text-sm">visibility</span>
+                                {{ __('Voir profil') }}
+                            </a>
+                        </div>
                     </div>
                 </article>
             @empty
@@ -78,4 +98,45 @@
             {{ $users->links() }}
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('[data-impersonate-trigger]').forEach(function (button) {
+                    button.addEventListener('click', function (event) {
+                        event.preventDefault();
+
+                        var form = button.closest('form');
+                        if (! form) {
+                            return;
+                        }
+
+                        var ipInput = form.querySelector('input[name="ip_address"]');
+                        if (! ipInput) {
+                            return;
+                        }
+
+                        var userName = button.dataset.impersonateUserName || '';
+                        var promptMessage = userName
+                            ? "Quelle adresse IP devons-nous enregistrer pour " + userName + " ?"
+                            : "Quelle adresse IP devons-nous enregistrer pour ce compte ?";
+
+                        var rawIp = window.prompt(promptMessage, '');
+                        if (rawIp === null) {
+                            return;
+                        }
+
+                        var ip = rawIp.trim();
+                        if (ip === '') {
+                            window.alert("Veuillez saisir une adresse IP valide.");
+                            return;
+                        }
+
+                        ipInput.value = ip;
+                        form.submit();
+                    });
+                });
+            });
+        </script>
+    @endpush
 </x-admin.global-layout>
