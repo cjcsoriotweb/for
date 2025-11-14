@@ -1,7 +1,7 @@
 @if (Auth::user()->superadmin)
     <button type="button" command="--toggle" commandfor="products"
         class="flex w-full items-center justify-between rounded-lg py-2 pr-3.5 pl-3 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">
-        {{ __('Superadmin') }}
+        {{ __('Super-Admin') }}
         <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true"
             class="size-5 flex-none in-aria-expanded:rotate-180">
             <path

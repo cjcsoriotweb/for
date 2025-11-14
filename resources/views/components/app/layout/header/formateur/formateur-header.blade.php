@@ -58,26 +58,6 @@
 
       </div>
 
-      <!-- Pied de popover -->
-      <div class="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
-        <a href="#" class="flex items-center justify-center gap-x-2.5 p-3 text-sm/6 font-semibold text-gray-900 hover:bg-gray-100">
-          <!-- Icône lecture / démo -->
-          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-5 flex-none text-gray-400">
-            <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0Zm6.39-2.908a.75.75 0 0 1 .766.027l3.5 2.25a.75.75 0 0 1 0 1.262l-3.5 2.25A.75.75 0 0 1 8 12.25v-4.5a.75.75 0 0 1 .39-.658Z"/>
-          </svg>
-          Documentation
-        </a>
-        <a href="#" class="flex items-center justify-center gap-x-2.5 p-3 text-sm/6 font-semibold text-gray-900 hover:bg-gray-100">
-          <!-- Icône contact -->
-          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-5 flex-none text-gray-400">
-            <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M2 3.5A1.5 1.5 0 0 1 3.5 2h13A1.5 1.5 0 0 1 18 3.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 2 16.5v-13Zm2.06 2.56a.75.75 0 0 0 0 1.06l3.75 3.75a2.5 2.5 0 0 0 3.54 0l3.75-3.75a.75.75 0 1 0-1.06-1.06L9.79 9.31a1 1 0 0 1-1.41 0L4.94 6.06a.75.75 0 0 0-1.06 0Z"/>
-          </svg>
-          Nous contacter
-        </a>
-      </div>
-
     </el-popover>
   </div>
 @endif
