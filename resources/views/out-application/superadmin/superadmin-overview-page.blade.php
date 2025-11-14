@@ -37,6 +37,28 @@
             'icon' => 'book',
             'route' => route('superadmin.compta.index'),
         ],
+
+        [
+            'title' => __('Assistant IA'),
+            'description' => __('Dialogue et recherches IA dans un iframe sécurisé.'),
+            'stat' => '',
+            'icon' => 'smart_toy',
+            'route' => route('superadmin.assistant'),
+        ],
+        [
+            'title' => __('Console debug'),
+            'description' => __('Exécutez des commandes Artisan supervisées.'),
+            'stat' => '',
+            'icon' => 'terminal',
+            'route' => route('superadmin.console'),
+        ],
+        [
+            'title' => __('Base de données'),
+            'description' => __('PhpMyAdmin et sauvegardes en un clic.'),
+            'stat' => '',
+            'icon' => 'dns',
+            'route' => route('superadmin.db'),
+        ],
     ];
 @endphp
 
@@ -85,56 +107,15 @@
         </aside>
 
         <section class="space-y-8">
-            <div class="rounded-3xl border border-slate-100 bg-white/90 p-6 shadow-lg ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80">
-                <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
-                            {{ __('Visionnage par defaut') }}
-                        </p>
-                        <h2 class="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
-                            {{ __('Assistant') }}
-                        </h2>
-                    </div>
-                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-100">
-                        {{ __('Iframe') }}
-                    </span>
-                </div>
-                <iframe
-                    src="{{ config('services.goodview_genie_url') }}"
-                    class="h-[60vh] w-full rounded-2xl border border-slate-100 shadow-inner dark:border-slate-800"
-                    loading="lazy"
-                    title="Goodview NAS"
-                ></iframe>
+            <div class="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-lg ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-sm text-slate-600 dark:text-slate-300">
+                    {{ __('Utilisez le menu principal à gauche pour lancer l’assistant, la console ou la vue base de données.') }}
+                </p>
+                <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">
+                    {{ __('Aucune vignette n’est affichée côté contenu pour garder cette page dégagée.') }}
+                </p>
             </div>
-
-            <section class="rounded-3xl border border-slate-100 bg-gradient-to-r from-indigo-500 to-sky-500 p-8 shadow-lg ring-1 ring-black/5 transition dark:border-slate-800">
-                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-white/90">
-                            {{ __('Utilitaires') }}
-                        </p>
-                        <h2 class="text-2xl font-semibold text-white">
-                            {{ __('Console debug') }}
-                        </h2>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        <a
-                            href="{{ route('superadmin.console') }}"
-                            class="inline-flex items-center justify-center rounded-2xl border border-white/50 bg-white/90 px-6 py-3 text-sm font-semibold text-indigo-600 transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                        >
-                            {{ __('Developpeur') }}
-                        </a>
-                        <a
-                            href="{{ route('superadmin.db') }}"
-                            target="_blank"
-                            rel="noreferrer"
-                            class="inline-flex items-center justify-center rounded-2xl border border-white/50 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                        >
-                            {{ __('Base de donnée') }}
-                        </a>
-                    </div>
-                </div>
-            </section>
         </section>
+
     </div>
 </x-admin.global-layout>

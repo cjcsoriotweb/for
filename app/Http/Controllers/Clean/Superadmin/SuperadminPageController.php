@@ -40,6 +40,11 @@ class SuperadminPageController extends Controller
         return view('out-application.superadmin.superadmin-console-page');
     }
 
+    public function assistant()
+    {
+        return view('out-application.superadmin.superadmin-assistant-page');
+    }
+
     public function comptaDashboard(Request $request)
     {
         $filterMonth = $request->query('filter_month');
