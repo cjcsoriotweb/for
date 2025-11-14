@@ -256,8 +256,38 @@
                                                 </div>
                                             @endif
                                             </div>
-                                        </div>
                                     </div>
+                                    </div>
+                                    @if ($loop->last && $message->reply && $streamingMessageId !== $message->id)
+                                        <div class="flex items-center gap-3 text-xs text-white/70">
+                                            <span class="uppercase tracking-[0.35em] text-white/50">
+                                                Réagir
+                                            </span>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button"
+                                                    wire:click="rateMessage({{ $message->id }}, true)"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="rateMessage"
+                                                    class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-3 py-2 text-[0.65rem] font-semibold text-emerald-300 transition hover:border-emerald-400 hover:text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-300/40"
+                                                    title="Pouce en l'air">
+                                                    <span aria-hidden="true" class="text-base leading-none">👍</span>
+                                                    <span class="sr-only">J'aime cette réponse</span>
+                                                </button>
+                                                <button type="button"
+                                                    wire:click="rateMessage({{ $message->id }}, false)"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="rateMessage"
+                                                    class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-3 py-2 text-[0.65rem] font-semibold text-rose-300 transition hover:border-rose-400 hover:text-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-300/40"
+                                                    title="Pouce vers le bas - régénérer la réponse">
+                                                    <span aria-hidden="true" class="text-base leading-none">👎</span>
+                                                    <span class="sr-only">Je n'aime pas cette réponse, régénère-la</span>
+                                                </button>
+                                            </div>
+                                            <p class="text-[0.65rem] uppercase tracking-[0.35em] text-white/40">
+                                                Le pouce vers le bas demande une nouvelle réponse.
+                                            </p>
+                                        </div>
+                                    @endif
                                     @if ($message->indication)
                                         <div class="flex justify-start">
                                             <div

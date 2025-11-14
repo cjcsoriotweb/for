@@ -40,6 +40,8 @@ class ChatBot extends Component
 
     public string $body = '';
 
+    public ?int $streamingMessageId = null;
+
     protected array $rules = [
         'body' => 'required|string|min:1|max:500',
     ];
@@ -148,6 +150,8 @@ class ChatBot extends Component
 
         $this->ensureActiveModelLoaded();
 
+        $this->streamingMessageId = $message->id;
+
         try {
             $this->streamReplyFor($message);
         } catch (Throwable $exception) {
@@ -156,10 +160,40 @@ class ChatBot extends Component
             $message->save();
 
             $this->streamChunk($message->id, $fallback, true);
+        } finally {
+            $this->streamingMessageId = null;
         }
 
         $this->fetchMessage();
         $this->fetchConversations();
+    }
+
+    public function rateMessage(int $messageId, bool $positive): void
+    {
+        $userId = Auth::id();
+
+        if (! $userId || $this->conversationId === null) {
+            return;
+        }
+
+        $message = ChatWithBot::query()
+            ->where('user_id', $userId)
+            ->where('chatbot_conversation_id', $this->conversationId)
+            ->whereKey($messageId)
+            ->first();
+
+        if (! $message) {
+            return;
+        }
+
+        if ($positive) {
+            return;
+        }
+
+        $message->reply = '';
+        $message->save();
+
+        $this->look($messageId);
     }
 
     public function clearConversation(): void
