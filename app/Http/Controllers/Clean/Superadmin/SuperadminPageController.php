@@ -28,6 +28,9 @@ class SuperadminPageController extends Controller
             'invitations' => TeamInvitation::count(),
             'tickets' => SupportTicket::count(),
             'completion_requests_pending' => FormationUser::where('completion_request_status', 'pending')->count(),
+            'tickets_pending_resolution' => SupportTicket::query()
+                ->whereIn('status', [SupportTicket::STATUS_OPEN, SupportTicket::STATUS_PENDING])
+                ->count(),
         ];
 
         return view('out-application.superadmin.superadmin-overview-page', [

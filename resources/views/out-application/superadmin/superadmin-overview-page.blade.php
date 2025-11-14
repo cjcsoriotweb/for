@@ -90,6 +90,13 @@
             'icon' => 'check_circle',
             'route' => route('superadmin.completion-requests.index'),
         ],
+        [
+            'label' => __('Tickets en attente de résolution'),
+            'value' => number_format($stats->get('tickets_pending_resolution', 0)),
+            'description' => __('Demandes support à traiter'),
+            'icon' => 'support_agent',
+            'route' => route('superadmin.support.index'),
+        ],
     ];
 @endphp
 
@@ -100,22 +107,6 @@
 >
 
         <section class="space-y-8">
-            <div class="rounded-3xl  border-slate-100 bg-white/90 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80">
-                <div class="space-y-5 lg:space-y-8">
-                    <div class="space-y-2">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                            {{ __('Bureau central') }}
-                        </p>
-                        <h1 class="text-2xl font-semibold leading-tight text-slate-900 dark:text-white">
-                            {{ __('Vue d’ensemble Super-Admin') }}
-                        </h1>
-                        <p class="text-sm text-slate-600 dark:text-slate-300">
-                            {{ __('Suivez les métriques clés, apportez un soutien immédiat et basculez vers un module en un clic.') }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <div class="space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
