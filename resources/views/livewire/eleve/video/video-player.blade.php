@@ -1,13 +1,46 @@
 <div>
+    <style>
+        [data-fullscreen-root].video-player--fake-fullscreen {
+            position: fixed;
+            inset: 0;
+            z-index: 10001;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background-color: #030712;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(1rem, 2vw, 1.5rem);
+            border-radius: 0;
+        }
+        [data-fullscreen-root].video-player--fake-fullscreen [data-player-video-wrapper] {
+            flex: 1;
+            min-height: 0;
+        }
+        [data-fullscreen-root].video-player--fake-fullscreen [data-player-video-panel] {
+            aspect-ratio: auto !important;
+            height: 100%;
+        }
+        [data-fullscreen-root].video-player--fake-fullscreen [data-player-video-panel] video {
+            height: 100%;
+            width: 100%;
+            object-fit: contain;
+        }
+        [data-fullscreen-root].video-player--fake-fullscreen [data-player-controls] {
+            width: 100%;
+        }
+    </style>
 
     <main class="flex flex-1 justify-center py-8 px-4 sm:px-6 lg:px-8">
         <div class="layout-content-container flex flex-col w-full max-w-5xl flex-1">
-            <div class="flex flex-col gap-6">
-                <div class="relative group">
+            <div class="flex flex-col gap-6" data-fullscreen-root>
+                <div class="relative group" data-player-video-wrapper>
 
                     <div class="relative flex items-center justify-center bg-black bg-cover bg-center aspect-video rounded-xl overflow-hidden shadow-lg"
                         data-alt="Abstract gradient background for video placeholder"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8uTSDep5uWpkw20gfP_oegiJ9Sz_XPzoDXWLXm5VgUB4rOfJV32Vw3rYBIR3IxKonTtVGIp1QRrdxf2BIDXgHfhhr4kDfX7evvAPSTW_jIbGBKlqkAACVXHNEnhs4WDuil3uNEiP4zVpGjoyaO3FtaTbCHu0mg5IAlfnRuGvZnzcjjUV1NGLu-PQcivjrp2H88e5L1BhWkaOLDaN63UV_piT4lDTNKF4LZbpKl9FevxmaS7OLf9UjyJAGK8XEjTH076805Qn4tmk");' data-fullscreen-root>
+                        data-player-video-panel
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8uTSDep5uWpkw20gfP_oegiJ9Sz_XPzoDXWLXm5VgUB4rOfJV32Vw3rYBIR3IxKonTtVGIp1QRrdxf2BIDXgHfhhr4kDfX7evvAPSTW_jIbGBKlqkAACVXHNEnhs4WDuil3uNEiP4zVpGjoyaO3FtaTbCHu0mg5IAlfnRuGvZnzcjjUV1NGLu-PQcivjrp2H88e5L1BhWkaOLDaN63UV_piT4lDTNKF4LZbpKl9FevxmaS7OLf9UjyJAGK8XEjTH076805Qn4tmk");'>
                         @php
                             $videoSource = null;
 
@@ -59,7 +92,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4" data-player-controls>
 
                     @php
                         $formatTime = function ($seconds) {
@@ -213,8 +246,47 @@
             const video = getVideo();
             return video ? video.parentElement : null;
         };
+        const FAKE_FULLSCREEN_CLASS = 'video-player--fake-fullscreen';
+        let previousDocumentOverflow = '';
+        let fakeFullscreenKeyListenerBound = false;
+        const isFakeFullscreenActive = () => {
+            const target = getFullscreenTarget();
+            return Boolean(target && target.classList.contains(FAKE_FULLSCREEN_CLASS));
+        };
+        const applyDocumentOverflowState = (enabled) => {
+            const rootElement = document.documentElement;
+            if (!rootElement) return;
+            if (enabled) {
+                previousDocumentOverflow = rootElement.style.overflow;
+                rootElement.style.overflow = 'hidden';
+            } else {
+                rootElement.style.overflow = previousDocumentOverflow || '';
+                previousDocumentOverflow = '';
+            }
+        };
+        const updateFullscreenIcon = () => {
+            const { icon } = getFullscreenElements();
+            if (!icon) return;
+            icon.textContent = isFakeFullscreenActive() ? 'fullscreen_exit' : 'fullscreen';
+        };
+        const toggleFakeFullscreen = () => {
+            const target = getFullscreenTarget();
+            if (!target) return;
+            const entering = !target.classList.contains(FAKE_FULLSCREEN_CLASS);
+            target.classList.toggle(FAKE_FULLSCREEN_CLASS, entering);
+            applyDocumentOverflowState(entering);
+            updateFullscreenIcon();
+        };
+        const bindFakeFullscreenKeyListener = () => {
+            if (fakeFullscreenKeyListenerBound) return;
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && isFakeFullscreenActive()) {
+                    toggleFakeFullscreen();
+                }
+            });
+            fakeFullscreenKeyListenerBound = true;
+        };
         let lastKnownVolume = 1;
-        let fullscreenChangeBound = false;
         const formatTime = (seconds) => {
             const value = Math.max(0, Math.floor(seconds || 0));
             const hrs = Math.floor(value / 3600);
@@ -247,22 +319,6 @@
                 slider.value = volume;
             }
             updateVolumeIcon(volume, targetVideo.muted);
-        };
-        const requestBrowserFullscreen = (element) => {
-            if (!element) return Promise.resolve();
-            if (element.requestFullscreen) return element.requestFullscreen();
-            if (element.webkitRequestFullscreen) return element.webkitRequestFullscreen();
-            return Promise.resolve();
-        };
-        const exitBrowserFullscreen = () => {
-            if (document.exitFullscreen) return document.exitFullscreen();
-            if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
-            return Promise.resolve();
-        };
-        const updateFullscreenIcon = () => {
-            const { icon } = getFullscreenElements();
-            if (!icon) return;
-            icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
         };
         const updateAllowedTrack = (video = null) => {
             const targetVideo = video || getVideo();
@@ -372,31 +428,14 @@
         };
         const bindFullscreenControl = () => {
             const { button } = getFullscreenElements();
-            const target = getFullscreenTarget();
-            if (!button || !target) return;
+            if (!button || !getFullscreenTarget()) return;
 
             if (button.dataset.bound !== 'true') {
-                button.addEventListener('click', async () => {
-                    if (document.fullscreenElement === target) {
-                        await exitBrowserFullscreen();
-                    } else {
-                        try {
-                            await requestBrowserFullscreen(target);
-                        } catch (error) {
-                            console.warn('Unable to enter fullscreen', error);
-                        }
-                    }
-                });
+                button.addEventListener('click', toggleFakeFullscreen);
                 button.dataset.bound = 'true';
             }
 
-            if (!fullscreenChangeBound) {
-                ['fullscreenchange', 'webkitfullscreenchange'].forEach((eventName) => {
-                    document.addEventListener(eventName, updateFullscreenIcon);
-                });
-                fullscreenChangeBound = true;
-            }
-
+            bindFakeFullscreenKeyListener();
             updateFullscreenIcon();
         };
 

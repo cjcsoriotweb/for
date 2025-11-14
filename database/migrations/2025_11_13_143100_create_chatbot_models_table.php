@@ -31,6 +31,17 @@ return new class extends Migration
                 'updated_at' => now(),
             ],
         ]);
+
+        DB::table('chatbot_models')->insert([
+            [
+                'key' => 'dev-',
+                'name' => 'Assistant Evolubat',
+                'image' => '/images/chatbot/models/macon.png',
+                'description' => 'Specialiste des reponses liees a la maçonnerie et aux travaux de gros oeuvre.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
     }
 
     /**
