@@ -186,17 +186,32 @@
                                         </div>
                                     </div>
 
-                                    <div class="flex justify-start">
+                                    <div class="flex justify-start gap-3">
+                                        <div class="flex-shrink-0">
+                                            @if (! empty($activeModel['image'] ?? null))
+                                                <img src="{{ asset($activeModel['image']) }}"
+                                                    alt="{{ $activeModel['name'] ?? 'EvoBot' }}"
+                                                    class="h-10 w-10 rounded-full object-cover border border-white/20" />
+                                            @else
+                                                <div
+                                                    class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/40 text-sm font-semibold uppercase tracking-[0.35em] text-white">
+                                                    EB
+                                                </div>
+                                            @endif
+                                        </div>
                                         <div wire:stream="reply-{{ $message->id }}"
                                             class="max-w-[80%] rounded-3xl bg-white/10 px-5 py-4 text-sm leading-relaxed text-white shadow-lg shadow-slate-900/40">
-                                            <div
-                                                class="flex items-center gap-2 text-[11px] uppercase tracking-wide text-emerald-300">
-                                                <span>EvoBot</span>
-                                                <span class="text-white/60">{{ $message['time'] }}</span>
-                                            </div>
-                                            <div class="mt-2 text-base font-semibold leading-relaxed text-white">
+                                      
+                                            <div class="mt-2">
                                                 @if ($message->reply)
-                                                    {!! $message->formatted_reply !!}
+                                                    <div class="space-y-3">
+                                                        @foreach ($message->segments as $segment)
+                                                            <div
+                                                                class="rounded-3xl bg-white/5 px-5 py-4 text-base font-semibold leading-relaxed text-white shadow-inner shadow-slate-900/30">
+                                                                {!! $segment !!}
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 @else
                                                     <!-- Overlay réflexion IA (à rendre seulement pendant le stream) -->
                                                     <div
@@ -237,12 +252,25 @@
                                                             <path class="opacity-75" fill="currentColor"
                                                                 d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
                                                         </svg>
-                                                        EvoBot est en train d'ecrire...
-                                                    </div>
-                                                @endif
+                                                    EvoBot est en train d'ecrire...
+                                                </div>
+                                            @endif
                                             </div>
                                         </div>
                                     </div>
+                                    @if ($message->indication)
+                                        <div class="flex justify-start">
+                                            <div
+                                                class="max-w-[70%] rounded-3xl border border-white/20 bg-slate-800/70 px-5 py-3 text-xs leading-relaxed text-white/80 shadow-lg shadow-slate-900/30">
+                                                <p class="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-emerald-200">
+                                                    Indication
+                                                </p>
+                                                <p class="mt-2 text-[0.8rem] text-white/70">
+                                                    {!! $message->indication !!}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             @empty
                                 <p class="text-center text-sm text-white/60">

@@ -70,7 +70,11 @@ class ChatBot extends Component
             ->map(function (ChatWithBot $message) {
                 $message->sender = 'user';
                 $message->time = optional($message->created_at)->format('H:i');
-                $message->formatted_reply = $this->formatReply($message->reply);
+
+                [$reply, $indication] = $this->splitReplyAndIndication($message->reply);
+                $message->segments = $this->buildReplySegments($reply);
+                $message->formatted_reply = $message->segments[0] ?? $this->formatReply($reply);
+                $message->indication = $indication ? $this->formatReply($indication) : null;
 
                 return $message;
             })
@@ -574,6 +578,77 @@ class ChatBot extends Component
         }
 
         return null;
+    }
+
+    private function splitReplyAndIndication(?string $reply): array
+    {
+        if (! $reply) {
+            return ['', null];
+        }
+
+        $trimmed = trim($reply);
+
+        if ($trimmed === '') {
+            return ['', null];
+        }
+
+        if (preg_match('/^(.*?)\s*\(\[\s*(.+?)\s*\]\)\s*$/is', $trimmed, $matches)) {
+            $main = trim($matches[1]);
+            $indicator = trim($matches[2]);
+
+            return [$main, $indicator === '' ? null : $indicator];
+        }
+
+        return [$trimmed, null];
+    }
+
+    private function buildReplySegments(?string $reply): array
+    {
+        if (! $reply) {
+            return [];
+        }
+
+        $trimmed = trim($reply);
+
+        if ($trimmed === '') {
+            return [];
+        }
+
+        $segments = [];
+        $current = '';
+
+        foreach (preg_split('//u', $trimmed, -1, PREG_SPLIT_NO_EMPTY) ?: [] as $char) {
+            $current .= $char;
+
+            if ($char === '?') {
+                $segments[] = trim($current);
+                $current = '';
+            }
+        }
+
+        if (trim($current) !== '') {
+            $segments[] = trim($current);
+        }
+
+        $formatted = [];
+
+        foreach ($segments as $segment) {
+            $formattedSegment = $this->formatReply($segment);
+
+            if ($formattedSegment !== '') {
+                $formatted[] = $formattedSegment;
+            }
+        }
+
+        if (empty($formatted)) {
+            $full = $this->formatReply($trimmed);
+
+            if ($full !== '') {
+                $formatted[] = $full;
+            }
+        }
+
+        return $formatted;
     }
 
     private function formatReply(?string $content): string
