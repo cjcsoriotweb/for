@@ -81,10 +81,10 @@
             'icon' => 'school',
         ],
         [
-            'label' => __('Tickets en cours'),
-            'value' => number_format($stats->get('tickets', 0)),
-            'description' => __('Suivi support'),
-            'icon' => 'headset_mic',
+            'label' => __('Formations en attente'),
+            'value' => number_format($stats->get('completion_requests_pending', 0)),
+            'description' => __('Demandes à valider'),
+            'icon' => 'check_circle',
         ],
     ];
 @endphp
@@ -97,44 +97,27 @@
 
         <section class="space-y-8">
             <div class="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-lg ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80">
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-center">
-                    <div class="space-y-3">
+                <div class="space-y-5 lg:space-y-8">
+                    <div class="space-y-2">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                             {{ __('Bureau central') }}
                         </p>
-                        <div>
-                            <h1 class="text-2xl font-semibold leading-tight text-slate-900 dark:text-white">
-                                {{ __('Vue d’ensemble Super-Admin') }}
-                            </h1>
-                            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                                {{ __('Suivez les métriques clés, apportez un soutien immédiat et basculez vers un module en un clic.') }}
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-3 pt-1">
-                            <a href="{{ route('superadmin.support.index') }}"
-                                class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">
-                                {{ __('Ouvrir le support') }}
-                            </a>
-                            <a href="{{ route('superadmin.completion-requests.index') }}"
-                                class="inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:text-white">
-                                {{ __('Valider les formations') }}
-                            </a>
-                        </div>
+                        <h1 class="text-2xl font-semibold leading-tight text-slate-900 dark:text-white">
+                            {{ __('Vue d’ensemble Super-Admin') }}
+                        </h1>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">
+                            {{ __('Suivez les métriques clés, apportez un soutien immédiat et basculez vers un module en un clic.') }}
+                        </p>
                     </div>
-                    <div class="flex-1 rounded-2xl bg-slate-900/95 p-5 text-white shadow-lg shadow-slate-900/20 dark:bg-gradient-to-br dark:from-indigo-900 dark:to-slate-900">
-                        <p class="text-sm font-semibold uppercase tracking-wide text-slate-200">
-                            {{ __('Aperçu instantané') }}
-                        </p>
-                        <p class="mt-2 text-3xl font-semibold">
-                            {{ number_format($stats->get('teams', 0)) }}
-                        </p>
-                        <p class="text-sm text-slate-300">
-                            {{ __('Equipes suivies en temps réel') }}
-                        </p>
-                        <div class="mt-4 flex gap-4 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-300">
-                            <span>{{ __('Tickets ouverts') }} : {{ number_format($stats->get('tickets', 0)) }}</span>
-                            <span>{{ __('Demandes de validation') }} : {{ number_format($stats->get('completion_requests_pending', 0)) }}</span>
-                        </div>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('superadmin.support.index') }}"
+                            class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">
+                            {{ __('Ouvrir le support') }}
+                        </a>
+                        <a href="{{ route('superadmin.completion-requests.index') }}"
+                            class="inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:text-white">
+                            {{ __('Valider les formations') }}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -156,7 +139,7 @@
                                     {{ $stat['label'] }}
                                 </span>
                                 <span class="text-slate-500 dark:text-slate-400">
-                                    <span class="material-symbols-rounded text-base">
+                                <span class="material-symbols-outlined text-base">
                                         {{ $stat['icon'] }}
                                     </span>
                                 </span>
@@ -189,7 +172,7 @@
                                 <span class="text-sm font-semibold text-slate-800 dark:text-white">
                                     {{ $module['title'] }}
                                 </span>
-                                <span class="material-symbols-rounded text-xl text-slate-400 dark:text-slate-500">
+                                <span class="material-symbols-outlined text-xl text-slate-400 dark:text-slate-500">
                                     {{ $module['icon'] }}
                                 </span>
                             </div>
