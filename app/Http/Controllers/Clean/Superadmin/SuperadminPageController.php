@@ -45,6 +45,37 @@ class SuperadminPageController extends Controller
         return view('out-application.superadmin.superadmin-assistant-page');
     }
 
+    public function databasePage()
+    {
+        $disk = Storage::disk('local');
+        $directory = 'db-backups';
+
+        $backups = collect();
+        if ($disk->exists($directory)) {
+            $backups = collect($disk->files($directory))
+                ->filter(fn ($path) => str_ends_with($path, '.sql'))
+                ->map(function (string $path) use ($disk) {
+                    $name = basename($path);
+                    $modifiedAt = Carbon::createFromTimestamp($disk->lastModified($path));
+                    $size = $disk->size($path);
+
+                    return [
+                        'path' => $path,
+                        'name' => $name,
+                        'human_size' => $this->formatByteSize($size),
+                        'size' => $size,
+                        'modified_at' => $modifiedAt,
+                    ];
+                })
+                ->sortByDesc('modified_at')
+                ->values();
+        }
+
+        return view('out-application.superadmin.superadmin-db-page', [
+            'backups' => $backups,
+        ]);
+    }
+
     public function comptaDashboard(Request $request)
     {
         $filterMonth = $request->query('filter_month');
@@ -767,5 +798,19 @@ class SuperadminPageController extends Controller
         }
 
         return $disk->download($path, $file);
+    }
+
+    private function formatByteSize(int $bytes): string
+    {
+        if ($bytes <= 0) {
+            return '0 o';
+        }
+
+        $units = ['o', 'Ko', 'Mo', 'Go', 'To'];
+        $power = (int) floor(log($bytes, 1024));
+        $power = min($power, count($units) - 1);
+        $value = $bytes / (1024 ** $power);
+
+        return number_format($value, $power === 0 ? 0 : 1, ',', ' ') . ' ' . $units[$power];
     }
 }

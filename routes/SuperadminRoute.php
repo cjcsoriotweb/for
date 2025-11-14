@@ -28,9 +28,7 @@ Route::prefix('superadmin')
         Route::get('/console', [SuperadminPageController::class, 'console'])->name('console');
         Route::get('/assistant', [SuperadminPageController::class, 'assistant'])->name('assistant');
         Route::get('/compta', [SuperadminPageController::class, 'comptaDashboard'])->name('compta.index');
-        Route::get('/db', function () {
-            return view('out-application.superadmin.superadmin-db-page');
-        })->name('db');
+        Route::get('/db', [SuperadminPageController::class, 'databasePage'])->name('db');
         Route::post('/db/backup', [SuperadminPageController::class, 'backupDatabase'])->name('db.backup');
         Route::get('/db/backup/{file}', [SuperadminPageController::class, 'downloadBackup'])->name('db.backup.download')->where('file', '[A-Za-z0-9_.-]+');
         Route::get('/formation-categories', [FormationCategoryController::class, 'index'])->name('formation-categories.index');

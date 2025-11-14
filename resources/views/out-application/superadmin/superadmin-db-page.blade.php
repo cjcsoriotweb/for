@@ -1,5 +1,8 @@
 @php
     $iframeUrl = config('services.phpmyadmin');
+    $backups = $backups ?? collect();
+    $backupsCount = $backups->count();
+    $latestBackup = $backups->first();
 @endphp
 
 <x-admin.global-layout
@@ -46,8 +49,17 @@
                     <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div class="rounded-2xl border border-white/10 bg-white/10 p-4">
                             <dt class="text-xs font-semibold text-slate-300">{{ __('Copies de sécurité') }}</dt>
-                            <dd class="mt-2 text-2xl font-semibold text-white">12</dd>
-                            <p class="text-xs text-slate-400">{{ __('Dernière : il y a 3 heures') }}</p>
+                            <dd class="mt-2 text-2xl font-semibold text-white">{{ $backupsCount }}</dd>
+                            <p class="text-xs text-slate-400">
+                                {{ $latestBackup
+                                    ? __('Dernière : :date', [
+                                        'date' => $latestBackup['modified_at']
+                                            ->locale(app()->getLocale())
+                                            ->isoFormat('LLL'),
+                                    ])
+                                    : __('Aucune sauvegarde enregistrée')
+                                }}
+                            </p>
                         </div>
                         <div class="rounded-2xl border border-white/10 bg-white/10 p-4">
                             <dt class="text-xs font-semibold text-slate-300">{{ __('Serveurs actifs') }}</dt>
@@ -86,6 +98,19 @@
             </div>
         </section>
 
+        @if (session('status'))
+            <section class="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-xl ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80 dark:ring-white/5">
+                <div class="flex items-center justify-between gap-4">
+                    <p class="text-sm text-slate-600 dark:text-slate-200">
+                        {{ session('status') }}
+                    </p>
+                    <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                        {{ __('Info') }}
+                    </span>
+                </div>
+            </section>
+        @endif
+
         @if (session('backup_file'))
             <section class="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-inner ring-1 ring-emerald-300/30 dark:border-emerald-500/40 dark:bg-emerald-900/70">
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -101,6 +126,80 @@
                 </div>
             </section>
         @endif
+
+        <section class="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-xl ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80 dark:ring-white/5">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                        {{ __('Archives') }}
+                    </p>
+                    <h2 class="text-2xl font-semibold text-slate-900 dark:text-white">
+                        {{ __('Sauvegardes disponibles') }}
+                    </h2>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        {{ __('Retrouvez l’historique des exports effectués sur la base et récupérez le fichier qui vous intéresse.') }}
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <div class="rounded-2xl border border-slate-100 bg-slate-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                        {{ __('Total : :count', ['count' => $backupsCount]) }}
+                    </div>
+                    <div class="rounded-2xl border border-slate-100 bg-slate-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                        {{ $latestBackup
+                            ? __('Dernier : :date', [
+                                'date' => $latestBackup['modified_at']
+                                    ->locale(app()->getLocale())
+                                    ->isoFormat('LLL'),
+                            ])
+                            : __('Aucune sauvegarde récente')
+                        }}
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 overflow-x-auto rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+                <table class="min-w-full divide-y divide-slate-100 text-left text-sm dark:divide-slate-800">
+                    <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500 dark:bg-slate-900/50 dark:text-slate-400">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">{{ __('Fichier') }}</th>
+                            <th scope="col" class="px-4 py-3">{{ __('Taille') }}</th>
+                            <th scope="col" class="px-4 py-3">{{ __('Modifié le') }}</th>
+                            <th scope="col" class="px-4 py-3">{{ __('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white text-slate-600 dark:bg-slate-900/80 dark:text-slate-300">
+                        @forelse ($backups as $backup)
+                            <tr class="border-t border-slate-100 dark:border-slate-800">
+                                <td class="px-4 py-4 text-base font-medium text-slate-900 dark:text-white">
+                                    {{ $backup['name'] }}
+                                </td>
+                                <td class="px-4 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    {{ $backup['human_size'] }}
+                                </td>
+                                <td class="px-4 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    {{ $backup['modified_at']
+                                        ->locale(app()->getLocale())
+                                        ->isoFormat('LLL') }}
+                                </td>
+                                <td class="px-4 py-4">
+                                    <a
+                                        href="{{ route('superadmin.db.backup.download', $backup['name']) }}"
+                                        class="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-900/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                                    >
+                                        {{ __('Télécharger') }}
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                                    {{ __('Aucune sauvegarde trouvée. Lancez une nouvelle sauvegarde pour voir les fichiers ici.') }}
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
         <section class="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-xl ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/80 dark:ring-white/5">
             <div class="flex flex-col gap-4">
